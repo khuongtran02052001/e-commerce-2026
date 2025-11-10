@@ -4,9 +4,10 @@ import { Product } from "@/sanity.types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Package, Truck, Shield, Award } from "lucide-react";
+import { IProductMock } from "@/mock-data";
 
 interface ProductSpecsProps {
-  product: Product;
+  product: IProductMock;
 }
 
 const ProductSpecs = ({ product }: ProductSpecsProps) => {
@@ -47,7 +48,7 @@ const ProductSpecs = ({ product }: ProductSpecsProps) => {
           <div className="flex justify-between text-sm">
             <span className="text-gray-600">SKU:</span>
             <span className="font-medium text-xs text-gray-500">
-              #{product?.slug?.current?.slice(-8).toUpperCase()}
+              #{product?.slug?.slice(-8).toUpperCase()}
             </span>
           </div>
         </CardContent>

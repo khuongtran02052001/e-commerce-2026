@@ -1,7 +1,7 @@
 import React, { Suspense } from "react";
 import Container from "@/components/Container";
 import Title from "@/components/Title";
-import { getAllProducts, getCategories, getAllBrands } from "@/sanity/queries";
+// import { getAllProducts, getCategories, getAllBrands } from "@/sanity/queries";
 import ProductCatalog from "@/components/ProductCatalog";
 
 import { ArrowRight, Package, Filter, Search } from "lucide-react";
@@ -13,13 +13,18 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { mockBrands, mockCategories, mockProducts } from "@/mock-data";
 
 const ProductPage = async () => {
-  const [products, categories, brands] = await Promise.all([
-    getAllProducts(),
-    getCategories(),
-    getAllBrands(),
-  ]);
+  // const [products, categories, brands] = await Promise.all([
+  //   getAllProducts(),
+  //   getCategories(),
+  //   getAllBrands(),
+  // ]);
+  const products = mockProducts
+  const categories = mockCategories
+  const brands = mockBrands
+
 
   return (
     <div className="bg-gradient-to-b from-gray-50 to-white min-h-screen">

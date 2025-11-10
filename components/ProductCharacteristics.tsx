@@ -5,10 +5,11 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "./ui/accordion";
+import { IBrandMock, IProductMock } from "@/mock-data";
 
 interface ProductCharacteristicsProps {
-  product: Product;
-  brand: BRAND_QUERYResult | null;
+  product: IProductMock;
+  brand: IBrandMock[] | null;
 }
 
 const ProductCharacteristics = ({
@@ -26,7 +27,7 @@ const ProductCharacteristics = ({
             Brand:{" "}
             {brand && brand.length > 0 && (
               <span className="font-semibold tracking-wide">
-                {brand[0]?.brandName}
+                {brand[0]?.title}
               </span>
             )}
           </p>

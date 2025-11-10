@@ -161,9 +161,9 @@ const useCartStore = create<StoreState>()(
             return {
               favoriteProduct: isFavorite
                 ? _.filter(
-                    state.favoriteProduct,
-                    (item) => item.id !== product.id
-                  )
+                  state.favoriteProduct,
+                  (item) => item.id !== product.id
+                )
                 : [...state.favoriteProduct, { ...product }],
             };
           });

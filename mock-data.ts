@@ -29,6 +29,7 @@ export interface IProductMock {
   averageRating?: number;
   totalReviews?: number;
   ratingDistribution?: IRatingDistributionMock;
+  createdAt: string; 
 }
 
 
@@ -273,6 +274,7 @@ export const mockProducts: IProductMock[] = [
       twoStars: 2,
       oneStar: 0,
     },
+    createdAt: ""
   },
   {
     id: "prod-002",
@@ -299,6 +301,7 @@ export const mockProducts: IProductMock[] = [
       twoStars: 3,
       oneStar: 1,
     },
+    createdAt: ""
   },
   {
     id: "prod-003",
@@ -325,6 +328,7 @@ export const mockProducts: IProductMock[] = [
       twoStars: 3,
       oneStar: 2,
     },
+    createdAt: ""
   },
   {
     id: "prod-004",
@@ -351,6 +355,7 @@ export const mockProducts: IProductMock[] = [
       twoStars: 1,
       oneStar: 1,
     },
+    createdAt: ""
   },
   {
     id: "prod-005",
@@ -377,5 +382,6 @@ export const mockProducts: IProductMock[] = [
       twoStars: 1,
       oneStar: 1,
     },
+    createdAt: ""
   },
 ];

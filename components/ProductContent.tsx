@@ -9,7 +9,7 @@ import ProductsDetails from "@/components/ProductsDetails";
 import DynamicBreadcrumb from "@/components/DynamicBreadcrumb";
 import ProductSpecs from "@/components/ProductSpecs";
 import ProductReviews from "@/components/ProductReviews";
-import { trackProductView } from "@/lib/analytics";
+// import { trackProductView } from "@/lib/analytics";
 
 import { Product } from "@/sanity.types";
 import {
@@ -35,11 +35,12 @@ import {
 } from "@/components/ProductClientWrapper";
 import RelatedProducts from "./RelatedProducts";
 import { BRAND_QUERYResult } from "@/sanity.types";
+import { IBrandMock, IProductMock } from "@/mock-data";
 
 interface ProductContentProps {
-  product: Product;
-  relatedProducts: Product[];
-  brand: BRAND_QUERYResult | null;
+  product: IProductMock;
+  relatedProducts: IProductMock[];
+  brand: IBrandMock[] | null;
 }
 
 const ProductContent = ({
@@ -52,14 +53,14 @@ const ProductContent = ({
   const totalReviews = product?.totalReviews || 0;
 
   // Track product view on component mount
-  useEffect(() => {
-    if (product) {
-      trackProductView({
-        productId: product._id,
-        name: product.name || "Unknown",
-      });
-    }
-  }, [product]);
+  // useEffect(() => {
+  //   if (product) {
+  //     trackProductView({
+  //       productId: product._id,
+  //       name: product.name || "Unknown",
+  //     });
+  //   }
+  // }, [product]);
 
   return (
     <ProductAnimationWrapper>
@@ -68,7 +69,7 @@ const ProductContent = ({
         <DynamicBreadcrumb
           productData={{
             name: product?.name || "",
-            slug: product?.slug?.current || "",
+            slug: product?.slug || "",
           }}
         />
 
@@ -88,7 +89,7 @@ const ProductContent = ({
                 <Badge className="bg-shop_light_green/10 text-shop_dark_green hover:bg-shop_light_green/20 w-fit">
                   {brand && brand.length > 0 && (
                     <span className="font-semibold tracking-wide">
-                      {brand[0]?.brandName}
+                      {brand[0]?.title || "Brand"}
                     </span>
                   )}
                 </Badge>
@@ -108,11 +109,10 @@ const ProductContent = ({
                       <StarIcon
                         key={index}
                         size={16}
-                        className={`${
-                          index < Math.floor(averageRating)
-                            ? "text-shop_light_green fill-shop_light_green"
-                            : "text-gray-300"
-                        }`}
+                        className={`${index < Math.floor(averageRating)
+                          ? "text-shop_light_green fill-shop_light_green"
+                          : "text-gray-300"
+                          }`}
                       />
                     ))}
                   </div>
@@ -148,19 +148,18 @@ const ProductContent = ({
               {/* Enhanced Stock Status */}
               <div className="flex items-center gap-3">
                 <Badge
-                  className={`text-sm font-semibold ${
-                    product?.stock === 0
-                      ? "bg-red-100 text-red-700 hover:bg-red-100"
-                      : product?.stock && product.stock < 10
+                  className={`text-sm font-semibold ${product?.stock === 0
+                    ? "bg-red-100 text-red-700 hover:bg-red-100"
+                    : product?.stock && product.stock < 10
                       ? "bg-yellow-100 text-yellow-700 hover:bg-yellow-100"
                       : "bg-green-100 text-green-700 hover:bg-green-100"
-                  }`}
+                    }`}
                 >
                   {product?.stock === 0
                     ? "Out of Stock"
                     : product?.stock && product.stock < 10
-                    ? `Only ${product.stock} left!`
-                    : "In Stock"}
+                      ? `Only ${product.stock} left!`
+                      : "In Stock"}
                 </Badge>
               </div>
 
@@ -289,7 +288,7 @@ const ProductContent = ({
         {/* Customer Reviews */}
         <ProductSectionWrapper delay={0.9}>
           <ProductReviews
-            productId={product._id}
+            productId={product.id}
             productName={product.name || "this product"}
           />
         </ProductSectionWrapper>

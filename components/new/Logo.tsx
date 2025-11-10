@@ -34,7 +34,7 @@ const Logo = ({ className, variant = "default" }: Props) => {
                 Shop
               </span>
               <span className="bg-gradient-to-r from-shop_light_green to-shop_orange bg-clip-text text-transparent group-hover:from-shop_dark_green group-hover:to-shop_light_green hoverEffect">
-                cart
+                2Hand
               </span>
             </h1>
 
@@ -71,7 +71,7 @@ const Logo = ({ className, variant = "default" }: Props) => {
               Shop
             </span>
             <span className="bg-gradient-to-r from-shop_light_green to-shop_orange bg-clip-text text-transparent group-hover:from-shop_dark_green group-hover:to-shop_light_green hoverEffect">
-              cart
+              2Hand
             </span>
           </h1>
 

@@ -9,10 +9,11 @@ import { Product } from "@/sanity.types";
 import { urlFor } from "@/sanity/lib/image";
 import AddToCartButton from "./AddToCartButton";
 import FavoriteButton from "./FavoriteButton";
+import { IProductMock } from "@/mock-data";
 
 interface RelatedProductsProps {
-  currentProduct: Product;
-  relatedProducts: Product[];
+  currentProduct: IProductMock;
+  relatedProducts: IProductMock[];
 }
 
 const RelatedProducts = memo(({ relatedProducts }: RelatedProductsProps) => {
@@ -31,7 +32,7 @@ const RelatedProducts = memo(({ relatedProducts }: RelatedProductsProps) => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {relatedProducts.map((product: Product) => {
+        {relatedProducts.map((product: IProductMock) => {
           const imageUrl = product?.images?.[0]
             ? urlFor(product.images[0]).url()
             : null;
@@ -43,7 +44,7 @@ const RelatedProducts = memo(({ relatedProducts }: RelatedProductsProps) => {
 
           return (
             <Card
-              key={product._id}
+              key={product.id}
               className="group hover:shadow-xl transition-all duration-300 border-2 hover:border-shop_light_green/30"
             >
               <CardContent className="p-4">
@@ -90,7 +91,7 @@ const RelatedProducts = memo(({ relatedProducts }: RelatedProductsProps) => {
                 {/* Product Info */}
                 <div className="space-y-2">
                   <Link
-                    href={`/product/${product?.slug?.current}`}
+                    href={`/product/${product?.slug}`}
                     className="block hover:text-shop_light_green transition-colors"
                   >
                     <h3 className="font-semibold text-shop_dark_green line-clamp-2 text-sm">

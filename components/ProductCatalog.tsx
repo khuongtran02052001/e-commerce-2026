@@ -31,11 +31,12 @@ import {
 } from "./ui/collapsible";
 import { Checkbox } from "./ui/checkbox";
 import { Slider } from "./ui/slider";
+import { IBrandMock, ICategoryMock, IProductMock } from "@/mock-data";
 
 interface Props {
-  initialProducts: Product[];
-  categories: Category[];
-  brands: BRANDS_QUERYResult;
+  initialProducts: IProductMock[];
+  categories: ICategoryMock[];
+  brands: IBrandMock[];
 }
 
 type SortOption =
@@ -47,7 +48,7 @@ type SortOption =
   | "popular";
 
 const ProductCatalog = ({ initialProducts, categories, brands }: Props) => {
-  const [products] = useState<Product[]>(initialProducts);
+  const [products] = useState<IProductMock[]>(initialProducts);
   const [loading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -83,18 +84,18 @@ const ProductCatalog = ({ initialProducts, categories, brands }: Props) => {
     }
 
     // Category filter
-    if (selectedCategories.length > 0) {
-      filtered = filtered.filter((product) =>
-        product.categories?.some((cat) => selectedCategories.includes(cat._ref))
-      );
-    }
+    // if (selectedCategories.length > 0) {
+    //   filtered = filtered.filter((product) =>
+    //     product.categories?.some((cat) => selectedCategories.includes(cat._ref))
+    //   );
+    // }
 
-    // Brand filter
-    if (selectedBrands.length > 0) {
-      filtered = filtered.filter((product) =>
-        selectedBrands.includes(product.brand?._ref || "")
-      );
-    }
+    // // Brand filter
+    // if (selectedBrands.length > 0) {
+    //   filtered = filtered.filter((product) =>
+    //     selectedBrands.includes(product.brand?._ref || "")
+    //   );
+    // }
 
     // Price filter
     const [minPrice, maxPrice] = priceRange;
@@ -116,7 +117,7 @@ const ProductCatalog = ({ initialProducts, categories, brands }: Props) => {
           return (b.price || 0) - (a.price || 0);
         case "newest":
           return (
-            new Date(b._createdAt).getTime() - new Date(a._createdAt).getTime()
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
           );
         default:
           return 0;
@@ -257,7 +258,7 @@ const ProductCatalog = ({ initialProducts, categories, brands }: Props) => {
               </Badge>
             )}
             {selectedCategories.map((catId) => {
-              const category = categories.find((c) => c._id === catId);
+              const category = categories.find((c) => c.id === catId);
               return category ? (
                 <Badge key={catId} variant="secondary" className="gap-1">
                   {category.title}
@@ -269,7 +270,7 @@ const ProductCatalog = ({ initialProducts, categories, brands }: Props) => {
               ) : null;
             })}
             {selectedBrands.map((brandId) => {
-              const brand = brands.find((b) => b._id === brandId);
+              const brand = brands.find((b) => b.id === brandId);
               return brand ? (
                 <Badge key={brandId} variant="secondary" className="gap-1">
                   {brand.title}
@@ -333,24 +334,23 @@ const ProductCatalog = ({ initialProducts, categories, brands }: Props) => {
                   <CollapsibleTrigger className="flex items-center justify-between w-full text-left">
                     <span className="font-medium">Categories</span>
                     <ChevronDown
-                      className={`w-4 h-4 transition-transform ${
-                        isFilterOpen.categories ? "rotate-180" : ""
-                      }`}
+                      className={`w-4 h-4 transition-transform ${isFilterOpen.categories ? "rotate-180" : ""
+                        }`}
                     />
                   </CollapsibleTrigger>
                   <CollapsibleContent className="mt-3 space-y-2">
                     {categories.map((category) => (
                       <div
-                        key={category._id}
+                        key={category.id}
                         className="flex items-center space-x-2"
                       >
                         <Checkbox
-                          id={category._id}
-                          checked={selectedCategories.includes(category._id)}
-                          onCheckedChange={() => toggleCategory(category._id)}
+                          id={category.id}
+                          checked={selectedCategories.includes(category.id)}
+                          onCheckedChange={() => toggleCategory(category.id)}
                         />
                         <label
-                          htmlFor={category._id}
+                          htmlFor={category.id}
                           className="text-sm flex-1 cursor-pointer"
                         >
                           {category.title}
@@ -372,24 +372,23 @@ const ProductCatalog = ({ initialProducts, categories, brands }: Props) => {
                   <CollapsibleTrigger className="flex items-center justify-between w-full text-left">
                     <span className="font-medium">Brands</span>
                     <ChevronDown
-                      className={`w-4 h-4 transition-transform ${
-                        isFilterOpen.brands ? "rotate-180" : ""
-                      }`}
+                      className={`w-4 h-4 transition-transform ${isFilterOpen.brands ? "rotate-180" : ""
+                        }`}
                     />
                   </CollapsibleTrigger>
                   <CollapsibleContent className="mt-3 space-y-2">
                     {brands.map((brand) => (
                       <div
-                        key={brand._id}
+                        key={brand.id}
                         className="flex items-center space-x-2"
                       >
                         <Checkbox
-                          id={brand._id}
-                          checked={selectedBrands.includes(brand._id)}
-                          onCheckedChange={() => toggleBrand(brand._id)}
+                          id={brand.id}
+                          checked={selectedBrands.includes(brand.id)}
+                          onCheckedChange={() => toggleBrand(brand.id)}
                         />
                         <label
-                          htmlFor={brand._id}
+                          htmlFor={brand.id}
                           className="text-sm flex-1 cursor-pointer"
                         >
                           {brand.title}
@@ -411,9 +410,8 @@ const ProductCatalog = ({ initialProducts, categories, brands }: Props) => {
                   <CollapsibleTrigger className="flex items-center justify-between w-full text-left">
                     <span className="font-medium">Price Range</span>
                     <ChevronDown
-                      className={`w-4 h-4 transition-transform ${
-                        isFilterOpen.price ? "rotate-180" : ""
-                      }`}
+                      className={`w-4 h-4 transition-transform ${isFilterOpen.price ? "rotate-180" : ""
+                        }`}
                     />
                   </CollapsibleTrigger>
                   <CollapsibleContent className="mt-3 space-y-4">
@@ -452,11 +450,10 @@ const ProductCatalog = ({ initialProducts, categories, brands }: Props) => {
           {/* Products */}
           {loading ? (
             <div
-              className={`grid gap-4 ${
-                viewMode === "grid"
-                  ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-                  : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-              }`}
+              className={`grid gap-4 ${viewMode === "grid"
+                ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+                : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+                }`}
             >
               {Array.from({ length: 12 }).map((_, index) => (
                 <div
@@ -475,16 +472,15 @@ const ProductCatalog = ({ initialProducts, categories, brands }: Props) => {
             </div>
           ) : filteredProducts.length > 0 ? (
             <div
-              className={`grid gap-4 ${
-                viewMode === "grid"
-                  ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-                  : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-              }`}
+              className={`grid gap-4 ${viewMode === "grid"
+                ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+                : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+                }`}
             >
               <AnimatePresence>
                 {filteredProducts.map((product) => (
                   <motion.div
-                    key={product._id}
+                    key={product.id}
                     layout
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}

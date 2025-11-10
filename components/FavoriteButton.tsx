@@ -7,29 +7,30 @@ import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import isArray from "js-isarray";
 import _ from "lodash";
-import { trackWishlistAdd, trackWishlistRemove } from "@/lib/analytics";
+import { IProductMock } from "@/mock-data";
+// import { trackWishlistAdd, trackWishlistRemove } from "@/lib/analytics";
 
 const FavoriteButton = ({
   showProduct = false,
   product,
 }: {
   showProduct?: boolean;
-  product?: Product;
+  product?: IProductMock;
 }) => {
   const { favoriteProduct, addToFavorite } = useCartStore();
-  const [existingProduct, setExistingProduct] = useState<Product | null>(null);
+  const [existingProduct, setExistingProduct] = useState<IProductMock | null>(null);
 
   useEffect(() => {
     const availableItem = _.find(
       favoriteProduct,
-      (item) => item?._id === product?._id
+      (item) => item?.id === product?.id
     );
     setExistingProduct(availableItem || null);
   }, [product, favoriteProduct]);
 
   const handleFavorite = (e: React.MouseEvent<HTMLSpanElement>) => {
     e.preventDefault();
-    if (product?._id) {
+    if (product?.id) {
       const isRemoving = !!existingProduct;
 
       addToFavorite(product).then(() => {
@@ -44,17 +45,17 @@ const FavoriteButton = ({
         );
 
         // Track wishlist analytics
-        if (isRemoving) {
-          trackWishlistRemove({
-            productId: product._id,
-            name: product.name || "Unknown Product",
-          });
-        } else {
-          trackWishlistAdd({
-            productId: product._id,
-            name: product.name || "Unknown Product",
-          });
-        }
+        // if (isRemoving) {
+        //   trackWishlistRemove({
+        //     productId: product._id,
+        //     name: product.name || "Unknown Product",
+        //   });
+        // } else {
+        //   trackWishlistAdd({
+        //     productId: product._id,
+        //     name: product.name || "Unknown Product",
+        //   });
+        // }
       });
     }
   };
