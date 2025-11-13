@@ -7,8 +7,18 @@ import ShopFeatures from "@/components/ShopFeatures";
 // import { getCategories } from "@/sanity/queries";
 import { generateOrganizationSchema, generateWebsiteSchema } from "@/lib/seo";
 import { mockCategories } from "@/mock-data";
+import { createHydratedPage } from "@/react-query/HydratedPage";
+import { getAllProducts, getBanner } from "@/react-query/queries";
 
-export default async function Home() {
+
+// async function prefetch(queryClient: any) {
+//   await queryClient.prefetchQuery({
+//     queryKey: ["banners"],
+//     queryFn: getAllProducts,
+//   });
+// }
+
+function Home() {
   // const categories = await mockCategories(8);
   const categories = mockCategories;
 
@@ -43,3 +53,6 @@ export default async function Home() {
     </div>
   );
 }
+
+// export default createHydratedPage(prefetch, Home);
+export default Home

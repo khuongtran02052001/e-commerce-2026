@@ -7,7 +7,11 @@ import Script from "next/script";
 import Head from "next/head";
 import { UserDataProvider } from "@/contexts/UserDataContext";
 import PremiumFloatingButton from "@/components/PremiumFloatingButton";
+import { QueryClientProvider } from '@tanstack/react-query';
+
 import "./globals.css";
+import { getQueryClient } from "@/lib/react-query";
+import ReactQueryProvider from "@/react-query/ReactQueryProvider";
 
 const poppins = localFont({
   src: "./fonts/Poppins.woff2",
@@ -28,7 +32,7 @@ const opensans = localFont({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://shopcartpro.reactbd.org"),
+  // metadataBase: new URL("https://"),
   title: {
     template: "%s | ShopCart - Premium Online Shopping",
     default: "ShopCart - Your Trusted Online Shopping Destination",
@@ -58,7 +62,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://shopcartpro.reactbd.org",
+    url: "current url production",
     siteName: "ShopCart",
     title: "ShopCart - Your Trusted Online Shopping Destination",
     description:
@@ -96,12 +100,13 @@ export const metadata: Metadata = {
     // Add other verification codes as needed
   },
   alternates: {
-    canonical: "https://shopcartpro.reactbd.org",
+    canonical: "current url production",
   },
 };
 
 const RootLayout = async ({ children }: { children: ReactNode }) => {
-  const GADSENSE_CLIENT_ID = "ca-pub-6542623777003381"; // Define it once
+  const GADSENSE_CLIENT_ID = "ENV"; // Define it once
+
   return (
     <ClerkProvider>
       <html lang="en">
