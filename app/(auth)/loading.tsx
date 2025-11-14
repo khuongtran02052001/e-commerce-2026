@@ -1,4 +1,4 @@
-import { Loader2 } from "lucide-react";
+import { Loader2 } from 'lucide-react';
 
 const AuthLoading = () => {
   return (
@@ -11,9 +11,7 @@ const AuthLoading = () => {
         <h2 className="text-xl font-semibold text-shop_dark_green mb-2">
           Loading Authentication...
         </h2>
-        <p className="text-dark-text">
-          Please wait while we prepare your sign-in experience.
-        </p>
+        <p className="text-dark-text">Please wait while we prepare your sign-in experience.</p>
       </div>
     </div>
   );

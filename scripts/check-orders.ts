@@ -1,8 +1,8 @@
-import { client } from "../sanity/lib/client";
+import { client } from '../sanity/lib/client';
 
 async function checkOrders() {
   try {
-    console.log("Checking orders in Sanity...\n");
+    console.log('Checking orders in Sanity...\n');
 
     // Get total count
     const totalCount = await client.fetch(`count(*[_type == "order"])`);
@@ -28,9 +28,7 @@ async function checkOrders() {
         console.log(`   Customer: ${order.customerName} (${order.email})`);
         console.log(`   Status: ${order.status}`);
         console.log(`   Total: $${order.totalPrice}`);
-        console.log(
-          `   Created: ${new Date(order._createdAt).toLocaleString()}`
-        );
+        console.log(`   Created: ${new Date(order._createdAt).toLocaleString()}`);
       });
 
       // Get status breakdown
@@ -50,17 +48,17 @@ async function checkOrders() {
         }
       `);
 
-      console.log("\n\nStatus Breakdown:");
+      console.log('\n\nStatus Breakdown:');
       Object.entries(statusBreakdown).forEach(([status, count]) => {
         if ((count as number) > 0) {
           console.log(`  ${status}: ${count}`);
         }
       });
     } else {
-      console.log("No orders found in the database.");
+      console.log('No orders found in the database.');
     }
   } catch (error) {
-    console.error("Error checking orders:", error);
+    console.error('Error checking orders:', error);
   }
 }
 

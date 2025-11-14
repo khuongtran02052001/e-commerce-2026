@@ -1,14 +1,14 @@
-import { auth, clerkClient } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
-import { isUserAdmin } from "@/lib/adminUtils";
-import AdminNotifications from "@/components/admin/AdminNotifications";
+import AdminNotifications from '@/components/admin/AdminNotifications';
+import { isUserAdmin } from '@/lib/adminUtils';
+import { auth, clerkClient } from '@clerk/nextjs/server';
+import { redirect } from 'next/navigation';
 
 const AdminNotificationsPage = async () => {
   // Check authentication and admin access
   const { userId } = await auth();
 
   if (!userId) {
-    redirect("/sign-in");
+    redirect('/sign-in');
   }
 
   // Get current user details to check admin status
@@ -18,7 +18,7 @@ const AdminNotificationsPage = async () => {
 
   // Check if current user is admin
   if (!userEmail || !isUserAdmin(userEmail)) {
-    redirect("/");
+    redirect('/');
   }
 
   return <AdminNotifications adminEmail={userEmail} />;

@@ -1,18 +1,15 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
-import { writeClient } from "@/sanity/lib/client";
+import { writeClient } from '@/sanity/lib/client';
+import { auth } from '@clerk/nextjs/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 // GET - Get reviews for a specific product
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const productId = searchParams.get("productId");
+    const productId = searchParams.get('productId');
 
     if (!productId) {
-      return NextResponse.json(
-        { error: "Product ID is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Product ID is required' }, { status: 400 });
     }
 
     // Get approved reviews
@@ -36,7 +33,7 @@ export async function GET(request: NextRequest) {
           }
         }
       }`,
-      { productId }
+      { productId },
     );
 
     if (!reviews || reviews.length === 0) {
@@ -58,20 +55,16 @@ export async function GET(request: NextRequest) {
     const totalReviews = reviews.length;
     const totalRating = reviews.reduce(
       (sum: number, review: { rating: number }) => sum + review.rating,
-      0
+      0,
     );
     const averageRating = totalRating / totalReviews;
 
     // Calculate rating distribution
     const ratingDistribution = {
-      fiveStars: reviews.filter((r: { rating: number }) => r.rating === 5)
-        .length,
-      fourStars: reviews.filter((r: { rating: number }) => r.rating === 4)
-        .length,
-      threeStars: reviews.filter((r: { rating: number }) => r.rating === 3)
-        .length,
-      twoStars: reviews.filter((r: { rating: number }) => r.rating === 2)
-        .length,
+      fiveStars: reviews.filter((r: { rating: number }) => r.rating === 5).length,
+      fourStars: reviews.filter((r: { rating: number }) => r.rating === 4).length,
+      threeStars: reviews.filter((r: { rating: number }) => r.rating === 3).length,
+      twoStars: reviews.filter((r: { rating: number }) => r.rating === 2).length,
       oneStar: reviews.filter((r: { rating: number }) => r.rating === 1).length,
     };
 
@@ -82,11 +75,8 @@ export async function GET(request: NextRequest) {
       ratingDistribution,
     });
   } catch (error) {
-    console.error("Error fetching reviews:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch reviews" },
-      { status: 500 }
-    );
+    console.error('Error fetching reviews:', error);
+    return NextResponse.json({ error: 'Failed to fetch reviews' }, { status: 500 });
   }
 }
 
@@ -96,10 +86,7 @@ export async function POST(request: NextRequest) {
     const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json(
-        { error: "Authentication required" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
     const body = await request.json();
@@ -107,30 +94,24 @@ export async function POST(request: NextRequest) {
 
     // Validate input
     if (!productId || !rating || !title || !content) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
     if (rating < 1 || rating > 5) {
-      return NextResponse.json(
-        { error: "Rating must be between 1 and 5" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Rating must be between 1 and 5' }, { status: 400 });
     }
 
     if (title.length < 5 || title.length > 100) {
       return NextResponse.json(
-        { error: "Title must be between 5 and 100 characters" },
-        { status: 400 }
+        { error: 'Title must be between 5 and 100 characters' },
+        { status: 400 },
       );
     }
 
     if (content.length < 20 || content.length > 1000) {
       return NextResponse.json(
-        { error: "Content must be between 20 and 1000 characters" },
-        { status: 400 }
+        { error: 'Content must be between 20 and 1000 characters' },
+        { status: 400 },
       );
     }
 
@@ -141,48 +122,48 @@ export async function POST(request: NextRequest) {
         firstName,
         lastName
       }`,
-      { clerkUserId: userId }
+      { clerkUserId: userId },
     );
 
     if (!sanityUser) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
     // Check if user has already reviewed this product
     const existingReview = await writeClient.fetch(
       `*[_type == "review" && user._ref == $userId && product._ref == $productId][0]`,
-      { userId: sanityUser._id, productId }
+      { userId: sanityUser._id, productId },
     );
 
     if (existingReview) {
       return NextResponse.json(
-        { error: "You have already reviewed this product" },
-        { status: 400 }
+        { error: 'You have already reviewed this product' },
+        { status: 400 },
       );
     }
 
     // Check if user has purchased this product
     const hasPurchased = await writeClient.fetch(
       `count(*[_type == "order" && user._ref == $userId && status == "delivered" && $productId in products[].product._ref]) > 0`,
-      { userId: sanityUser._id, productId }
+      { userId: sanityUser._id, productId },
     );
 
     // Create the review using Sanity's API token
     const review = await writeClient.create({
-      _type: "review",
+      _type: 'review',
       product: {
-        _type: "reference",
+        _type: 'reference',
         _ref: productId,
       },
       user: {
-        _type: "reference",
+        _type: 'reference',
         _ref: sanityUser._id,
       },
       rating,
       title,
       content,
       isVerifiedPurchase: hasPurchased,
-      status: "pending",
+      status: 'pending',
       helpful: 0,
       helpfulBy: [],
       createdAt: new Date().toISOString(),
@@ -190,16 +171,12 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message:
-        "Thank you for your review! It will be published after admin approval.",
+      message: 'Thank you for your review! It will be published after admin approval.',
       reviewId: review._id,
     });
   } catch (error) {
-    console.error("Error submitting review:", error);
-    return NextResponse.json(
-      { error: "Failed to submit review" },
-      { status: 500 }
-    );
+    console.error('Error submitting review:', error);
+    return NextResponse.json({ error: 'Failed to submit review' }, { status: 500 });
   }
 }
 
@@ -209,20 +186,14 @@ export async function PATCH(request: NextRequest) {
     const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json(
-        { error: "Authentication required" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
     const body = await request.json();
     const { reviewId } = body;
 
     if (!reviewId) {
-      return NextResponse.json(
-        { error: "Review ID is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Review ID is required' }, { status: 400 });
     }
 
     // Get the user from Sanity
@@ -230,11 +201,11 @@ export async function PATCH(request: NextRequest) {
       `*[_type == "user" && clerkUserId == $clerkUserId][0]{
         _id
       }`,
-      { clerkUserId: userId }
+      { clerkUserId: userId },
     );
 
     if (!sanityUser) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
     // Get the review
@@ -244,11 +215,11 @@ export async function PATCH(request: NextRequest) {
         helpful,
         "helpfulByIds": helpfulBy[]._ref
       }`,
-      { reviewId }
+      { reviewId },
     );
 
     if (!review) {
-      return NextResponse.json({ error: "Review not found" }, { status: 404 });
+      return NextResponse.json({ error: 'Review not found' }, { status: 404 });
     }
 
     // Check if user has already marked this review as helpful
@@ -266,7 +237,7 @@ export async function PATCH(request: NextRequest) {
 
       return NextResponse.json({
         success: true,
-        message: "Review unmarked as helpful",
+        message: 'Review unmarked as helpful',
       });
     } else {
       // Add the helpful mark
@@ -276,9 +247,9 @@ export async function PATCH(request: NextRequest) {
           helpful: review.helpful + 1,
         })
         .setIfMissing({ helpfulBy: [] })
-        .append("helpfulBy", [
+        .append('helpfulBy', [
           {
-            _type: "reference",
+            _type: 'reference',
             _ref: sanityUser._id,
           },
         ])
@@ -286,14 +257,11 @@ export async function PATCH(request: NextRequest) {
 
       return NextResponse.json({
         success: true,
-        message: "Review marked as helpful",
+        message: 'Review marked as helpful',
       });
     }
   } catch (error) {
-    console.error("Error marking review as helpful:", error);
-    return NextResponse.json(
-      { error: "Failed to update review" },
-      { status: 500 }
-    );
+    console.error('Error marking review as helpful:', error);
+    return NextResponse.json({ error: 'Failed to update review' }, { status: 500 });
   }
 }

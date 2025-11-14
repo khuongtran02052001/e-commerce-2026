@@ -1,19 +1,19 @@
-"use client";
+'use client';
 
-import { motion } from "motion/react";
-import { HelpCircle, MessageCircle } from "lucide-react";
+import Container from '@/components/Container';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import Container from "@/components/Container";
-import { faqsData } from "@/constants";
-import Link from "next/link";
+} from '@/components/ui/accordion';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { faqsData } from '@/constants';
+import { HelpCircle, MessageCircle } from 'lucide-react';
+import { motion } from 'motion/react';
+import Link from 'next/link';
 
 const FAQPage = () => {
   return (
@@ -93,8 +93,8 @@ const FAQPage = () => {
                 <MessageCircle className="w-12 h-12 mx-auto mb-4 opacity-90" />
                 <h3 className="text-2xl font-bold mb-4">Need More Help?</h3>
                 <p className="text-white/90 mb-6 max-w-2xl mx-auto">
-                  Can&apos;t find the answer you&apos;re looking for? Check out
-                  our comprehensive FAQ section or contact our support team.
+                  Can&apos;t find the answer you&apos;re looking for? Check out our comprehensive
+                  FAQ section or contact our support team.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Button

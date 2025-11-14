@@ -1,71 +1,66 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
-import { writeClient, client } from "@/sanity/lib/client";
+import { client, writeClient } from '@/sanity/lib/client';
+import { auth } from '@clerk/nextjs/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
     const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { email } = await request.json();
 
     if (!email) {
-      return NextResponse.json({ error: "Email is required" }, { status: 400 });
+      return NextResponse.json({ error: 'Email is required' }, { status: 400 });
     }
 
     // Check if user exists in Sanity
-    const existingUser = await client.fetch(
-      `*[_type == "userType" && email == $email][0]`,
-      { email }
-    );
+    const existingUser = await client.fetch(`*[_type == "userType" && email == $email][0]`, {
+      email,
+    });
 
     if (!existingUser) {
       return NextResponse.json(
-        { error: "Please register for premium services first" },
-        { status: 404 }
+        { error: 'Please register for premium services first' },
+        { status: 404 },
       );
     }
 
     if (!existingUser.isActive) {
       return NextResponse.json(
-        { error: "Please activate your premium account first" },
-        { status: 400 }
+        { error: 'Please activate your premium account first' },
+        { status: 400 },
       );
     }
 
     // Check business account status
-    if (existingUser.businessStatus === "rejected") {
+    if (existingUser.businessStatus === 'rejected') {
       return NextResponse.json(
         {
-          error:
-            "Business account application was rejected. Please contact admin for assistance.",
+          error: 'Business account application was rejected. Please contact admin for assistance.',
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    if (existingUser.businessStatus === "pending") {
+    if (existingUser.businessStatus === 'pending') {
       return NextResponse.json(
-        { error: "Business account application is already pending approval." },
-        { status: 400 }
+        { error: 'Business account application is already pending approval.' },
+        { status: 400 },
       );
     }
 
     if (existingUser.isBusiness) {
-      return NextResponse.json(
-        { error: "Business account already approved" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Business account already approved' }, { status: 400 });
     }
 
     // Apply for business account
     const result = await writeClient
       .patch(existingUser._id)
       .set({
-        businessStatus: "pending",
+        businessStatus: 'pending',
         businessAppliedAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       })
@@ -78,10 +73,10 @@ export async function POST(request: NextRequest) {
       user: result,
     });
   } catch (error) {
-    console.error("Error applying for business account:", error);
+    console.error('Error applying for business account:', error);
     return NextResponse.json(
-      { error: "Failed to submit business account application" },
-      { status: 500 }
+      { error: 'Failed to submit business account application' },
+      { status: 500 },
     );
   }
 }

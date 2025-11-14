@@ -1,29 +1,29 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import Link from "next/link";
-import { cn } from "@/lib/utils";
-import { useClerk } from "@clerk/nextjs";
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import { useClerk } from '@clerk/nextjs';
 import {
-  LayoutDashboard,
-  Users,
-  Package,
-  ShoppingCart,
   BarChart3,
-  Shield,
   Bell,
-  UserCheck,
-  LogOut,
-  Menu,
-  X,
-  User,
   ChevronDown,
   ChevronUp,
-  Star,
-  Mail,
   Crown,
-} from "lucide-react";
+  LayoutDashboard,
+  LogOut,
+  Mail,
+  Menu,
+  Package,
+  Shield,
+  ShoppingCart,
+  Star,
+  User,
+  UserCheck,
+  Users,
+  X,
+} from 'lucide-react';
+import Link from 'next/link';
+import { useState } from 'react';
 
 interface AdminTopNavigationProps {
   currentPath: string;
@@ -38,53 +38,53 @@ interface AdminTopNavigationProps {
 
 const adminRoutes = [
   {
-    label: "Dashboard",
+    label: 'Dashboard',
     icon: LayoutDashboard,
-    href: "/admin",
+    href: '/admin',
     isPremium: true,
   },
   {
-    label: "Analytics",
+    label: 'Analytics',
     icon: BarChart3,
-    href: "/admin/analytics",
+    href: '/admin/analytics',
     isPremium: true,
   },
   {
-    label: "Users",
+    label: 'Users',
     icon: Users,
-    href: "/admin/users",
+    href: '/admin/users',
   },
   {
-    label: "Account Requests",
+    label: 'Account Requests',
     icon: UserCheck,
-    href: "/admin/account-requests",
+    href: '/admin/account-requests',
   },
   {
-    label: "Products",
+    label: 'Products',
     icon: Package,
-    href: "/admin/products",
+    href: '/admin/products',
   },
   {
-    label: "Orders",
+    label: 'Orders',
     icon: ShoppingCart,
-    href: "/admin/orders",
+    href: '/admin/orders',
   },
   {
-    label: "Reviews",
+    label: 'Reviews',
     icon: Star,
-    href: "/admin/reviews",
+    href: '/admin/reviews',
     isPremium: true,
   },
   {
-    label: "Subscriptions",
+    label: 'Subscriptions',
     icon: Mail,
-    href: "/admin/subscriptions",
+    href: '/admin/subscriptions',
     isPremium: true,
   },
   {
-    label: "Notifications",
+    label: 'Notifications',
     icon: Bell,
-    href: "/admin/notifications",
+    href: '/admin/notifications',
   },
 ];
 
@@ -188,9 +188,7 @@ const AdminTopNavigation = ({ currentPath, user }: AdminTopNavigationProps) => {
             >
               <div className="flex items-center space-x-2">
                 <Menu className="h-5 w-5 text-shop_dark_green" />
-                <span className="font-medium text-gray-900">
-                  Navigation Menu
-                </span>
+                <span className="font-medium text-gray-900">Navigation Menu</span>
               </div>
               {desktopMenuOpen ? (
                 <ChevronUp className="h-5 w-5 text-gray-500 transition-transform duration-200" />
@@ -203,10 +201,8 @@ const AdminTopNavigation = ({ currentPath, user }: AdminTopNavigationProps) => {
           {/* Collapsible Horizontal Navigation */}
           <div
             className={cn(
-              "grid transition-all duration-300 ease-in-out",
-              desktopMenuOpen
-                ? "grid-rows-[1fr] opacity-100"
-                : "grid-rows-[0fr] opacity-0"
+              'grid transition-all duration-300 ease-in-out',
+              desktopMenuOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0',
             )}
           >
             <div className="overflow-hidden">
@@ -221,37 +217,33 @@ const AdminTopNavigation = ({ currentPath, user }: AdminTopNavigationProps) => {
                         key={route.href}
                         href={route.href}
                         className={cn(
-                          "admin-nav-item flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 group border-2 transform hover:scale-[1.02] whitespace-nowrap shrink-0",
+                          'admin-nav-item flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 group border-2 transform hover:scale-[1.02] whitespace-nowrap shrink-0',
                           isActive
-                            ? "active bg-shop_light_green/10 border-shop_light_green shadow-md scale-[1.02]"
-                            : "hover:bg-gray-50 border-gray-200 hover:border-shop_light_green/40"
+                            ? 'active bg-shop_light_green/10 border-shop_light_green shadow-md scale-[1.02]'
+                            : 'hover:bg-gray-50 border-gray-200 hover:border-shop_light_green/40',
                         )}
                         style={{
-                          animationDelay: desktopMenuOpen
-                            ? `${index * 50}ms`
-                            : "0ms",
+                          animationDelay: desktopMenuOpen ? `${index * 50}ms` : '0ms',
                         }}
                       >
                         <div
                           className={cn(
-                            "p-1.5 rounded-md transition-all duration-200",
+                            'p-1.5 rounded-md transition-all duration-200',
                             isActive
-                              ? "bg-shop_light_green text-white shadow-md"
-                              : "bg-gray-100 text-gray-600 group-hover:bg-shop_light_green/20 group-hover:text-shop_dark_green"
+                              ? 'bg-shop_light_green text-white shadow-md'
+                              : 'bg-gray-100 text-gray-600 group-hover:bg-shop_light_green/20 group-hover:text-shop_dark_green',
                           )}
                         >
                           <Icon className="h-3.5 w-3.5" />
                         </div>
                         <div
                           className={cn(
-                            "font-medium text-xs transition-colors duration-200 flex items-center gap-1",
-                            isActive ? "text-shop_dark_green" : "text-gray-900"
+                            'font-medium text-xs transition-colors duration-200 flex items-center gap-1',
+                            isActive ? 'text-shop_dark_green' : 'text-gray-900',
                           )}
                         >
                           <span>{route.label}</span>
-                          {route.isPremium && (
-                            <Crown className="w-3 h-3 text-yellow-500" />
-                          )}
+                          {route.isPremium && <Crown className="w-3 h-3 text-yellow-500" />}
                         </div>
                       </Link>
                     );
@@ -266,27 +258,21 @@ const AdminTopNavigation = ({ currentPath, user }: AdminTopNavigationProps) => {
       {/* Mobile Navigation Menu */}
       <div
         className={cn(
-          "lg:hidden overflow-hidden mobile-menu-container",
-          mobileMenuOpen
-            ? "max-h-[800px] opacity-100 mt-2"
-            : "max-h-0 opacity-0 mt-0"
+          'lg:hidden overflow-hidden mobile-menu-container',
+          mobileMenuOpen ? 'max-h-[800px] opacity-100 mt-2' : 'max-h-0 opacity-0 mt-0',
         )}
       >
         <div
           className={cn(
-            "admin-mobile-menu bg-white rounded-2xl shadow-xl border border-shop_light_green/10 overflow-hidden transform transition-all duration-300 ease-out",
-            mobileMenuOpen
-              ? "translate-y-0 scale-100"
-              : "-translate-y-4 scale-95"
+            'admin-mobile-menu bg-white rounded-2xl shadow-xl border border-shop_light_green/10 overflow-hidden transform transition-all duration-300 ease-out',
+            mobileMenuOpen ? 'translate-y-0 scale-100' : '-translate-y-4 scale-95',
           )}
         >
           {/* Admin Profile Section */}
           <div
             className={cn(
-              "p-6 bg-gradient-to-r from-shop_dark_green to-shop_light_green text-white transition-all duration-200 delay-75",
-              mobileMenuOpen
-                ? "translate-y-0 opacity-100"
-                : "-translate-y-2 opacity-0"
+              'p-6 bg-gradient-to-r from-shop_dark_green to-shop_light_green text-white transition-all duration-200 delay-75',
+              mobileMenuOpen ? 'translate-y-0 opacity-100' : '-translate-y-2 opacity-0',
             )}
           >
             <div className="flex items-center space-x-4">
@@ -298,9 +284,7 @@ const AdminTopNavigation = ({ currentPath, user }: AdminTopNavigationProps) => {
                 <p className="text-white/80 text-sm">
                   {user?.firstName} {user?.lastName}
                 </p>
-                <p className="text-white/70 text-xs">
-                  {user?.primaryEmailAddress?.emailAddress}
-                </p>
+                <p className="text-white/70 text-xs">{user?.primaryEmailAddress?.emailAddress}</p>
               </div>
               {user?.imageUrl && (
                 <img
@@ -315,10 +299,8 @@ const AdminTopNavigation = ({ currentPath, user }: AdminTopNavigationProps) => {
           {/* Mobile Navigation Links */}
           <nav
             className={cn(
-              "p-6 space-y-2 transition-all duration-300 delay-100",
-              mobileMenuOpen
-                ? "translate-y-0 opacity-100"
-                : "translate-y-2 opacity-0"
+              'p-6 space-y-2 transition-all duration-300 delay-100',
+              mobileMenuOpen ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0',
             )}
           >
             {adminRoutes.map((route, index) => {
@@ -335,21 +317,21 @@ const AdminTopNavigation = ({ currentPath, user }: AdminTopNavigationProps) => {
                     setTimeout(() => setIsAnimating(false), 300);
                   }}
                   className={cn(
-                    "admin-nav-item flex items-center gap-4 p-4 rounded-xl transition-all duration-200 group",
+                    'admin-nav-item flex items-center gap-4 p-4 rounded-xl transition-all duration-200 group',
                     isActive
-                      ? "active bg-gradient-to-r from-shop_light_green to-shop_dark_green text-white shadow-lg"
-                      : "hover:bg-shop_light_bg hover:shadow-md text-gray-900"
+                      ? 'active bg-gradient-to-r from-shop_light_green to-shop_dark_green text-white shadow-lg'
+                      : 'hover:bg-shop_light_bg hover:shadow-md text-gray-900',
                   )}
                   style={{
-                    animationDelay: mobileMenuOpen ? `${index * 50}ms` : "0ms",
+                    animationDelay: mobileMenuOpen ? `${index * 50}ms` : '0ms',
                   }}
                 >
                   <div
                     className={cn(
-                      "p-3 rounded-lg transition-all duration-200",
+                      'p-3 rounded-lg transition-all duration-200',
                       isActive
-                        ? "bg-white/20 text-white"
-                        : "bg-shop_light_green/10 text-shop_light_green group-hover:bg-shop_light_green/20"
+                        ? 'bg-white/20 text-white'
+                        : 'bg-shop_light_green/10 text-shop_light_green group-hover:bg-shop_light_green/20',
                     )}
                   >
                     <Icon className="w-5 h-5 transition-transform group-hover:scale-110" />
@@ -357,14 +339,12 @@ const AdminTopNavigation = ({ currentPath, user }: AdminTopNavigationProps) => {
                   <div className="flex-1">
                     <div
                       className={cn(
-                        "font-semibold text-base transition-colors duration-200 flex items-center gap-2",
-                        isActive ? "text-white" : "text-gray-900"
+                        'font-semibold text-base transition-colors duration-200 flex items-center gap-2',
+                        isActive ? 'text-white' : 'text-gray-900',
                       )}
                     >
                       <span>{route.label}</span>
-                      {route.isPremium && (
-                        <Crown className="w-4 h-4 text-yellow-400" />
-                      )}
+                      {route.isPremium && <Crown className="w-4 h-4 text-yellow-400" />}
                     </div>
                   </div>
                   {isActive && (

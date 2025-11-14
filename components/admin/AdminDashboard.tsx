@@ -1,39 +1,33 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import {
-  Users,
-  ShoppingBag,
-  Package,
-  TrendingUp,
-  BarChart3,
-} from "lucide-react";
-import AdminAnalytics from "./AdminAnalytics";
-import AdminUsers from "./AdminUsers";
-import AdminOrders from "./AdminOrders";
-import AdminProducts from "./AdminProducts";
+import { BarChart3, Package, ShoppingBag, TrendingUp, Users } from 'lucide-react';
+import { useState } from 'react';
+import AdminAnalytics from './AdminAnalytics';
+import AdminOrders from './AdminOrders';
+import AdminProducts from './AdminProducts';
+import AdminUsers from './AdminUsers';
 
 const AdminDashboard = () => {
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState('overview');
 
   const tabs = [
-    { id: "overview", label: "Overview", icon: TrendingUp },
-    { id: "analytics", label: "Analytics", icon: BarChart3 },
-    { id: "users", label: "Users", icon: Users },
-    { id: "orders", label: "Orders", icon: ShoppingBag },
-    { id: "products", label: "Products", icon: Package },
+    { id: 'overview', label: 'Overview', icon: TrendingUp },
+    { id: 'analytics', label: 'Analytics', icon: BarChart3 },
+    { id: 'users', label: 'Users', icon: Users },
+    { id: 'orders', label: 'Orders', icon: ShoppingBag },
+    { id: 'products', label: 'Products', icon: Package },
   ];
 
   const renderTabContent = () => {
     switch (activeTab) {
-      case "overview":
-      case "analytics":
+      case 'overview':
+      case 'analytics':
         return <AdminAnalytics />;
-      case "users":
+      case 'users':
         return <AdminUsers />;
-      case "orders":
+      case 'orders':
         return <AdminOrders />;
-      case "products":
+      case 'products':
         return <AdminProducts />;
       default:
         return <AdminAnalytics />;
@@ -53,8 +47,8 @@ const AdminDashboard = () => {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 py-2 px-1 border-b-2 font-medium text-sm ${
                   activeTab === tab.id
-                    ? "border-shop_dark_green text-shop_dark_green"
-                    : "border-transparent text-gray-500 hover:text-gray-700"
+                    ? 'border-shop_dark_green text-shop_dark_green'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
                 }`}
               >
                 <Icon className="h-4 w-4" />

@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import React, { useEffect, useState } from "react";
-import { ClerkLoaded, SignedIn, SignedOut, useUser } from "@clerk/nextjs";
-import Container from "./Container";
-import HeaderMenu from "./layout/HeaderMenu";
-import Logo from "./common/Logo";
-import CartIcon from "./cart/CartIcon";
-import MobileMenu from "./layout/MobileMenu";
+import { ClerkLoaded, SignedIn, SignedOut, useUser } from '@clerk/nextjs';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import CartIcon from './cart/CartIcon';
+import Logo from './common/Logo';
+import Container from './Container';
+import HeaderMenu from './layout/HeaderMenu';
+import MobileMenu from './layout/MobileMenu';
 // import SearchBar from "./common/SearchBar";
-import FavoriteButton from "./FavoriteButton";
-import NotificationBell from "./NotificationBell";
-import UserDropdown from "./UserDropdown";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from 'next/navigation';
+import FavoriteButton from './FavoriteButton';
+import NotificationBell from './NotificationBell';
+import UserDropdown from './UserDropdown';
 
 const ClientHeader = () => {
   const { user, isSignedIn } = useUser();
@@ -27,8 +27,8 @@ const ClientHeader = () => {
 
   // Handle redirect after successful login
   useEffect(() => {
-    if (isSignedIn && user && isMounted && typeof window !== "undefined") {
-      const redirectTo = searchParams.get("redirectTo");
+    if (isSignedIn && user && isMounted && typeof window !== 'undefined') {
+      const redirectTo = searchParams.get('redirectTo');
       if (redirectTo) {
         // Clean up the URL and redirect
         const cleanUrl = decodeURIComponent(redirectTo);
@@ -41,13 +41,13 @@ const ClientHeader = () => {
   }, [isSignedIn, user, searchParams, router, isMounted]);
 
   const getSignInUrl = () => {
-    if (!isMounted || typeof window === "undefined") return "/sign-in";
+    if (!isMounted || typeof window === 'undefined') return '/sign-in';
     const currentPath = window.location.pathname + window.location.search;
     return `/sign-in?redirectTo=${encodeURIComponent(currentPath)}`;
   };
 
   const getSignUpUrl = () => {
-    if (!isMounted || typeof window === "undefined") return "/sign-up";
+    if (!isMounted || typeof window === 'undefined') return '/sign-up';
     const currentPath = window.location.pathname + window.location.search;
     return `/sign-up?redirectTo=${encodeURIComponent(currentPath)}`;
   };
@@ -70,9 +70,7 @@ const ClientHeader = () => {
           {/* Right Section: Search + Actions */}
           <div className="flex items-center gap-2 sm:gap-3 lg:gap-4 ml-auto">
             {/* Search Bar */}
-            <div className="flex-shrink-0">
-              {/* <SearchBar /> */}
-            </div>
+            <div className="flex-shrink-0">{/* <SearchBar /> */}</div>
 
             {/* Desktop Actions */}
             <div className="hidden lg:flex items-center gap-4">

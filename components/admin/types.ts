@@ -91,14 +91,14 @@ export interface Order {
 
 export interface Product {
   _id: string;
-  _type: "product";
+  _type: 'product';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
   name: string;
   slug?: {
     current: string;
-    _type: "slug";
+    _type: 'slug';
   };
   description?: string;
   price: number;
@@ -120,16 +120,16 @@ export interface Product {
       current: string;
     };
   };
-  status: "new" | "hot" | "sale";
-  variant?: "gadget" | "appliances" | "refrigerators" | "others";
+  status: 'new' | 'hot' | 'sale';
+  variant?: 'gadget' | 'appliances' | 'refrigerators' | 'others';
   featured: boolean;
   isFeatured?: boolean;
   images?: Array<{
     asset?: {
       _ref: string;
-      _type: "reference";
+      _type: 'reference';
     };
-    _type: "image";
+    _type: 'image';
     _key: string;
   }>;
 }

@@ -1,17 +1,16 @@
-import nodemailer, { Transporter, SentMessageInfo } from "nodemailer";
-import SMTPTransport from "nodemailer/lib/smtp-transport";
+import nodemailer, { Transporter } from 'nodemailer';
+import SMTPTransport from 'nodemailer/lib/smtp-transport';
 
-const transporter: Transporter<SMTPTransport.SentMessageInfo> =
-  nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      type: "OAuth2",
-      user: process.env.SENDER_EMAIL_ADDRESS || "reactjsbd@gmail.com",
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      refreshToken: process.env.GOOGLE_REFRESH_TOKEN,
-    },
-  });
+const transporter: Transporter<SMTPTransport.SentMessageInfo> = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    type: 'OAuth2',
+    user: process.env.SENDER_EMAIL_ADDRESS || 'reactjsbd@gmail.com',
+    clientId: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    refreshToken: process.env.GOOGLE_REFRESH_TOKEN,
+  },
+});
 
 // Type definitions
 interface OrderItem {
@@ -512,19 +511,17 @@ const generateOrderConfirmationHTML = (data: OrderConfirmationData): string => {
                                     <div class="item-name">${item.name}</div>
                                 </td>
                                 <td style="text-align: center;">
-                                    <span class="quantity">${
-                                      item.quantity
-                                    }</span>
+                                    <span class="quantity">${item.quantity}</span>
                                 </td>
                                 <td style="text-align: right;">
                                     <span class="price">${formatCurrency(
-                                      item.price * item.quantity
+                                      item.price * item.quantity,
                                     )}</span>
                                 </td>
                             </tr>
-                        `
+                        `,
                           )
-                          .join("")}
+                          .join('')}
                     </tbody>
                 </table>
                 
@@ -555,8 +552,8 @@ const generateOrderConfirmationHTML = (data: OrderConfirmationData): string => {
                     <strong>${data.shippingAddress.name}</strong><br>
                     ${data.shippingAddress.street}<br>
                     ${data.shippingAddress.city}, ${
-    data.shippingAddress.state
-  } ${data.shippingAddress.zipCode}<br>
+                      data.shippingAddress.state
+                    } ${data.shippingAddress.zipCode}<br>
                     ${data.shippingAddress.country}
                 </div>
             </div>
@@ -570,7 +567,7 @@ const generateOrderConfirmationHTML = (data: OrderConfirmationData): string => {
                 <p>${data.estimatedDelivery}</p>
             </div>
             `
-                : ""
+                : ''
             }
             
             <!-- Next Steps -->
@@ -625,16 +622,12 @@ const generateOrderConfirmationHTML = (data: OrderConfirmationData): string => {
 </html>`;
 };
 
-const sendOrderConfirmationEmail = async (
-  data: OrderConfirmationData
-): Promise<EmailResponse> => {
+const sendOrderConfirmationEmail = async (data: OrderConfirmationData): Promise<EmailResponse> => {
   try {
     const htmlContent = generateOrderConfirmationHTML(data);
 
     const mailOptions = {
-      from: `"ShopCart Ecommerce" <${
-        process.env.SENDER_EMAIL_ADDRESS || "reactjsbd@gmail.com"
-      }>`,
+      from: `"ShopCart Ecommerce" <${process.env.SENDER_EMAIL_ADDRESS || 'reactjsbd@gmail.com'}>`,
       to: data.customerEmail,
       subject: `Order Confirmation - ${data.orderId} | Thank you for your purchase!`,
       html: htmlContent,
@@ -652,21 +645,17 @@ Items Ordered:
 ${data.items
   .map(
     (item) =>
-      `- ${item.name} (Qty: ${item.quantity}) - $${(
-        item.price * item.quantity
-      ).toFixed(2)}`
+      `- ${item.name} (Qty: ${item.quantity}) - $${(item.price * item.quantity).toFixed(2)}`,
   )
-  .join("\n")}
+  .join('\n')}
 
 Shipping Address:
 ${data.shippingAddress.name}
 ${data.shippingAddress.street}
-${data.shippingAddress.city}, ${data.shippingAddress.state} ${
-        data.shippingAddress.zipCode
-      }
+${data.shippingAddress.city}, ${data.shippingAddress.state} ${data.shippingAddress.zipCode}
 ${data.shippingAddress.country}
 
-${data.estimatedDelivery ? `Estimated Delivery: ${data.estimatedDelivery}` : ""}
+${data.estimatedDelivery ? `Estimated Delivery: ${data.estimatedDelivery}` : ''}
 
 We'll send you another email with tracking information once your order ships.
 
@@ -680,26 +669,19 @@ Thank you for choosing ShopCart!
 
     return { success: true, messageId: result.messageId };
   } catch (error) {
-    console.error("Failed to send order confirmation email:", error);
+    console.error('Failed to send order confirmation email:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Unknown error occurred",
+      error: error instanceof Error ? error.message : 'Unknown error occurred',
     };
   }
 };
 
 // Simple email function for other purposes
-const sendMail = async ({
-  email,
-  subject,
-  text,
-  html,
-}: SendMailParams): Promise<EmailResponse> => {
+const sendMail = async ({ email, subject, text, html }: SendMailParams): Promise<EmailResponse> => {
   try {
     const mailOptions = {
-      from: `"ShopCart Ecommerce" <${
-        process.env.SENDER_EMAIL_ADDRESS || "reactjsbd@gmail.com"
-      }>`,
+      from: `"ShopCart Ecommerce" <${process.env.SENDER_EMAIL_ADDRESS || 'reactjsbd@gmail.com'}>`,
       to: email,
       subject,
       text,
@@ -709,19 +691,13 @@ const sendMail = async ({
     const result = await transporter.sendMail(mailOptions);
     return { success: true, messageId: result.messageId };
   } catch (error) {
-    console.error("Failed to send email:", error);
+    console.error('Failed to send email:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Unknown error occurred",
+      error: error instanceof Error ? error.message : 'Unknown error occurred',
     };
   }
 };
 
-export { sendOrderConfirmationEmail, sendMail };
-export type {
-  OrderConfirmationData,
-  OrderItem,
-  ShippingAddress,
-  EmailResponse,
-  SendMailParams,
-};
+export { sendMail, sendOrderConfirmationEmail };
+export type { EmailResponse, OrderConfirmationData, OrderItem, SendMailParams, ShippingAddress };

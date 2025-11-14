@@ -1,50 +1,39 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import {
-  Mail,
-  Trash2,
-  Search,
-  Calendar,
-  Filter,
-  Download,
-  AlertTriangle,
-  X,
-  RefreshCw,
-  Copy,
-} from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogOverlay, DialogPortal, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
+import { cn } from '@/lib/utils';
+import * as DialogPrimitive from '@radix-ui/react-dialog';
+import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
 import {
-  Dialog,
-  DialogPortal,
-  DialogOverlay,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import * as DialogPrimitive from "@radix-ui/react-dialog";
-import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
-import { toast } from "sonner";
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
+  AlertTriangle,
+  Calendar,
+  Copy,
+  Download,
+  Filter,
+  Mail,
+  RefreshCw,
+  Search,
+  Trash2,
+  X,
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 interface Subscription {
   _id: string;
   email: string;
-  status: "active" | "unsubscribed" | "pending";
+  status: 'active' | 'unsubscribed' | 'pending';
   subscribedAt: string;
   unsubscribedAt?: string;
   source: string;
@@ -53,18 +42,15 @@ interface Subscription {
 
 export default function AdminSubscriptions() {
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
-  const [filteredSubscriptions, setFilteredSubscriptions] = useState<
-    Subscription[]
-  >([]);
+  const [filteredSubscriptions, setFilteredSubscriptions] = useState<Subscription[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [sourceFilter, setSourceFilter] = useState<string>("all");
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [sourceFilter, setSourceFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [subscriptionToDelete, setSubscriptionToDelete] =
-    useState<Subscription | null>(null);
+  const [subscriptionToDelete, setSubscriptionToDelete] = useState<Subscription | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -80,17 +66,17 @@ export default function AdminSubscriptions() {
     // Search filter
     if (searchQuery) {
       filtered = filtered.filter((sub) =>
-        sub.email.toLowerCase().includes(searchQuery.toLowerCase())
+        sub.email.toLowerCase().includes(searchQuery.toLowerCase()),
       );
     }
 
     // Status filter
-    if (statusFilter !== "all") {
+    if (statusFilter !== 'all') {
       filtered = filtered.filter((sub) => sub.status === statusFilter);
     }
 
     // Source filter
-    if (sourceFilter !== "all") {
+    if (sourceFilter !== 'all') {
       filtered = filtered.filter((sub) => sub.source === sourceFilter);
     }
 
@@ -102,16 +88,16 @@ export default function AdminSubscriptions() {
     setIsLoading(true);
     setIsRefreshing(true);
     try {
-      const response = await fetch("/api/admin/subscriptions");
+      const response = await fetch('/api/admin/subscriptions');
       if (response.ok) {
         const data = await response.json();
         setSubscriptions(data.subscriptions || []);
       } else {
-        toast.error("Failed to fetch subscriptions");
+        toast.error('Failed to fetch subscriptions');
       }
     } catch (error) {
-      console.error("Error fetching subscriptions:", error);
-      toast.error("Error loading subscriptions");
+      console.error('Error fetching subscriptions:', error);
+      toast.error('Error loading subscriptions');
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);
@@ -119,41 +105,38 @@ export default function AdminSubscriptions() {
   };
 
   const handleRefresh = async () => {
-    toast.info("Refreshing subscriptions...");
+    toast.info('Refreshing subscriptions...');
     await fetchSubscriptions();
-    toast.success("Subscriptions refreshed!");
+    toast.success('Subscriptions refreshed!');
   };
 
   const handleCleanupDuplicates = async () => {
     if (
       !confirm(
-        "Are you sure you want to remove duplicate subscriptions? This will keep only the oldest subscription for each email address."
+        'Are you sure you want to remove duplicate subscriptions? This will keep only the oldest subscription for each email address.',
       )
     ) {
       return;
     }
 
-    toast.info("Cleaning up duplicate subscriptions...");
+    toast.info('Cleaning up duplicate subscriptions...');
     try {
-      const response = await fetch(
-        "/api/admin/subscriptions/cleanup-duplicates",
-        {
-          method: "POST",
-        }
-      );
+      const response = await fetch('/api/admin/subscriptions/cleanup-duplicates', {
+        method: 'POST',
+      });
 
       if (response.ok) {
         const data = await response.json();
         toast.success(
-          `Cleanup completed! Removed ${data.duplicatesRemoved} duplicate(s) from ${data.duplicatesFound} email(s).`
+          `Cleanup completed! Removed ${data.duplicatesRemoved} duplicate(s) from ${data.duplicatesFound} email(s).`,
         );
         await fetchSubscriptions(); // Refresh the list
       } else {
-        toast.error("Failed to cleanup duplicates");
+        toast.error('Failed to cleanup duplicates');
       }
     } catch (error) {
-      console.error("Error cleaning up duplicates:", error);
-      toast.error("Error cleaning up duplicates");
+      console.error('Error cleaning up duplicates:', error);
+      toast.error('Error cleaning up duplicates');
     }
   };
 
@@ -167,27 +150,22 @@ export default function AdminSubscriptions() {
 
     setIsDeleting(true);
     try {
-      const response = await fetch(
-        `/api/admin/subscriptions/${subscriptionToDelete._id}`,
-        {
-          method: "DELETE",
-        }
-      );
+      const response = await fetch(`/api/admin/subscriptions/${subscriptionToDelete._id}`, {
+        method: 'DELETE',
+      });
 
       if (response.ok) {
-        toast.success("Subscription deleted successfully");
-        setSubscriptions((prev) =>
-          prev.filter((sub) => sub._id !== subscriptionToDelete._id)
-        );
+        toast.success('Subscription deleted successfully');
+        setSubscriptions((prev) => prev.filter((sub) => sub._id !== subscriptionToDelete._id));
         setDeleteDialogOpen(false);
         setSubscriptionToDelete(null);
       } else {
         const data = await response.json();
-        toast.error(data.error || "Failed to delete subscription");
+        toast.error(data.error || 'Failed to delete subscription');
       }
     } catch (error) {
-      console.error("Error deleting subscription:", error);
-      toast.error("Error deleting subscription");
+      console.error('Error deleting subscription:', error);
+      toast.error('Error deleting subscription');
     } finally {
       setIsDeleting(false);
     }
@@ -195,46 +173,43 @@ export default function AdminSubscriptions() {
 
   const handleExportCSV = () => {
     const csvContent = [
-      ["Email", "Status", "Source", "Subscribed At", "IP Address"],
+      ['Email', 'Status', 'Source', 'Subscribed At', 'IP Address'],
       ...filteredSubscriptions.map((sub) => [
         sub.email,
         sub.status,
         sub.source,
         new Date(sub.subscribedAt).toLocaleString(),
-        sub.ipAddress || "N/A",
+        sub.ipAddress || 'N/A',
       ]),
     ]
-      .map((row) => row.join(","))
-      .join("\n");
+      .map((row) => row.join(','))
+      .join('\n');
 
-    const blob = new Blob([csvContent], { type: "text/csv" });
+    const blob = new Blob([csvContent], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
+    const a = document.createElement('a');
     a.href = url;
-    a.download = `subscriptions-${new Date().toISOString().split("T")[0]}.csv`;
+    a.download = `subscriptions-${new Date().toISOString().split('T')[0]}.csv`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     window.URL.revokeObjectURL(url);
-    toast.success("Subscriptions exported successfully");
+    toast.success('Subscriptions exported successfully');
   };
 
   // Pagination
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentSubscriptions = filteredSubscriptions.slice(
-    indexOfFirstItem,
-    indexOfLastItem
-  );
+  const currentSubscriptions = filteredSubscriptions.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredSubscriptions.length / itemsPerPage);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case "active":
+      case 'active':
         return <Badge className="bg-green-500">Active</Badge>;
-      case "unsubscribed":
+      case 'unsubscribed':
         return <Badge variant="secondary">Unsubscribed</Badge>;
-      case "pending":
+      case 'pending':
         return <Badge variant="outline">Pending</Badge>;
       default:
         return <Badge>{status}</Badge>;
@@ -243,22 +218,20 @@ export default function AdminSubscriptions() {
 
   const getSourceBadge = (source: string) => {
     const colors: Record<string, string> = {
-      footer: "bg-blue-500",
-      popup: "bg-purple-500",
-      checkout: "bg-orange-500",
-      other: "bg-gray-500",
+      footer: 'bg-blue-500',
+      popup: 'bg-purple-500',
+      checkout: 'bg-orange-500',
+      other: 'bg-gray-500',
     };
     return (
-      <Badge className={colors[source] || "bg-gray-500"}>
+      <Badge className={colors[source] || 'bg-gray-500'}>
         {source.charAt(0).toUpperCase() + source.slice(1)}
       </Badge>
     );
   };
 
   // Get unique sources for filter
-  const uniqueSources = Array.from(
-    new Set(subscriptions.map((sub) => sub.source))
-  );
+  const uniqueSources = Array.from(new Set(subscriptions.map((sub) => sub.source)));
 
   return (
     <div className="p-6 space-y-6">
@@ -269,9 +242,7 @@ export default function AdminSubscriptions() {
             <Mail className="h-8 w-8 text-shop_dark_green" />
             Newsletter Subscriptions
           </h1>
-          <p className="text-gray-600 mt-1">
-            Manage and monitor all newsletter subscriptions
-          </p>
+          <p className="text-gray-600 mt-1">Manage and monitor all newsletter subscriptions</p>
         </div>
         <div className="flex gap-2">
           <Button
@@ -282,14 +253,8 @@ export default function AdminSubscriptions() {
             <Copy className="h-4 w-4 mr-2" />
             Remove Duplicates
           </Button>
-          <Button
-            onClick={handleRefresh}
-            variant="outline"
-            disabled={isRefreshing}
-          >
-            <RefreshCw
-              className={cn("h-4 w-4 mr-2", isRefreshing && "animate-spin")}
-            />
+          <Button onClick={handleRefresh} variant="outline" disabled={isRefreshing}>
+            <RefreshCw className={cn('h-4 w-4 mr-2', isRefreshing && 'animate-spin')} />
             Refresh
           </Button>
           <Button onClick={handleExportCSV} variant="outline">
@@ -311,7 +276,7 @@ export default function AdminSubscriptions() {
           <CardHeader className="pb-3">
             <CardDescription>Active</CardDescription>
             <CardTitle className="text-3xl text-green-600">
-              {subscriptions.filter((s) => s.status === "active").length}
+              {subscriptions.filter((s) => s.status === 'active').length}
             </CardTitle>
           </CardHeader>
         </Card>
@@ -319,7 +284,7 @@ export default function AdminSubscriptions() {
           <CardHeader className="pb-3">
             <CardDescription>Unsubscribed</CardDescription>
             <CardTitle className="text-3xl text-gray-600">
-              {subscriptions.filter((s) => s.status === "unsubscribed").length}
+              {subscriptions.filter((s) => s.status === 'unsubscribed').length}
             </CardTitle>
           </CardHeader>
         </Card>
@@ -397,11 +362,11 @@ export default function AdminSubscriptions() {
           <CardTitle>Subscribers ({filteredSubscriptions.length})</CardTitle>
           <CardDescription>
             {isLoading ? (
-              "Loading subscriptions..."
+              'Loading subscriptions...'
             ) : (
               <>
-                Showing {indexOfFirstItem + 1} to{" "}
-                {Math.min(indexOfLastItem, filteredSubscriptions.length)} of{" "}
+                Showing {indexOfFirstItem + 1} to{' '}
+                {Math.min(indexOfLastItem, filteredSubscriptions.length)} of{' '}
                 {filteredSubscriptions.length} subscriptions
               </>
             )}
@@ -427,33 +392,18 @@ export default function AdminSubscriptions() {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b">
-                      <th className="text-left p-4 font-semibold text-gray-900">
-                        Email
-                      </th>
-                      <th className="text-left p-4 font-semibold text-gray-900">
-                        Status
-                      </th>
-                      <th className="text-left p-4 font-semibold text-gray-900">
-                        Source
-                      </th>
-                      <th className="text-left p-4 font-semibold text-gray-900">
-                        Subscribed At
-                      </th>
-                      <th className="text-left p-4 font-semibold text-gray-900">
-                        IP Address
-                      </th>
-                      <th className="text-right p-4 font-semibold text-gray-900">
-                        Actions
-                      </th>
+                      <th className="text-left p-4 font-semibold text-gray-900">Email</th>
+                      <th className="text-left p-4 font-semibold text-gray-900">Status</th>
+                      <th className="text-left p-4 font-semibold text-gray-900">Source</th>
+                      <th className="text-left p-4 font-semibold text-gray-900">Subscribed At</th>
+                      <th className="text-left p-4 font-semibold text-gray-900">IP Address</th>
+                      <th className="text-right p-4 font-semibold text-gray-900">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {currentSubscriptions.length === 0 ? (
                       <tr>
-                        <td
-                          colSpan={6}
-                          className="text-center p-8 text-gray-500"
-                        >
+                        <td colSpan={6} className="text-center p-8 text-gray-500">
                           No subscriptions found
                         </td>
                       </tr>
@@ -466,27 +416,19 @@ export default function AdminSubscriptions() {
                           <td className="p-4">
                             <div className="flex items-center gap-2">
                               <Mail className="h-4 w-4 text-gray-400" />
-                              <span className="font-medium">
-                                {subscription.email}
-                              </span>
+                              <span className="font-medium">{subscription.email}</span>
                             </div>
                           </td>
-                          <td className="p-4">
-                            {getStatusBadge(subscription.status)}
-                          </td>
-                          <td className="p-4">
-                            {getSourceBadge(subscription.source)}
-                          </td>
+                          <td className="p-4">{getStatusBadge(subscription.status)}</td>
+                          <td className="p-4">{getSourceBadge(subscription.source)}</td>
                           <td className="p-4">
                             <div className="flex items-center gap-2 text-sm text-gray-600">
                               <Calendar className="h-4 w-4" />
-                              {new Date(
-                                subscription.subscribedAt
-                              ).toLocaleDateString()}
+                              {new Date(subscription.subscribedAt).toLocaleDateString()}
                             </div>
                           </td>
                           <td className="p-4 text-sm text-gray-600">
-                            {subscription.ipAddress || "N/A"}
+                            {subscription.ipAddress || 'N/A'}
                           </td>
                           <td className="p-4 text-right">
                             <Button
@@ -515,9 +457,7 @@ export default function AdminSubscriptions() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() =>
-                        setCurrentPage((prev) => Math.max(1, prev - 1))
-                      }
+                      onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                       disabled={currentPage === 1}
                     >
                       Previous
@@ -525,9 +465,7 @@ export default function AdminSubscriptions() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() =>
-                        setCurrentPage((prev) => Math.min(totalPages, prev + 1))
-                      }
+                      onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
                       disabled={currentPage === totalPages}
                     >
                       Next
@@ -546,7 +484,7 @@ export default function AdminSubscriptions() {
           <DialogOverlay />
           <DialogPrimitive.Content
             className={cn(
-              "fixed left-[50%] top-[50%] z-50 grid w-full max-w-md translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-300 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 sm:rounded-lg"
+              'fixed left-[50%] top-[50%] z-50 grid w-full max-w-md translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-300 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 sm:rounded-lg',
             )}
           >
             <VisuallyHidden.Root>
@@ -557,15 +495,11 @@ export default function AdminSubscriptions() {
                 <AlertTriangle className="h-8 w-8 text-red-600 animate-pulse" />
               </div>
               <div className="space-y-2">
-                <h3 className="text-xl font-bold text-gray-900">
-                  Delete Subscription
-                </h3>
+                <h3 className="text-xl font-bold text-gray-900">Delete Subscription</h3>
                 <p className="text-gray-600 leading-relaxed">
-                  You&apos;re about to permanently delete the subscription for{" "}
-                  <span className="font-semibold text-red-600">
-                    {subscriptionToDelete?.email}
-                  </span>
-                  . This action cannot be undone.
+                  You&apos;re about to permanently delete the subscription for{' '}
+                  <span className="font-semibold text-red-600">{subscriptionToDelete?.email}</span>.
+                  This action cannot be undone.
                 </p>
               </div>
             </div>
@@ -585,7 +519,7 @@ export default function AdminSubscriptions() {
                 className="flex-1 bg-red-600 hover:bg-red-700 focus:ring-red-500 font-semibold shadow-lg hover:shadow-red-200"
               >
                 <Trash2 className="w-4 h-4 mr-2" />
-                {isDeleting ? "Deleting..." : "Delete"}
+                {isDeleting ? 'Deleting...' : 'Delete'}
               </Button>
             </div>
             <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">

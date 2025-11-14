@@ -1,16 +1,16 @@
-import Container from "@/components/Container";
-import DynamicBreadcrumb from "@/components/DynamicBreadcrumb";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { GET_ALL_BLOGResult } from "@/sanity.types";
-import { urlFor } from "@/sanity/lib/image";
-import { getAllBlogs } from "@/sanity/queries";
-import dayjs from "dayjs";
-import { Calendar, Clock, ArrowRight, User, Eye, BookOpen } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
+import Container from '@/components/Container';
+import DynamicBreadcrumb from '@/components/DynamicBreadcrumb';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { GET_ALL_BLOGResult } from '@/sanity.types';
+import { urlFor } from '@/sanity/lib/image';
+import { getAllBlogs } from '@/sanity/queries';
+import dayjs from 'dayjs';
+import { ArrowRight, BookOpen, Calendar, Clock, Eye, User } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
 
 const BlogPage = async () => {
   const blogs = await getAllBlogs(12);
@@ -18,36 +18,29 @@ const BlogPage = async () => {
   // Calculate reading time (mock calculation based on title length)
   const calculateReadingTime = (title: string) => {
     const wordsPerMinute = 200;
-    const wordCount = title.split(" ").length * 20; // Estimate based on title
+    const wordCount = title.split(' ').length * 20; // Estimate based on title
     return Math.ceil(wordCount / wordsPerMinute);
   };
 
   // Extract description from blog body
-  const extractDescription = (
-    body: GET_ALL_BLOGResult[0]["body"],
-    maxLength: number = 150
-  ) => {
-    if (!body || !Array.isArray(body))
-      return "Discover insights and stories that matter.";
+  const extractDescription = (body: GET_ALL_BLOGResult[0]['body'], maxLength: number = 150) => {
+    if (!body || !Array.isArray(body)) return 'Discover insights and stories that matter.';
 
-    let description = "";
+    let description = '';
     for (const block of body) {
-      if (block._type === "block" && block.children) {
+      if (block._type === 'block' && block.children) {
         for (const child of block.children) {
-          if (child.text && child._type === "span") {
-            description += child.text + " ";
+          if (child.text && child._type === 'span') {
+            description += child.text + ' ';
             if (description.length > maxLength) {
-              return description.substring(0, maxLength).trim() + "...";
+              return description.substring(0, maxLength).trim() + '...';
             }
           }
         }
       }
     }
 
-    return (
-      description.trim() ||
-      "Read our latest insights and discover new perspectives."
-    );
+    return description.trim() || 'Read our latest insights and discover new perspectives.';
   };
 
   return (
@@ -64,10 +57,7 @@ const BlogPage = async () => {
             <div className="max-w-3xl mx-auto">
               <div className="flex items-center justify-center gap-2 mb-4">
                 <BookOpen className="w-6 h-6 sm:w-8 sm:h-8" />
-                <Badge
-                  variant="secondary"
-                  className="bg-white/20 text-white hover:bg-white/30"
-                >
+                <Badge variant="secondary" className="bg-white/20 text-white hover:bg-white/30">
                   Our Blog
                 </Badge>
               </div>
@@ -75,9 +65,8 @@ const BlogPage = async () => {
                 Stories, Tips & Insights
               </h1>
               <p className="text-sm sm:text-base md:text-lg text-white/90 mb-6 max-w-2xl mx-auto">
-                Discover the latest trends, expert advice, and behind-the-scenes
-                stories from our team. Stay informed with our curated collection
-                of articles.
+                Discover the latest trends, expert advice, and behind-the-scenes stories from our
+                team. Stay informed with our curated collection of articles.
               </p>
 
               {/* Blog Stats */}
@@ -87,9 +76,7 @@ const BlogPage = async () => {
                     <BookOpen className="w-4 h-4" />
                     <span className="text-xs sm:text-sm">Articles</span>
                   </div>
-                  <p className="text-xl sm:text-2xl font-bold">
-                    {blogs?.length || 0}
-                  </p>
+                  <p className="text-xl sm:text-2xl font-bold">{blogs?.length || 0}</p>
                 </div>
 
                 <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 sm:p-4">
@@ -121,9 +108,7 @@ const BlogPage = async () => {
               <h2 className="text-2xl sm:text-3xl font-bold text-shop_dark_green mb-2">
                 Latest Articles
               </h2>
-              <p className="text-gray-600">
-                Stay updated with our latest posts and insights
-              </p>
+              <p className="text-gray-600">Stay updated with our latest posts and insights</p>
             </div>
           </div>
         </div>
@@ -134,25 +119,22 @@ const BlogPage = async () => {
               <Card
                 key={blog?._id}
                 className={`group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden border-0 shadow-lg ${
-                  index === 0 ? "md:col-span-2 lg:col-span-2" : ""
+                  index === 0 ? 'md:col-span-2 lg:col-span-2' : ''
                 }`}
               >
                 {blog?.mainImage && (
                   <div className="relative overflow-hidden">
                     <Image
                       src={urlFor(blog.mainImage).url()}
-                      alt={blog?.title || "Blog image"}
+                      alt={blog?.title || 'Blog image'}
                       width={500}
                       height={300}
                       className={`w-full object-cover transition-transform duration-300 group-hover:scale-105 ${
-                        index === 0 ? "h-64 md:h-80" : "h-48 md:h-56"
+                        index === 0 ? 'h-64 md:h-80' : 'h-48 md:h-56'
                       }`}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-                    <Link
-                      href={`/blog/${blog?.slug?.current}`}
-                      className="absolute inset-0"
-                    />
+                    <Link href={`/blog/${blog?.slug?.current}`} className="absolute inset-0" />
 
                     {/* Category Badge */}
                     {blog?.blogcategories && blog.blogcategories.length > 0 && (
@@ -168,24 +150,21 @@ const BlogPage = async () => {
                   <div className="flex items-center gap-4 text-xs sm:text-sm text-gray-500 mb-3">
                     <div className="flex items-center gap-1">
                       <Calendar size={14} />
-                      {dayjs(blog.publishedAt).format("MMM D, YYYY")}
+                      {dayjs(blog.publishedAt).format('MMM D, YYYY')}
                     </div>
                     <div className="flex items-center gap-1">
                       <Clock size={14} />
-                      {calculateReadingTime(blog?.title || "")} min read
+                      {calculateReadingTime(blog?.title || '')} min read
                     </div>
                   </div>
 
                   {/* Title */}
-                  <Link
-                    href={`/blog/${blog?.slug?.current}`}
-                    className="block group/title"
-                  >
+                  <Link href={`/blog/${blog?.slug?.current}`} className="block group/title">
                     <h3
                       className={`font-bold text-shop_dark_green group-hover/title:text-shop_light_green transition-colors duration-200 line-clamp-2 leading-tight ${
                         index === 0
-                          ? "text-lg sm:text-xl md:text-2xl mb-3"
-                          : "text-base sm:text-lg mb-2"
+                          ? 'text-lg sm:text-xl md:text-2xl mb-3'
+                          : 'text-base sm:text-lg mb-2'
                       }`}
                     >
                       {blog?.title}
@@ -246,9 +225,8 @@ const BlogPage = async () => {
                 Stay Updated
               </h2>
               <p className="text-sm sm:text-base text-gray-600 mb-6">
-                Subscribe to our newsletter and never miss an update. Get the
-                latest articles, tips, and insights delivered straight to your
-                inbox.
+                Subscribe to our newsletter and never miss an update. Get the latest articles, tips,
+                and insights delivered straight to your inbox.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center max-w-md mx-auto">
                 <Button

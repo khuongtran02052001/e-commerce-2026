@@ -73,12 +73,10 @@ The employee dashboard is a comprehensive system for managing orders with role-b
 ### Order Confirmation Workflow
 
 1. **View Orders**
-
    - Orders appear in the list with priority badges
    - Click "View" to open order details
 
 2. **Confirm Address**
-
    - Review customer's delivery address
    - Verify contact information
    - Click "Confirm Address" button
@@ -162,21 +160,18 @@ The system automatically tracks your performance:
 ### For Call Center Agents
 
 1. **Address Verification**
-
    - Always verify address completeness
    - Check for phone number availability
    - Confirm city, state, and ZIP code accuracy
    - Add notes if customer provides special instructions
 
 2. **Order Confirmation**
-
    - Review all items before confirming
    - Check payment method
    - Verify order total
    - Add notes for special handling requirements
 
 3. **Communication**
-
    - Use the notes field for important information
    - Document customer requests
    - Flag any unusual orders

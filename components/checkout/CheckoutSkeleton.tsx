@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export function CheckoutSkeleton() {
   return (
@@ -212,8 +212,7 @@ export function OrderCheckoutSkeleton() {
                 <Skeleton className="h-6 w-40" /> {/* Order number */}
                 <Skeleton className="h-4 w-32" /> {/* Date */}
               </div>
-              <Skeleton className="h-6 w-20 rounded-full" />{" "}
-              {/* Status badge */}
+              <Skeleton className="h-6 w-20 rounded-full" /> {/* Status badge */}
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -289,8 +288,7 @@ export function OrderCheckoutSkeleton() {
               <Skeleton className="h-5 w-16" />
               <Skeleton className="h-5 w-24" />
             </div>
-            <Skeleton className="h-12 w-full rounded-md mt-6" />{" "}
-            {/* Pay button */}
+            <Skeleton className="h-12 w-full rounded-md mt-6" /> {/* Pay button */}
           </CardContent>
         </Card>
       </div>

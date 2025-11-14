@@ -1,7 +1,7 @@
-import { MetadataRoute } from "next";
-import { client } from "@/sanity/lib/client";
+import { client } from '@/sanity/lib/client';
+import { MetadataRoute } from 'next';
 
-const BASE_URL = "https://shopcartpro.reactbd.org";
+const BASE_URL = 'https://shopcartpro.reactbd.org';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Fetch all products
@@ -33,37 +33,37 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     {
       url: BASE_URL,
       lastModified: new Date(),
-      changeFrequency: "daily" as const,
+      changeFrequency: 'daily' as const,
       priority: 1,
     },
     {
       url: `${BASE_URL}/shop`,
       lastModified: new Date(),
-      changeFrequency: "daily" as const,
+      changeFrequency: 'daily' as const,
       priority: 0.9,
     },
     {
       url: `${BASE_URL}/category`,
       lastModified: new Date(),
-      changeFrequency: "weekly" as const,
+      changeFrequency: 'weekly' as const,
       priority: 0.8,
     },
     {
       url: `${BASE_URL}/brands`,
       lastModified: new Date(),
-      changeFrequency: "weekly" as const,
+      changeFrequency: 'weekly' as const,
       priority: 0.7,
     },
     {
       url: `${BASE_URL}/deal`,
       lastModified: new Date(),
-      changeFrequency: "daily" as const,
+      changeFrequency: 'daily' as const,
       priority: 0.8,
     },
     {
       url: `${BASE_URL}/blog`,
       lastModified: new Date(),
-      changeFrequency: "weekly" as const,
+      changeFrequency: 'weekly' as const,
       priority: 0.6,
     },
   ];
@@ -72,7 +72,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const productPages = products.map((product: any) => ({
     url: `${BASE_URL}/product/${product.slug}`,
     lastModified: new Date(product._updatedAt),
-    changeFrequency: "weekly" as const,
+    changeFrequency: 'weekly' as const,
     priority: 0.7,
   }));
 
@@ -80,7 +80,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const categoryPages = categories.map((category: any) => ({
     url: `${BASE_URL}/category/${category.slug}`,
     lastModified: new Date(category._updatedAt),
-    changeFrequency: "weekly" as const,
+    changeFrequency: 'weekly' as const,
     priority: 0.8,
   }));
 
@@ -88,7 +88,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const brandPages = brands.map((brand: any) => ({
     url: `${BASE_URL}/brands/${brand.slug}`,
     lastModified: new Date(brand._updatedAt),
-    changeFrequency: "monthly" as const,
+    changeFrequency: 'monthly' as const,
     priority: 0.6,
   }));
 

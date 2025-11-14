@@ -1,5 +1,6 @@
-import Container from "@/components/Container";
-import Title from "@/components/Title";
+import Container from '@/components/Container';
+import CategoryProducts from '@/components/product/CategoryProducts';
+import Title from '@/components/Title';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -7,30 +8,20 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { getCategories } from "@/sanity/queries";
-import { Category, Product } from "@/sanity.types";
-import { urlFor } from "@/sanity/lib/image";
-import Image from "next/image";
-import Link from "next/link";
+} from '@/components/ui/breadcrumb';
 import {
-  ArrowLeft,
-  ArrowRight,
-  Package,
-  Tag,
-  Grid3X3,
-  Filter,
-  TrendingUp,
-} from "lucide-react";
-import React from "react";
-import CategoryProducts from "@/components/product/CategoryProducts";
-import { client } from "@/sanity/lib/client";
-import { Metadata } from "next";
-import {
-  generateCategoryMetadata,
   generateBreadcrumbSchema,
+  generateCategoryMetadata,
   generateItemListSchema,
-} from "@/lib/seo";
+} from '@/lib/seo';
+import { Category, Product } from '@/sanity.types';
+import { client } from '@/sanity/lib/client';
+import { urlFor } from '@/sanity/lib/image';
+import { getCategories } from '@/sanity/queries';
+import { ArrowLeft, ArrowRight, Filter, Grid3X3, Package, Tag, TrendingUp } from 'lucide-react';
+import { Metadata } from 'next';
+import Image from 'next/image';
+import Link from 'next/link';
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -49,13 +40,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const products = await client.fetch(query, { slug });
 
   // Find the current category
-  const currentCategory = categories.find(
-    (cat: Category) => cat.slug?.current === slug
-  );
+  const currentCategory = categories.find((cat: Category) => cat.slug?.current === slug);
 
   if (!currentCategory) {
     return {
-      title: "Category Not Found",
+      title: 'Category Not Found',
       description: "The category you're looking for could not be found.",
     };
   }
@@ -63,11 +52,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return generateCategoryMetadata(currentCategory, products.length);
 }
 
-const CategoryPage = async ({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) => {
+const CategoryPage = async ({ params }: { params: Promise<{ slug: string }> }) => {
   const { slug } = await params;
   const categories: Category[] = await getCategories();
 
@@ -84,27 +69,20 @@ const CategoryPage = async ({
   const products: Product[] = await client.fetch(query, { slug });
 
   // Find the current category to get its proper title
-  const currentCategory = categories.find(
-    (cat: Category) => cat.slug?.current === slug
-  );
+  const currentCategory = categories.find((cat: Category) => cat.slug?.current === slug);
   const categoryTitle = currentCategory?.title || slug;
 
   // Get related categories (exclude current category)
-  const relatedCategories = categories
-    .filter((cat) => cat.slug?.current !== slug)
-    .slice(0, 6);
+  const relatedCategories = categories.filter((cat) => cat.slug?.current !== slug).slice(0, 6);
 
   // Generate structured data
   const breadcrumbSchema = generateBreadcrumbSchema([
-    { name: "Home", url: "/" },
-    { name: "Categories", url: "/category" },
+    { name: 'Home', url: '/' },
+    { name: 'Categories', url: '/category' },
     { name: categoryTitle, url: `/category/${slug}` },
   ]);
 
-  const itemListSchema = generateItemListSchema(
-    products,
-    `${categoryTitle} Products`
-  );
+  const itemListSchema = generateItemListSchema(products, `${categoryTitle} Products`);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-shop_light_bg via-white to-shop_light_pink">
@@ -235,11 +213,7 @@ const CategoryPage = async ({
         </div>
 
         {/* Main Content */}
-        <CategoryProducts
-          categories={categories}
-          slug={slug}
-          initialProducts={products}
-        />
+        <CategoryProducts categories={categories} slug={slug} initialProducts={products} />
 
         {/* Related Categories Section */}
         {relatedCategories.length > 0 && (
@@ -269,7 +243,7 @@ const CategoryPage = async ({
                     {category.image ? (
                       <Image
                         src={urlFor(category.image).url()}
-                        alt={category.title || "Category"}
+                        alt={category.title || 'Category'}
                         width={32}
                         height={32}
                         className="w-8 h-8 object-contain"
@@ -296,8 +270,8 @@ const CategoryPage = async ({
               Discover More Amazing Products
             </h3>
             <p className="text-dark-text mb-6 text-sm lg:text-base">
-              Can&apos;t find what you&apos;re looking for in {categoryTitle}?
-              Explore our complete collection of products across all categories.
+              Can&apos;t find what you&apos;re looking for in {categoryTitle}? Explore our complete
+              collection of products across all categories.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link

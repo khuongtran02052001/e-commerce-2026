@@ -1,20 +1,12 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { toast } from "sonner";
-import { useUser } from "@clerk/nextjs";
-import {
-  User,
-  Calendar,
-  Mail,
-  CheckCircle,
-  XCircle,
-  Clock,
-  Building2,
-} from "lucide-react";
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useUser } from '@clerk/nextjs';
+import { Building2, Calendar, CheckCircle, Clock, Mail, User, XCircle } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 interface BusinessAccount {
   _id: string;
@@ -40,16 +32,16 @@ export default function BusinessAccountsAdmin() {
 
   const fetchBusinessAccounts = async () => {
     try {
-      const response = await fetch("/api/admin/business-accounts");
+      const response = await fetch('/api/admin/business-accounts');
       if (response.ok) {
         const data = await response.json();
         setAccounts(data.accounts || []);
       } else {
-        toast.error("Failed to fetch business accounts");
+        toast.error('Failed to fetch business accounts');
       }
     } catch (error) {
-      console.error("Error fetching business accounts:", error);
-      toast.error("Error loading business accounts");
+      console.error('Error fetching business accounts:', error);
+      toast.error('Error loading business accounts');
     } finally {
       setLoading(false);
     }
@@ -58,10 +50,10 @@ export default function BusinessAccountsAdmin() {
   const handleApproval = async (accountId: string, approve: boolean) => {
     setProcessing(accountId);
     try {
-      const response = await fetch("/api/admin/business-accounts/approve", {
-        method: "POST",
+      const response = await fetch('/api/admin/business-accounts/approve', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           accountId,
@@ -71,17 +63,15 @@ export default function BusinessAccountsAdmin() {
       });
 
       if (response.ok) {
-        toast.success(
-          `Business account ${approve ? "approved" : "rejected"} successfully`
-        );
+        toast.success(`Business account ${approve ? 'approved' : 'rejected'} successfully`);
         fetchBusinessAccounts(); // Refresh the list
       } else {
         const errorData = await response.json();
-        toast.error(errorData.error || "Failed to update business account");
+        toast.error(errorData.error || 'Failed to update business account');
       }
     } catch (error) {
-      console.error("Error updating business account:", error);
-      toast.error("Error updating business account");
+      console.error('Error updating business account:', error);
+      toast.error('Error updating business account');
     } finally {
       setProcessing(null);
     }
@@ -130,31 +120,22 @@ export default function BusinessAccountsAdmin() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          Business Account Management
-        </h1>
-        <p className="text-gray-600">
-          Manage and approve business account requests
-        </p>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Business Account Management</h1>
+        <p className="text-gray-600">Manage and approve business account requests</p>
       </div>
 
       {accounts.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">
             <Building2 className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              No Business Accounts
-            </h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No Business Accounts</h3>
             <p className="text-gray-500">No business account requests found.</p>
           </CardContent>
         </Card>
       ) : (
         <div className="space-y-4">
           {accounts.map((account) => (
-            <Card
-              key={account._id}
-              className="hover:shadow-md transition-shadow"
-            >
+            <Card key={account._id} className="hover:shadow-md transition-shadow">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
@@ -174,8 +155,7 @@ export default function BusinessAccountsAdmin() {
                         </div>
                         <div className="flex items-center">
                           <Calendar className="w-4 h-4 mr-1" />
-                          Joined{" "}
-                          {new Date(account.createdAt).toLocaleDateString()}
+                          Joined {new Date(account.createdAt).toLocaleDateString()}
                         </div>
                       </div>
                     </div>
@@ -187,26 +167,20 @@ export default function BusinessAccountsAdmin() {
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
                     <p className="text-sm text-gray-600">
-                      Membership:{" "}
-                      <span className="font-medium capitalize">
-                        {account.membershipType}
-                      </span>
+                      Membership:{' '}
+                      <span className="font-medium capitalize">{account.membershipType}</span>
                     </p>
                     {account.businessApprovedBy && (
                       <p className="text-sm text-gray-600">
-                        Approved by:{" "}
-                        <span className="font-medium">
-                          {account.businessApprovedBy}
-                        </span>
+                        Approved by:{' '}
+                        <span className="font-medium">{account.businessApprovedBy}</span>
                       </p>
                     )}
                     {account.businessApprovedAt && (
                       <p className="text-sm text-gray-600">
-                        Approved on:{" "}
+                        Approved on:{' '}
                         <span className="font-medium">
-                          {new Date(
-                            account.businessApprovedAt
-                          ).toLocaleDateString()}
+                          {new Date(account.businessApprovedAt).toLocaleDateString()}
                         </span>
                       </p>
                     )}

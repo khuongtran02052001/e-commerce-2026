@@ -1,5 +1,5 @@
-import { Category } from "@/sanity.types";
-import CategorySelector from "./ui/category-selector";
+import { Category } from '@/sanity.types';
+import CategorySelector from './ui/category-selector';
 interface Props {
   categories: Category[];
 }

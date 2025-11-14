@@ -1,13 +1,7 @@
-"use client";
+'use client';
 
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  useCallback,
-} from "react";
-import { useUser } from "@clerk/nextjs";
+import { useUser } from '@clerk/nextjs';
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
 interface UserData {
   ordersCount: number;
@@ -21,9 +15,7 @@ interface UserDataContextType extends UserData {
   refreshUserData: () => Promise<void>;
 }
 
-const UserDataContext = createContext<UserDataContextType | undefined>(
-  undefined
-);
+const UserDataContext = createContext<UserDataContextType | undefined>(undefined);
 
 // Cache for user data to prevent unnecessary API calls
 let cachedData: UserData | null = null;
@@ -46,11 +38,7 @@ export function UserDataProvider({ children }: { children: React.ReactNode }) {
 
       // Use cached data if available and not expired
       const now = Date.now();
-      if (
-        !forceRefresh &&
-        cachedData &&
-        now - cacheTimestamp < CACHE_DURATION
-      ) {
+      if (!forceRefresh && cachedData && now - cacheTimestamp < CACHE_DURATION) {
         setUserData(cachedData);
         return;
       }
@@ -59,9 +47,9 @@ export function UserDataProvider({ children }: { children: React.ReactNode }) {
 
       try {
         // Fetch all user data in a single optimized API call
-        const response = await fetch("/api/user/combined-data", {
-          headers: { "Content-Type": "application/json" },
-          cache: "no-store",
+        const response = await fetch('/api/user/combined-data', {
+          headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
         });
 
         if (response.ok) {
@@ -84,11 +72,11 @@ export function UserDataProvider({ children }: { children: React.ReactNode }) {
           setUserData((prev) => ({ ...prev, isLoading: false }));
         }
       } catch (error) {
-        console.error("Error fetching user data:", error);
+        console.error('Error fetching user data:', error);
         setUserData((prev) => ({ ...prev, isLoading: false }));
       }
     },
-    [user, isLoaded]
+    [user, isLoaded],
   );
 
   useEffect(() => {
@@ -116,7 +104,7 @@ export function UserDataProvider({ children }: { children: React.ReactNode }) {
 export function useUserData() {
   const context = useContext(UserDataContext);
   if (context === undefined) {
-    throw new Error("useUserData must be used within a UserDataProvider");
+    throw new Error('useUserData must be used within a UserDataProvider');
   }
   return context;
 }

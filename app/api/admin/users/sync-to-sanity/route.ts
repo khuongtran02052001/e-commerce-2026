@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth, clerkClient } from "@clerk/nextjs/server";
-import { isUserAdmin } from "@/lib/adminUtils";
-import { writeClient } from "@/sanity/lib/client";
+import { isUserAdmin } from '@/lib/adminUtils';
+import { writeClient } from '@/sanity/lib/client';
+import { auth, clerkClient } from '@clerk/nextjs/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
   try {
@@ -9,10 +9,7 @@ export async function POST(req: NextRequest) {
     const { userId: currentUserId } = await auth();
 
     if (!currentUserId) {
-      return NextResponse.json(
-        { error: "Unauthorized - Not logged in" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized - Not logged in' }, { status: 401 });
     }
 
     // Get current user details to check admin status
@@ -22,23 +19,13 @@ export async function POST(req: NextRequest) {
 
     // Check if current user is admin
     if (!adminEmail || !isUserAdmin(adminEmail)) {
-      return NextResponse.json(
-        { error: "Forbidden - Admin access required" },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
     }
 
     const { clerkUserIds } = await req.json(); // Array of Clerk user IDs
 
-    if (
-      !clerkUserIds ||
-      !Array.isArray(clerkUserIds) ||
-      clerkUserIds.length === 0
-    ) {
-      return NextResponse.json(
-        { error: "clerkUserIds array is required" },
-        { status: 400 }
-      );
+    if (!clerkUserIds || !Array.isArray(clerkUserIds) || clerkUserIds.length === 0) {
+      return NextResponse.json({ error: 'clerkUserIds array is required' }, { status: 400 });
     }
 
     const results = [];
@@ -51,7 +38,7 @@ export async function POST(req: NextRequest) {
           results.push({
             clerkUserId,
             success: false,
-            error: "User not found in Clerk",
+            error: 'User not found in Clerk',
           });
           continue;
         }
@@ -61,7 +48,7 @@ export async function POST(req: NextRequest) {
           results.push({
             clerkUserId,
             success: false,
-            error: "User email not found",
+            error: 'User email not found',
           });
           continue;
         }
@@ -69,7 +56,7 @@ export async function POST(req: NextRequest) {
         // Check if user already exists in Sanity
         const existingUser = await writeClient.fetch(
           `*[_type == "user" && clerkUserId == $clerkUserId][0]`,
-          { clerkUserId }
+          { clerkUserId },
         );
 
         if (existingUser) {
@@ -89,18 +76,18 @@ export async function POST(req: NextRequest) {
           results.push({
             clerkUserId,
             success: true,
-            action: existingUser.isActive ? "already_active" : "activated",
+            action: existingUser.isActive ? 'already_active' : 'activated',
             sanityId: existingUser._id,
           });
         } else {
           // Create new user in Sanity
           const newUser = await writeClient.create({
-            _type: "user",
+            _type: 'user',
             clerkUserId,
             email: userEmail,
-            firstName: clerkUser.firstName || "",
-            lastName: clerkUser.lastName || "",
-            profileImageUrl: clerkUser.imageUrl || "",
+            firstName: clerkUser.firstName || '',
+            lastName: clerkUser.lastName || '',
+            profileImageUrl: clerkUser.imageUrl || '',
             isActive: true,
             activatedAt: new Date().toISOString(),
             activatedBy: adminEmail,
@@ -110,8 +97,8 @@ export async function POST(req: NextRequest) {
               emailNotifications: true,
               smsNotifications: false,
               newsletter: false,
-              preferredCurrency: "USD",
-              preferredLanguage: "en",
+              preferredCurrency: 'USD',
+              preferredLanguage: 'en',
             },
             loyaltyPoints: 0,
             totalSpent: 0,
@@ -124,7 +111,7 @@ export async function POST(req: NextRequest) {
           results.push({
             clerkUserId,
             success: true,
-            action: "created",
+            action: 'created',
             sanityId: newUser._id,
           });
         }
@@ -133,7 +120,7 @@ export async function POST(req: NextRequest) {
         results.push({
           clerkUserId,
           success: false,
-          error: error instanceof Error ? error.message : "Unknown error",
+          error: error instanceof Error ? error.message : 'Unknown error',
         });
       }
     }
@@ -152,10 +139,7 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Error syncing users to Sanity:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    console.error('Error syncing users to Sanity:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

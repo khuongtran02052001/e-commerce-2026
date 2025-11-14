@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth, currentUser } from "@clerk/nextjs/server";
-import { backendClient } from "@/sanity/lib/backendClient";
+import { backendClient } from '@/sanity/lib/backendClient';
+import { auth, currentUser } from '@clerk/nextjs/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET() {
   try {
@@ -8,18 +8,12 @@ export async function GET() {
     const user = await currentUser();
 
     if (!userId || !user) {
-      return NextResponse.json(
-        { error: "User not authenticated" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'User not authenticated' }, { status: 401 });
     }
 
     const userEmail = user.emailAddresses[0]?.emailAddress;
     if (!userEmail) {
-      return NextResponse.json(
-        { error: "User email not found" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'User email not found' }, { status: 400 });
     }
 
     // Fetch addresses for this user by email
@@ -38,7 +32,7 @@ export async function GET() {
         type,
         createdAt
       }`,
-      { email: userEmail }
+      { email: userEmail },
     );
 
     return NextResponse.json({
@@ -46,11 +40,8 @@ export async function GET() {
       addresses,
     });
   } catch (error) {
-    console.error("Error fetching addresses:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch addresses" },
-      { status: 500 }
-    );
+    console.error('Error fetching addresses:', error);
+    return NextResponse.json({ error: 'Failed to fetch addresses' }, { status: 500 });
   }
 }
 
@@ -60,10 +51,7 @@ export async function POST(request: NextRequest) {
     const user = await currentUser();
 
     if (!userId || !user) {
-      return NextResponse.json(
-        { error: "User not authenticated" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'User not authenticated' }, { status: 401 });
     }
 
     const body = await request.json();
@@ -84,22 +72,19 @@ export async function POST(request: NextRequest) {
 
     // Validate required fields
     if (!name || !address || !city || !state || !zip) {
-      return NextResponse.json(
-        { error: "All fields are required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'All fields are required' }, { status: 400 });
     }
 
     // First, ensure the user exists in Sanity
     let sanityUser = await backendClient.fetch(
       `*[_type == "user" && clerkUserId == $clerkUserId][0]`,
-      { clerkUserId: userId }
+      { clerkUserId: userId },
     );
 
     if (!sanityUser) {
       // Create user if doesn't exist
       sanityUser = await backendClient.create({
-        _type: "user",
+        _type: 'user',
         clerkUserId: userId,
         email: user.emailAddresses[0]?.emailAddress,
         firstName: user.firstName,
@@ -113,35 +98,32 @@ export async function POST(request: NextRequest) {
       const userEmail = user.emailAddresses[0]?.emailAddress;
       const existingAddresses = await backendClient.fetch(
         `*[_type == "address" && email == $email && default == true]`,
-        { email: userEmail }
+        { email: userEmail },
       );
 
       for (const existingAddress of existingAddresses) {
-        await backendClient
-          .patch(existingAddress._id)
-          .set({ default: false })
-          .commit();
+        await backendClient.patch(existingAddress._id).set({ default: false }).commit();
       }
     }
 
     // Create new address
     const newAddress = await backendClient.create({
-      _type: "address",
+      _type: 'address',
       name,
       email: user.emailAddresses[0]?.emailAddress,
       address,
       city,
       state,
       zip,
-      country: country || "",
-      countryCode: countryCode || "",
-      stateCode: stateCode || "",
-      subArea: subArea || "",
+      country: country || '',
+      countryCode: countryCode || '',
+      stateCode: stateCode || '',
+      subArea: subArea || '',
       default: isDefault || false,
-      type: type || "home",
+      type: type || 'home',
       phone: phone || null,
       user: {
-        _type: "reference",
+        _type: 'reference',
         _ref: sanityUser._id,
       },
       createdAt: new Date().toISOString(),
@@ -150,14 +132,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       addressId: newAddress._id,
-      message: "Address created successfully",
+      message: 'Address created successfully',
     });
   } catch (error) {
-    console.error("Error creating address:", error);
-    return NextResponse.json(
-      { error: "Failed to create address" },
-      { status: 500 }
-    );
+    console.error('Error creating address:', error);
+    return NextResponse.json({ error: 'Failed to create address' }, { status: 500 });
   }
 }
 
@@ -167,10 +146,7 @@ export async function PUT(request: NextRequest) {
     const user = await currentUser();
 
     if (!userId || !user) {
-      return NextResponse.json(
-        { error: "User not authenticated" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'User not authenticated' }, { status: 401 });
     }
 
     const body = await request.json();
@@ -192,40 +168,28 @@ export async function PUT(request: NextRequest) {
     } = body;
 
     if (!_id) {
-      return NextResponse.json(
-        { error: "Address ID is required for update" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Address ID is required for update' }, { status: 400 });
     }
 
     // Validate required fields
     if (!name || !address || !city || !state || !zip) {
-      return NextResponse.json(
-        { error: "All fields are required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'All fields are required' }, { status: 400 });
     }
 
     const userEmail = user.emailAddresses[0]?.emailAddress;
     if (!userEmail) {
-      return NextResponse.json(
-        { error: "User email not found" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'User email not found' }, { status: 400 });
     }
 
     // If this is set as default, unset all other default addresses for this user
     if (isDefault) {
       const existingAddresses = await backendClient.fetch(
         `*[_type == "address" && email == $email && _id != $currentId]`,
-        { email: userEmail, currentId: _id }
+        { email: userEmail, currentId: _id },
       );
 
       for (const existingAddress of existingAddresses) {
-        await backendClient
-          .patch(existingAddress._id)
-          .set({ default: false })
-          .commit();
+        await backendClient.patch(existingAddress._id).set({ default: false }).commit();
       }
     }
 
@@ -238,12 +202,12 @@ export async function PUT(request: NextRequest) {
         city,
         state,
         zip,
-        country: country || "",
-        countryCode: countryCode || "",
-        stateCode: stateCode || "",
-        subArea: subArea || "",
+        country: country || '',
+        countryCode: countryCode || '',
+        stateCode: stateCode || '',
+        subArea: subArea || '',
         default: isDefault || false,
-        type: type || "home",
+        type: type || 'home',
         phone: phone || null,
         updatedAt: new Date().toISOString(),
       })
@@ -252,16 +216,16 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({
       success: true,
       address: updatedAddress,
-      message: "Address updated successfully",
+      message: 'Address updated successfully',
     });
   } catch (error) {
-    console.error("Error updating address:", error);
+    console.error('Error updating address:', error);
     return NextResponse.json(
       {
-        error: "Failed to update address",
-        details: error instanceof Error ? error.message : "Unknown error",
+        error: 'Failed to update address',
+        details: error instanceof Error ? error.message : 'Unknown error',
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -271,20 +235,14 @@ export async function DELETE(request: NextRequest) {
     const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json(
-        { error: "User not authenticated" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'User not authenticated' }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
-    const addressId = searchParams.get("id");
+    const addressId = searchParams.get('id');
 
     if (!addressId) {
-      return NextResponse.json(
-        { error: "Address ID is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Address ID is required' }, { status: 400 });
     }
 
     // Delete the address
@@ -292,13 +250,10 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: "Address deleted successfully",
+      message: 'Address deleted successfully',
     });
   } catch (error) {
-    console.error("Error deleting address:", error);
-    return NextResponse.json(
-      { error: "Failed to delete address" },
-      { status: 500 }
-    );
+    console.error('Error deleting address:', error);
+    return NextResponse.json({ error: 'Failed to delete address' }, { status: 500 });
   }
 }

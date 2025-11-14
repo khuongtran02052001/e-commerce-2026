@@ -1,26 +1,19 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import {
-  CreditCard,
-  Truck,
-  MapPin,
-  Package,
-  ArrowLeft,
-  Loader2,
-} from "lucide-react";
-import PriceFormatter from "@/components/PriceFormatter";
-import Image from "next/image";
-import { urlFor } from "@/sanity/lib/image";
-import { toast } from "sonner";
-import { PAYMENT_METHODS, PaymentMethod } from "@/lib/orderStatus";
-import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
+import PriceFormatter from '@/components/PriceFormatter';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Separator } from '@/components/ui/separator';
+import { PAYMENT_METHODS, PaymentMethod } from '@/lib/orderStatus';
+import { urlFor } from '@/sanity/lib/image';
+import { ArrowLeft, CreditCard, Loader2, MapPin, Package, Truck } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
 interface OrderProduct {
   product: {
@@ -62,8 +55,9 @@ interface OrderCheckoutContentProps {
 }
 
 export function OrderCheckoutContent({ order }: OrderCheckoutContentProps) {
-  const [selectedPaymentMethod, setSelectedPaymentMethod] =
-    useState<PaymentMethod>(PAYMENT_METHODS.STRIPE);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod>(
+    PAYMENT_METHODS.STRIPE,
+  );
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handlePayNow = async () => {
@@ -71,9 +65,9 @@ export function OrderCheckoutContent({ order }: OrderCheckoutContentProps) {
 
     try {
       const response = await fetch(`/api/orders/${order._id}/pay`, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
       });
 
@@ -83,11 +77,11 @@ export function OrderCheckoutContent({ order }: OrderCheckoutContentProps) {
         // Redirect to Stripe checkout
         window.location.href = data.url;
       } else {
-        toast.error(data.error || "Failed to create payment session");
+        toast.error(data.error || 'Failed to create payment session');
       }
     } catch (error) {
-      console.error("Payment error:", error);
-      toast.error("Failed to initiate payment");
+      console.error('Payment error:', error);
+      toast.error('Failed to initiate payment');
     } finally {
       setIsProcessing(false);
     }
@@ -99,14 +93,14 @@ export function OrderCheckoutContent({ order }: OrderCheckoutContentProps) {
     try {
       // Here you could implement COD logic if needed
       // For now, just show a message
-      toast.success("Order confirmed with Cash on Delivery payment method");
+      toast.success('Order confirmed with Cash on Delivery payment method');
 
       setTimeout(() => {
         window.location.href = `/user/orders/${order._id}`;
       }, 1500);
     } catch (error) {
-      console.error("COD payment error:", error);
-      toast.error("Failed to process COD payment");
+      console.error('COD payment error:', error);
+      toast.error('Failed to process COD payment');
     } finally {
       setIsProcessing(false);
     }
@@ -138,9 +132,7 @@ export function OrderCheckoutContent({ order }: OrderCheckoutContentProps) {
               </div>
               <div>
                 <p className="text-muted-foreground">Order Date</p>
-                <p className="font-medium">
-                  {new Date(order.orderDate).toLocaleDateString()}
-                </p>
+                <p className="font-medium">{new Date(order.orderDate).toLocaleDateString()}</p>
               </div>
             </div>
           </CardContent>
@@ -176,17 +168,11 @@ export function OrderCheckoutContent({ order }: OrderCheckoutContentProps) {
           <CardContent>
             <RadioGroup
               value={selectedPaymentMethod}
-              onValueChange={(value) =>
-                setSelectedPaymentMethod(value as PaymentMethod)
-              }
+              onValueChange={(value) => setSelectedPaymentMethod(value as PaymentMethod)}
               className="space-y-3"
             >
               <div className="flex items-start space-x-3 p-3 border rounded-lg">
-                <RadioGroupItem
-                  value={PAYMENT_METHODS.STRIPE}
-                  id="stripe"
-                  className="mt-1"
-                />
+                <RadioGroupItem value={PAYMENT_METHODS.STRIPE} id="stripe" className="mt-1" />
                 <div className="flex-1">
                   <Label htmlFor="stripe" className="cursor-pointer">
                     <div className="flex items-center gap-2 font-medium">
@@ -235,9 +221,9 @@ export function OrderCheckoutContent({ order }: OrderCheckoutContentProps) {
                     src={
                       item.product.images?.[0]
                         ? urlFor(item.product.images[0]).url()
-                        : "/placeholder.jpg"
+                        : '/placeholder.jpg'
                     }
-                    alt={item.product.name || "Product"}
+                    alt={item.product.name || 'Product'}
                     width={64}
                     height={64}
                     className="w-full h-full object-cover rounded"
@@ -245,15 +231,11 @@ export function OrderCheckoutContent({ order }: OrderCheckoutContentProps) {
                 </div>
                 <div className="flex-1">
                   <h4 className="font-medium">{item.product.name}</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Qty: {item.quantity}
-                  </p>
+                  <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
                 </div>
                 <div className="text-right">
                   <p className="font-medium">
-                    <PriceFormatter
-                      amount={item.product.price * item.quantity}
-                    />
+                    <PriceFormatter amount={item.product.price * item.quantity} />
                   </p>
                   <p className="text-sm text-muted-foreground">
                     <PriceFormatter amount={item.product.price} /> each
@@ -298,9 +280,7 @@ export function OrderCheckoutContent({ order }: OrderCheckoutContentProps) {
 
         <Button
           onClick={
-            selectedPaymentMethod === PAYMENT_METHODS.STRIPE
-              ? handlePayNow
-              : handleCODPayment
+            selectedPaymentMethod === PAYMENT_METHODS.STRIPE ? handlePayNow : handleCODPayment
           }
           disabled={isProcessing}
           className="w-full h-12 text-lg font-semibold"

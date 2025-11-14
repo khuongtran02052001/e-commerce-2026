@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
-import { currentUser } from "@clerk/nextjs/server";
 import {
+  deleteUserNotification,
   getUserNotifications,
   markNotificationAsRead,
-  deleteUserNotification,
-} from "@/sanity/queries/userQueries";
+} from '@/sanity/queries/userQueries';
+import { currentUser } from '@clerk/nextjs/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 interface UserNotification {
   sentAt: string;
@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     const user = await currentUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const notifications = await getUserNotifications(user.id);
@@ -24,21 +24,17 @@ export async function GET(request: NextRequest) {
     // Sort notifications by date (newest first)
     const sortedNotifications = notifications.sort(
       (a: UserNotification, b: UserNotification) =>
-        new Date(b.sentAt).getTime() - new Date(a.sentAt).getTime()
+        new Date(b.sentAt).getTime() - new Date(a.sentAt).getTime(),
     );
 
     return NextResponse.json({
       success: true,
       notifications: sortedNotifications,
-      unreadCount: notifications.filter((n: UserNotification) => !n.read)
-        .length,
+      unreadCount: notifications.filter((n: UserNotification) => !n.read).length,
     });
   } catch (error) {
-    console.error("Error fetching user notifications:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch notifications" },
-      { status: 500 }
-    );
+    console.error('Error fetching user notifications:', error);
+    return NextResponse.json({ error: 'Failed to fetch notifications' }, { status: 500 });
   }
 }
 
@@ -47,16 +43,13 @@ export async function PATCH(request: NextRequest) {
     const user = await currentUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { notificationId } = await request.json();
 
     if (!notificationId) {
-      return NextResponse.json(
-        { error: "Notification ID is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Notification ID is required' }, { status: 400 });
     }
 
     const result = await markNotificationAsRead(user.id, notificationId);
@@ -67,11 +60,8 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Error marking notification as read:", error);
-    return NextResponse.json(
-      { error: "Failed to mark notification as read" },
-      { status: 500 }
-    );
+    console.error('Error marking notification as read:', error);
+    return NextResponse.json({ error: 'Failed to mark notification as read' }, { status: 500 });
   }
 }
 
@@ -80,17 +70,14 @@ export async function DELETE(request: NextRequest) {
     const user = await currentUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
-    const notificationId = searchParams.get("id");
+    const notificationId = searchParams.get('id');
 
     if (!notificationId) {
-      return NextResponse.json(
-        { error: "Notification ID is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Notification ID is required' }, { status: 400 });
     }
 
     const result = await deleteUserNotification(user.id, notificationId);
@@ -101,10 +88,7 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Error deleting notification:", error);
-    return NextResponse.json(
-      { error: "Failed to delete notification" },
-      { status: 500 }
-    );
+    console.error('Error deleting notification:', error);
+    return NextResponse.json({ error: 'Failed to delete notification' }, { status: 500 });
   }
 }

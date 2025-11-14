@@ -1,5 +1,5 @@
-import { Clock, Mail, MapPin, Phone } from "lucide-react";
-import { contactConfig } from "@/config/contact";
+import { contactConfig } from '@/config/contact';
+import { Clock, Mail, MapPin, Phone } from 'lucide-react';
 
 interface ContactItemData {
   title: string;
@@ -10,34 +10,26 @@ interface ContactItemData {
 
 const data: ContactItemData[] = [
   {
-    title: "Visit Us",
+    title: 'Visit Us',
     subtitle: `${contactConfig.company.address}, ${contactConfig.company.city}`,
-    icon: (
-      <MapPin className="h-6 w-6 text-gray-600 group-hover:text-primary transition-colors" />
-    ),
+    icon: <MapPin className="h-6 w-6 text-gray-600 group-hover:text-primary transition-colors" />,
     href: `https://maps.google.com/?q=${encodeURIComponent(`${contactConfig.company.address}, ${contactConfig.company.city}`)}`,
   },
   {
-    title: "Call Us",
+    title: 'Call Us',
     subtitle: contactConfig.company.phone,
-    icon: (
-      <Phone className="h-6 w-6 text-gray-600 group-hover:text-primary transition-colors" />
-    ),
-    href: `tel:${contactConfig.company.phone.replace(/\D/g, "")}`,
+    icon: <Phone className="h-6 w-6 text-gray-600 group-hover:text-primary transition-colors" />,
+    href: `tel:${contactConfig.company.phone.replace(/\D/g, '')}`,
   },
   {
-    title: "Working Hours",
+    title: 'Working Hours',
     subtitle: contactConfig.businessHours.weekday,
-    icon: (
-      <Clock className="h-6 w-6 text-gray-600 group-hover:text-primary transition-colors" />
-    ),
+    icon: <Clock className="h-6 w-6 text-gray-600 group-hover:text-primary transition-colors" />,
   },
   {
-    title: "Email Us",
+    title: 'Email Us',
     subtitle: contactConfig.emails.support,
-    icon: (
-      <Mail className="h-6 w-6 text-gray-600 group-hover:text-primary transition-colors" />
-    ),
+    icon: <Mail className="h-6 w-6 text-gray-600 group-hover:text-primary transition-colors" />,
     href: `mailto:${contactConfig.emails.support}`,
   },
 ];
@@ -66,12 +58,12 @@ interface ContactItemProps {
 }
 
 const ContactItem = ({ icon, title, content, href }: ContactItemProps) => {
-  const Component = href ? "a" : "div";
+  const Component = href ? 'a' : 'div';
   const props = href
     ? {
         href,
-        target: href.startsWith("http") ? "_blank" : "_self",
-        rel: href.startsWith("http") ? "noopener noreferrer" : undefined,
+        target: href.startsWith('http') ? '_blank' : '_self',
+        rel: href.startsWith('http') ? 'noopener noreferrer' : undefined,
       }
     : {};
 

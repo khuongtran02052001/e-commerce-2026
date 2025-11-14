@@ -1,94 +1,89 @@
-"use client";
+'use client';
 
-import { useUser } from "@clerk/nextjs";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
-import Link from "next/link";
+import Container from '@/components/Container';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import { useClerk, useUser } from '@clerk/nextjs';
 import {
-  LayoutDashboard,
-  Package,
-  User,
   Bell,
+  Building2,
+  ChevronRight,
   Heart,
-  Settings,
+  LayoutDashboard,
   LogOut,
   Menu,
-  X,
-  ChevronRight,
+  Package,
+  Settings,
   Shield,
+  User,
   Users,
-  Building2,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useClerk } from "@clerk/nextjs";
-import { cn } from "@/lib/utils";
-import Container from "@/components/Container";
+  X,
+} from 'lucide-react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useState } from 'react';
 
 const sidebarItems = [
   {
-    title: "Dashboard",
-    href: "/user/dashboard",
+    title: 'Dashboard',
+    href: '/user/dashboard',
     icon: LayoutDashboard,
-    description: "Overview & stats",
+    description: 'Overview & stats',
   },
   {
-    title: "Orders",
-    href: "/user/orders",
+    title: 'Orders',
+    href: '/user/orders',
     icon: Package,
-    description: "Track your orders",
+    description: 'Track your orders',
   },
   {
-    title: "Profile",
-    href: "/user/profile",
+    title: 'Profile',
+    href: '/user/profile',
     icon: User,
-    description: "Personal information",
+    description: 'Personal information',
   },
   {
-    title: "Notifications",
-    href: "/user/notifications",
+    title: 'Notifications',
+    href: '/user/notifications',
     icon: Bell,
-    description: "Updates & alerts",
+    description: 'Updates & alerts',
   },
   {
-    title: "Wishlist",
-    href: "/wishlist",
+    title: 'Wishlist',
+    href: '/wishlist',
     icon: Heart,
-    description: "Saved items",
+    description: 'Saved items',
   },
   {
-    title: "Settings",
-    href: "/user/settings",
+    title: 'Settings',
+    href: '/user/settings',
     icon: Settings,
-    description: "Account preferences",
+    description: 'Account preferences',
   },
 ];
 
 const adminItems = [
   {
-    title: "Manage Users",
-    href: "/user/admin/manage-users",
+    title: 'Manage Users',
+    href: '/user/admin/manage-users',
     icon: Users,
-    description: "User premium status",
+    description: 'User premium status',
   },
   {
-    title: "Premium Accounts",
-    href: "/user/admin/premium-accounts",
+    title: 'Premium Accounts',
+    href: '/user/admin/premium-accounts',
     icon: Shield,
-    description: "Premium approvals",
+    description: 'Premium approvals',
   },
   {
-    title: "Business Accounts",
-    href: "/user/admin/business-accounts",
+    title: 'Business Accounts',
+    href: '/user/admin/business-accounts',
     icon: Building2,
-    description: "Business approvals",
+    description: 'Business approvals',
   },
 ];
 
-export default function UserLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function UserLayout({ children }: { children: React.ReactNode }) {
   const { user } = useUser();
   const { signOut } = useClerk();
   const pathname = usePathname();
@@ -126,11 +121,7 @@ export default function UserLayout({
                 onClick={() => setSidebarOpen(!sidebarOpen)}
                 className="p-2"
               >
-                {sidebarOpen ? (
-                  <X className="h-5 w-5" />
-                ) : (
-                  <Menu className="h-5 w-5" />
-                )}
+                {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
               </Button>
             </div>
           </div>
@@ -190,18 +181,18 @@ export default function UserLayout({
                         key={item.title}
                         href={item.href}
                         className={cn(
-                          "flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group border",
+                          'flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group border',
                           isActive
-                            ? "bg-shop_light_green/10 border-shop_light_green/30 shadow-sm"
-                            : "hover:bg-gray-50 border-gray-200 hover:border-shop_light_green/30"
+                            ? 'bg-shop_light_green/10 border-shop_light_green/30 shadow-sm'
+                            : 'hover:bg-gray-50 border-gray-200 hover:border-shop_light_green/30',
                         )}
                       >
                         <div
                           className={cn(
-                            "p-2 rounded-lg transition-colors",
+                            'p-2 rounded-lg transition-colors',
                             isActive
-                              ? "bg-shop_light_green text-white"
-                              : "bg-gray-100 text-gray-600 group-hover:bg-shop_light_green/20 group-hover:text-shop_dark_green"
+                              ? 'bg-shop_light_green text-white'
+                              : 'bg-gray-100 text-gray-600 group-hover:bg-shop_light_green/20 group-hover:text-shop_dark_green',
                           )}
                         >
                           <item.icon className="h-4 w-4" />
@@ -209,30 +200,23 @@ export default function UserLayout({
                         <div>
                           <div
                             className={cn(
-                              "font-medium text-sm",
-                              isActive
-                                ? "text-shop_dark_green"
-                                : "text-gray-900"
+                              'font-medium text-sm',
+                              isActive ? 'text-shop_dark_green' : 'text-gray-900',
                             )}
                           >
                             {item.title}
                           </div>
-                          <div className="text-xs text-gray-500">
-                            {item.description}
-                          </div>
+                          <div className="text-xs text-gray-500">{item.description}</div>
                         </div>
                       </Link>
                     );
                   })}
 
                   {/* Admin Section - Show for dev.reactbd@gmail.com */}
-                  {user?.emailAddresses?.[0]?.emailAddress ===
-                    "dev.reactbd@gmail.com" && (
+                  {user?.emailAddresses?.[0]?.emailAddress === 'dev.reactbd@gmail.com' && (
                     <>
                       <div className="w-full border-t border-gray-200 my-3"></div>
-                      <div className="w-full text-xs text-gray-500 mb-2 px-2">
-                        Admin Tools
-                      </div>
+                      <div className="w-full text-xs text-gray-500 mb-2 px-2">Admin Tools</div>
                       {adminItems.map((item) => {
                         const isActive = pathname === item.href;
                         return (
@@ -240,18 +224,18 @@ export default function UserLayout({
                             key={item.title}
                             href={item.href}
                             className={cn(
-                              "flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group border",
+                              'flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group border',
                               isActive
-                                ? "bg-red-50 border-red-200 shadow-sm"
-                                : "hover:bg-red-50 border-gray-200 hover:border-red-200"
+                                ? 'bg-red-50 border-red-200 shadow-sm'
+                                : 'hover:bg-red-50 border-gray-200 hover:border-red-200',
                             )}
                           >
                             <div
                               className={cn(
-                                "p-2 rounded-lg transition-colors",
+                                'p-2 rounded-lg transition-colors',
                                 isActive
-                                  ? "bg-red-500 text-white"
-                                  : "bg-gray-100 text-gray-600 group-hover:bg-red-100 group-hover:text-red-600"
+                                  ? 'bg-red-500 text-white'
+                                  : 'bg-gray-100 text-gray-600 group-hover:bg-red-100 group-hover:text-red-600',
                               )}
                             >
                               <item.icon className="h-4 w-4" />
@@ -259,15 +243,13 @@ export default function UserLayout({
                             <div>
                               <div
                                 className={cn(
-                                  "font-medium text-sm",
-                                  isActive ? "text-red-700" : "text-gray-900"
+                                  'font-medium text-sm',
+                                  isActive ? 'text-red-700' : 'text-gray-900',
                                 )}
                               >
                                 {item.title}
                               </div>
-                              <div className="text-xs text-gray-500">
-                                {item.description}
-                              </div>
+                              <div className="text-xs text-gray-500">{item.description}</div>
                             </div>
                           </Link>
                         );
@@ -280,7 +262,7 @@ export default function UserLayout({
           </div>
 
           {/* Mobile Sidebar */}
-          <div className={cn("lg:hidden", sidebarOpen ? "block" : "hidden")}>
+          <div className={cn('lg:hidden', sidebarOpen ? 'block' : 'hidden')}>
             <div className="bg-white rounded-2xl shadow-xl border border-shop_light_green/10 overflow-hidden">
               {/* User Profile Section */}
               <div className="p-6 bg-gradient-to-r from-shop_dark_green to-shop_light_green text-white">
@@ -321,19 +303,19 @@ export default function UserLayout({
                       href={item.href}
                       onClick={() => setSidebarOpen(false)}
                       className={cn(
-                        "flex items-center justify-between p-4 rounded-xl transition-all duration-200 group",
+                        'flex items-center justify-between p-4 rounded-xl transition-all duration-200 group',
                         isActive
-                          ? "bg-shop_light_green/10 border border-shop_light_green/30 shadow-sm"
-                          : "hover:bg-gray-50 border border-transparent"
+                          ? 'bg-shop_light_green/10 border border-shop_light_green/30 shadow-sm'
+                          : 'hover:bg-gray-50 border border-transparent',
                       )}
                     >
                       <div className="flex items-center space-x-3">
                         <div
                           className={cn(
-                            "p-2 rounded-lg transition-colors",
+                            'p-2 rounded-lg transition-colors',
                             isActive
-                              ? "bg-shop_light_green text-white"
-                              : "bg-gray-100 text-gray-600 group-hover:bg-shop_light_green/20 group-hover:text-shop_dark_green"
+                              ? 'bg-shop_light_green text-white'
+                              : 'bg-gray-100 text-gray-600 group-hover:bg-shop_light_green/20 group-hover:text-shop_dark_green',
                           )}
                         >
                           <item.icon className="h-5 w-5" />
@@ -341,23 +323,19 @@ export default function UserLayout({
                         <div>
                           <div
                             className={cn(
-                              "font-medium",
-                              isActive
-                                ? "text-shop_dark_green"
-                                : "text-gray-900"
+                              'font-medium',
+                              isActive ? 'text-shop_dark_green' : 'text-gray-900',
                             )}
                           >
                             {item.title}
                           </div>
-                          <div className="text-xs text-gray-500">
-                            {item.description}
-                          </div>
+                          <div className="text-xs text-gray-500">{item.description}</div>
                         </div>
                       </div>
                       <ChevronRight
                         className={cn(
-                          "h-4 w-4 transition-colors",
-                          isActive ? "text-shop_dark_green" : "text-gray-400"
+                          'h-4 w-4 transition-colors',
+                          isActive ? 'text-shop_dark_green' : 'text-gray-400',
                         )}
                       />
                     </Link>
@@ -365,13 +343,10 @@ export default function UserLayout({
                 })}
 
                 {/* Admin Section - Mobile */}
-                {user?.emailAddresses?.[0]?.emailAddress ===
-                  "dev.reactbd@gmail.com" && (
+                {user?.emailAddresses?.[0]?.emailAddress === 'dev.reactbd@gmail.com' && (
                   <>
                     <div className="border-t border-gray-200 pt-4 mt-4">
-                      <div className="text-xs text-gray-500 mb-3 px-4">
-                        Admin Tools
-                      </div>
+                      <div className="text-xs text-gray-500 mb-3 px-4">Admin Tools</div>
                       {adminItems.map((item) => {
                         const isActive = pathname === item.href;
                         return (
@@ -380,19 +355,19 @@ export default function UserLayout({
                             href={item.href}
                             onClick={() => setSidebarOpen(false)}
                             className={cn(
-                              "flex items-center justify-between p-4 rounded-xl transition-all duration-200 group",
+                              'flex items-center justify-between p-4 rounded-xl transition-all duration-200 group',
                               isActive
-                                ? "bg-red-50 border border-red-200 shadow-sm"
-                                : "hover:bg-red-50 border border-transparent"
+                                ? 'bg-red-50 border border-red-200 shadow-sm'
+                                : 'hover:bg-red-50 border border-transparent',
                             )}
                           >
                             <div className="flex items-center space-x-3">
                               <div
                                 className={cn(
-                                  "p-2 rounded-lg transition-colors",
+                                  'p-2 rounded-lg transition-colors',
                                   isActive
-                                    ? "bg-red-500 text-white"
-                                    : "bg-gray-100 text-gray-600 group-hover:bg-red-100 group-hover:text-red-600"
+                                    ? 'bg-red-500 text-white'
+                                    : 'bg-gray-100 text-gray-600 group-hover:bg-red-100 group-hover:text-red-600',
                                 )}
                               >
                                 <item.icon className="h-4 w-4" />
@@ -400,21 +375,19 @@ export default function UserLayout({
                               <div>
                                 <div
                                   className={cn(
-                                    "font-medium text-sm",
-                                    isActive ? "text-red-700" : "text-gray-900"
+                                    'font-medium text-sm',
+                                    isActive ? 'text-red-700' : 'text-gray-900',
                                   )}
                                 >
                                   {item.title}
                                 </div>
-                                <div className="text-xs text-gray-500">
-                                  {item.description}
-                                </div>
+                                <div className="text-xs text-gray-500">{item.description}</div>
                               </div>
                             </div>
                             <ChevronRight
                               className={cn(
-                                "h-4 w-4 transition-colors",
-                                isActive ? "text-red-600" : "text-gray-400"
+                                'h-4 w-4 transition-colors',
+                                isActive ? 'text-red-600' : 'text-gray-400',
                               )}
                             />
                           </Link>

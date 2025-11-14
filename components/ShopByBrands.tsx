@@ -1,31 +1,30 @@
-import Container from "./Container";
+import Container from './Container';
 // import { getAllBrands } from "@/sanity/queries";
-import Title from "./Title";
-import Link from "next/link";
-import Image from "next/image";
-import { urlFor } from "@/sanity/lib/image";
-import { GitCompareArrows, Headset, ShieldCheck, Truck } from "lucide-react";
-import { mockBrands } from "@/mock-data";
+import { mockBrands } from '@/mock-data';
+import { GitCompareArrows, Headset, ShieldCheck, Truck } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import Title from './Title';
 
 const extraData = [
   {
-    title: "Free Delivery",
-    description: "Free shipping over $100",
+    title: 'Free Delivery',
+    description: 'Free shipping over $100',
     icon: <Truck size={45} />,
   },
   {
-    title: "Free Return",
-    description: "Free shipping over $100",
+    title: 'Free Return',
+    description: 'Free shipping over $100',
     icon: <GitCompareArrows size={45} />,
   },
   {
-    title: "Customer Support",
-    description: "Friendly 27/7 customer support",
+    title: 'Customer Support',
+    description: 'Friendly 27/7 customer support',
     icon: <Headset size={45} />,
   },
   {
-    title: "Money Back guarantee",
-    description: "Quality checked by our team",
+    title: 'Money Back guarantee',
+    description: 'Quality checked by our team',
     icon: <ShieldCheck size={45} />,
   },
 ];
@@ -40,16 +39,14 @@ const ShopByBrands = async () => {
       <div className="text-center mb-12">
         <div className="inline-flex items-center gap-3 mb-4">
           <div className="h-1 w-12 bg-gradient-to-r from-shop_orange to-shop_light_orange rounded-full"></div>
-          <Title className="text-3xl lg:text-4xl font-bold text-dark-color">
-            Shop By Brands
-          </Title>
+          <Title className="text-3xl lg:text-4xl font-bold text-dark-color">Shop By Brands</Title>
           <div className="h-1 w-12 bg-gradient-to-l from-shop_orange to-shop_light_orange rounded-full"></div>
         </div>
         <p className="text-light-color text-lg max-w-2xl mx-auto">
           Discover products from your favorite trusted brands
         </p>
         <Link
-          href={"/shop"}
+          href={'/shop'}
           className="inline-flex items-center gap-2 mt-6 px-6 py-3 bg-shop_light_pink text-shop_dark_green font-semibold rounded-full hover:bg-shop_orange hover:text-white border-2 border-shop_orange hoverEffect"
         >
           Explore All Brands
@@ -76,7 +73,7 @@ const ShopByBrands = async () => {
             <Link
               key={index}
               href={{
-                pathname: "/shop",
+                pathname: '/shop',
                 query: { brand: brand?.slug },
               }}
               className="group bg-white rounded-2xl p-6 flex items-center justify-center aspect-square hover:shadow-2xl shadow-lg border border-gray-100 hover:border-shop_orange hoverEffect transform hover:-translate-y-2"
@@ -86,7 +83,7 @@ const ShopByBrands = async () => {
                 <div className="relative w-full h-full flex items-center justify-center">
                   <Image
                     src={brand?.imageUrl}
-                    alt={`${brand?.title || "Brand"} logo`}
+                    alt={`${brand?.title || 'Brand'} logo`}
                     width={120}
                     height={80}
                     className="max-w-full max-h-full object-contain group-hover:scale-110 hoverEffect filter group-hover:brightness-110"
@@ -101,10 +98,8 @@ const ShopByBrands = async () => {
         {/* Brand Grid Footer */}
         <div className="text-center mt-8 pt-6 border-t border-shop_light_green/20">
           <p className="text-dark-text text-sm">
-            <span className="font-semibold text-shop_orange">
-              {brands?.length}+
-            </span>{" "}
-            trusted brands and counting
+            <span className="font-semibold text-shop_orange">{brands?.length}+</span> trusted brands
+            and counting
           </p>
         </div>
       </div>
@@ -112,9 +107,7 @@ const ShopByBrands = async () => {
       {/* Features Section */}
       <div className="bg-white rounded-3xl shadow-xl border border-shop_light_green/10 p-8 lg:p-12">
         <div className="text-center mb-10">
-          <h3 className="text-2xl lg:text-3xl font-bold text-dark-color mb-3">
-            Why Choose Us?
-          </h3>
+          <h3 className="text-2xl lg:text-3xl font-bold text-dark-color mb-3">Why Choose Us?</h3>
           <p className="text-light-color text-lg">
             We provide the best shopping experience with premium services
           </p>
@@ -129,9 +122,7 @@ const ShopByBrands = async () => {
             >
               {/* Icon Container */}
               <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-shop_light_pink to-shop_light_orange/20 text-shop_orange group-hover:from-shop_orange group-hover:to-shop_light_orange group-hover:text-white group-hover:scale-110 hoverEffect mb-4">
-                <span className="transform group-hover:scale-110 hoverEffect">
-                  {item?.icon}
-                </span>
+                <span className="transform group-hover:scale-110 hoverEffect">{item?.icon}</span>
               </div>
 
               {/* Content */}
@@ -139,9 +130,7 @@ const ShopByBrands = async () => {
                 <h4 className="text-lg font-bold text-dark-color group-hover:text-shop_dark_green hoverEffect mb-2">
                   {item?.title}
                 </h4>
-                <p className="text-light-color text-sm leading-relaxed">
-                  {item?.description}
-                </p>
+                <p className="text-light-color text-sm leading-relaxed">{item?.description}</p>
               </div>
             </div>
           ))}

@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
-import { unsubscribeFromNewsletter } from "@/actions/subscriptionActions";
+import { unsubscribeFromNewsletter } from '@/actions/subscriptionActions';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
     const { email } = body;
 
     if (!email) {
-      return NextResponse.json({ error: "Email is required" }, { status: 400 });
+      return NextResponse.json({ error: 'Email is required' }, { status: 400 });
     }
 
     const result = await unsubscribeFromNewsletter(email);
@@ -20,13 +20,13 @@ export async function POST(request: NextRequest) {
       {
         message: result.message,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
-    console.error("Newsletter unsubscribe API error:", error);
+    console.error('Newsletter unsubscribe API error:', error);
     return NextResponse.json(
-      { error: "Something went wrong. Please try again later." },
-      { status: 500 }
+      { error: 'Something went wrong. Please try again later.' },
+      { status: 500 },
     );
   }
 }

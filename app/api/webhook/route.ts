@@ -1,22 +1,22 @@
-import { headers } from "next/headers";
-import { NextRequest, NextResponse } from "next/server";
-import Stripe from "stripe";
-import stripe from "@/lib/stripe";
-import { backendClient } from "@/sanity/lib/backendClient";
-import { ORDER_STATUSES, PAYMENT_STATUSES } from "@/lib/orderStatus";
-import { sendOrderStatusNotification } from "@/lib/notificationService";
+import { sendOrderStatusNotification } from '@/lib/notificationService';
+import { ORDER_STATUSES, PAYMENT_STATUSES } from '@/lib/orderStatus';
+import stripe from '@/lib/stripe';
+import { backendClient } from '@/sanity/lib/backendClient';
+import { headers } from 'next/headers';
+import { NextRequest, NextResponse } from 'next/server';
+import Stripe from 'stripe';
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
   const headersList = await headers();
-  const sig = headersList.get("stripe-signature");
+  const sig = headersList.get('stripe-signature');
 
   if (!sig) {
     return NextResponse.json(
       {
-        error: "No signature",
+        error: 'No signature',
       },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -24,9 +24,9 @@ export async function POST(req: NextRequest) {
   if (!webhookSecret) {
     return NextResponse.json(
       {
-        error: "Stripe webhook secret is not set",
+        error: 'Stripe webhook secret is not set',
       },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -35,16 +35,16 @@ export async function POST(req: NextRequest) {
   try {
     event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
   } catch (error) {
-    console.error("Webhook signature verification failed:", error);
+    console.error('Webhook signature verification failed:', error);
     return NextResponse.json(
       {
         error: `Webhook Error: ${error}`,
       },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
-  if (event.type === "checkout.session.completed") {
+  if (event.type === 'checkout.session.completed') {
     const session = event.data.object as Stripe.Checkout.Session;
 
     try {
@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
               totalPrice,
               currency
             }`,
-            { orderId }
+            { orderId },
           );
 
           if (order) {
@@ -81,33 +81,33 @@ export async function POST(req: NextRequest) {
               order.products || [],
               {
                 totalAmount: order.totalAmount || 0,
-                customerEmail: order.email || "",
+                customerEmail: order.email || '',
                 orderNumber: order.orderNumber,
                 currency: order.currency,
                 tax: order.tax || 0,
                 shipping: order.shipping || 0,
-              }
+              },
             );
           }
         }
 
         await updateOrderWithPaymentCompletion(orderId, session, invoice);
       } else {
-        console.error("No orderId found in session metadata");
+        console.error('No orderId found in session metadata');
         return NextResponse.json(
           {
-            error: "No orderId found in session metadata",
+            error: 'No orderId found in session metadata',
           },
-          { status: 400 }
+          { status: 400 },
         );
       }
     } catch (error) {
-      console.error("Error processing order:", error);
+      console.error('Error processing order:', error);
       return NextResponse.json(
         {
           error: `Error processing order: ${error}`,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
   }
@@ -130,7 +130,7 @@ async function createAndFinalizeInvoice(
     currency?: string;
     tax?: number;
     shipping?: number;
-  }
+  },
 ) {
   try {
     // Validate required data
@@ -145,8 +145,8 @@ async function createAndFinalizeInvoice(
     }
 
     // Validate currency
-    const currency = (orderData.currency || "USD").toLowerCase();
-    if (!["usd", "eur", "gbp", "cad", "aud"].includes(currency)) {
+    const currency = (orderData.currency || 'USD').toLowerCase();
+    if (!['usd', 'eur', 'gbp', 'cad', 'aud'].includes(currency)) {
       console.warn(`Unsupported currency: ${currency}, defaulting to USD`);
     }
 
@@ -156,11 +156,11 @@ async function createAndFinalizeInvoice(
       description: `Invoice for Order ${orderData.orderNumber || orderId}`,
       metadata: {
         orderId: orderId,
-        orderNumber: orderData.orderNumber || "",
-        source: "webhook",
+        orderNumber: orderData.orderNumber || '',
+        source: 'webhook',
       },
       auto_advance: false,
-      collection_method: "charge_automatically",
+      collection_method: 'charge_automatically',
     });
 
     // Add invoice items for products
@@ -178,7 +178,7 @@ async function createAndFinalizeInvoice(
           currency: currency,
           description: `${item.product.name} x ${item.quantity}`,
           metadata: {
-            productId: item.product._id || "",
+            productId: item.product._id || '',
             quantity: item.quantity.toString(),
           },
         });
@@ -196,8 +196,8 @@ async function createAndFinalizeInvoice(
           invoice: invoice.id,
           amount: Math.round(orderData.tax * 100),
           currency: currency,
-          description: "Tax",
-          metadata: { type: "tax" },
+          description: 'Tax',
+          metadata: { type: 'tax' },
         });
       } catch (error) {
         console.error(`Failed to add tax:`, error);
@@ -213,8 +213,8 @@ async function createAndFinalizeInvoice(
           invoice: invoice.id,
           amount: Math.round(orderData.shipping * 100),
           currency: currency,
-          description: "Shipping",
-          metadata: { type: "shipping" },
+          description: 'Shipping',
+          metadata: { type: 'shipping' },
         });
       } catch (error) {
         console.error(`Failed to add shipping:`, error);
@@ -224,7 +224,7 @@ async function createAndFinalizeInvoice(
 
     // Finalize the invoice
     if (!invoice.id) {
-      throw new Error("Failed to create invoice - no invoice ID");
+      throw new Error('Failed to create invoice - no invoice ID');
     }
 
     const finalizedInvoice = await stripe.invoices.finalizeInvoice(invoice.id);
@@ -239,7 +239,7 @@ async function createAndFinalizeInvoice(
 async function updateOrderWithPaymentCompletion(
   orderId: string,
   session: Stripe.Checkout.Session,
-  invoice: Stripe.Invoice | null
+  invoice: Stripe.Invoice | null,
 ) {
   const { id, customer, payment_intent } = session;
 
@@ -250,7 +250,7 @@ async function updateOrderWithPaymentCompletion(
       paymentMethod,
       paymentStatus
     }`,
-    { orderId }
+    { orderId },
   );
 
   // Prepare update data
@@ -266,7 +266,7 @@ async function updateOrderWithPaymentCompletion(
   // 1. For COD orders paid later: Keep current delivery status (packed, out_for_delivery, etc.)
   // 2. For new checkout orders: Set status to "pending" to start the fulfillment workflow
   // 3. For orders already in processing: Keep current status
-  if (existingOrder?.paymentMethod === "cash_on_delivery") {
+  if (existingOrder?.paymentMethod === 'cash_on_delivery') {
     // COD order paid online - keep current status
     // Don't update status at all
   } else {
@@ -299,7 +299,7 @@ async function updateOrderWithPaymentCompletion(
           clerkUserId
         }
       }`,
-      { orderId }
+      { orderId },
     );
 
     if (order) {
@@ -321,10 +321,7 @@ async function updateOrderWithPaymentCompletion(
           });
         }
       } catch (notificationError) {
-        console.error(
-          "Failed to send payment confirmation notification:",
-          notificationError
-        );
+        console.error('Failed to send payment confirmation notification:', notificationError);
         // Don't fail the webhook if notification fails
       }
     }
@@ -339,7 +336,7 @@ async function updateStockLevels(
   orderProducts: Array<{
     product: { _ref: string };
     quantity: number;
-  }>
+  }>,
 ) {
   for (const orderProduct of orderProducts) {
     try {
@@ -349,10 +346,8 @@ async function updateStockLevels(
       // Fetch current stock
       const product = await backendClient.getDocument(productId);
 
-      if (!product || typeof product.stock !== "number") {
-        console.warn(
-          `Product with ID ${productId} not found or stock is invalid.`
-        );
+      if (!product || typeof product.stock !== 'number') {
+        console.warn(`Product with ID ${productId} not found or stock is invalid.`);
         continue;
       }
 
@@ -361,10 +356,7 @@ async function updateStockLevels(
       // Update stock in Sanity
       await backendClient.patch(productId).set({ stock: newStock }).commit();
     } catch (error) {
-      console.error(
-        `Failed to update stock for product ${orderProduct.product._ref}:`,
-        error
-      );
+      console.error(`Failed to update stock for product ${orderProduct.product._ref}:`, error);
     }
   }
 }

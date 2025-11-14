@@ -1,4 +1,4 @@
-import BlogPageSkeleton from "@/components/BlogPageSkeleton";
+import BlogPageSkeleton from '@/components/BlogPageSkeleton';
 
 export default function BlogLoading() {
   return <BlogPageSkeleton />;

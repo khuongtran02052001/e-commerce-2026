@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth, clerkClient } from "@clerk/nextjs/server";
-import { writeClient } from "@/sanity/lib/client";
-import { isUserAdmin } from "@/lib/adminUtils";
+import { isUserAdmin } from '@/lib/adminUtils';
+import { writeClient } from '@/sanity/lib/client';
+import { auth, clerkClient } from '@clerk/nextjs/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 // PATCH - Approve or reject a review
 export async function PATCH(request: NextRequest) {
@@ -9,7 +9,7 @@ export async function PATCH(request: NextRequest) {
     const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // Get current user details to check admin status
@@ -19,26 +19,20 @@ export async function PATCH(request: NextRequest) {
 
     // Check if current user is admin
     if (!userEmail || !isUserAdmin(userEmail)) {
-      return NextResponse.json(
-        { error: "Forbidden - Admin access required" },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
     }
 
     const body = await request.json();
     const { reviewId, action, adminNotes } = body;
 
     if (!reviewId || !action) {
-      return NextResponse.json(
-        { error: "Review ID and action are required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Review ID and action are required' }, { status: 400 });
     }
 
-    if (!["approve", "reject"].includes(action)) {
+    if (!['approve', 'reject'].includes(action)) {
       return NextResponse.json(
         { error: "Invalid action. Must be 'approve' or 'reject'" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -54,15 +48,15 @@ export async function PATCH(request: NextRequest) {
           ratingDistribution
         }
       }`,
-      { reviewId }
+      { reviewId },
     );
 
     if (!review) {
-      return NextResponse.json({ error: "Review not found" }, { status: 404 });
+      return NextResponse.json({ error: 'Review not found' }, { status: 404 });
     }
 
     const now = new Date().toISOString();
-    const newStatus = action === "approve" ? "approved" : "rejected";
+    const newStatus = action === 'approve' ? 'approved' : 'rejected';
 
     // Update the review status
     await writeClient
@@ -70,7 +64,7 @@ export async function PATCH(request: NextRequest) {
       .set({
         status: newStatus,
         updatedAt: now,
-        ...(action === "approve"
+        ...(action === 'approve'
           ? {
               approvedAt: now,
               approvedBy: userEmail,
@@ -81,7 +75,7 @@ export async function PATCH(request: NextRequest) {
       .commit();
 
     // If approved, update product rating statistics
-    if (action === "approve" && review.product) {
+    if (action === 'approve' && review.product) {
       const productId = review.product._id;
 
       // Get all approved reviews for this product
@@ -89,7 +83,7 @@ export async function PATCH(request: NextRequest) {
         `*[_type == "review" && product._ref == $productId && status == "approved"]{
           rating
         }`,
-        { productId }
+        { productId },
       );
 
       if (approvedReviews && approvedReviews.length > 0) {
@@ -97,7 +91,7 @@ export async function PATCH(request: NextRequest) {
         const totalReviews = approvedReviews.length;
         const totalRating = approvedReviews.reduce(
           (sum: number, r: { rating: number }) => sum + r.rating,
-          0
+          0,
         );
         const averageRating = totalRating / totalReviews;
 
@@ -111,7 +105,7 @@ export async function PATCH(request: NextRequest) {
               twoStars: number;
               oneStar: number;
             },
-            r: { rating: number }
+            r: { rating: number },
           ) => {
             if (r.rating === 5) acc.fiveStars++;
             else if (r.rating === 4) acc.fourStars++;
@@ -126,7 +120,7 @@ export async function PATCH(request: NextRequest) {
             threeStars: 0,
             twoStars: 0,
             oneStar: 0,
-          }
+          },
         );
 
         // Update product with new statistics
@@ -147,11 +141,8 @@ export async function PATCH(request: NextRequest) {
       status: newStatus,
     });
   } catch (error) {
-    console.error("Error updating review:", error);
-    return NextResponse.json(
-      { error: "Failed to update review" },
-      { status: 500 }
-    );
+    console.error('Error updating review:', error);
+    return NextResponse.json({ error: 'Failed to update review' }, { status: 500 });
   }
 }
 
@@ -161,7 +152,7 @@ export async function GET(request: NextRequest) {
     const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // Get current user details to check admin status
@@ -171,20 +162,14 @@ export async function GET(request: NextRequest) {
 
     // Check if current user is admin
     if (!userEmail || !isUserAdmin(userEmail)) {
-      return NextResponse.json(
-        { error: "Forbidden - Admin access required" },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
     }
 
     const searchParams = request.nextUrl.searchParams;
-    const status = searchParams.get("status") || "pending";
+    const status = searchParams.get('status') || 'pending';
 
-    if (!["pending", "approved", "rejected"].includes(status)) {
-      return NextResponse.json(
-        { error: "Invalid status parameter" },
-        { status: 400 }
-      );
+    if (!['pending', 'approved', 'rejected'].includes(status)) {
+      return NextResponse.json({ error: 'Invalid status parameter' }, { status: 400 });
     }
 
     // Fetch reviews by status
@@ -218,7 +203,7 @@ export async function GET(request: NextRequest) {
           }
         }
       }`,
-      { status }
+      { status },
     );
 
     return NextResponse.json({
@@ -227,10 +212,7 @@ export async function GET(request: NextRequest) {
       count: reviews?.length || 0,
     });
   } catch (error) {
-    console.error("Error fetching reviews:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch reviews" },
-      { status: 500 }
-    );
+    console.error('Error fetching reviews:', error);
+    return NextResponse.json({ error: 'Failed to fetch reviews' }, { status: 500 });
   }
 }

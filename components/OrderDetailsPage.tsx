@@ -1,45 +1,40 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { Badge } from "./ui/badge";
-import { Button } from "./ui/button";
-import { Separator } from "./ui/separator";
+import { requestOrderCancellation } from '@/actions/orderCancellationActions';
+import { Dialog, DialogOverlay, DialogPortal, DialogTitle } from '@/components/ui/dialog';
+import { ORDER_STATUSES, PAYMENT_STATUSES } from '@/lib/orderStatus';
+import { cn } from '@/lib/utils';
+import { urlFor } from '@/sanity/lib/image';
+import useCartStore from '@/store';
+import * as DialogPrimitive from '@radix-ui/react-dialog';
+import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
+import { format } from 'date-fns';
 import {
+  AlertTriangle,
   CalendarDays,
-  MapPin,
-  Package,
+  CheckCircle,
+  Clock,
   CreditCard,
   Download,
-  Truck,
-  Clock,
-  XCircle,
+  MapPin,
+  Package,
   ShoppingCart,
-  CheckCircle,
-  AlertTriangle,
-  X,
+  Truck,
   Wallet,
-} from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { urlFor } from "@/sanity/lib/image";
-import PriceFormatter from "./PriceFormatter";
-import { format } from "date-fns";
-import { ORDER_STATUSES, PAYMENT_STATUSES } from "@/lib/orderStatus";
-import { toast } from "sonner";
-import useCartStore from "@/store";
-import OrderTimeline from "./OrderTimeline";
-import { requestOrderCancellation } from "@/actions/orderCancellationActions";
-import {
-  Dialog,
-  DialogPortal,
-  DialogOverlay,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import * as DialogPrimitive from "@radix-ui/react-dialog";
-import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
-import { cn } from "@/lib/utils";
+  X,
+  XCircle,
+} from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import React, { useState } from 'react';
+import { toast } from 'sonner';
+import OrderTimeline from './OrderTimeline';
+import PriceFormatter from './PriceFormatter';
+import { Badge } from './ui/badge';
+import { Button } from './ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Separator } from './ui/separator';
 
 interface OrderDetailsPageProps {
   order: {
@@ -130,28 +125,28 @@ const getStatusColor = (status: string) => {
   switch (status) {
     case ORDER_STATUSES.PAID:
     case ORDER_STATUSES.DELIVERED:
-      return "bg-green-100 text-green-800";
+      return 'bg-green-100 text-green-800';
     case ORDER_STATUSES.CANCELLED:
-      return "bg-red-100 text-red-800";
+      return 'bg-red-100 text-red-800';
     case ORDER_STATUSES.SHIPPED:
     case ORDER_STATUSES.OUT_FOR_DELIVERY:
-      return "bg-blue-100 text-blue-800";
+      return 'bg-blue-100 text-blue-800';
     case ORDER_STATUSES.PROCESSING:
-      return "bg-yellow-100 text-yellow-800";
+      return 'bg-yellow-100 text-yellow-800';
     default:
-      return "bg-gray-100 text-gray-800";
+      return 'bg-gray-100 text-gray-800';
   }
 };
 
 const getPaymentStatusColor = (status: string) => {
   switch (status) {
     case PAYMENT_STATUSES.PAID:
-      return "bg-green-100 text-green-800";
+      return 'bg-green-100 text-green-800';
     case PAYMENT_STATUSES.FAILED:
     case PAYMENT_STATUSES.CANCELLED:
-      return "bg-red-100 text-red-800";
+      return 'bg-red-100 text-red-800';
     default:
-      return "bg-yellow-100 text-yellow-800";
+      return 'bg-yellow-100 text-yellow-800';
   }
 };
 
@@ -161,7 +156,7 @@ const OrderDetailsPage: React.FC<OrderDetailsPageProps> = ({ order }) => {
   const [isReordering, setIsReordering] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
-  const [cancellationReason, setCancellationReason] = useState("");
+  const [cancellationReason, setCancellationReason] = useState('');
 
   const { addMultipleItems } = useCartStore();
   const router = useRouter();
@@ -180,16 +175,16 @@ const OrderDetailsPage: React.FC<OrderDetailsPageProps> = ({ order }) => {
       addMultipleItems(cartItems);
 
       toast.success(`${order.products.length} items added to cart!`, {
-        description: "Redirecting to cart...",
+        description: 'Redirecting to cart...',
       });
 
       // Redirect to cart after a short delay
       setTimeout(() => {
-        router.push("/cart");
+        router.push('/cart');
       }, 1000);
     } catch (error) {
-      console.error("Error reordering:", error);
-      toast.error("Failed to reorder items. Please try again.");
+      console.error('Error reordering:', error);
+      toast.error('Failed to reorder items. Please try again.');
     } finally {
       setIsReordering(false);
     }
@@ -198,36 +193,31 @@ const OrderDetailsPage: React.FC<OrderDetailsPageProps> = ({ order }) => {
   const handleGenerateInvoice = async () => {
     setGeneratingInvoice(true);
     try {
-      const response = await fetch(
-        `/api/orders/${order._id}/generate-invoice`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(`/api/orders/${order._id}/generate-invoice`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
       const data = await response.json();
 
       if (response.ok && data.success) {
-        toast.success(data.message || "Invoice generated successfully!");
+        toast.success(data.message || 'Invoice generated successfully!');
         // Update the current order with the new invoice data
         setCurrentOrder((prev) => ({
           ...prev,
           invoice: data.invoice,
         }));
       } else {
-        console.error("Invoice generation failed:", data);
-        const errorMessage = data.error || "Failed to generate invoice";
-        const details = data.details ? ` Details: ${data.details}` : "";
+        console.error('Invoice generation failed:', data);
+        const errorMessage = data.error || 'Failed to generate invoice';
+        const details = data.details ? ` Details: ${data.details}` : '';
         toast.error(errorMessage + details);
       }
     } catch (error) {
-      console.error("Invoice generation error:", error);
-      toast.error(
-        "Network error: Failed to generate invoice. Please try again."
-      );
+      console.error('Invoice generation error:', error);
+      toast.error('Network error: Failed to generate invoice. Please try again.');
     } finally {
       setGeneratingInvoice(false);
     }
@@ -238,7 +228,7 @@ const OrderDetailsPage: React.FC<OrderDetailsPageProps> = ({ order }) => {
     try {
       const result = await requestOrderCancellation(
         order._id,
-        cancellationReason || "Cancelled by customer"
+        cancellationReason || 'Cancelled by customer',
       );
 
       if (result.success) {
@@ -250,23 +240,20 @@ const OrderDetailsPage: React.FC<OrderDetailsPageProps> = ({ order }) => {
               ...prev,
               cancellationRequested: true,
               cancellationRequestedAt: new Date().toISOString(),
-              cancellationRequestReason:
-                cancellationReason || "Cancelled by customer",
-            } as any)
+              cancellationRequestReason: cancellationReason || 'Cancelled by customer',
+            }) as any,
         );
         setShowCancelDialog(false);
-        setCancellationReason("");
+        setCancellationReason('');
 
         // Refresh the page to show updated status
         router.refresh();
       } else {
-        toast.error(result.message || "Failed to submit cancellation request");
+        toast.error(result.message || 'Failed to submit cancellation request');
       }
     } catch (error) {
-      console.error("Error requesting cancellation:", error);
-      toast.error(
-        "An error occurred while submitting the cancellation request"
-      );
+      console.error('Error requesting cancellation:', error);
+      toast.error('An error occurred while submitting the cancellation request');
     } finally {
       setIsCancelling(false);
     }
@@ -274,10 +261,10 @@ const OrderDetailsPage: React.FC<OrderDetailsPageProps> = ({ order }) => {
 
   // Check if order can be cancelled (before order is confirmed)
   const canCancelOrder = () => {
-    const cancellableStatuses = ["pending", "address_confirmed"];
+    const cancellableStatuses = ['pending', 'address_confirmed'];
     return (
       cancellableStatuses.includes(currentOrder.status) &&
-      currentOrder.status !== "cancelled" &&
+      currentOrder.status !== 'cancelled' &&
       !(currentOrder as any).cancellationRequested // Don't show cancel button if request already pending
     );
   };
@@ -288,9 +275,7 @@ const OrderDetailsPage: React.FC<OrderDetailsPageProps> = ({ order }) => {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Order Details</h1>
-          <p className="text-gray-600 mt-1">
-            Order #{currentOrder.orderNumber}
-          </p>
+          <p className="text-gray-600 mt-1">Order #{currentOrder.orderNumber}</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-2">
           {currentOrder.invoice?.hosted_invoice_url ? (
@@ -304,13 +289,8 @@ const OrderDetailsPage: React.FC<OrderDetailsPageProps> = ({ order }) => {
                 Download Invoice
               </Link>
             </Button>
-          ) : currentOrder.paymentStatus === "paid" ||
-            currentOrder.status === "paid" ? (
-            <Button
-              onClick={handleGenerateInvoice}
-              disabled={generatingInvoice}
-              variant="outline"
-            >
+          ) : currentOrder.paymentStatus === 'paid' || currentOrder.status === 'paid' ? (
+            <Button onClick={handleGenerateInvoice} disabled={generatingInvoice} variant="outline">
               {generatingInvoice ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-600 mr-2"></div>
@@ -382,15 +362,15 @@ const OrderDetailsPage: React.FC<OrderDetailsPageProps> = ({ order }) => {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-orange-700">
-                  Your cancellation request has been submitted and is awaiting
-                  admin review. You will be notified once it has been processed.
+                  Your cancellation request has been submitted and is awaiting admin review. You
+                  will be notified once it has been processed.
                 </p>
                 {(currentOrder as any).cancellationRequestedAt && (
                   <p className="text-xs text-orange-600 mt-2">
-                    Requested on:{" "}
+                    Requested on:{' '}
                     {format(
                       new Date((currentOrder as any).cancellationRequestedAt),
-                      "MMM dd, yyyy 'at' h:mm a"
+                      "MMM dd, yyyy 'at' h:mm a",
                     )}
                   </p>
                 )}
@@ -410,9 +390,7 @@ const OrderDetailsPage: React.FC<OrderDetailsPageProps> = ({ order }) => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-gray-600">Order Status</p>
-                  <Badge
-                    className={`${getStatusColor(currentOrder.status)} mt-1`}
-                  >
+                  <Badge className={`${getStatusColor(currentOrder.status)} mt-1`}>
                     {currentOrder.status}
                   </Badge>
                 </div>
@@ -420,7 +398,7 @@ const OrderDetailsPage: React.FC<OrderDetailsPageProps> = ({ order }) => {
                   <p className="text-sm text-gray-600">Payment Status</p>
                   <Badge
                     className={`${getPaymentStatusColor(
-                      currentOrder.paymentStatus
+                      currentOrder.paymentStatus,
                     )} mt-1 flex items-center gap-1 w-fit`}
                   >
                     {getPaymentStatusIcon(currentOrder.paymentStatus)}
@@ -431,14 +409,14 @@ const OrderDetailsPage: React.FC<OrderDetailsPageProps> = ({ order }) => {
                   <p className="text-sm text-gray-600">Payment Method</p>
                   <p className="font-medium capitalize flex items-center gap-2">
                     <CreditCard className="w-4 h-4" />
-                    {currentOrder.paymentMethod.replace("_", " ")}
+                    {currentOrder.paymentMethod.replace('_', ' ')}
                   </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Order Date</p>
                   <p className="font-medium flex items-center gap-2">
                     <CalendarDays className="w-4 h-4" />
-                    {format(new Date(currentOrder.orderDate), "PPP")}
+                    {format(new Date(currentOrder.orderDate), 'PPP')}
                   </p>
                 </div>
               </div>
@@ -472,12 +450,9 @@ const OrderDetailsPage: React.FC<OrderDetailsPageProps> = ({ order }) => {
                       };
                       quantity: number;
                     },
-                    index: number
+                    index: number,
                   ) => (
-                    <div
-                      key={index}
-                      className="flex items-center gap-4 p-4 border rounded-lg"
-                    >
+                    <div key={index} className="flex items-center gap-4 p-4 border rounded-lg">
                       {item.product.image && (
                         <div className="relative w-16 h-16 shrink-0">
                           <Image
@@ -503,19 +478,12 @@ const OrderDetailsPage: React.FC<OrderDetailsPageProps> = ({ order }) => {
                         </h3>
                         {item.product.categories && (
                           <p className="text-sm text-gray-500 mt-1">
-                            {item.product.categories
-                              .map((cat) => cat.title)
-                              .join(", ")}
+                            {item.product.categories.map((cat) => cat.title).join(', ')}
                           </p>
                         )}
                         <div className="flex items-center gap-4 mt-2">
-                          <span className="text-sm text-gray-600">
-                            Qty: {item.quantity}
-                          </span>
-                          <PriceFormatter
-                            amount={item.product.price}
-                            className="font-medium"
-                          />
+                          <span className="text-sm text-gray-600">Qty: {item.quantity}</span>
+                          <PriceFormatter amount={item.product.price} className="font-medium" />
                         </div>
                       </div>
                       <div className="text-right">
@@ -525,7 +493,7 @@ const OrderDetailsPage: React.FC<OrderDetailsPageProps> = ({ order }) => {
                         />
                       </div>
                     </div>
-                  )
+                  ),
                 )}
               </div>
             </CardContent>
@@ -583,7 +551,7 @@ const OrderDetailsPage: React.FC<OrderDetailsPageProps> = ({ order }) => {
                 <p className="font-medium">{currentOrder.address.name}</p>
                 <p className="text-gray-600">{currentOrder.address.address}</p>
                 <p className="text-gray-600">
-                  {currentOrder.address.city}, {currentOrder.address.state}{" "}
+                  {currentOrder.address.city}, {currentOrder.address.state}{' '}
                   {currentOrder.address.zip}
                 </p>
               </div>
@@ -605,7 +573,7 @@ const OrderDetailsPage: React.FC<OrderDetailsPageProps> = ({ order }) => {
                   <div className="pt-2 border-t">
                     <p className="text-gray-600">Payment Completed</p>
                     <p className="font-medium">
-                      {format(new Date(currentOrder.paymentCompletedAt), "PPp")}
+                      {format(new Date(currentOrder.paymentCompletedAt), 'PPp')}
                     </p>
                   </div>
                 )}
@@ -621,7 +589,7 @@ const OrderDetailsPage: React.FC<OrderDetailsPageProps> = ({ order }) => {
           <DialogOverlay />
           <DialogPrimitive.Content
             className={cn(
-              "fixed left-[50%] top-[50%] z-50 grid w-full max-w-md translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-300 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 sm:rounded-lg"
+              'fixed left-[50%] top-[50%] z-50 grid w-full max-w-md translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-300 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 sm:rounded-lg',
             )}
           >
             <VisuallyHidden.Root>
@@ -632,12 +600,9 @@ const OrderDetailsPage: React.FC<OrderDetailsPageProps> = ({ order }) => {
                 <AlertTriangle className="h-8 w-8 text-red-600 animate-pulse" />
               </div>
               <div className="space-y-2">
-                <h3 className="text-xl font-bold text-gray-900">
-                  Request Order Cancellation
-                </h3>
+                <h3 className="text-xl font-bold text-gray-900">Request Order Cancellation</h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Your cancellation request will be submitted to our team for
-                  review.
+                  Your cancellation request will be submitted to our team for review.
                 </p>
 
                 {/* Cancellation Reason Input */}
@@ -658,21 +623,19 @@ const OrderDetailsPage: React.FC<OrderDetailsPageProps> = ({ order }) => {
                   />
                 </div>
 
-                {currentOrder.paymentStatus === "paid" && (
+                {currentOrder.paymentStatus === 'paid' && (
                   <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                     <div className="flex items-start gap-3">
                       <div className="shrink-0">
                         <Wallet className="h-5 w-5 text-blue-600 mt-0.5" />
                       </div>
                       <div className="text-left">
-                        <p className="font-semibold text-blue-900">
-                          Refund Information
-                        </p>
+                        <p className="font-semibold text-blue-900">Refund Information</p>
                         <p className="text-sm text-blue-700 mt-1">
-                          If approved, your payment of{" "}
+                          If approved, your payment of{' '}
                           <span className="font-bold">
                             <PriceFormatter amount={currentOrder.totalPrice} />
-                          </span>{" "}
+                          </span>{' '}
                           will be added to your wallet balance.
                         </p>
                         <ul className="text-sm text-blue-700 mt-2 space-y-1 list-disc list-inside">
@@ -691,7 +654,7 @@ const OrderDetailsPage: React.FC<OrderDetailsPageProps> = ({ order }) => {
                 variant="outline"
                 onClick={() => {
                   setShowCancelDialog(false);
-                  setCancellationReason("");
+                  setCancellationReason('');
                 }}
                 disabled={isCancelling}
                 className="flex-1 border-gray-300 hover:bg-gray-50 font-medium"

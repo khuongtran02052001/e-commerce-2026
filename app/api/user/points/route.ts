@@ -1,24 +1,21 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
-import { backendClient } from "@/sanity/lib/backendClient";
-import { calculatePointsUpdate } from "@/lib/pointsCalculation";
+import { calculatePointsUpdate } from '@/lib/pointsCalculation';
+import { backendClient } from '@/sanity/lib/backendClient';
+import { auth } from '@clerk/nextjs/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
     const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await request.json();
     const { orderTotal, orderId } = body;
 
     if (!orderTotal || !orderId) {
-      return NextResponse.json(
-        { error: "Order total and order ID are required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Order total and order ID are required' }, { status: 400 });
     }
 
     // Get user from Sanity
@@ -30,11 +27,11 @@ export async function POST(request: NextRequest) {
         totalSpent,
         "completedOrders": count(*[_type == "order" && user._ref == ^._id && status == "completed"])
       }`,
-      { clerkUserId: userId }
+      { clerkUserId: userId },
     );
 
     if (!sanityUser) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
     // Calculate points update
@@ -42,7 +39,7 @@ export async function POST(request: NextRequest) {
       orderTotal,
       sanityUser.completedOrders || 0,
       sanityUser.rewardPoints || 0,
-      sanityUser.loyaltyPoints || 0
+      sanityUser.loyaltyPoints || 0,
     );
 
     // Update user points and total spent
@@ -61,19 +58,14 @@ export async function POST(request: NextRequest) {
       success: true,
       user: updatedUser,
       pointsEarned: {
-        rewardPoints:
-          pointsUpdate.rewardPoints - (sanityUser.rewardPoints || 0),
-        loyaltyPoints:
-          pointsUpdate.loyaltyPoints - (sanityUser.loyaltyPoints || 0),
+        rewardPoints: pointsUpdate.rewardPoints - (sanityUser.rewardPoints || 0),
+        loyaltyPoints: pointsUpdate.loyaltyPoints - (sanityUser.loyaltyPoints || 0),
       },
       messages: pointsUpdate.message,
     });
   } catch (error) {
-    console.error("Error updating user points:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    console.error('Error updating user points:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -82,7 +74,7 @@ export async function GET(request: NextRequest) {
     const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // Get user points and stats
@@ -97,11 +89,11 @@ export async function GET(request: NextRequest) {
         "pendingOrders": count(*[_type == "order" && user._ref == ^._id && status in ["pending", "processing"]]),
         "totalOrders": count(*[_type == "order" && user._ref == ^._id])
       }`,
-      { clerkUserId: userId }
+      { clerkUserId: userId },
     );
 
     if (!userStats) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
     return NextResponse.json({
@@ -109,10 +101,7 @@ export async function GET(request: NextRequest) {
       stats: userStats,
     });
   } catch (error) {
-    console.error("Error fetching user points:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    console.error('Error fetching user points:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

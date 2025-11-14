@@ -68,13 +68,11 @@ export async function submitReviewAPI(data: {
 }): Promise<ReviewSubmissionResult>;
 
 // Get product reviews
-export async function getProductReviewsAPI(
-  productId: string
-): Promise<ProductReviewsData>;
+export async function getProductReviewsAPI(productId: string): Promise<ProductReviewsData>;
 
 // Mark review helpful
 export async function markReviewHelpfulAPI(
-  reviewId: string
+  reviewId: string,
 ): Promise<{ success: boolean; message: string }>;
 ```
 
@@ -83,19 +81,19 @@ export async function markReviewHelpfulAPI(
 ```typescript
 // Get reviews by status
 export async function getReviewsByStatusAPI(
-  status: "pending" | "approved" | "rejected"
+  status: 'pending' | 'approved' | 'rejected',
 ): Promise<ReviewsByStatusResponse>;
 
 // Approve review
 export async function approveReviewAPI(
   reviewId: string,
-  adminNotes?: string
+  adminNotes?: string,
 ): Promise<ReviewActionResponse>;
 
 // Reject review
 export async function rejectReviewAPI(
   reviewId: string,
-  adminNotes?: string
+  adminNotes?: string,
 ): Promise<ReviewActionResponse>;
 ```
 
@@ -108,7 +106,7 @@ export async function rejectReviewAPI(
 #### `ReviewSidebar.tsx` - Review submission
 
 ```typescript
-import { submitReviewAPI } from "@/lib/reviewAPI";
+import { submitReviewAPI } from '@/lib/reviewAPI';
 
 const handleSubmit = async () => {
   const result = await submitReviewAPI({
@@ -123,7 +121,7 @@ const handleSubmit = async () => {
 #### `ProductReviews.tsx` - Display reviews
 
 ```typescript
-import { getProductReviewsAPI, markReviewHelpfulAPI } from "@/lib/reviewAPI";
+import { getProductReviewsAPI, markReviewHelpfulAPI } from '@/lib/reviewAPI';
 
 const loadReviews = async () => {
   const data = await getProductReviewsAPI(productId);
@@ -159,19 +157,15 @@ const handleMarkHelpful = async (reviewId: string) => {
 #### `admin/AdminReviews.tsx` - Manage reviews
 
 ```typescript
-import {
-  getReviewsByStatusAPI,
-  approveReviewAPI,
-  rejectReviewAPI,
-} from "@/lib/adminReviewAPI";
+import { getReviewsByStatusAPI, approveReviewAPI, rejectReviewAPI } from '@/lib/adminReviewAPI';
 
 const loadPendingReviews = async () => {
-  const data = await getReviewsByStatusAPI("pending");
+  const data = await getReviewsByStatusAPI('pending');
   setPendingReviews(data.reviews);
 };
 
 const loadApprovedReviews = async () => {
-  const data = await getReviewsByStatusAPI("approved");
+  const data = await getReviewsByStatusAPI('approved');
   setApprovedReviews(data.reviews);
 };
 
@@ -194,14 +188,11 @@ const handleReject = async (reviewId: string) => {
 // In admin API routes
 const adminUser = await writeClient.fetch(
   `*[_type == "user" && clerkId == $userId && role == "admin"][0]`,
-  { userId }
+  { userId },
 );
 
 if (!adminUser) {
-  return NextResponse.json(
-    { error: "Forbidden - Admin access required" },
-    { status: 403 }
-  );
+  return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
 }
 ```
 
@@ -235,14 +226,11 @@ await writeClient
 // Check if user already reviewed this product
 const existingReview = await writeClient.fetch(
   `*[_type == "review" && user._ref == $userId && product._ref == $productId][0]`,
-  { userId, productId }
+  { userId, productId },
 );
 
 if (existingReview) {
-  return NextResponse.json(
-    { error: "You have already reviewed this product" },
-    { status: 400 }
-  );
+  return NextResponse.json({ error: 'You have already reviewed this product' }, { status: 400 });
 }
 ```
 

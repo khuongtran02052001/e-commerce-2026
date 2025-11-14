@@ -1,41 +1,30 @@
-import Container from "@/components/Container";
-import DynamicBreadcrumb from "@/components/DynamicBreadcrumb";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Container from '@/components/Container';
+import DynamicBreadcrumb from '@/components/DynamicBreadcrumb';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { OTHERS_BLOG_QUERYResult, SINGLE_BLOG_QUERYResult } from '@/sanity.types';
+import { urlFor } from '@/sanity/lib/image';
+import { getBlogCategories, getOthersBlog, getSingleBlog } from '@/sanity/queries';
+import dayjs from 'dayjs';
 import {
-  SINGLE_BLOG_QUERYResult,
-  OTHERS_BLOG_QUERYResult,
-} from "@/sanity.types";
-import { urlFor } from "@/sanity/lib/image";
-import {
-  getBlogCategories,
-  getOthersBlog,
-  getSingleBlog,
-} from "@/sanity/queries";
-import dayjs from "dayjs";
-import {
+  ArrowRight,
+  BookOpen,
   Calendar,
   ChevronLeft,
-  User,
   Clock,
   Eye,
-  Share2,
-  BookOpen,
-  ArrowRight,
   Heart,
   MessageCircle,
-} from "lucide-react";
-import { PortableText } from "next-sanity";
-import Image from "next/image";
-import Link from "next/link";
-import { notFound } from "next/navigation";
+  Share2,
+  User,
+} from 'lucide-react';
+import { PortableText } from 'next-sanity';
+import Image from 'next/image';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
 
-const SingleBlogPage = async ({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) => {
+const SingleBlogPage = async ({ params }: { params: Promise<{ slug: string }> }) => {
   const { slug } = await params;
   const blog = (await getSingleBlog(slug)) as SINGLE_BLOG_QUERYResult | null;
   if (!blog) return notFound();
@@ -45,18 +34,14 @@ const SingleBlogPage = async ({
     if (!body) return 5;
     let wordCount = 0;
     body.forEach((block: unknown) => {
-      if (typeof block === "object" && block !== null && "children" in block) {
+      if (typeof block === 'object' && block !== null && 'children' in block) {
         const blockObj = block as { _type?: string; children?: unknown[] };
-        if (blockObj._type === "block" && blockObj.children) {
+        if (blockObj._type === 'block' && blockObj.children) {
           blockObj.children.forEach((child: unknown) => {
-            if (
-              typeof child === "object" &&
-              child !== null &&
-              "text" in child
-            ) {
+            if (typeof child === 'object' && child !== null && 'text' in child) {
               const childObj = child as { text?: string };
               if (childObj.text) {
-                wordCount += childObj.text.split(" ").length;
+                wordCount += childObj.text.split(' ').length;
               }
             }
           });
@@ -73,10 +58,7 @@ const SingleBlogPage = async ({
       {/* Breadcrumb */}
       <Container className="pt-6">
         <DynamicBreadcrumb
-          customItems={[
-            { label: "Blog", href: "/blog" },
-            { label: blog?.title || "Article" },
-          ]}
+          customItems={[{ label: 'Blog', href: '/blog' }, { label: blog?.title || 'Article' }]}
         />
       </Container>
 
@@ -91,17 +73,11 @@ const SingleBlogPage = async ({
                 {blog?.blogcategories && blog.blogcategories.length > 0 && (
                   <div className="flex flex-wrap gap-2">
                     {blog.blogcategories.map(
-                      (
-                        category: { title: string | null; slug: string | null },
-                        index: number
-                      ) => (
-                        <Badge
-                          key={index}
-                          className="bg-shop_dark_green hover:bg-shop_light_green"
-                        >
+                      (category: { title: string | null; slug: string | null }, index: number) => (
+                        <Badge key={index} className="bg-shop_dark_green hover:bg-shop_light_green">
                           {category.title}
                         </Badge>
-                      )
+                      ),
                     )}
                   </div>
                 )}
@@ -117,10 +93,7 @@ const SingleBlogPage = async ({
                     <div className="flex items-center gap-2">
                       {blog?.author?.image && (
                         <Image
-                          src={urlFor(blog.author.image)
-                            .width(32)
-                            .height(32)
-                            .url()}
+                          src={urlFor(blog.author.image).width(32).height(32).url()}
                           alt={blog.author.name}
                           width={32}
                           height={32}
@@ -129,18 +102,14 @@ const SingleBlogPage = async ({
                       )}
                       <div className="flex items-center gap-1">
                         <User size={16} />
-                        <span className="font-medium text-shop_dark_green">
-                          {blog.author.name}
-                        </span>
+                        <span className="font-medium text-shop_dark_green">{blog.author.name}</span>
                       </div>
                     </div>
                   )}
 
                   <div className="flex items-center gap-1">
                     <Calendar size={16} />
-                    <time>
-                      {dayjs(blog.publishedAt).format("MMMM D, YYYY")}
-                    </time>
+                    <time>{dayjs(blog.publishedAt).format('MMMM D, YYYY')}</time>
                   </div>
 
                   <div className="flex items-center gap-1">
@@ -188,7 +157,7 @@ const SingleBlogPage = async ({
                 <div className="relative overflow-hidden rounded-xl shadow-lg">
                   <Image
                     src={urlFor(blog.mainImage).width(1200).height(600).url()}
-                    alt={blog.title || "Blog Image"}
+                    alt={blog.title || 'Blog Image'}
                     width={1200}
                     height={600}
                     className="w-full h-[400px] sm:h-[500px] object-cover"
@@ -236,7 +205,7 @@ const SingleBlogPage = async ({
                             image: ({ value }) => (
                               <div className="my-8 overflow-hidden rounded-lg shadow-md">
                                 <Image
-                                  alt={value.alt || ""}
+                                  alt={value.alt || ''}
                                   src={urlFor(value).width(800).url()}
                                   className="w-full h-auto"
                                   width={800}
@@ -246,11 +215,9 @@ const SingleBlogPage = async ({
                             ),
                             separator: ({ value }) => {
                               switch (value.style) {
-                                case "line":
-                                  return (
-                                    <hr className="my-8 border-t-2 border-shop_light_green" />
-                                  );
-                                case "space":
+                                case 'line':
+                                  return <hr className="my-8 border-t-2 border-shop_light_green" />;
+                                case 'space':
                                   return <div className="my-8" />;
                                 default:
                                   return null;
@@ -270,12 +237,8 @@ const SingleBlogPage = async ({
                             ),
                           },
                           listItem: {
-                            bullet: ({ children }) => (
-                              <li className="pl-2">{children}</li>
-                            ),
-                            number: ({ children }) => (
-                              <li className="pl-2">{children}</li>
-                            ),
+                            bullet: ({ children }) => <li className="pl-2">{children}</li>,
+                            number: ({ children }) => <li className="pl-2">{children}</li>,
                           },
                           marks: {
                             strong: ({ children }) => (
@@ -384,10 +347,7 @@ const BlogSidebar = async ({ slug }: { slug: string }) => {
         </CardHeader>
         <CardContent className="space-y-4">
           {blogs?.map(
-            (
-              blogItem: OTHERS_BLOG_QUERYResult[0] & { publishedAt?: string },
-              index: number
-            ) => (
+            (blogItem: OTHERS_BLOG_QUERYResult[0] & { publishedAt?: string }, index: number) => (
               <Link
                 href={`/blog/${blogItem?.slug?.current}`}
                 key={index}
@@ -396,10 +356,7 @@ const BlogSidebar = async ({ slug }: { slug: string }) => {
                 {blogItem?.mainImage && (
                   <div className="flex-shrink-0">
                     <Image
-                      src={urlFor(blogItem.mainImage)
-                        .width(80)
-                        .height(80)
-                        .url()}
+                      src={urlFor(blogItem.mainImage).width(80).height(80).url()}
                       alt="blog thumbnail"
                       width={80}
                       height={80}
@@ -413,7 +370,7 @@ const BlogSidebar = async ({ slug }: { slug: string }) => {
                   </h4>
                   <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
                     <Calendar size={12} />
-                    {dayjs(blogItem?.publishedAt).format("MMM D, YYYY")}
+                    {dayjs(blogItem?.publishedAt).format('MMM D, YYYY')}
                   </p>
                 </div>
                 <ArrowRight
@@ -421,7 +378,7 @@ const BlogSidebar = async ({ slug }: { slug: string }) => {
                   className="flex-shrink-0 text-gray-400 group-hover:text-shop_light_green transition-colors"
                 />
               </Link>
-            )
+            ),
           )}
         </CardContent>
       </Card>
@@ -430,16 +387,11 @@ const BlogSidebar = async ({ slug }: { slug: string }) => {
       <Card className="shadow-lg border-0 bg-gradient-to-br from-shop_light_pink to-light-orange/20">
         <CardContent className="p-6 text-center">
           <BookOpen className="w-12 h-12 text-shop_dark_green mx-auto mb-4" />
-          <h3 className="text-lg font-bold text-shop_dark_green mb-2">
-            Stay Updated
-          </h3>
+          <h3 className="text-lg font-bold text-shop_dark_green mb-2">Stay Updated</h3>
           <p className="text-sm text-gray-600 mb-4">
             Get the latest articles delivered to your inbox.
           </p>
-          <Button
-            className="w-full bg-shop_dark_green hover:bg-shop_light_green"
-            size="sm"
-          >
+          <Button className="w-full bg-shop_dark_green hover:bg-shop_light_green" size="sm">
             Subscribe Now
           </Button>
         </CardContent>

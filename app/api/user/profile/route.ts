@@ -1,13 +1,13 @@
-import { auth } from "@clerk/nextjs/server";
-import { NextRequest, NextResponse } from "next/server";
-import { backendClient } from "@/sanity/lib/backendClient";
+import { backendClient } from '@/sanity/lib/backendClient';
+import { auth } from '@clerk/nextjs/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function PUT(request: NextRequest) {
   try {
     const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await request.json();
@@ -15,9 +15,9 @@ export async function PUT(request: NextRequest) {
 
     // Update or create user in Sanity
     const sanityUser = {
-      _type: "user",
+      _type: 'user',
       clerkUserId: clerkUserId || userId,
-      email: "", // We'll get this from Clerk
+      email: '', // We'll get this from Clerk
       firstName,
       lastName,
       phone,
@@ -28,7 +28,7 @@ export async function PUT(request: NextRequest) {
     // Check if user exists in Sanity
     const existingUser = await backendClient.fetch(
       `*[_type == "user" && clerkUserId == $clerkUserId][0]`,
-      { clerkUserId: clerkUserId || userId }
+      { clerkUserId: clerkUserId || userId },
     );
 
     let result;
@@ -54,14 +54,11 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: "Profile updated successfully",
+      message: 'Profile updated successfully',
       user: result,
     });
   } catch (error) {
-    console.error("Error updating profile:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    console.error('Error updating profile:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

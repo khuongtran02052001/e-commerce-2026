@@ -1,25 +1,22 @@
-import { NextRequest, NextResponse } from "next/server";
-import { currentUser } from "@clerk/nextjs/server";
-import { writeClient } from "@/sanity/lib/client";
-import stripe from "@/lib/stripe";
-import { urlFor } from "@/sanity/lib/image";
+import stripe from '@/lib/stripe';
+import { writeClient } from '@/sanity/lib/client';
+import { urlFor } from '@/sanity/lib/image';
+import { currentUser } from '@clerk/nextjs/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ orderId: string }> }
+  { params }: { params: Promise<{ orderId: string }> },
 ) {
   try {
     const user = await currentUser();
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { orderId } = await params;
     if (!orderId) {
-      return NextResponse.json(
-        { error: "Order ID is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Order ID is required' }, { status: 400 });
     }
 
     // Get the order from Sanity
@@ -51,37 +48,28 @@ export async function POST(
         stripePaymentIntentId,
         address
       }`,
-      { orderId, clerkUserId: user.id }
+      { orderId, clerkUserId: user.id },
     );
 
     if (!order) {
       console.error(`Order not found: ${orderId}`);
-      return NextResponse.json({ error: "Order not found" }, { status: 404 });
+      return NextResponse.json({ error: 'Order not found' }, { status: 404 });
     }
 
     // Check if order is already paid
-    if (order.paymentStatus === "paid" || order.status === "paid") {
-      return NextResponse.json(
-        { error: "Order is already paid" },
-        { status: 400 }
-      );
+    if (order.paymentStatus === 'paid' || order.status === 'paid') {
+      return NextResponse.json({ error: 'Order is already paid' }, { status: 400 });
     }
 
     // Validate order has products and total
     if (!order.products || order.products.length === 0) {
       console.error(`No products found for order: ${orderId}`);
-      return NextResponse.json(
-        { error: "No products found in order" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'No products found in order' }, { status: 400 });
     }
 
     if (!order.totalPrice || order.totalPrice <= 0) {
       console.error(`Invalid total price for order: ${orderId}`);
-      return NextResponse.json(
-        { error: "Invalid order total" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Invalid order total' }, { status: 400 });
     }
 
     // Handle Stripe customer - create or find existing customer
@@ -90,8 +78,8 @@ export async function POST(
     // If we don't have a valid Stripe customer ID, create one
     if (
       !stripeCustomerId ||
-      stripeCustomerId.includes("@") ||
-      !stripeCustomerId.startsWith("cus_")
+      stripeCustomerId.includes('@') ||
+      !stripeCustomerId.startsWith('cus_')
     ) {
       try {
         // First, try to find existing customer by email
@@ -120,14 +108,14 @@ export async function POST(
       } catch (customerError) {
         console.error(`Failed to create/find Stripe customer:`, customerError);
         return NextResponse.json(
-          { error: "Failed to create or find Stripe customer" },
-          { status: 500 }
+          { error: 'Failed to create or find Stripe customer' },
+          { status: 500 },
         );
       }
     }
 
     // Create Stripe checkout session for the order
-    const currency = (order.currency || "USD").toLowerCase();
+    const currency = (order.currency || 'USD').toLowerCase();
 
     try {
       // Prepare line items for the checkout session
@@ -148,7 +136,7 @@ export async function POST(
             unit_amount: Math.round((item.product.price || 0) * 100),
           },
           quantity: item.quantity,
-        })
+        }),
       );
 
       // Add tax as a line item if exists
@@ -157,7 +145,7 @@ export async function POST(
           price_data: {
             currency,
             product_data: {
-              name: "Tax",
+              name: 'Tax',
             },
             unit_amount: Math.round(order.tax * 100),
           },
@@ -171,7 +159,7 @@ export async function POST(
           price_data: {
             currency,
             product_data: {
-              name: "Shipping",
+              name: 'Shipping',
             },
             unit_amount: Math.round(order.shipping * 100),
           },
@@ -181,15 +169,15 @@ export async function POST(
 
       const checkoutSession = await stripe.checkout.sessions.create({
         customer: stripeCustomerId,
-        payment_method_types: ["card"],
+        payment_method_types: ['card'],
         line_items: lineItems,
-        mode: "payment",
+        mode: 'payment',
         success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success?session_id={CHECKOUT_SESSION_ID}&orderId=${order._id}`,
         cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/orders`,
         metadata: {
           orderId: order._id,
-          orderNumber: order.orderNumber || "",
-          customerName: order.customerName || "",
+          orderNumber: order.orderNumber || '',
+          customerName: order.customerName || '',
         },
       });
 
@@ -207,33 +195,30 @@ export async function POST(
           success: true,
           checkoutUrl: checkoutSession.url,
           sessionId: checkoutSession.id,
-          message: "Checkout session created successfully",
+          message: 'Checkout session created successfully',
         },
-        { status: 200 }
+        { status: 200 },
       );
     } catch (checkoutError) {
       console.error(`Failed to create checkout session:`, checkoutError);
-      return NextResponse.json(
-        { error: "Failed to create checkout session" },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'Failed to create checkout session' }, { status: 500 });
     }
   } catch (error) {
-    console.error("Direct payment error:", error);
+    console.error('Direct payment error:', error);
 
     // Provide more specific error messages
-    let errorMessage = "Failed to process payment";
+    let errorMessage = 'Failed to process payment';
     let statusCode = 500;
 
     if (error instanceof Error) {
-      if (error.message.includes("No such customer")) {
-        errorMessage = "Customer not found in Stripe. Please contact support.";
+      if (error.message.includes('No such customer')) {
+        errorMessage = 'Customer not found in Stripe. Please contact support.';
         statusCode = 400;
-      } else if (error.message.includes("currency")) {
-        errorMessage = "Invalid currency specified";
+      } else if (error.message.includes('currency')) {
+        errorMessage = 'Invalid currency specified';
         statusCode = 400;
-      } else if (error.message.includes("amount")) {
-        errorMessage = "Invalid amount specified";
+      } else if (error.message.includes('amount')) {
+        errorMessage = 'Invalid amount specified';
         statusCode = 400;
       }
     }
@@ -242,13 +227,13 @@ export async function POST(
       {
         error: errorMessage,
         details:
-          process.env.NODE_ENV === "development"
+          process.env.NODE_ENV === 'development'
             ? error instanceof Error
               ? error.message
               : String(error)
             : undefined,
       },
-      { status: statusCode }
+      { status: statusCode },
     );
   }
 }

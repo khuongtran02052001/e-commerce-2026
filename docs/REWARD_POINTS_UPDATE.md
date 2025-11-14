@@ -70,8 +70,8 @@ REWARD_POINTS_AMOUNT=5  # Base points for first threshold
 
 ```typescript
 export function calculateRewardPoints(orderTotal: number): number {
-  const threshold = parseFloat(process.env.REWARD_POINTS_THRESHOLD || "3000");
-  const basePoints = parseInt(process.env.REWARD_POINTS_AMOUNT || "5");
+  const threshold = parseFloat(process.env.REWARD_POINTS_THRESHOLD || '3000');
+  const basePoints = parseInt(process.env.REWARD_POINTS_AMOUNT || '5');
 
   if (orderTotal < threshold) {
     return 0;

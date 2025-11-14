@@ -1,4 +1,4 @@
-import { sanityFetch } from "../lib/live";
+import { sanityFetch } from '../lib/live';
 
 // Email-based User Queries
 export const USER_ADDRESSES_BY_EMAIL_QUERY = `
@@ -69,7 +69,7 @@ export const getUserAddressesByEmail = async (email: string) => {
     });
     return data ?? [];
   } catch (error) {
-    console.error("Error fetching user addresses by email:", error);
+    console.error('Error fetching user addresses by email:', error);
     return [];
   }
 };
@@ -82,7 +82,7 @@ export const getUserOrdersByEmail = async (email: string) => {
     });
     return data ?? [];
   } catch (error) {
-    console.error("Error fetching user orders by email:", error);
+    console.error('Error fetching user orders by email:', error);
     return [];
   }
 };
@@ -95,7 +95,7 @@ export const getDefaultAddressByEmail = async (email: string) => {
     });
     return data;
   } catch (error) {
-    console.error("Error fetching default address by email:", error);
+    console.error('Error fetching default address by email:', error);
     return null;
   }
 };

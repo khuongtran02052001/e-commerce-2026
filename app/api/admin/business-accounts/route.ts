@@ -1,13 +1,13 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
-import { client } from "@/sanity/lib/client";
+import { client } from '@/sanity/lib/client';
+import { auth } from '@clerk/nextjs/server';
+import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
     const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // Check if user is admin (you can implement your own admin check logic)
@@ -38,10 +38,7 @@ export async function GET() {
       accounts,
     });
   } catch (error) {
-    console.error("Error fetching business accounts:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch business accounts" },
-      { status: 500 }
-    );
+    console.error('Error fetching business accounts:', error);
+    return NextResponse.json({ error: 'Failed to fetch business accounts' }, { status: 500 });
   }
 }

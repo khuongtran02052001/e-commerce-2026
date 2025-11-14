@@ -1,44 +1,36 @@
-"use server";
+'use server';
 
-import { auth } from "@clerk/nextjs/server";
-import { backendClient } from "@/sanity/lib/backendClient";
-import {
-  Employee,
-  EmployeeRole,
-  EmployeeStatus,
-  ROLE_PERMISSIONS,
-} from "@/types/employee";
+import { backendClient } from '@/sanity/lib/backendClient';
+import { Employee, EmployeeRole, EmployeeStatus, ROLE_PERMISSIONS } from '@/types/employee';
+import { auth } from '@clerk/nextjs/server';
 
 // Assign employee role to a user
 export async function assignEmployeeRole(
   userId: string,
-  role: EmployeeRole
+  role: EmployeeRole,
 ): Promise<{ success: boolean; message: string; employee?: Employee }> {
   try {
     const { userId: clerkUserId } = await auth();
 
     if (!clerkUserId) {
-      return { success: false, message: "Unauthorized" };
+      return { success: false, message: 'Unauthorized' };
     }
 
     // Get admin user to verify permissions
     const adminUser = await backendClient.fetch(
       `*[_type == "user" && clerkUserId == $clerkUserId][0]`,
-      { clerkUserId }
+      { clerkUserId },
     );
 
     if (!adminUser) {
-      return { success: false, message: "Admin user not found" };
+      return { success: false, message: 'Admin user not found' };
     }
 
     // Get user to assign role to
-    const user = await backendClient.fetch(
-      `*[_type == "user" && _id == $userId][0]`,
-      { userId }
-    );
+    const user = await backendClient.fetch(`*[_type == "user" && _id == $userId][0]`, { userId });
 
     if (!user) {
-      return { success: false, message: "User not found" };
+      return { success: false, message: 'User not found' };
     }
 
     // Update user with employee fields
@@ -47,7 +39,7 @@ export async function assignEmployeeRole(
       .set({
         isEmployee: true,
         employeeRole: role,
-        employeeStatus: "active",
+        employeeStatus: 'active',
         employeeAssignedBy: adminUser.email,
         employeeAssignedAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -65,7 +57,7 @@ export async function assignEmployeeRole(
         firstName: updatedUser.firstName,
         lastName: updatedUser.lastName,
         role,
-        status: "active",
+        status: 'active',
         assignedBy: adminUser.email,
         assignedAt: new Date().toISOString(),
         permissions: ROLE_PERMISSIONS[role],
@@ -74,26 +66,23 @@ export async function assignEmployeeRole(
       },
     };
   } catch (error) {
-    console.error("Error assigning employee role:", error);
+    console.error('Error assigning employee role:', error);
     return {
       success: false,
-      message:
-        error instanceof Error
-          ? error.message
-          : "Failed to assign employee role",
+      message: error instanceof Error ? error.message : 'Failed to assign employee role',
     };
   }
 }
 
 // Remove employee role from user
 export async function removeEmployeeRole(
-  userId: string
+  userId: string,
 ): Promise<{ success: boolean; message: string }> {
   try {
     const { userId: clerkUserId } = await auth();
 
     if (!clerkUserId) {
-      return { success: false, message: "Unauthorized" };
+      return { success: false, message: 'Unauthorized' };
     }
 
     await backendClient
@@ -101,20 +90,17 @@ export async function removeEmployeeRole(
       .set({
         isEmployee: false,
         employeeRole: undefined,
-        employeeStatus: "inactive",
+        employeeStatus: 'inactive',
         updatedAt: new Date().toISOString(),
       })
       .commit();
 
-    return { success: true, message: "Employee role removed successfully" };
+    return { success: true, message: 'Employee role removed successfully' };
   } catch (error) {
-    console.error("Error removing employee role:", error);
+    console.error('Error removing employee role:', error);
     return {
       success: false,
-      message:
-        error instanceof Error
-          ? error.message
-          : "Failed to remove employee role",
+      message: error instanceof Error ? error.message : 'Failed to remove employee role',
     };
   }
 }
@@ -123,22 +109,22 @@ export async function removeEmployeeRole(
 export async function updateEmployeeStatus(
   userId: string,
   status: EmployeeStatus,
-  reason?: string
+  reason?: string,
 ): Promise<{ success: boolean; message: string }> {
   try {
     const { userId: clerkUserId } = await auth();
 
     if (!clerkUserId) {
-      return { success: false, message: "Unauthorized" };
+      return { success: false, message: 'Unauthorized' };
     }
 
     const adminUser = await backendClient.fetch(
       `*[_type == "user" && clerkUserId == $clerkUserId][0]`,
-      { clerkUserId }
+      { clerkUserId },
     );
 
     if (!adminUser) {
-      return { success: false, message: "Admin user not found" };
+      return { success: false, message: 'Admin user not found' };
     }
 
     const updateData: any = {
@@ -146,7 +132,7 @@ export async function updateEmployeeStatus(
       updatedAt: new Date().toISOString(),
     };
 
-    if (status === "suspended") {
+    if (status === 'suspended') {
       updateData.employeeSuspendedBy = adminUser.email;
       updateData.employeeSuspendedAt = new Date().toISOString();
       if (reason) {
@@ -158,13 +144,10 @@ export async function updateEmployeeStatus(
 
     return { success: true, message: `Employee status updated to ${status}` };
   } catch (error) {
-    console.error("Error updating employee status:", error);
+    console.error('Error updating employee status:', error);
     return {
       success: false,
-      message:
-        error instanceof Error
-          ? error.message
-          : "Failed to update employee status",
+      message: error instanceof Error ? error.message : 'Failed to update employee status',
     };
   }
 }
@@ -190,7 +173,7 @@ export async function getAllEmployees(): Promise<Employee[]> {
         employeePerformance,
         createdAt,
         updatedAt
-      }`
+      }`,
     );
 
     return employees.map((emp: any) => ({
@@ -206,15 +189,13 @@ export async function getAllEmployees(): Promise<Employee[]> {
       performance: emp.employeePerformance,
     }));
   } catch (error) {
-    console.error("Error fetching employees:", error);
+    console.error('Error fetching employees:', error);
     return [];
   }
 }
 
 // Get employees by role
-export async function getEmployeesByRole(
-  role: EmployeeRole
-): Promise<Employee[]> {
+export async function getEmployeesByRole(role: EmployeeRole): Promise<Employee[]> {
   try {
     const employees = await backendClient.fetch(
       `*[_type == "user" && isEmployee == true && employeeRole == $role && employeeStatus == "active"] | order(firstName asc) {
@@ -232,7 +213,7 @@ export async function getEmployeesByRole(
         createdAt,
         updatedAt
       }`,
-      { role }
+      { role },
     );
 
     return employees.map((emp: any) => ({
@@ -245,7 +226,7 @@ export async function getEmployeesByRole(
       performance: emp.employeePerformance,
     }));
   } catch (error) {
-    console.error("Error fetching employees by role:", error);
+    console.error('Error fetching employees by role:', error);
     return [];
   }
 }
@@ -275,7 +256,7 @@ export async function getCurrentEmployee(): Promise<Employee | null> {
         createdAt,
         updatedAt
       }`,
-      { clerkUserId }
+      { clerkUserId },
     );
 
     if (!user || !user.employeeRole) {
@@ -292,7 +273,7 @@ export async function getCurrentEmployee(): Promise<Employee | null> {
       performance: user.employeePerformance,
     };
   } catch (error) {
-    console.error("Error fetching current employee:", error);
+    console.error('Error fetching current employee:', error);
     return null;
   }
 }
@@ -312,12 +293,12 @@ export async function getAllUsers() {
         employeeStatus,
         isActive,
         createdAt
-      }`
+      }`,
     );
 
     return users;
   } catch (error) {
-    console.error("Error fetching users:", error);
+    console.error('Error fetching users:', error);
     return [];
   }
 }
@@ -333,12 +314,12 @@ export async function updateEmployeePerformance(
     ordersDelivered: number;
     cashCollected: number;
     paymentsReceived: number;
-  }>
+  }>,
 ): Promise<{ success: boolean; message: string }> {
   try {
     const user = await backendClient.fetch(
       `*[_type == "user" && _id == $userId][0] { employeePerformance }`,
-      { userId }
+      { userId },
     );
 
     const currentPerformance = user?.employeePerformance || {};
@@ -355,13 +336,12 @@ export async function updateEmployeePerformance(
       })
       .commit();
 
-    return { success: true, message: "Performance updated successfully" };
+    return { success: true, message: 'Performance updated successfully' };
   } catch (error) {
-    console.error("Error updating employee performance:", error);
+    console.error('Error updating employee performance:', error);
     return {
       success: false,
-      message:
-        error instanceof Error ? error.message : "Failed to update performance",
+      message: error instanceof Error ? error.message : 'Failed to update performance',
     };
   }
 }

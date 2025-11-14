@@ -1,36 +1,36 @@
-import { MetadataRoute } from "next";
+import { MetadataRoute } from 'next';
 
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
       {
-        userAgent: "*",
-        allow: "/",
+        userAgent: '*',
+        allow: '/',
         disallow: [
-          "/api/",
-          "/admin/",
-          "/employee/",
-          "/user/",
-          "/dashboard/",
-          "/studio/",
-          "/_next/",
-          "/checkout/",
+          '/api/',
+          '/admin/',
+          '/employee/',
+          '/user/',
+          '/dashboard/',
+          '/studio/',
+          '/_next/',
+          '/checkout/',
         ],
       },
       {
-        userAgent: "Googlebot",
-        allow: "/",
+        userAgent: 'Googlebot',
+        allow: '/',
         disallow: [
-          "/api/",
-          "/admin/",
-          "/employee/",
-          "/user/",
-          "/dashboard/",
-          "/studio/",
-          "/checkout/",
+          '/api/',
+          '/admin/',
+          '/employee/',
+          '/user/',
+          '/dashboard/',
+          '/studio/',
+          '/checkout/',
         ],
       },
     ],
-    sitemap: "https://shopcartpro.reactbd.org/sitemap.xml",
+    sitemap: 'https://shopcartpro.reactbd.org/sitemap.xml',
   };
 }

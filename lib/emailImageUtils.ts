@@ -1,4 +1,4 @@
-import { urlFor } from "@/sanity/lib/image";
+import { urlFor } from '@/sanity/lib/image';
 
 interface SanityImageAsset {
   _ref: string;
@@ -26,32 +26,31 @@ export function getEmailImageUrl(
     | { asset?: { _ref?: string; url?: string } }
     | undefined,
   width: number = 300,
-  height: number = 300
+  height: number = 300,
 ): string {
   try {
     // Handle undefined or null
     if (!imageData) {
-      const baseUrl =
-        process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
       return `${baseUrl}/images/products/product_1.png`;
     }
 
     // If imageData is already a string URL, return it
-    if (typeof imageData === "string") {
+    if (typeof imageData === 'string') {
       return imageData;
     }
 
     // If it's a Sanity image object, generate URL
     if (
       imageData &&
-      typeof imageData === "object" &&
+      typeof imageData === 'object' &&
       !Array.isArray(imageData) &&
-      ("_type" in imageData || "asset" in imageData)
+      ('_type' in imageData || 'asset' in imageData)
     ) {
       const imageUrl = urlFor(imageData)
         .width(width)
         .height(height)
-        .format("jpg")
+        .format('jpg')
         .quality(80)
         .url();
 
@@ -64,11 +63,11 @@ export function getEmailImageUrl(
     }
 
     // Fallback to placeholder image
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
     return `${baseUrl}/images/products/product_1.png`;
   } catch (error) {
-    console.error("Error generating email image URL:", error);
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+    console.error('Error generating email image URL:', error);
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
     return `${baseUrl}/images/products/product_1.png`;
   }
 }
@@ -78,5 +77,5 @@ export function getEmailImageUrl(
  * @returns The base URL with protocol
  */
 export function getBaseUrl(): string {
-  return process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+  return process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
 }

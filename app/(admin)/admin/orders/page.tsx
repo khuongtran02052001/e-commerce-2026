@@ -1,5 +1,5 @@
-import AdminOrders from "@/components/admin/AdminOrders";
-import { auth } from "@clerk/nextjs/server";
+import AdminOrders from '@/components/admin/AdminOrders';
+import { auth } from '@clerk/nextjs/server';
 
 const AdminOrdersPage = async () => {
   const { userId } = await auth();
@@ -7,9 +7,7 @@ const AdminOrdersPage = async () => {
   if (!userId) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <p className="text-xl text-gray-600">
-          Please sign in to access this page
-        </p>
+        <p className="text-xl text-gray-600">Please sign in to access this page</p>
       </div>
     );
   }

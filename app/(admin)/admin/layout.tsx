@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import React, { useEffect } from "react";
-import { useUser } from "@clerk/nextjs";
-import { useRouter, usePathname } from "next/navigation";
-import { useIsAdmin } from "@/lib/adminUtils";
-import Container from "@/components/Container";
-import AdminTopNavigation from "@/components/admin/AdminTopNavigation";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import AdminTopNavigation from '@/components/admin/AdminTopNavigation';
+import Container from '@/components/Container';
+import Footer from '@/components/Footer';
+import Header from '@/components/Header';
+import { useIsAdmin } from '@/lib/adminUtils';
+import { useUser } from '@clerk/nextjs';
+import { usePathname, useRouter } from 'next/navigation';
+import React, { useEffect } from 'react';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -22,7 +22,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
   // Redirect non-admin users
   useEffect(() => {
     if (isLoaded && !isAdmin) {
-      router.push("/admin/access-denied");
+      router.push('/admin/access-denied');
     }
   }, [isLoaded, isAdmin, router]);
 

@@ -1,17 +1,14 @@
-import { NextRequest, NextResponse } from "next/server";
-import { currentUser } from "@clerk/nextjs/server";
-import { backendClient } from "@/sanity/lib/backendClient";
-import { writeClient } from "@/sanity/lib/client";
+import { backendClient } from '@/sanity/lib/backendClient';
+import { writeClient } from '@/sanity/lib/client';
+import { currentUser } from '@clerk/nextjs/server';
+import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
     const user = await currentUser();
 
     if (!user) {
-      return NextResponse.json(
-        { error: "User not authenticated" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'User not authenticated' }, { status: 401 });
     }
 
     // Check if user exists in Sanity
@@ -35,7 +32,7 @@ export async function GET() {
         businessApprovedAt,
         rejectionReason
       }`,
-      { email: userEmail }
+      { email: userEmail },
     );
 
     return NextResponse.json({
@@ -44,11 +41,8 @@ export async function GET() {
       userProfile: sanityUser || null,
     });
   } catch (error) {
-    console.error("Error checking user status:", error);
-    return NextResponse.json(
-      { error: "Failed to check user status" },
-      { status: 500 }
-    );
+    console.error('Error checking user status:', error);
+    return NextResponse.json({ error: 'Failed to check user status' }, { status: 500 });
   }
 }
 
@@ -57,46 +51,39 @@ export async function POST() {
     const user = await currentUser();
 
     if (!user) {
-      return NextResponse.json(
-        { error: "User not authenticated" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'User not authenticated' }, { status: 401 });
     }
 
     const userEmail = user.emailAddresses[0]?.emailAddress;
     if (!userEmail) {
-      return NextResponse.json(
-        { error: "User email not found" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'User email not found' }, { status: 400 });
     }
 
     // Check if user already exists in Sanity
     const existingSanityUser = await backendClient.fetch(
       `*[_type == "userType" && email == $email][0]`,
-      { email: userEmail }
+      { email: userEmail },
     );
 
     if (existingSanityUser) {
       // Check current premium status
-      if (existingSanityUser.premiumStatus === "rejected") {
+      if (existingSanityUser.premiumStatus === 'rejected') {
         return NextResponse.json(
           {
             success: false,
-            error:
-              "Premium application was rejected. Please contact admin for assistance.",
+            error: 'Premium application was rejected. Please contact admin for assistance.',
           },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
-      if (existingSanityUser.premiumStatus === "pending") {
+      if (existingSanityUser.premiumStatus === 'pending') {
         return NextResponse.json(
           {
             success: false,
-            error: "Premium application is already pending approval.",
+            error: 'Premium application is already pending approval.',
           },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -104,9 +91,9 @@ export async function POST() {
         return NextResponse.json(
           {
             success: false,
-            error: "User already has premium account.",
+            error: 'User already has premium account.',
           },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -114,7 +101,7 @@ export async function POST() {
       const updatedUser = await writeClient
         .patch(existingSanityUser._id)
         .set({
-          premiumStatus: "pending",
+          premiumStatus: 'pending',
           premiumAppliedAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         })
@@ -130,15 +117,15 @@ export async function POST() {
 
     // Create new user with pending premium status
     const newUser = await writeClient.create({
-      _type: "userType",
+      _type: 'userType',
       email: userEmail,
       firstName: user.firstName,
       lastName: user.lastName,
       isActive: false, // Will be set to true when approved
-      premiumStatus: "pending",
+      premiumStatus: 'pending',
       isBusiness: false,
-      businessStatus: "none",
-      membershipType: "standard",
+      businessStatus: 'none',
+      membershipType: 'standard',
       premiumAppliedAt: new Date().toISOString(),
       rewardPoints: 0,
       loyaltyPoints: 0,
@@ -148,33 +135,31 @@ export async function POST() {
         newsletter: true,
         emailNotifications: true,
         smsNotifications: false,
-        preferredCurrency: "USD",
-        preferredLanguage: "en",
+        preferredCurrency: 'USD',
+        preferredLanguage: 'en',
       },
     });
 
     // Track user registration event
     try {
       await fetch(
-        `${
-          process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
-        }/api/analytics/track`,
+        `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/analytics/track`,
         {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            eventName: "user_registration",
+            eventName: 'user_registration',
             eventParams: {
               userId: newUser._id,
               email: userEmail,
-              membershipType: "standard",
-              premiumStatus: "pending",
+              membershipType: 'standard',
+              premiumStatus: 'pending',
             },
           }),
-        }
+        },
       );
     } catch (analyticsError) {
-      console.error("Failed to track user registration event:", analyticsError);
+      console.error('Failed to track user registration event:', analyticsError);
     }
 
     return NextResponse.json({
@@ -184,10 +169,7 @@ export async function POST() {
       userProfile: newUser,
     });
   } catch (error) {
-    console.error("Error creating user in Sanity:", error);
-    return NextResponse.json(
-      { error: "Failed to register for premium services" },
-      { status: 500 }
-    );
+    console.error('Error creating user in Sanity:', error);
+    return NextResponse.json({ error: 'Failed to register for premium services' }, { status: 500 });
   }
 }

@@ -1,13 +1,13 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
-import { client } from "@/sanity/lib/client";
+import { client } from '@/sanity/lib/client';
+import { auth } from '@clerk/nextjs/server';
+import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
     const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // Fetch all users with premium applications
@@ -37,10 +37,7 @@ export async function GET() {
       accounts,
     });
   } catch (error) {
-    console.error("Error fetching premium accounts:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch premium accounts" },
-      { status: 500 }
-    );
+    console.error('Error fetching premium accounts:', error);
+    return NextResponse.json({ error: 'Failed to fetch premium accounts' }, { status: 500 });
   }
 }

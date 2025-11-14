@@ -1,4 +1,4 @@
-import { toast } from "sonner";
+import { toast } from 'sonner';
 
 // Enhanced toast utilities with theme-aware styling and better UX
 export const showToast = {
@@ -8,7 +8,7 @@ export const showToast = {
       description,
       duration: 4000,
       action: {
-        label: "✓",
+        label: '✓',
         onClick: () => {},
       },
     });
@@ -20,7 +20,7 @@ export const showToast = {
       description,
       duration: 6000,
       action: {
-        label: "Retry",
+        label: 'Retry',
         onClick: () => {
           // You can customize retry logic here
         },
@@ -58,12 +58,12 @@ export const showToast = {
       loading?: string;
       success?: string | ((data: T) => string);
       error?: string | ((error: Error) => string);
-    }
+    },
   ) {
     return toast.promise(promise, {
-      loading: options.loading || "Loading...",
-      success: options.success || "Success!",
-      error: options.error || "Something went wrong!",
+      loading: options.loading || 'Loading...',
+      success: options.success || 'Success!',
+      error: options.error || 'Something went wrong!',
     });
   },
 
@@ -83,10 +83,10 @@ export const showToast = {
 
 // Theme-aware toast colors (you can use these in components)
 export const toastColors = {
-  success: "#10b981", // emerald-500
-  error: "#ef4444", // red-500
-  warning: "#f59e0b", // amber-500
-  info: "#3b82f6", // blue-500
-  dark: "#1f2937", // gray-800
-  light: "#ffffff", // white
+  success: '#10b981', // emerald-500
+  error: '#ef4444', // red-500
+  warning: '#f59e0b', // amber-500
+  info: '#3b82f6', // blue-500
+  dark: '#1f2937', // gray-800
+  light: '#ffffff', // white
 };

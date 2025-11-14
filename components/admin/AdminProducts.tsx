@@ -1,9 +1,24 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect, useCallback } from "react";
-import Image from "next/image";
-import { urlFor } from "@/sanity/lib/image";
-import { Card } from "@/components/ui/card";
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
 import {
   Table,
   TableBody,
@@ -11,60 +26,42 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+} from '@/components/ui/table';
+import { ADMIN_CATEGORIES_QUERYResult } from '@/sanity.types';
+import { urlFor } from '@/sanity/lib/image';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetDescription,
-} from "@/components/ui/sheet";
-import { Separator } from "@/components/ui/separator";
-import {
-  RefreshCw,
-  Eye,
-  Package,
   Calendar,
-  Tag,
-  Star,
-  Package2,
   ChevronLeft,
   ChevronRight,
-} from "lucide-react";
-import { ProductsSkeleton } from "./SkeletonLoaders";
-import { Product } from "./types";
-import { safeApiCall, handleApiError } from "./apiHelpers";
-import { ADMIN_CATEGORIES_QUERYResult } from "@/sanity.types";
+  Eye,
+  Package,
+  Package2,
+  RefreshCw,
+  Star,
+  Tag,
+} from 'lucide-react';
+import Image from 'next/image';
+import React, { useCallback, useEffect, useState } from 'react';
+import { handleApiError, safeApiCall } from './apiHelpers';
+import { ProductsSkeleton } from './SkeletonLoaders';
+import { Product } from './types';
 
 interface AdminProductsProps {
   initialCategories?: ADMIN_CATEGORIES_QUERYResult;
 }
 
-const AdminProducts: React.FC<AdminProductsProps> = ({
-  initialCategories = [],
-}) => {
+const AdminProducts: React.FC<AdminProductsProps> = ({ initialCategories = [] }) => {
   const [loading, setLoading] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
   const [currentPage, setCurrentPage] = useState(0);
-  const [productCategory, setProductCategory] = useState("all");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const [productCategory, setProductCategory] = useState('all');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isProductDetailsOpen, setIsProductDetailsOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [imageLoading, setImageLoading] = useState(false);
-  const [categories, setCategories] =
-    useState<ADMIN_CATEGORIES_QUERYResult>(initialCategories);
+  const [categories, setCategories] = useState<ADMIN_CATEGORIES_QUERYResult>(initialCategories);
 
   const limit = 10;
 
@@ -86,9 +83,9 @@ const AdminProducts: React.FC<AdminProductsProps> = ({
 
   // Utility functions
   const formatCurrency = (amount: number): string => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
     }).format(amount);
   };
 
@@ -97,20 +94,20 @@ const AdminProducts: React.FC<AdminProductsProps> = ({
     async (page = 0) => {
       setLoading(true);
       try {
-        const categoryParam = productCategory === "all" ? "" : productCategory;
+        const categoryParam = productCategory === 'all' ? '' : productCategory;
         const data = await safeApiCall(
           `/api/admin/products?limit=${limit}&offset=${
             page * limit
-          }&category=${categoryParam}&search=${debouncedSearchTerm}`
+          }&category=${categoryParam}&search=${debouncedSearchTerm}`,
         );
         setProducts(data.products);
       } catch (error) {
-        handleApiError(error, "Products fetch");
+        handleApiError(error, 'Products fetch');
       } finally {
         setLoading(false);
       }
     },
-    [productCategory, debouncedSearchTerm, limit]
+    [productCategory, debouncedSearchTerm, limit],
   );
 
   // Effects
@@ -126,32 +123,28 @@ const AdminProducts: React.FC<AdminProductsProps> = ({
   // Keyboard navigation for image carousel
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (
-        !isProductDetailsOpen ||
-        !selectedProduct?.images ||
-        selectedProduct.images.length <= 1
-      ) {
+      if (!isProductDetailsOpen || !selectedProduct?.images || selectedProduct.images.length <= 1) {
         return;
       }
 
       switch (event.key) {
-        case "ArrowLeft":
+        case 'ArrowLeft':
           event.preventDefault();
           goToPrevImage();
           break;
-        case "ArrowRight":
+        case 'ArrowRight':
           event.preventDefault();
           goToNextImage();
           break;
-        case "Escape":
+        case 'Escape':
           event.preventDefault();
           setIsProductDetailsOpen(false);
           break;
       }
     };
 
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isProductDetailsOpen, selectedProduct?.images]);
 
   // Handle product view
@@ -160,13 +153,11 @@ const AdminProducts: React.FC<AdminProductsProps> = ({
       // Reset image index when viewing a new product
       setCurrentImageIndex(0);
       // Fetch complete product details
-      const response = await safeApiCall(
-        `/api/admin/products?id=${product._id}`
-      );
+      const response = await safeApiCall(`/api/admin/products?id=${product._id}`);
       setSelectedProduct(response.product);
       setIsProductDetailsOpen(true);
     } catch (error) {
-      handleApiError(error, "Product details fetch");
+      handleApiError(error, 'Product details fetch');
       // Fallback to existing product data
       setCurrentImageIndex(0);
       setSelectedProduct(product);
@@ -177,17 +168,13 @@ const AdminProducts: React.FC<AdminProductsProps> = ({
   // Carousel navigation functions
   const goToPrevImage = () => {
     if (selectedProduct?.images && selectedProduct.images.length > 0) {
-      setCurrentImageIndex((prev) =>
-        prev === 0 ? selectedProduct.images!.length - 1 : prev - 1
-      );
+      setCurrentImageIndex((prev) => (prev === 0 ? selectedProduct.images!.length - 1 : prev - 1));
     }
   };
 
   const goToNextImage = () => {
     if (selectedProduct?.images && selectedProduct.images.length > 0) {
-      setCurrentImageIndex((prev) =>
-        prev === selectedProduct.images!.length - 1 ? 0 : prev + 1
-      );
+      setCurrentImageIndex((prev) => (prev === selectedProduct.images!.length - 1 ? 0 : prev + 1));
     }
   };
 
@@ -197,24 +184,24 @@ const AdminProducts: React.FC<AdminProductsProps> = ({
 
   // Format date
   const formatDate = (dateString: string): string => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
     });
   };
 
   // Get status color
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "hot":
-        return "destructive";
-      case "new":
-        return "default";
-      case "sale":
-        return "secondary";
+      case 'hot':
+        return 'destructive';
+      case 'new':
+        return 'default';
+      case 'sale':
+        return 'secondary';
       default:
-        return "outline";
+        return 'outline';
     }
   };
 
@@ -222,9 +209,7 @@ const AdminProducts: React.FC<AdminProductsProps> = ({
     <div className="space-y-4 p-4">
       {/* Header */}
       <div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
-        <h3 className="text-lg font-semibold">
-          Products Management (Read-Only)
-        </h3>
+        <h3 className="text-lg font-semibold">Products Management (Read-Only)</h3>
         <div className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:gap-2 sm:space-y-0">
           <Input
             placeholder="Search products..."
@@ -239,17 +224,13 @@ const AdminProducts: React.FC<AdminProductsProps> = ({
             <SelectContent>
               <SelectItem value="all">All Categories</SelectItem>
               {categories.map((category) => (
-                <SelectItem key={category._id} value={category.title || ""}>
+                <SelectItem key={category._id} value={category.title || ''}>
                   {category.title}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
-          <Button
-            onClick={() => fetchProducts(currentPage)}
-            size="sm"
-            className="w-full sm:w-auto"
-          >
+          <Button onClick={() => fetchProducts(currentPage)} size="sm" className="w-full sm:w-auto">
             <RefreshCw className="h-4 w-4" />
             <span className="ml-2 sm:hidden">Refresh</span>
           </Button>
@@ -279,10 +260,7 @@ const AdminProducts: React.FC<AdminProductsProps> = ({
                   <TableBody>
                     {products.length === 0 ? (
                       <TableRow>
-                        <TableCell
-                          colSpan={7}
-                          className="text-center py-8 text-muted-foreground"
-                        >
+                        <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                           No products found.
                         </TableCell>
                       </TableRow>
@@ -295,11 +273,8 @@ const AdminProducts: React.FC<AdminProductsProps> = ({
                               <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
                                 {product.images && product.images[0] ? (
                                   <Image
-                                    src={urlFor(product.images[0])
-                                      .width(48)
-                                      .height(48)
-                                      .url()}
-                                    alt={product.name || "Product"}
+                                    src={urlFor(product.images[0]).width(48).height(48).url()}
+                                    alt={product.name || 'Product'}
                                     width={48}
                                     height={48}
                                     className="w-full h-full object-cover"
@@ -312,14 +287,9 @@ const AdminProducts: React.FC<AdminProductsProps> = ({
                               </div>
                               {/* Product Info */}
                               <div className="min-w-0">
-                                <div className="font-medium truncate">
-                                  {product.name}
-                                </div>
+                                <div className="font-medium truncate">{product.name}</div>
                                 {(product.featured || product.isFeatured) && (
-                                  <Badge
-                                    variant="secondary"
-                                    className="text-xs"
-                                  >
+                                  <Badge variant="secondary" className="text-xs">
                                     Featured
                                   </Badge>
                                 )}
@@ -327,28 +297,18 @@ const AdminProducts: React.FC<AdminProductsProps> = ({
                             </div>
                           </TableCell>
                           <TableCell>
-                            {product.category?.name ||
-                              product.category?.title ||
-                              "N/A"}
+                            {product.category?.name || product.category?.title || 'N/A'}
                           </TableCell>
                           <TableCell>
-                            {product.brand?.name ||
-                              product.brand?.title ||
-                              "N/A"}
+                            {product.brand?.name || product.brand?.title || 'N/A'}
                           </TableCell>
                           <TableCell>{formatCurrency(product.price)}</TableCell>
                           <TableCell>
-                            <Badge
-                              variant={
-                                product.stock > 0 ? "default" : "destructive"
-                              }
-                            >
+                            <Badge variant={product.stock > 0 ? 'default' : 'destructive'}>
                               {product.stock}
                             </Badge>
                           </TableCell>
-                          <TableCell className="capitalize">
-                            {product.status}
-                          </TableCell>
+                          <TableCell className="capitalize">{product.status}</TableCell>
                           <TableCell>
                             <div className="flex items-center gap-1">
                               <Button
@@ -373,9 +333,7 @@ const AdminProducts: React.FC<AdminProductsProps> = ({
           <div className="md:hidden space-y-4">
             {products.length === 0 ? (
               <Card>
-                <div className="p-8 text-center text-muted-foreground">
-                  No products found.
-                </div>
+                <div className="p-8 text-center text-muted-foreground">No products found.</div>
               </Card>
             ) : (
               products.map((product) => (
@@ -386,11 +344,8 @@ const AdminProducts: React.FC<AdminProductsProps> = ({
                       <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
                         {product.images && product.images[0] ? (
                           <Image
-                            src={urlFor(product.images[0])
-                              .width(64)
-                              .height(64)
-                              .url()}
-                            alt={product.name || "Product"}
+                            src={urlFor(product.images[0]).width(64).height(64).url()}
+                            alt={product.name || 'Product'}
                             width={64}
                             height={64}
                             className="w-full h-full object-cover"
@@ -404,9 +359,7 @@ const AdminProducts: React.FC<AdminProductsProps> = ({
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between">
                           <div className="min-w-0 flex-1">
-                            <h3 className="font-medium text-gray-900 truncate">
-                              {product.name}
-                            </h3>
+                            <h3 className="font-medium text-gray-900 truncate">{product.name}</h3>
                             <div className="flex items-center gap-2 mt-1">
                               {(product.featured || product.isFeatured) && (
                                 <Badge variant="secondary" className="text-xs">
@@ -432,15 +385,13 @@ const AdminProducts: React.FC<AdminProductsProps> = ({
                       <div>
                         <div className="text-gray-500">Category</div>
                         <div className="font-medium">
-                          {product.category?.name ||
-                            product.category?.title ||
-                            "N/A"}
+                          {product.category?.name || product.category?.title || 'N/A'}
                         </div>
                       </div>
                       <div>
                         <div className="text-gray-500">Brand</div>
                         <div className="font-medium">
-                          {product.brand?.name || product.brand?.title || "N/A"}
+                          {product.brand?.name || product.brand?.title || 'N/A'}
                         </div>
                       </div>
                       <div>
@@ -452,9 +403,7 @@ const AdminProducts: React.FC<AdminProductsProps> = ({
                       <div>
                         <div className="text-gray-500">Stock</div>
                         <Badge
-                          variant={
-                            product.stock > 0 ? "default" : "destructive"
-                          }
+                          variant={product.stock > 0 ? 'default' : 'destructive'}
                           className="text-xs"
                         >
                           {product.stock} units
@@ -508,9 +457,7 @@ const AdminProducts: React.FC<AdminProductsProps> = ({
         <SheetContent className="w-full sm:w-[480px] md:w-[640px] overflow-y-auto">
           <SheetHeader className="pb-6">
             <SheetTitle>Product Details</SheetTitle>
-            <SheetDescription>
-              Complete product information in read-only mode
-            </SheetDescription>
+            <SheetDescription>Complete product information in read-only mode</SheetDescription>
           </SheetHeader>
 
           {selectedProduct && (
@@ -519,12 +466,9 @@ const AdminProducts: React.FC<AdminProductsProps> = ({
               <div className="space-y-4">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                   <h4 className="text-sm font-medium text-gray-900">Images</h4>
-                  {selectedProduct.images &&
-                    selectedProduct.images.length > 1 && (
-                      <span className="text-xs text-gray-500">
-                        Use ← → keys to navigate
-                      </span>
-                    )}
+                  {selectedProduct.images && selectedProduct.images.length > 1 && (
+                    <span className="text-xs text-gray-500">Use ← → keys to navigate</span>
+                  )}
                 </div>
                 {selectedProduct.images && selectedProduct.images.length > 0 ? (
                   <div className="space-y-4">
@@ -541,9 +485,7 @@ const AdminProducts: React.FC<AdminProductsProps> = ({
                             .width(400)
                             .height(400)
                             .url()}
-                          alt={`${selectedProduct.name} - Image ${
-                            currentImageIndex + 1
-                          }`}
+                          alt={`${selectedProduct.name} - Image ${currentImageIndex + 1}`}
                           width={400}
                           height={400}
                           className="w-full h-full object-cover"
@@ -587,15 +529,13 @@ const AdminProducts: React.FC<AdminProductsProps> = ({
                               onClick={() => goToImage(index)}
                               className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all duration-200 ${
                                 index === currentImageIndex
-                                  ? "border-blue-500 shadow-md"
-                                  : "border-gray-200 hover:border-gray-300"
+                                  ? 'border-blue-500 shadow-md'
+                                  : 'border-gray-200 hover:border-gray-300'
                               }`}
                             >
                               <Image
                                 src={urlFor(image).width(64).height(64).url()}
-                                alt={`${selectedProduct.name} - Thumbnail ${
-                                  index + 1
-                                }`}
+                                alt={`${selectedProduct.name} - Thumbnail ${index + 1}`}
                                 width={64}
                                 height={64}
                                 className="w-full h-full object-cover"
@@ -604,8 +544,7 @@ const AdminProducts: React.FC<AdminProductsProps> = ({
                           ))}
                         </div>
                         <div className="text-xs text-gray-500 text-center">
-                          {currentImageIndex + 1} of{" "}
-                          {selectedProduct.images.length} images
+                          {currentImageIndex + 1} of {selectedProduct.images.length} images
                         </div>
                       </div>
                     )}
@@ -614,9 +553,7 @@ const AdminProducts: React.FC<AdminProductsProps> = ({
                   <div className="aspect-square max-w-sm mx-auto rounded-lg bg-gray-100 flex items-center justify-center border border-gray-200">
                     <div className="text-center">
                       <Package className="w-12 h-12 text-gray-400 mx-auto mb-2" />
-                      <span className="text-sm text-gray-500">
-                        No images available
-                      </span>
+                      <span className="text-sm text-gray-500">No images available</span>
                     </div>
                   </div>
                 )}
@@ -626,14 +563,10 @@ const AdminProducts: React.FC<AdminProductsProps> = ({
 
               {/* Basic Information */}
               <div className="space-y-4">
-                <h4 className="text-sm font-medium text-gray-900">
-                  Basic Information
-                </h4>
+                <h4 className="text-sm font-medium text-gray-900">Basic Information</h4>
                 <div className="grid gap-4 bg-gray-50 p-4 rounded-lg">
                   <div className="flex justify-between items-start">
-                    <span className="text-sm text-gray-600 min-w-[80px]">
-                      Product ID:
-                    </span>
+                    <span className="text-sm text-gray-600 min-w-[80px]">Product ID:</span>
                     <span className="text-sm font-mono bg-white px-3 py-1 rounded border text-right break-all ml-2">
                       {selectedProduct._id}
                     </span>
@@ -645,18 +578,14 @@ const AdminProducts: React.FC<AdminProductsProps> = ({
                     </span>
                   </div>
                   <div className="flex justify-between items-start">
-                    <span className="text-sm text-gray-600 min-w-[80px]">
-                      Slug:
-                    </span>
+                    <span className="text-sm text-gray-600 min-w-[80px]">Slug:</span>
                     <span className="text-sm font-mono bg-white px-3 py-1 rounded border text-right break-all ml-2">
-                      {selectedProduct.slug?.current || "N/A"}
+                      {selectedProduct.slug?.current || 'N/A'}
                     </span>
                   </div>
                   {selectedProduct.description && (
                     <div className="flex flex-col gap-2">
-                      <span className="text-sm text-gray-600">
-                        Description:
-                      </span>
+                      <span className="text-sm text-gray-600">Description:</span>
                       <span className="text-sm text-gray-800 bg-white p-3 rounded border leading-relaxed">
                         {selectedProduct.description}
                       </span>
@@ -669,9 +598,7 @@ const AdminProducts: React.FC<AdminProductsProps> = ({
 
               {/* Pricing & Stock */}
               <div className="space-y-4">
-                <h4 className="text-sm font-medium text-gray-900">
-                  Pricing & Inventory
-                </h4>
+                <h4 className="text-sm font-medium text-gray-900">Pricing & Inventory</h4>
                 <div className="grid gap-4 bg-gray-50 p-4 rounded-lg">
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">Price:</span>
@@ -690,9 +617,7 @@ const AdminProducts: React.FC<AdminProductsProps> = ({
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">Stock:</span>
                     <Badge
-                      variant={
-                        selectedProduct.stock > 0 ? "default" : "destructive"
-                      }
+                      variant={selectedProduct.stock > 0 ? 'default' : 'destructive'}
                       className="text-sm px-3 py-1"
                     >
                       {selectedProduct.stock} units
@@ -705,39 +630,25 @@ const AdminProducts: React.FC<AdminProductsProps> = ({
 
               {/* Categories & Brand */}
               <div className="space-y-4">
-                <h4 className="text-sm font-medium text-gray-900">
-                  Classification
-                </h4>
+                <h4 className="text-sm font-medium text-gray-900">Classification</h4>
                 <div className="grid gap-4 bg-gray-50 p-4 rounded-lg">
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">Category:</span>
-                    <Badge
-                      variant="outline"
-                      className="flex items-center gap-1 px-3 py-1"
-                    >
+                    <Badge variant="outline" className="flex items-center gap-1 px-3 py-1">
                       <Tag className="w-3 h-3" />
-                      {selectedProduct.category?.name ||
-                        selectedProduct.category?.title ||
-                        "N/A"}
+                      {selectedProduct.category?.name || selectedProduct.category?.title || 'N/A'}
                     </Badge>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">Brand:</span>
-                    <Badge
-                      variant="outline"
-                      className="flex items-center gap-1 px-3 py-1"
-                    >
+                    <Badge variant="outline" className="flex items-center gap-1 px-3 py-1">
                       <Package2 className="w-3 h-3" />
-                      {selectedProduct.brand?.name ||
-                        selectedProduct.brand?.title ||
-                        "N/A"}
+                      {selectedProduct.brand?.name || selectedProduct.brand?.title || 'N/A'}
                     </Badge>
                   </div>
                   {selectedProduct.variant && (
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">
-                        Product Type:
-                      </span>
+                      <span className="text-sm text-gray-600">Product Type:</span>
                       <Badge variant="secondary" className="px-3 py-1">
                         {selectedProduct.variant}
                       </Badge>
@@ -750,16 +661,11 @@ const AdminProducts: React.FC<AdminProductsProps> = ({
 
               {/* Status & Features */}
               <div className="space-y-4">
-                <h4 className="text-sm font-medium text-gray-900">
-                  Status & Features
-                </h4>
+                <h4 className="text-sm font-medium text-gray-900">Status & Features</h4>
                 <div className="grid gap-4 bg-gray-50 p-4 rounded-lg">
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">Status:</span>
-                    <Badge
-                      variant={getStatusColor(selectedProduct.status)}
-                      className="px-3 py-1"
-                    >
+                    <Badge variant={getStatusColor(selectedProduct.status)} className="px-3 py-1">
                       {selectedProduct.status}
                     </Badge>
                   </div>
@@ -768,19 +674,18 @@ const AdminProducts: React.FC<AdminProductsProps> = ({
                     <Badge
                       variant={
                         selectedProduct.featured || selectedProduct.isFeatured
-                          ? "default"
-                          : "outline"
+                          ? 'default'
+                          : 'outline'
                       }
                       className="px-3 py-1"
                     >
-                      {selectedProduct.featured ||
-                      selectedProduct.isFeatured ? (
+                      {selectedProduct.featured || selectedProduct.isFeatured ? (
                         <>
                           <Star className="w-3 h-3 mr-1 fill-current" />
                           Featured
                         </>
                       ) : (
-                        "Not Featured"
+                        'Not Featured'
                       )}
                     </Badge>
                   </div>

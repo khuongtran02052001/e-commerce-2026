@@ -1,20 +1,14 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Bell, Shield, Trash2, Download } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import { toast } from "sonner";
-import NewsletterSubscription from "@/components/profile/NewsletterSubscription";
+import NewsletterSubscription from '@/components/profile/NewsletterSubscription';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
+import { Switch } from '@/components/ui/switch';
+import { Bell, Download, Shield, Trash2 } from 'lucide-react';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
 export default function UserSettingsPage() {
   const [settings, setSettings] = useState({
@@ -28,69 +22,67 @@ export default function UserSettingsPage() {
 
   const handleSettingChange = async (key: string, value: boolean) => {
     try {
-      const response = await fetch("/api/user/settings", {
-        method: "PATCH",
+      const response = await fetch('/api/user/settings', {
+        method: 'PATCH',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({ [key]: value }),
       });
 
       if (response.ok) {
         setSettings((prev) => ({ ...prev, [key]: value }));
-        toast.success("Settings updated successfully");
+        toast.success('Settings updated successfully');
       } else {
-        toast.error("Failed to update settings");
+        toast.error('Failed to update settings');
       }
     } catch (error) {
-      console.error("Error updating settings:", error);
-      toast.error("Failed to update settings");
+      console.error('Error updating settings:', error);
+      toast.error('Failed to update settings');
     }
   };
 
   const handleExportData = async () => {
     try {
-      const response = await fetch("/api/user/export-data");
+      const response = await fetch('/api/user/export-data');
       if (response.ok) {
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
-        const a = document.createElement("a");
+        const a = document.createElement('a');
         a.href = url;
-        a.download = "user-data.json";
+        a.download = 'user-data.json';
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
-        toast.success("Data exported successfully");
+        toast.success('Data exported successfully');
       } else {
-        toast.error("Failed to export data");
+        toast.error('Failed to export data');
       }
     } catch (error) {
-      console.error("Error exporting data:", error);
-      toast.error("Failed to export data");
+      console.error('Error exporting data:', error);
+      toast.error('Failed to export data');
     }
   };
 
   const handleDeleteAccount = async () => {
     if (
-      window.confirm(
-        "Are you sure you want to delete your account? This action cannot be undone."
-      )
+      window.confirm('Are you sure you want to delete your account? This action cannot be undone.')
     ) {
       try {
-        const response = await fetch("/api/user/delete-account", {
-          method: "DELETE",
+        const response = await fetch('/api/user/delete-account', {
+          method: 'DELETE',
         });
 
         if (response.ok) {
-          toast.success("Account deletion initiated");
+          toast.success('Account deletion initiated');
           // Redirect to sign out or home page
         } else {
-          toast.error("Failed to delete account");
+          toast.error('Failed to delete account');
         }
       } catch (error) {
-        console.error("Error deleting account:", error);
-        toast.error("Failed to delete account");
+        console.error('Error deleting account:', error);
+        toast.error('Failed to delete account');
       }
     }
   };
@@ -99,9 +91,7 @@ export default function UserSettingsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-        <p className="text-gray-600">
-          Manage your account preferences and privacy settings
-        </p>
+        <p className="text-gray-600">Manage your account preferences and privacy settings</p>
       </div>
 
       {/* Notification Settings */}
@@ -119,60 +109,44 @@ export default function UserSettingsPage() {
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label>Email Notifications</Label>
-              <p className="text-sm text-gray-500">
-                Receive notifications via email
-              </p>
+              <p className="text-sm text-gray-500">Receive notifications via email</p>
             </div>
             <Switch
               checked={settings.emailNotifications}
-              onCheckedChange={(checked) =>
-                handleSettingChange("emailNotifications", checked)
-              }
+              onCheckedChange={(checked) => handleSettingChange('emailNotifications', checked)}
             />
           </div>
 
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label>Push Notifications</Label>
-              <p className="text-sm text-gray-500">
-                Receive push notifications in your browser
-              </p>
+              <p className="text-sm text-gray-500">Receive push notifications in your browser</p>
             </div>
             <Switch
               checked={settings.pushNotifications}
-              onCheckedChange={(checked) =>
-                handleSettingChange("pushNotifications", checked)
-              }
+              onCheckedChange={(checked) => handleSettingChange('pushNotifications', checked)}
             />
           </div>
 
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label>Order Updates</Label>
-              <p className="text-sm text-gray-500">
-                Get notified about order status changes
-              </p>
+              <p className="text-sm text-gray-500">Get notified about order status changes</p>
             </div>
             <Switch
               checked={settings.orderUpdates}
-              onCheckedChange={(checked) =>
-                handleSettingChange("orderUpdates", checked)
-              }
+              onCheckedChange={(checked) => handleSettingChange('orderUpdates', checked)}
             />
           </div>
 
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label>Marketing Emails</Label>
-              <p className="text-sm text-gray-500">
-                Receive promotional offers and updates
-              </p>
+              <p className="text-sm text-gray-500">Receive promotional offers and updates</p>
             </div>
             <Switch
               checked={settings.marketingEmails}
-              onCheckedChange={(checked) =>
-                handleSettingChange("marketingEmails", checked)
-              }
+              onCheckedChange={(checked) => handleSettingChange('marketingEmails', checked)}
             />
           </div>
         </CardContent>
@@ -185,9 +159,7 @@ export default function UserSettingsPage() {
             <Shield className="mr-2 h-5 w-5" />
             Security & Privacy
           </CardTitle>
-          <CardDescription>
-            Manage your account security and privacy preferences
-          </CardDescription>
+          <CardDescription>Manage your account security and privacy preferences</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
@@ -199,24 +171,18 @@ export default function UserSettingsPage() {
             </div>
             <Switch
               checked={settings.twoFactorAuth}
-              onCheckedChange={(checked) =>
-                handleSettingChange("twoFactorAuth", checked)
-              }
+              onCheckedChange={(checked) => handleSettingChange('twoFactorAuth', checked)}
             />
           </div>
 
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label>Profile Visibility</Label>
-              <p className="text-sm text-gray-500">
-                Make your profile visible to other users
-              </p>
+              <p className="text-sm text-gray-500">Make your profile visible to other users</p>
             </div>
             <Switch
               checked={settings.profileVisibility}
-              onCheckedChange={(checked) =>
-                handleSettingChange("profileVisibility", checked)
-              }
+              onCheckedChange={(checked) => handleSettingChange('profileVisibility', checked)}
             />
           </div>
         </CardContent>
@@ -238,9 +204,7 @@ export default function UserSettingsPage() {
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label>Export Data</Label>
-              <p className="text-sm text-gray-500">
-                Download a copy of your account data
-              </p>
+              <p className="text-sm text-gray-500">Download a copy of your account data</p>
             </div>
             <Button variant="outline" onClick={handleExportData}>
               <Download className="mr-2 h-4 w-4" />
@@ -255,12 +219,9 @@ export default function UserSettingsPage() {
               <div className="flex items-start space-x-3">
                 <Trash2 className="h-5 w-5 text-red-500 mt-0.5" />
                 <div className="flex-1">
-                  <h3 className="text-sm font-medium text-red-800">
-                    Delete Account
-                  </h3>
+                  <h3 className="text-sm font-medium text-red-800">Delete Account</h3>
                   <p className="text-sm text-red-700 mt-1">
-                    Once you delete your account, there is no going back. Please
-                    be certain.
+                    Once you delete your account, there is no going back. Please be certain.
                   </p>
                   <Button
                     variant="destructive"

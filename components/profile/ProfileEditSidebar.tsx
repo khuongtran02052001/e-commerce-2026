@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from "@/components/ui/sheet";
-import { showToast } from "@/lib/toast";
-import { User, Phone, Calendar, Save, X } from "lucide-react";
+} from '@/components/ui/sheet';
+import { showToast } from '@/lib/toast';
+import { Calendar, Phone, Save, User, X } from 'lucide-react';
+import { useState } from 'react';
 
 interface EmailAddress {
   emailAddress: string;
@@ -38,7 +38,7 @@ interface Address {
   zip: string;
   country: string;
   default: boolean;
-  type: "home" | "office" | "other";
+  type: 'home' | 'office' | 'other';
   createdAt?: string;
   phone?: string;
 }
@@ -78,17 +78,13 @@ interface ProfileEditSidebarProps {
   };
 }
 
-export default function ProfileEditSidebar({
-  isOpen,
-  onClose,
-  userData,
-}: ProfileEditSidebarProps) {
+export default function ProfileEditSidebar({ isOpen, onClose, userData }: ProfileEditSidebarProps) {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    firstName: userData.sanity?.firstName || "",
-    lastName: userData.sanity?.lastName || "",
-    phone: userData.sanity?.phone || "",
-    dateOfBirth: userData.sanity?.dateOfBirth || "",
+    firstName: userData.sanity?.firstName || '',
+    lastName: userData.sanity?.lastName || '',
+    phone: userData.sanity?.phone || '',
+    dateOfBirth: userData.sanity?.dateOfBirth || '',
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -96,10 +92,10 @@ export default function ProfileEditSidebar({
     setLoading(true);
 
     try {
-      const response = await fetch("/api/user/profile", {
-        method: "PUT",
+      const response = await fetch('/api/user/profile', {
+        method: 'PUT',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           ...formData,
@@ -108,19 +104,16 @@ export default function ProfileEditSidebar({
       });
 
       if (response.ok) {
-        showToast.success(
-          "Profile Updated",
-          "Your profile has been successfully updated."
-        );
+        showToast.success('Profile Updated', 'Your profile has been successfully updated.');
         onClose();
         // Refresh the page to show updated data
         window.location.reload();
       } else {
-        throw new Error("Failed to update profile");
+        throw new Error('Failed to update profile');
       }
     } catch (error) {
-      console.error("Error updating profile:", error);
-      showToast.error("Error", "Failed to update profile. Please try again.");
+      console.error('Error updating profile:', error);
+      showToast.error('Error', 'Failed to update profile. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -159,22 +152,21 @@ export default function ProfileEditSidebar({
                 <div>
                   <Label className="text-sm text-gray-600">First Name</Label>
                   <div className="text-gray-900 bg-white p-2 rounded border text-sm">
-                    {userData.clerk.firstName || "Not provided"}
+                    {userData.clerk.firstName || 'Not provided'}
                   </div>
                 </div>
 
                 <div>
                   <Label className="text-sm text-gray-600">Last Name</Label>
                   <div className="text-gray-900 bg-white p-2 rounded border text-sm">
-                    {userData.clerk.lastName || "Not provided"}
+                    {userData.clerk.lastName || 'Not provided'}
                   </div>
                 </div>
 
                 <div>
                   <Label className="text-sm text-gray-600">Email</Label>
                   <div className="text-gray-900 bg-white p-2 rounded border text-sm">
-                    {userData.clerk.emailAddresses?.[0]?.emailAddress ||
-                      "Not provided"}
+                    {userData.clerk.emailAddresses?.[0]?.emailAddress || 'Not provided'}
                   </div>
                 </div>
               </div>
@@ -191,19 +183,14 @@ export default function ProfileEditSidebar({
 
               <div className="space-y-4">
                 <div>
-                  <Label
-                    htmlFor="firstName"
-                    className="flex items-center space-x-1"
-                  >
+                  <Label htmlFor="firstName" className="flex items-center space-x-1">
                     <User className="h-4 w-4" />
                     <span>First Name (Override)</span>
                   </Label>
                   <Input
                     id="firstName"
                     value={formData.firstName}
-                    onChange={(e) =>
-                      handleInputChange("firstName", e.target.value)
-                    }
+                    onChange={(e) => handleInputChange('firstName', e.target.value)}
                     placeholder="Enter first name"
                     className="mt-1"
                   />
@@ -213,32 +200,22 @@ export default function ProfileEditSidebar({
                 </div>
 
                 <div>
-                  <Label
-                    htmlFor="lastName"
-                    className="flex items-center space-x-1"
-                  >
+                  <Label htmlFor="lastName" className="flex items-center space-x-1">
                     <User className="h-4 w-4" />
                     <span>Last Name (Override)</span>
                   </Label>
                   <Input
                     id="lastName"
                     value={formData.lastName}
-                    onChange={(e) =>
-                      handleInputChange("lastName", e.target.value)
-                    }
+                    onChange={(e) => handleInputChange('lastName', e.target.value)}
                     placeholder="Enter last name"
                     className="mt-1"
                   />
-                  <p className="text-xs text-gray-500 mt-1">
-                    Override Clerk last name for display
-                  </p>
+                  <p className="text-xs text-gray-500 mt-1">Override Clerk last name for display</p>
                 </div>
 
                 <div>
-                  <Label
-                    htmlFor="phone"
-                    className="flex items-center space-x-1"
-                  >
+                  <Label htmlFor="phone" className="flex items-center space-x-1">
                     <Phone className="h-4 w-4" />
                     <span>Phone Number</span>
                   </Label>
@@ -246,17 +223,14 @@ export default function ProfileEditSidebar({
                     id="phone"
                     type="tel"
                     value={formData.phone}
-                    onChange={(e) => handleInputChange("phone", e.target.value)}
+                    onChange={(e) => handleInputChange('phone', e.target.value)}
                     placeholder="Enter phone number"
                     className="mt-1"
                   />
                 </div>
 
                 <div>
-                  <Label
-                    htmlFor="dateOfBirth"
-                    className="flex items-center space-x-1"
-                  >
+                  <Label htmlFor="dateOfBirth" className="flex items-center space-x-1">
                     <Calendar className="h-4 w-4" />
                     <span>Date of Birth</span>
                   </Label>
@@ -264,9 +238,7 @@ export default function ProfileEditSidebar({
                     id="dateOfBirth"
                     type="date"
                     value={formData.dateOfBirth}
-                    onChange={(e) =>
-                      handleInputChange("dateOfBirth", e.target.value)
-                    }
+                    onChange={(e) => handleInputChange('dateOfBirth', e.target.value)}
                     className="mt-1"
                   />
                 </div>
@@ -290,12 +262,7 @@ export default function ProfileEditSidebar({
               )}
             </Button>
 
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onClose}
-              disabled={loading}
-            >
+            <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
               <X className="h-4 w-4 mr-2" />
               Cancel
             </Button>

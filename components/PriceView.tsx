@@ -1,6 +1,6 @@
-import { twMerge } from "tailwind-merge";
-import PriceFormatter from "./PriceFormatter";
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils';
+import { twMerge } from 'tailwind-merge';
+import PriceFormatter from './PriceFormatter';
 
 interface Props {
   price: number | undefined;
@@ -13,8 +13,7 @@ const PriceView = ({ price, discount, className }: Props) => {
   const currentPrice = price || 0;
 
   // Gross price = current price + discount amount
-  const discountAmount =
-    discount && currentPrice ? (discount * currentPrice) / 100 : 0;
+  const discountAmount = discount && currentPrice ? (discount * currentPrice) / 100 : 0;
   const grossPrice = currentPrice + discountAmount;
 
   return (
@@ -23,7 +22,7 @@ const PriceView = ({ price, discount, className }: Props) => {
         {/* Current/Payable Price (discounted price) */}
         <PriceFormatter
           amount={currentPrice}
-          className={cn("text-shop_dark_green font-semibold", className)}
+          className={cn('text-shop_dark_green font-semibold', className)}
         />
 
         {/* Gross Price (original price before discount) - only show if there's a discount */}
@@ -31,10 +30,7 @@ const PriceView = ({ price, discount, className }: Props) => {
           <div className="flex items-center gap-1">
             <PriceFormatter
               amount={grossPrice}
-              className={twMerge(
-                "line-through text-xs font-normal text-zinc-500",
-                className
-              )}
+              className={twMerge('line-through text-xs font-normal text-zinc-500', className)}
             />
             <span className="text-xs bg-red-100 text-red-600 px-1.5 py-0.5 rounded font-medium">
               -{discount}%

@@ -1,17 +1,16 @@
-"use client";
-import { BRANDS_QUERYResult, Category, Product } from "@/sanity.types";
+'use client';
 // import { client } from "@/sanity/lib/client";
-import React, { useEffect, useState, useCallback } from "react";
-import Container from "../Container";
-import Title from "../Title";
-import CategoryList from "./CategoryList";
-import { Loader2, Filter, X } from "lucide-react";
-import ProductCard from "../ProductCard";
-import NoProductAvailable from "../product/NoProductAvailable";
-import BrandList from "./BrandList";
-import { useSearchParams } from "next/navigation";
-import PriceList from "./PriceList";
-import { IBrandMock, ICategoryMock, IProductMock, mockProducts } from "@/mock-data";
+import { IBrandMock, ICategoryMock, IProductMock, mockProducts } from '@/mock-data';
+import { Filter, X } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
+import { useState } from 'react';
+import Container from '../Container';
+import ProductCard from '../ProductCard';
+import Title from '../Title';
+import NoProductAvailable from '../product/NoProductAvailable';
+import BrandList from './BrandList';
+import CategoryList from './CategoryList';
+import PriceList from './PriceList';
 
 interface Props {
   categories: ICategoryMock[];
@@ -20,13 +19,11 @@ interface Props {
 
 const Shop = ({ categories, brands }: Props) => {
   const searchParams = useSearchParams();
-  const brandParams = searchParams?.get("brand");
+  const brandParams = searchParams?.get('brand');
   const [products, setProducts] = useState<IProductMock[]>(mockProducts ?? []);
   const [loading, setLoading] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [selectedBrand, setSelectedBrand] = useState<string | null>(
-    brandParams || null
-  );
+  const [selectedBrand, setSelectedBrand] = useState<string | null>(brandParams || null);
   const [selectedPrice, setSelectedPrice] = useState<string | null>(null);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
@@ -43,11 +40,11 @@ const Shop = ({ categories, brands }: Props) => {
   //       maxPrice = max;
   //     }
   //     const query = `
-  //     *[_type == 'product' 
+  //     *[_type == 'product'
   //       && (!defined($selectedCategory) || references(*[_type == "category" && slug.current == $selectedCategory]._id))
   //       && (!defined($selectedBrand) || references(*[_type == "brand" && slug.current == $selectedBrand]._id))
   //       && price >= $minPrice && price <= $maxPrice
-  //     ] 
+  //     ]
   //     | order(name asc) {
   //       ...,"categories": categories[]->title
   //     }
@@ -88,9 +85,7 @@ const Shop = ({ categories, brands }: Props) => {
                 Discover amazing products tailored to your needs
               </p>
             </div>
-            {(selectedCategory !== null ||
-              selectedBrand !== null ||
-              selectedPrice !== null) && (
+            {(selectedCategory !== null || selectedBrand !== null || selectedPrice !== null) && (
               <button
                 onClick={() => {
                   setSelectedCategory(null);
@@ -108,32 +103,20 @@ const Shop = ({ categories, brands }: Props) => {
           {(selectedCategory || selectedBrand || selectedPrice) && (
             <div className="mt-4 pt-4 border-t border-gray-100">
               <div className="flex flex-wrap gap-2">
-                <span className="text-sm font-medium text-gray-700 mr-2">
-                  Active filters:
-                </span>
+                <span className="text-sm font-medium text-gray-700 mr-2">Active filters:</span>
                 {selectedCategory && (
                   <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                    Category:{" "}
-                    {
-                      categories?.find(
-                        (cat) => cat?.slug === selectedCategory
-                      )?.title
-                    }
+                    Category: {categories?.find((cat) => cat?.slug === selectedCategory)?.title}
                   </span>
                 )}
                 {selectedBrand && (
                   <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    Brand:{" "}
-                    {
-                      brands?.find(
-                        (brand) => brand?.slug === selectedBrand
-                      )?.title
-                    }
+                    Brand: {brands?.find((brand) => brand?.slug === selectedBrand)?.title}
                   </span>
                 )}
                 {selectedPrice && (
                   <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                    Price: ${selectedPrice.replace("-", " - $")}
+                    Price: ${selectedPrice.replace('-', ' - $')}
                   </span>
                 )}
               </div>
@@ -148,14 +131,10 @@ const Shop = ({ categories, brands }: Props) => {
             className="inline-flex items-center justify-center w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-shop_dark_green transition-colors duration-200"
           >
             <Filter className="w-4 h-4 mr-2" />
-            {showMobileFilters ? "Hide Filters" : "Show Filters"}
+            {showMobileFilters ? 'Hide Filters' : 'Show Filters'}
             {(selectedCategory || selectedBrand || selectedPrice) && (
               <span className="ml-2 bg-shop_dark_green text-white text-xs px-2 py-1 rounded-full">
-                {
-                  [selectedCategory, selectedBrand, selectedPrice].filter(
-                    Boolean
-                  ).length
-                }
+                {[selectedCategory, selectedBrand, selectedPrice].filter(Boolean).length}
               </span>
             )}
           </button>
@@ -172,9 +151,7 @@ const Shop = ({ categories, brands }: Props) => {
               />
               <div className="fixed bottom-0 left-0 right-0 bg-white rounded-t-xl shadow-xl max-h-[80vh] overflow-y-auto">
                 <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    Filters
-                  </h3>
+                  <h3 className="text-lg font-semibold text-gray-900">Filters</h3>
                   <button
                     onClick={() => setShowMobileFilters(false)}
                     className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200"
@@ -193,10 +170,7 @@ const Shop = ({ categories, brands }: Props) => {
                     setSelectedBrand={setSelectedBrand}
                     selectedBrand={selectedBrand}
                   />
-                  <PriceList
-                    setSelectedPrice={setSelectedPrice}
-                    selectedPrice={selectedPrice}
-                  />
+                  <PriceList setSelectedPrice={setSelectedPrice} selectedPrice={selectedPrice} />
                 </div>
                 <div className="p-4 border-t border-gray-200 bg-gray-50">
                   <button
@@ -215,9 +189,7 @@ const Shop = ({ categories, brands }: Props) => {
             <div className="sticky top-6 space-y-4">
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
                 <div className="p-4 bg-gray-50 border-b border-gray-200">
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    Filters
-                  </h3>
+                  <h3 className="text-lg font-semibold text-gray-900">Filters</h3>
                 </div>
                 <div className="divide-y divide-gray-100">
                   <CategoryList
@@ -230,10 +202,7 @@ const Shop = ({ categories, brands }: Props) => {
                     setSelectedBrand={setSelectedBrand}
                     selectedBrand={selectedBrand}
                   />
-                  <PriceList
-                    setSelectedPrice={setSelectedPrice}
-                    selectedPrice={selectedPrice}
-                  />
+                  <PriceList setSelectedPrice={setSelectedPrice} selectedPrice={selectedPrice} />
                 </div>
               </div>
             </div>
@@ -265,11 +234,9 @@ const Shop = ({ categories, brands }: Props) => {
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 pb-4 border-b border-gray-100">
                       <h2 className="text-lg font-semibold text-gray-900 mb-2 sm:mb-0">
                         {products.length} Product
-                        {products.length !== 1 ? "s" : ""} Found
+                        {products.length !== 1 ? 's' : ''} Found
                       </h2>
-                      <div className="text-sm text-gray-600">
-                        Showing all available products
-                      </div>
+                      <div className="text-sm text-gray-600">Showing all available products</div>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
                       {products?.map((product) => (

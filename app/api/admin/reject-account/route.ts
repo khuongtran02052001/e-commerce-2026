@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
-import { client } from "@/sanity/lib/client";
-import { backendClient } from "@/sanity/lib/backendClient";
+import { backendClient } from '@/sanity/lib/backendClient';
+import { client } from '@/sanity/lib/client';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,15 +9,15 @@ export async function POST(request: NextRequest) {
 
     if (!userId || !type || !reason?.trim()) {
       return NextResponse.json(
-        { success: false, message: "Missing required fields" },
-        { status: 400 }
+        { success: false, message: 'Missing required fields' },
+        { status: 400 },
       );
     }
 
-    if (!["premium", "business"].includes(type)) {
+    if (!['premium', 'business'].includes(type)) {
       return NextResponse.json(
-        { success: false, message: "Invalid account type" },
-        { status: 400 }
+        { success: false, message: 'Invalid account type' },
+        { status: 400 },
       );
     }
 
@@ -33,29 +33,25 @@ export async function POST(request: NextRequest) {
         businessStatus
       }
     `,
-      { userId }
+      { userId },
     );
 
     if (!user) {
-      return NextResponse.json(
-        { success: false, message: "User not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ success: false, message: 'User not found' }, { status: 404 });
     }
 
-    const currentStatus =
-      type === "premium" ? user.premiumStatus : user.businessStatus;
+    const currentStatus = type === 'premium' ? user.premiumStatus : user.businessStatus;
 
-    if (currentStatus !== "pending") {
+    if (currentStatus !== 'pending') {
       return NextResponse.json(
         { success: false, message: `${type} account is not in pending status` },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     // Update the user status to rejected with reason
     const updateData: Record<string, string> = {
-      [`${type}Status`]: "rejected",
+      [`${type}Status`]: 'rejected',
       [`${type}RejectedAt`]: new Date().toISOString(),
       rejectionReason: reason.trim(),
     };
@@ -65,14 +61,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       message: `❌ ${
-        type === "premium" ? "Premium" : "Business"
+        type === 'premium' ? 'Premium' : 'Business'
       } account rejected for ${user.firstName} ${user.lastName}`,
     });
   } catch (error) {
-    console.error("Error rejecting account:", error);
+    console.error('Error rejecting account:', error);
     return NextResponse.json(
-      { success: false, message: "Failed to reject account" },
-      { status: 500 }
+      { success: false, message: 'Failed to reject account' },
+      { status: 500 },
     );
   }
 }

@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useUser } from "@clerk/nextjs";
-import Link from "next/link";
-import { Bell } from "lucide-react";
-import { useUserData } from "@/contexts/UserDataContext";
+import { useUserData } from '@/contexts/UserDataContext';
+import { useUser } from '@clerk/nextjs';
+import { Bell } from 'lucide-react';
+import Link from 'next/link';
 
 export default function NotificationBell() {
   const { isSignedIn } = useUser();
@@ -13,7 +13,7 @@ export default function NotificationBell() {
     return null;
   }
 
-  const displayCount = unreadNotifications > 9 ? "9+" : unreadNotifications;
+  const displayCount = unreadNotifications > 9 ? '9+' : unreadNotifications;
 
   return (
     <Link href="/user/notifications" className="relative">
@@ -21,7 +21,7 @@ export default function NotificationBell() {
       {unreadNotifications > 0 ? (
         <span
           className={`absolute -top-1 -right-1 bg-shop_btn_dark_green text-white rounded-full text-xs font-semibold flex items-center justify-center min-w-[14px] h-[14px] ${
-            unreadNotifications > 9 ? "px-1" : ""
+            unreadNotifications > 9 ? 'px-1' : ''
           }`}
         >
           {displayCount}

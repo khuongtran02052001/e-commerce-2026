@@ -11,7 +11,7 @@ export interface Review {
   title: string;
   content: string;
   isVerifiedPurchase: boolean;
-  status: "pending" | "approved" | "rejected";
+  status: 'pending' | 'approved' | 'rejected';
   helpful: number;
   helpfulBy: Array<{
     _ref: string;
@@ -23,7 +23,7 @@ export interface Review {
   approvedBy?: string;
 }
 
-export interface ReviewWithDetails extends Omit<Review, "user" | "product"> {
+export interface ReviewWithDetails extends Omit<Review, 'user' | 'product'> {
   user: {
     _id: string;
     firstName: string;

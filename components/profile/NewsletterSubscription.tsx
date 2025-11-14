@@ -1,18 +1,12 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { useUser } from "@clerk/nextjs";
-import { Mail, Loader2, CheckCircle2, XCircle } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
-import { checkSubscriptionStatus } from "@/actions/subscriptionActions";
+import { checkSubscriptionStatus } from '@/actions/subscriptionActions';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useUser } from '@clerk/nextjs';
+import { CheckCircle2, Loader2, Mail, XCircle } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 export default function NewsletterSubscription() {
   const { user } = useUser();
@@ -32,7 +26,7 @@ export default function NewsletterSubscription() {
         const status = await checkSubscriptionStatus(userEmail);
         setIsSubscribed(status.subscribed);
       } catch (error) {
-        console.error("Error checking subscription status:", error);
+        console.error('Error checking subscription status:', error);
       } finally {
         setIsLoading(false);
       }
@@ -43,16 +37,16 @@ export default function NewsletterSubscription() {
 
   const handleSubscribe = async () => {
     if (!userEmail) {
-      toast.error("Email not found");
+      toast.error('Email not found');
       return;
     }
 
     setIsProcessing(true);
     try {
-      const response = await fetch("/api/newsletter/subscribe", {
-        method: "POST",
+      const response = await fetch('/api/newsletter/subscribe', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email: userEmail }),
       });
@@ -61,18 +55,18 @@ export default function NewsletterSubscription() {
 
       if (response.ok) {
         setIsSubscribed(true);
-        toast.success(data.message || "Successfully subscribed to newsletter!");
+        toast.success(data.message || 'Successfully subscribed to newsletter!');
       } else {
         if (data.alreadySubscribed) {
           setIsSubscribed(true);
           toast.info(data.error || "You're already subscribed!");
         } else {
-          toast.error(data.error || "Failed to subscribe");
+          toast.error(data.error || 'Failed to subscribe');
         }
       }
     } catch (error) {
-      console.error("Error subscribing:", error);
-      toast.error("Something went wrong. Please try again.");
+      console.error('Error subscribing:', error);
+      toast.error('Something went wrong. Please try again.');
     } finally {
       setIsProcessing(false);
     }
@@ -80,16 +74,16 @@ export default function NewsletterSubscription() {
 
   const handleUnsubscribe = async () => {
     if (!userEmail) {
-      toast.error("Email not found");
+      toast.error('Email not found');
       return;
     }
 
     setIsProcessing(true);
     try {
-      const response = await fetch("/api/newsletter/unsubscribe", {
-        method: "POST",
+      const response = await fetch('/api/newsletter/unsubscribe', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email: userEmail }),
       });
@@ -98,15 +92,13 @@ export default function NewsletterSubscription() {
 
       if (response.ok) {
         setIsSubscribed(false);
-        toast.success(
-          data.message || "Successfully unsubscribed from newsletter"
-        );
+        toast.success(data.message || 'Successfully unsubscribed from newsletter');
       } else {
-        toast.error(data.error || "Failed to unsubscribe");
+        toast.error(data.error || 'Failed to unsubscribe');
       }
     } catch (error) {
-      console.error("Error unsubscribing:", error);
-      toast.error("Something went wrong. Please try again.");
+      console.error('Error unsubscribing:', error);
+      toast.error('Something went wrong. Please try again.');
     } finally {
       setIsProcessing(false);
     }
@@ -137,9 +129,7 @@ export default function NewsletterSubscription() {
           <Mail className="mr-2 h-5 w-5" />
           Newsletter Subscription
         </CardTitle>
-        <CardDescription>
-          Manage your newsletter subscription preferences
-        </CardDescription>
+        <CardDescription>Manage your newsletter subscription preferences</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Current Status */}
@@ -153,9 +143,7 @@ export default function NewsletterSubscription() {
                   </div>
                 </div>
                 <div>
-                  <p className="font-medium text-gray-900">
-                    Subscribed to Newsletter
-                  </p>
+                  <p className="font-medium text-gray-900">Subscribed to Newsletter</p>
                   <p className="text-sm text-gray-600">{userEmail}</p>
                 </div>
               </>
@@ -178,9 +166,7 @@ export default function NewsletterSubscription() {
         {/* Benefits Section */}
         {!isSubscribed && (
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <h4 className="font-semibold text-blue-900 text-sm mb-3">
-              Newsletter Benefits:
-            </h4>
+            <h4 className="font-semibold text-blue-900 text-sm mb-3">Newsletter Benefits:</h4>
             <ul className="space-y-2 text-sm text-blue-800">
               <li className="flex items-start">
                 <span className="mr-2">🎁</span>
@@ -251,8 +237,8 @@ export default function NewsletterSubscription() {
         {/* Info Text */}
         <p className="text-xs text-gray-500 text-center">
           {isSubscribed
-            ? "You can resubscribe at any time"
-            : "Join 50,000+ subscribers and never miss a deal"}
+            ? 'You can resubscribe at any time'
+            : 'Join 50,000+ subscribers and never miss a deal'}
         </p>
       </CardContent>
     </Card>

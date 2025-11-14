@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth, clerkClient } from "@clerk/nextjs/server";
-import { isUserAdmin } from "@/lib/adminUtils";
-import { writeClient } from "@/sanity/lib/client";
+import { isUserAdmin } from '@/lib/adminUtils';
+import { writeClient } from '@/sanity/lib/client';
+import { auth, clerkClient } from '@clerk/nextjs/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 // Disable caching for this route to ensure fresh data
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 interface SanityUser {
@@ -33,10 +33,7 @@ export async function GET(request: NextRequest) {
     const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json(
-        { error: "Unauthorized - Not logged in" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized - Not logged in' }, { status: 401 });
     }
 
     // Get current user details to check admin status
@@ -46,18 +43,15 @@ export async function GET(request: NextRequest) {
 
     // Check if current user is admin
     if (!userEmail || !isUserAdmin(userEmail)) {
-      return NextResponse.json(
-        { error: "Forbidden - Admin access required" },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
     }
 
     // Get pagination params
     const { searchParams } = new URL(request.url);
-    const limit = parseInt(searchParams.get("limit") || "20");
-    const offset = parseInt(searchParams.get("offset") || "0");
-    const query = searchParams.get("query") || "";
-    const activeOnly = searchParams.get("activeOnly") === "true";
+    const limit = parseInt(searchParams.get('limit') || '20');
+    const offset = parseInt(searchParams.get('offset') || '0');
+    const query = searchParams.get('query') || '';
+    const activeOnly = searchParams.get('activeOnly') === 'true';
 
     // Fetch data in parallel for better performance
     const [clerkUsers, sanityUsers] = await Promise.all([
@@ -66,7 +60,7 @@ export async function GET(request: NextRequest) {
         limit: query ? 100 : limit,
         offset: query ? 0 : offset,
         query: query || undefined,
-        orderBy: "-created_at",
+        orderBy: '-created_at',
       }),
 
       // Fetch Sanity users with optimized query (only needed fields)
@@ -97,13 +91,13 @@ export async function GET(request: NextRequest) {
               isEmployee,
               employeeRole,
               employeeStatus
-            }`
+            }`,
       ),
     ]);
 
     // Create a map of Sanity users by clerkUserId
     const sanityUserMap = new Map<string, SanityUser>(
-      sanityUsers.map((user: SanityUser) => [user.clerkUserId, user])
+      sanityUsers.map((user: SanityUser) => [user.clerkUserId, user]),
     );
 
     // Combine data: include all Clerk users with their Sanity status
@@ -115,15 +109,12 @@ export async function GET(request: NextRequest) {
         clerkUserId: clerkUser.id,
         firstName: clerkUser.firstName,
         lastName: clerkUser.lastName,
-        fullName: `${clerkUser.firstName || ""} ${
-          clerkUser.lastName || ""
-        }`.trim(),
+        fullName: `${clerkUser.firstName || ''} ${clerkUser.lastName || ''}`.trim(),
         email: clerkUser.primaryEmailAddress?.emailAddress,
         imageUrl: clerkUser.imageUrl,
         createdAt: clerkUser.createdAt,
         lastSignInAt: clerkUser.lastSignInAt,
-        emailVerified:
-          clerkUser.primaryEmailAddress?.verification?.status === "verified",
+        emailVerified: clerkUser.primaryEmailAddress?.verification?.status === 'verified',
         banned: clerkUser.banned,
         locked: clerkUser.locked,
         // Sanity-specific fields
@@ -150,7 +141,7 @@ export async function GET(request: NextRequest) {
         (user) =>
           user.firstName?.toLowerCase().includes(lowerQuery) ||
           user.lastName?.toLowerCase().includes(lowerQuery) ||
-          user.email?.toLowerCase().includes(lowerQuery)
+          user.email?.toLowerCase().includes(lowerQuery),
       );
     }
 
@@ -162,14 +153,10 @@ export async function GET(request: NextRequest) {
       totalCount: filteredUsers.length,
       hasNextPage: offset + limit < filteredUsers.length,
       sanityUsersCount: sanityUsers.length,
-      activeUsersCount: sanityUsers.filter((u: SanityUser) => u.isActive)
-        .length,
+      activeUsersCount: sanityUsers.filter((u: SanityUser) => u.isActive).length,
     });
   } catch (error) {
-    console.error("Error fetching combined users:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    console.error('Error fetching combined users:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

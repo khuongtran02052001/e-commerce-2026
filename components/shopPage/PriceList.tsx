@@ -1,14 +1,14 @@
-import { Dispatch, SetStateAction } from "react";
-import Title from "../Title";
-import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
-import { Label } from "../ui/label";
+import { Dispatch, SetStateAction } from 'react';
+import Title from '../Title';
+import { Label } from '../ui/label';
+import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
 
 const priceArray = [
-  { title: "Under $100", value: "0-100" },
-  { title: "$100 - $200", value: "100-200" },
-  { title: "$200 - $300", value: "200-300" },
-  { title: "$300 - $500", value: "300-500" },
-  { title: "Over $500", value: "500-10000" },
+  { title: 'Under $100', value: '0-100' },
+  { title: '$100 - $200', value: '100-200' },
+  { title: '$200 - $300', value: '200-300' },
+  { title: '$300 - $500', value: '300-500' },
+  { title: 'Over $500', value: '500-10000' },
 ];
 
 interface Props {
@@ -19,15 +19,13 @@ const PriceList = ({ selectedPrice, setSelectedPrice }: Props) => {
   return (
     <div className="p-6">
       <div className="flex items-center justify-between mb-4">
-        <Title className="text-base font-semibold text-gray-900">
-          Price Range
-        </Title>
+        <Title className="text-base font-semibold text-gray-900">Price Range</Title>
         <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
           {priceArray.length}
         </span>
       </div>
 
-      <RadioGroup className="space-y-1" value={selectedPrice || ""}>
+      <RadioGroup className="space-y-1" value={selectedPrice || ''}>
         {priceArray?.map((price, index) => (
           <div
             key={index}
@@ -43,8 +41,8 @@ const PriceList = ({ selectedPrice, setSelectedPrice }: Props) => {
               htmlFor={price.value}
               className={`flex-1 cursor-pointer transition-colors duration-150 ${
                 selectedPrice === price?.value
-                  ? "font-medium text-shop_dark_green"
-                  : "text-gray-700 group-hover:text-gray-900"
+                  ? 'font-medium text-shop_dark_green'
+                  : 'text-gray-700 group-hover:text-gray-900'
               }`}
             >
               {price?.title}

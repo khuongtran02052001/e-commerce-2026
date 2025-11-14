@@ -1,47 +1,45 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect } from "react";
-import { motion } from "motion/react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { AnalyticsSkeleton } from '@/components/admin/SkeletonLoaders';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { AnalyticsSkeleton } from "@/components/admin/SkeletonLoaders";
+} from '@/components/ui/select';
 import {
-  BarChart,
+  Activity,
+  ArrowDownRight,
+  ArrowUpRight,
+  BarChart3,
+  Calendar,
+  DollarSign,
+  Package,
+  PieChart as PieChartIcon,
+  RefreshCw,
+  ShoppingCart,
+  TrendingUp,
+  Users,
+} from 'lucide-react';
+import { motion } from 'motion/react';
+import React, { useEffect, useState } from 'react';
+import {
   Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Legend,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  LineChart,
-  Line,
-} from "recharts";
-import {
-  TrendingUp,
-  DollarSign,
-  ShoppingCart,
-  Users,
-  Package,
-  Calendar,
-  RefreshCw,
-  BarChart3,
-  PieChart as PieChartIcon,
-  Activity,
-  ArrowUpRight,
-  ArrowDownRight,
-} from "lucide-react";
+} from 'recharts';
 
 interface AnalyticsData {
   revenue: {
@@ -84,7 +82,7 @@ const AdminAnalytics = () => {
   const [loading, setLoading] = useState(true);
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [timeRange, setTimeRange] = useState("30d");
+  const [timeRange, setTimeRange] = useState('30d');
 
   useEffect(() => {
     fetchAnalytics();
@@ -108,17 +106,15 @@ const AdminAnalytics = () => {
 
       setAnalytics(data);
     } catch (error) {
-      console.error("Error fetching analytics:", error);
-      setError(
-        error instanceof Error ? error.message : "Failed to fetch analytics"
-      );
+      console.error('Error fetching analytics:', error);
+      setError(error instanceof Error ? error.message : 'Failed to fetch analytics');
     } finally {
       setLoading(false);
     }
   };
 
   // Chart colors
-  const COLORS = ["#10B981", "#3B82F6", "#EF4444", "#F59E0B", "#8B5CF6"];
+  const COLORS = ['#10B981', '#3B82F6', '#EF4444', '#F59E0B', '#8B5CF6'];
 
   // Prepare chart data
   const prepareOrderStatusChartData = () => {
@@ -126,15 +122,15 @@ const AdminAnalytics = () => {
 
     return [
       {
-        name: "Completed",
+        name: 'Completed',
         value: analytics.orders.completed,
-        color: "#10B981",
+        color: '#10B981',
       },
-      { name: "Pending", value: analytics.orders.pending, color: "#F59E0B" },
+      { name: 'Pending', value: analytics.orders.pending, color: '#F59E0B' },
       {
-        name: "Cancelled",
+        name: 'Cancelled',
         value: analytics.orders.cancelled,
-        color: "#EF4444",
+        color: '#EF4444',
       },
     ].filter((item) => item.value > 0);
   };
@@ -145,8 +141,8 @@ const AdminAnalytics = () => {
     return analytics.topProducts.map((product, index) => ({
       name:
         product.name && product.name.length > 15
-          ? product.name.substring(0, 15) + "..."
-          : product.name || "Unknown Product",
+          ? product.name.substring(0, 15) + '...'
+          : product.name || 'Unknown Product',
       revenue: product.revenue,
       sales: product.sales,
     }));
@@ -158,7 +154,7 @@ const AdminAnalytics = () => {
     change,
     icon: Icon,
     color,
-    format = "number",
+    format = 'number',
     subtitle,
   }: {
     title: string;
@@ -166,12 +162,12 @@ const AdminAnalytics = () => {
     change: number;
     icon: React.ComponentType<{ className?: string }>;
     color: string;
-    format?: "number" | "currency";
+    format?: 'number' | 'currency';
     subtitle?: string;
   }) => {
     const isPositive = change >= 0;
     const formatValue = (val: number) => {
-      if (format === "currency") return `$${val.toLocaleString()}`;
+      if (format === 'currency') return `$${val.toLocaleString()}`;
       return val.toLocaleString();
     };
 
@@ -186,12 +182,8 @@ const AdminAnalytics = () => {
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="space-y-1">
-            <div className="text-2xl font-bold text-dark-color">
-              {formatValue(value)}
-            </div>
-            {subtitle && (
-              <div className="text-xs text-light-color">{subtitle}</div>
-            )}
+            <div className="text-2xl font-bold text-dark-color">{formatValue(value)}</div>
+            {subtitle && <div className="text-xs text-light-color">{subtitle}</div>}
           </div>
           <div className="flex items-center gap-2">
             {isPositive ? (
@@ -199,11 +191,8 @@ const AdminAnalytics = () => {
             ) : (
               <ArrowDownRight className="w-4 h-4 text-red-500" />
             )}
-            <Badge
-              variant={isPositive ? "default" : "destructive"}
-              className="text-xs"
-            >
-              {isPositive ? "+" : ""}
+            <Badge variant={isPositive ? 'default' : 'destructive'} className="text-xs">
+              {isPositive ? '+' : ''}
               {change}%
             </Badge>
             <span className="text-xs text-light-color">vs last period</span>
@@ -229,10 +218,7 @@ const AdminAnalytics = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-red-500">{error}</p>
-            <Button
-              onClick={fetchAnalytics}
-              className="bg-red-600 hover:bg-red-700"
-            >
+            <Button onClick={fetchAnalytics} className="bg-red-600 hover:bg-red-700">
               Try Again
             </Button>
           </CardContent>
@@ -375,18 +361,12 @@ const AdminAnalytics = () => {
                           <Cell key={`cell-${index}`} fill={entry.color} />
                         ))}
                       </Pie>
-                      <Tooltip
-                        formatter={(value, name) => [`${value} orders`, name]}
-                      />
+                      <Tooltip formatter={(value, name) => [`${value} orders`, name]} />
                       <Legend
                         verticalAlign="bottom"
                         height={36}
                         formatter={(value, entry) => (
-                          <span
-                            style={{ color: entry.color, fontSize: "14px" }}
-                          >
-                            {value}
-                          </span>
+                          <span style={{ color: entry.color, fontSize: '14px' }}>{value}</span>
                         )}
                       />
                     </PieChart>
@@ -405,27 +385,21 @@ const AdminAnalytics = () => {
                     <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                     <span className="text-sm font-medium">Completed</span>
                   </div>
-                  <Badge variant="outline">
-                    {analytics?.orders?.completed || 0}
-                  </Badge>
+                  <Badge variant="outline">{analytics?.orders?.completed || 0}</Badge>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
                     <span className="text-sm font-medium">Pending</span>
                   </div>
-                  <Badge variant="outline">
-                    {analytics?.orders?.pending || 0}
-                  </Badge>
+                  <Badge variant="outline">{analytics?.orders?.pending || 0}</Badge>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 bg-red-500 rounded-full"></div>
                     <span className="text-sm font-medium">Cancelled</span>
                   </div>
-                  <Badge variant="outline">
-                    {analytics?.orders?.cancelled || 0}
-                  </Badge>
+                  <Badge variant="outline">{analytics?.orders?.cancelled || 0}</Badge>
                 </div>
               </div>
             </CardContent>
@@ -461,10 +435,8 @@ const AdminAnalytics = () => {
                       <YAxis />
                       <Tooltip
                         formatter={(value, name) => [
-                          name === "revenue"
-                            ? `$${value.toLocaleString()}`
-                            : value,
-                          name === "revenue" ? "Revenue" : "Sales",
+                          name === 'revenue' ? `$${value.toLocaleString()}` : value,
+                          name === 'revenue' ? 'Revenue' : 'Sales',
                         ]}
                       />
                       <Bar dataKey="revenue" fill="#10B981" name="revenue" />
@@ -513,9 +485,7 @@ const AdminAnalytics = () => {
                 <div className="text-2xl font-bold text-purple-600">
                   $
                   {analytics?.revenue?.total && analytics?.orders?.total
-                    ? (
-                        analytics.revenue.total / analytics.orders.total
-                      ).toFixed(2)
+                    ? (analytics.revenue.total / analytics.orders.total).toFixed(2)
                     : 0}
                 </div>
                 <div className="text-sm text-purple-500">Avg Order Value</div>
@@ -547,17 +517,13 @@ const AdminAnalytics = () => {
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-2 h-2 bg-shop_light_green rounded-full"></div>
-                    <span className="text-sm text-dark-color">
-                      {activity.action}
-                    </span>
+                    <span className="text-sm text-dark-color">{activity.action}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Badge variant="outline" className="text-xs">
                       {activity.value}
                     </Badge>
-                    <span className="text-xs text-light-color">
-                      {activity.time}
-                    </span>
+                    <span className="text-xs text-light-color">{activity.time}</span>
                   </div>
                 </div>
               )) || (

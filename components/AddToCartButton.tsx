@@ -1,15 +1,14 @@
-"use client";
-import { Product } from "@/sanity.types";
-import { useEffect, useState, memo, useCallback } from "react";
-import { toast } from "sonner";
-import PriceFormatter from "./PriceFormatter";
-import { Button } from "./ui/button";
-import useCartStore from "@/store";
-import QuantityButtons from "./QuantityButtons";
-import { cn } from "@/lib/utils";
-import { ShoppingBag } from "lucide-react";
+'use client';
+import { cn } from '@/lib/utils';
+import useCartStore from '@/store';
+import { ShoppingBag } from 'lucide-react';
+import { memo, useCallback, useEffect, useState } from 'react';
+import { toast } from 'sonner';
+import PriceFormatter from './PriceFormatter';
+import QuantityButtons from './QuantityButtons';
+import { Button } from './ui/button';
 // import { trackAddToCart } from "@/lib/analytics";
-import { IProductMock } from "@/mock-data";
+import { IProductMock } from '@/mock-data';
 
 interface Props {
   product: IProductMock;
@@ -46,8 +45,8 @@ const AddToCartButton = memo(({ product, className }: Props) => {
       //   quantity: itemCount + 1,
       // });
     } else {
-      toast.error("Stock limit reached", {
-        description: "Cannot add more than available stock",
+      toast.error('Stock limit reached', {
+        description: 'Cannot add more than available stock',
         duration: 4000,
       });
     }
@@ -60,8 +59,8 @@ const AddToCartButton = memo(({ product, className }: Props) => {
         <Button
           disabled
           className={cn(
-            "w-full bg-gray-200 text-gray-500 shadow-none border border-gray-300",
-            className
+            'w-full bg-gray-200 text-gray-500 shadow-none border border-gray-300',
+            className,
           )}
         >
           <ShoppingBag /> Loading...
@@ -80,9 +79,7 @@ const AddToCartButton = memo(({ product, className }: Props) => {
           </div>
           <div className="flex items-center justify-between border-t pt-1">
             <span className="text-xs font-semibold">Subtotal</span>
-            <PriceFormatter
-              amount={product?.price ? product.price * itemCount : 0}
-            />
+            <PriceFormatter amount={product?.price ? product.price * itemCount : 0} />
           </div>
         </div>
       ) : (
@@ -90,17 +87,17 @@ const AddToCartButton = memo(({ product, className }: Props) => {
           onClick={handleAddToCart}
           disabled={isOutOfStock}
           className={cn(
-            "w-full bg-shop_dark_green/80 text-light-bg shadow-none border border-shop_dark_green/80 font-semibold tracking-wide hover:text-white hover:bg-shop_dark_green hover:border-shop_dark_green hoverEffect",
-            className
+            'w-full bg-shop_dark_green/80 text-light-bg shadow-none border border-shop_dark_green/80 font-semibold tracking-wide hover:text-white hover:bg-shop_dark_green hover:border-shop_dark_green hoverEffect',
+            className,
           )}
         >
-          <ShoppingBag /> {isOutOfStock ? "Out of Stock" : "Add to Cart"}
+          <ShoppingBag /> {isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
         </Button>
       )}
     </div>
   );
 });
 
-AddToCartButton.displayName = "AddToCartButton";
+AddToCartButton.displayName = 'AddToCartButton';
 
 export default AddToCartButton;

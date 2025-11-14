@@ -1,17 +1,12 @@
-"use client";
-import {
-  internalGroqTypeReferenceTo,
-  SanityImageCrop,
-  SanityImageHotspot,
-} from "@/sanity.types";
-import { urlFor } from "@/sanity/lib/image";
-import Image from "next/image";
-import { useState } from "react";
-import { motion, AnimatePresence } from "motion/react";
-import { IProductImageMock } from "@/mock-data";
+'use client';
+import { IProductImageMock } from '@/mock-data';
+import { urlFor } from '@/sanity/lib/image';
+import { AnimatePresence, motion } from 'motion/react';
+import Image from 'next/image';
+import { useState } from 'react';
 
 interface Props {
-  images?: IProductImageMock[]
+  images?: IProductImageMock[];
   isStock?: number;
 }
 
@@ -34,18 +29,20 @@ const ImageView = ({ images = [], isStock }: Props) => {
             width={700}
             height={700}
             priority
-            className={`w-full h-96 max-h-[550px] min-h-[500px] object-contain group-hover:scale-110 hoverEffect rounded-md ${isStock === 0 ? "opacity-50" : ""
-              }`}
+            className={`w-full h-96 max-h-[550px] min-h-[500px] object-contain group-hover:scale-110 hoverEffect rounded-md ${
+              isStock === 0 ? 'opacity-50' : ''
+            }`}
           />
         </motion.div>
       </AnimatePresence>
       <div className="grid grid-cols-6 gap-2 h-20 md:h-24">
-        {images.map((image,) => (
+        {images.map((image) => (
           <button
             key={image.id}
             onClick={() => setActive(image)}
-            className={`border rounded-md overflow-hidden ${active.id === image.id ? "ring-1 ring-dark-color" : ""
-              }`}
+            className={`border rounded-md overflow-hidden ${
+              active.id === image.id ? 'ring-1 ring-dark-color' : ''
+            }`}
           >
             <Image
               src={urlFor(image).url()}

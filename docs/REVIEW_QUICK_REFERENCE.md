@@ -120,7 +120,7 @@ const data = await getProductReviews(productId);
   title: string;
   content: string;
   isVerifiedPurchase: boolean;
-  status: "pending" | "approved" | "rejected";
+  status: 'pending' | 'approved' | 'rejected';
   helpful: number;
   createdAt: datetime;
 }

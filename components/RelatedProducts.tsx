@@ -1,15 +1,14 @@
-import { memo } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { StarIcon } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { Product } from "@/sanity.types";
-import { urlFor } from "@/sanity/lib/image";
-import AddToCartButton from "./AddToCartButton";
-import FavoriteButton from "./FavoriteButton";
-import { IProductMock } from "@/mock-data";
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { IProductMock } from '@/mock-data';
+import { urlFor } from '@/sanity/lib/image';
+import { StarIcon } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { memo } from 'react';
+import AddToCartButton from './AddToCartButton';
+import FavoriteButton from './FavoriteButton';
 
 interface RelatedProductsProps {
   currentProduct: IProductMock;
@@ -33,9 +32,7 @@ const RelatedProducts = memo(({ relatedProducts }: RelatedProductsProps) => {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {relatedProducts.map((product: IProductMock) => {
-          const imageUrl = product?.images?.[0]
-            ? urlFor(product.images[0]).url()
-            : null;
+          const imageUrl = product?.images?.[0] ? urlFor(product.images[0]).url() : null;
           const originalPrice =
             product?.discount && product?.price
               ? (product.price / (1 - product.discount / 100)).toFixed(2)
@@ -53,16 +50,14 @@ const RelatedProducts = memo(({ relatedProducts }: RelatedProductsProps) => {
                   {imageUrl ? (
                     <Image
                       src={imageUrl}
-                      alt={"productImage"}
+                      alt={'productImage'}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-300"
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                     />
                   ) : (
                     <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
-                      <span className="text-gray-500 text-sm">
-                        Product Image
-                      </span>
+                      <span className="text-gray-500 text-sm">Product Image</span>
                     </div>
                   )}
 
@@ -108,8 +103,8 @@ const RelatedProducts = memo(({ relatedProducts }: RelatedProductsProps) => {
                           size={12}
                           className={`${
                             index < 4
-                              ? "text-shop_light_green fill-shop_light_green"
-                              : "text-gray-300"
+                              ? 'text-shop_light_green fill-shop_light_green'
+                              : 'text-gray-300'
                           }`}
                         />
                       ))}
@@ -123,9 +118,7 @@ const RelatedProducts = memo(({ relatedProducts }: RelatedProductsProps) => {
                       ${product?.price}
                     </span>
                     {originalPrice && (
-                      <span className="text-sm text-gray-500 line-through">
-                        ${originalPrice}
-                      </span>
+                      <span className="text-sm text-gray-500 line-through">${originalPrice}</span>
                     )}
                   </div>
 
@@ -155,6 +148,6 @@ const RelatedProducts = memo(({ relatedProducts }: RelatedProductsProps) => {
   );
 });
 
-RelatedProducts.displayName = "RelatedProducts";
+RelatedProducts.displayName = 'RelatedProducts';
 
 export default RelatedProducts;

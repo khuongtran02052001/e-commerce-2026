@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { motion } from "framer-motion";
-import { Crown, Sparkles, ArrowRight, Lock } from "lucide-react";
-import Link from "next/link";
+import { motion } from 'framer-motion';
+import { ArrowRight, Crown, Lock, Sparkles } from 'lucide-react';
+import Link from 'next/link';
 
 interface AdminPremiumFeatureProps {
   featureName: string;
@@ -11,21 +11,20 @@ interface AdminPremiumFeatureProps {
 
 export default function AdminPremiumFeature({
   featureName,
-  description = "This premium feature is only available in the paid version of ShopCart Pro.",
+  description = 'This premium feature is only available in the paid version of ShopCart Pro.',
 }: AdminPremiumFeatureProps) {
   const upgradeUrl =
-    process.env.NEXT_PUBLIC_PAID_VERION ||
-    "https://www.buymeacoffee.com/noor_Mohammad";
+    process.env.NEXT_PUBLIC_PAID_VERION || 'https://www.buymeacoffee.com/noor_Mohammad';
 
   const premiumFeatures = [
-    "Advanced Analytics Dashboard",
-    "Review Management System",
-    "Subscription Management",
-    "Customer Insights & Reports",
-    "Export Data to Excel/CSV",
-    "Email Marketing Integration",
-    "Custom Admin Branding",
-    "Priority Support & Updates",
+    'Advanced Analytics Dashboard',
+    'Review Management System',
+    'Subscription Management',
+    'Customer Insights & Reports',
+    'Export Data to Excel/CSV',
+    'Email Marketing Integration',
+    'Custom Admin Branding',
+    'Priority Support & Updates',
   ];
 
   return (
@@ -40,7 +39,7 @@ export default function AdminPremiumFeature({
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
-          transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+          transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
           className="flex justify-center mb-8"
         >
           <div className="bg-linear-to-r from-purple-600 to-indigo-600 text-white px-6 py-3 rounded-full flex items-center gap-2 shadow-lg">
@@ -61,7 +60,7 @@ export default function AdminPremiumFeature({
               transition={{
                 duration: 4,
                 repeat: Infinity,
-                ease: "easeInOut",
+                ease: 'easeInOut',
               }}
               className="absolute -top-20 -right-20 w-64 h-64 bg-purple-300/30 rounded-full blur-3xl"
             />
@@ -73,7 +72,7 @@ export default function AdminPremiumFeature({
               transition={{
                 duration: 5,
                 repeat: Infinity,
-                ease: "easeInOut",
+                ease: 'easeInOut',
               }}
               className="absolute -bottom-20 -left-20 w-64 h-64 bg-indigo-300/30 rounded-full blur-3xl"
             />
@@ -90,19 +89,15 @@ export default function AdminPremiumFeature({
                   transition={{
                     duration: 3,
                     repeat: Infinity,
-                    ease: "easeInOut",
+                    ease: 'easeInOut',
                   }}
                   className="inline-flex items-center justify-center w-24 h-24 bg-linear-to-br from-purple-600 via-indigo-600 to-purple-700 rounded-3xl shadow-2xl mb-6"
                 >
                   <Crown className="w-12 h-12 text-yellow-300" />
                 </motion.div>
 
-                <h1 className="text-4xl font-bold text-gray-900 mb-3">
-                  {featureName}
-                </h1>
-                <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                  {description}
-                </p>
+                <h1 className="text-4xl font-bold text-gray-900 mb-3">{featureName}</h1>
+                <p className="text-lg text-gray-600 max-w-2xl mx-auto">{description}</p>
               </div>
 
               {/* Features Grid */}
@@ -157,8 +152,7 @@ export default function AdminPremiumFeature({
                 <div className="inline-flex items-center gap-2 bg-purple-100/50 px-6 py-3 rounded-full">
                   <Sparkles className="w-4 h-4 text-purple-600" />
                   <span className="text-sm text-purple-900 font-medium">
-                    One-time payment • Lifetime access • All future updates
-                    included
+                    One-time payment • Lifetime access • All future updates included
                   </span>
                 </div>
               </motion.div>

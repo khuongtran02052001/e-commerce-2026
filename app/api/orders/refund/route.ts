@@ -1,13 +1,13 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
-import { writeClient, client } from "@/sanity/lib/client";
-import Stripe from "stripe";
+import { client, writeClient } from '@/sanity/lib/client';
+import { auth } from '@clerk/nextjs/server';
+import { NextRequest, NextResponse } from 'next/server';
+import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-10-29.clover",
+  apiVersion: '2025-10-29.clover',
 });
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export async function POST(req: NextRequest) {
@@ -15,16 +15,13 @@ export async function POST(req: NextRequest) {
     const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { orderId } = await req.json();
 
     if (!orderId) {
-      return NextResponse.json(
-        { error: "Order ID is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Order ID is required' }, { status: 400 });
     }
 
     // Fetch the order
@@ -41,31 +38,28 @@ export async function POST(req: NextRequest) {
         customerName,
         email
       }`,
-      { orderId }
+      { orderId },
     );
 
     if (!order) {
-      return NextResponse.json({ error: "Order not found" }, { status: 404 });
+      return NextResponse.json({ error: 'Order not found' }, { status: 404 });
     }
 
     // Verify the order belongs to the user
     if (order.clerkUserId !== userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
     // Check if order is already cancelled
-    if (order.status === "cancelled") {
-      return NextResponse.json(
-        { error: "Order is already cancelled" },
-        { status: 400 }
-      );
+    if (order.status === 'cancelled') {
+      return NextResponse.json({ error: 'Order is already cancelled' }, { status: 400 });
     }
 
     // Check if order can be cancelled (not delivered or completed)
-    if (["delivered", "completed"].includes(order.status)) {
+    if (['delivered', 'completed'].includes(order.status)) {
       return NextResponse.json(
-        { error: "Cannot cancel delivered or completed orders" },
-        { status: 400 }
+        { error: 'Cannot cancel delivered or completed orders' },
+        { status: 400 },
       );
     }
 
@@ -74,15 +68,15 @@ export async function POST(req: NextRequest) {
 
     // Process refund for Stripe payments
     if (
-      order.paymentMethod === "stripe" &&
-      order.paymentStatus === "paid" &&
+      order.paymentMethod === 'stripe' &&
+      order.paymentStatus === 'paid' &&
       order.stripePaymentIntentId
     ) {
       try {
         // Create refund in Stripe
         const refund = await stripe.refunds.create({
           payment_intent: order.stripePaymentIntentId,
-          reason: "requested_by_customer",
+          reason: 'requested_by_customer',
         });
 
         stripeRefundId = refund.id;
@@ -90,14 +84,11 @@ export async function POST(req: NextRequest) {
 
         console.log(`Stripe refund created: ${refund.id}`, refund);
       } catch (stripeError) {
-        console.error("Stripe refund error:", stripeError);
+        console.error('Stripe refund error:', stripeError);
         // If Stripe refund fails, still cancel the order but add to user wallet
         refundAmount = order.totalPrice || 0;
       }
-    } else if (
-      order.paymentMethod === "stripe" &&
-      order.paymentStatus === "paid"
-    ) {
+    } else if (order.paymentMethod === 'stripe' && order.paymentStatus === 'paid') {
       // Paid via Stripe but no payment intent (add to wallet)
       refundAmount = order.totalPrice || 0;
     }
@@ -106,7 +97,7 @@ export async function POST(req: NextRequest) {
     await writeClient
       .patch(orderId)
       .set({
-        status: "cancelled",
+        status: 'cancelled',
         cancelledAt: new Date().toISOString(),
         cancelledBy: userId,
         stripeRefundId: stripeRefundId || undefined,
@@ -124,7 +115,7 @@ export async function POST(req: NextRequest) {
           firstName,
           lastName
         }`,
-        { userId }
+        { userId },
       );
 
       if (user) {
@@ -138,15 +129,15 @@ export async function POST(req: NextRequest) {
         // Create wallet transaction
         const transaction = {
           id: transactionId,
-          type: "credit_refund",
+          type: 'credit_refund',
           amount: refundAmount,
           balanceBefore: currentBalance,
           balanceAfter: newBalance,
           description: `Refund for cancelled order #${order.orderNumber}`,
           orderId: order._id,
           createdAt: new Date().toISOString(),
-          status: "completed",
-          processedBy: "system",
+          status: 'completed',
+          processedBy: 'system',
         };
 
         // Update user wallet
@@ -154,35 +145,30 @@ export async function POST(req: NextRequest) {
           .patch(user._id)
           .set({ walletBalance: newBalance })
           .setIfMissing({ walletTransactions: [] })
-          .append("walletTransactions", [transaction])
+          .append('walletTransactions', [transaction])
           .commit();
 
-        console.log(
-          `Added $${refundAmount} to user wallet. New balance: $${newBalance}`
-        );
+        console.log(`Added $${refundAmount} to user wallet. New balance: $${newBalance}`);
       }
     }
 
     return NextResponse.json(
       {
         success: true,
-        message: "Order cancelled successfully",
+        message: 'Order cancelled successfully',
         refundAmount,
         refundedToWallet: refundAmount > 0,
       },
       {
         headers: {
-          "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
-          Pragma: "no-cache",
-          Expires: "0",
+          'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+          Pragma: 'no-cache',
+          Expires: '0',
         },
-      }
+      },
     );
   } catch (error) {
-    console.error("Error processing refund:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    console.error('Error processing refund:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

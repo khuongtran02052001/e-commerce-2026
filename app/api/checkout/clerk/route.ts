@@ -1,36 +1,23 @@
-import { NextRequest, NextResponse } from "next/server";
-import { clerkClient } from "@clerk/nextjs/server";
+import { clerkClient } from '@clerk/nextjs/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 export const POST = async (request: NextRequest) => {
   try {
     const reqBody = await request.json();
-    const {
-      orderId,
-      orderNumber,
-      items,
-      email,
-      shippingAddress,
-      orderAmount,
-      clerkUserId,
-    } = reqBody;
+    const { orderId, orderNumber, items, email, shippingAddress, orderAmount, clerkUserId } =
+      reqBody;
 
     // Validate required fields
     if (!orderId) {
-      return NextResponse.json(
-        { error: "Order ID is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Order ID is required' }, { status: 400 });
     }
 
     if (!clerkUserId) {
-      return NextResponse.json(
-        { error: "Clerk User ID is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Clerk User ID is required' }, { status: 400 });
     }
 
     if (!items || !Array.isArray(items) || items.length === 0) {
-      return NextResponse.json({ error: "No items provided" }, { status: 400 });
+      return NextResponse.json({ error: 'No items provided' }, { status: 400 });
     }
 
     // Verify user exists in Clerk
@@ -38,7 +25,7 @@ export const POST = async (request: NextRequest) => {
     const user = await clerk.users.getUser(clerkUserId);
 
     if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
     // Create a payment session ID for tracking
@@ -55,8 +42,8 @@ export const POST = async (request: NextRequest) => {
       userId: clerkUserId,
       email: user.emailAddresses[0]?.emailAddress || email,
       amount: orderAmount,
-      currency: "usd",
-      status: "pending",
+      currency: 'usd',
+      status: 'pending',
       metadata: {
         orderId: orderId.toString(),
         orderNumber: orderNumber.toString(),
@@ -64,7 +51,7 @@ export const POST = async (request: NextRequest) => {
         orderDate: new Date().toISOString(),
         itemCount: items.length.toString(),
         shippingAddress: JSON.stringify(shippingAddress),
-        orderAmount: orderAmount?.toString() || "",
+        orderAmount: orderAmount?.toString() || '',
       },
       createdAt: new Date().toISOString(),
     };
@@ -82,15 +69,14 @@ export const POST = async (request: NextRequest) => {
       paymentId: clerkPaymentId,
       url: paymentUrl,
       session: paymentSession,
-      message: "Clerk payment session created successfully",
+      message: 'Clerk payment session created successfully',
     });
   } catch (error: unknown) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
-    console.error("Clerk checkout error:", error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Clerk checkout error:', error);
     return NextResponse.json(
-      { error: errorMessage || "Failed to create Clerk checkout session" },
-      { status: 500 }
+      { error: errorMessage || 'Failed to create Clerk checkout session' },
+      { status: 500 },
     );
   }
 };

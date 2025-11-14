@@ -1,13 +1,13 @@
-import { NextResponse } from "next/server";
-import { currentUser } from "@clerk/nextjs/server";
-import { client } from "@/sanity/lib/client";
+import { client } from '@/sanity/lib/client';
+import { currentUser } from '@clerk/nextjs/server';
+import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
     const user = await currentUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // Get total count of orders for this user
@@ -19,9 +19,8 @@ export async function GET() {
       totalOrders: totalOrders || 0,
     });
   } catch (error: unknown) {
-    console.error("Error fetching orders count:", error);
-    const errorMessage =
-      error instanceof Error ? error.message : "Failed to fetch orders count";
+    console.error('Error fetching orders count:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Failed to fetch orders count';
     return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

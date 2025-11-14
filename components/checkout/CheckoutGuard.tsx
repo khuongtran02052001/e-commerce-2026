@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import useCartStore from "@/store";
-import { CheckoutSkeleton } from "@/components/checkout/CheckoutSkeleton";
+import { CheckoutSkeleton } from '@/components/checkout/CheckoutSkeleton';
+import useCartStore from '@/store';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 interface CheckoutGuardProps {
   children: React.ReactNode;
@@ -16,7 +16,7 @@ export function CheckoutGuard({ children }: CheckoutGuardProps) {
   useEffect(() => {
     // Check if cart is empty on mount and redirect to cart page
     if (cart !== undefined && cart.length === 0) {
-      router.replace("/cart");
+      router.replace('/cart');
     }
   }, [cart, router]);
 

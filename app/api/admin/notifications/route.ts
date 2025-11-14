@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth, clerkClient } from "@clerk/nextjs/server";
-import { isUserAdmin } from "@/lib/adminUtils";
-import { client } from "@/sanity/lib/client";
+import { isUserAdmin } from '@/lib/adminUtils';
+import { client } from '@/sanity/lib/client';
+import { auth, clerkClient } from '@clerk/nextjs/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 interface Order {
   _id: string;
@@ -25,10 +25,7 @@ export async function GET(req: NextRequest) {
     const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json(
-        { error: "Unauthorized - Not logged in" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized - Not logged in' }, { status: 401 });
     }
 
     // Get current user details to check admin status
@@ -38,10 +35,7 @@ export async function GET(req: NextRequest) {
 
     // Check if current user is admin
     if (!userEmail || !isUserAdmin(userEmail)) {
-      return NextResponse.json(
-        { error: "Forbidden - Admin access required" },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
     }
 
     // Get recent orders for notifications
@@ -72,32 +66,30 @@ export async function GET(req: NextRequest) {
       ...recentOrders.map((order: Order) => ({
         id: `order-${order._id}`,
         title: `New order ${order.orderNumber || `#${order._id.slice(-6)}`}`,
-        description: `${order.customerName || order.email} - $${
-          order.totalPrice
-        }`,
+        description: `${order.customerName || order.email} - $${order.totalPrice}`,
         time: getTimeAgo(new Date(order._createdAt)),
-        type: "order",
-        icon: "shopping-cart",
+        type: 'order',
+        icon: 'shopping-cart',
       })),
 
       // Low stock notifications
       ...lowStockProducts.map((product: Product) => ({
         id: `stock-${product._id}`,
-        title: "Low stock alert",
+        title: 'Low stock alert',
         description: `${product.title} - Only ${product.stock} left`,
-        time: "Today",
-        type: "warning",
-        icon: "alert-triangle",
+        time: 'Today',
+        type: 'warning',
+        icon: 'alert-triangle',
       })),
 
       // System notification
       {
-        id: "system-1",
-        title: "Daily backup completed",
-        description: "All data has been successfully backed up",
-        time: "2 hours ago",
-        type: "success",
-        icon: "check-circle",
+        id: 'system-1',
+        title: 'Daily backup completed',
+        description: 'All data has been successfully backed up',
+        time: '2 hours ago',
+        type: 'success',
+        icon: 'check-circle',
       },
     ].slice(0, 15); // Limit to 15 notifications
 
@@ -106,27 +98,21 @@ export async function GET(req: NextRequest) {
       count: notifications.length,
     });
   } catch (error) {
-    console.error("Error fetching notifications:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    console.error('Error fetching notifications:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
 function getTimeAgo(date: Date): string {
   const now = new Date();
-  const diffInMinutes = Math.floor(
-    (now.getTime() - date.getTime()) / (1000 * 60)
-  );
+  const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
 
-  if (diffInMinutes < 1) return "just now";
+  if (diffInMinutes < 1) return 'just now';
   if (diffInMinutes < 60) return `${diffInMinutes} min ago`;
 
   const diffInHours = Math.floor(diffInMinutes / 60);
-  if (diffInHours < 24)
-    return `${diffInHours} hour${diffInHours > 1 ? "s" : ""} ago`;
+  if (diffInHours < 24) return `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`;
 
   const diffInDays = Math.floor(diffInHours / 24);
-  return `${diffInDays} day${diffInDays > 1 ? "s" : ""} ago`;
+  return `${diffInDays} day${diffInDays > 1 ? 's' : ''} ago`;
 }

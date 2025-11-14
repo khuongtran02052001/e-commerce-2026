@@ -1,12 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth, clerkClient } from "@clerk/nextjs/server";
-import { isUserAdmin } from "@/lib/adminUtils";
+import { isUserAdmin } from '@/lib/adminUtils';
 import {
-  createNotification,
-  sendBulkNotifications,
-  NotificationType,
   NotificationPriority,
-} from "@/lib/notificationService";
+  NotificationType,
+  sendBulkNotifications,
+} from '@/lib/notificationService';
+import { auth, clerkClient } from '@clerk/nextjs/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
   try {
@@ -14,24 +13,18 @@ export async function POST(req: NextRequest) {
     const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json(
-        { error: "Unauthorized - Not logged in" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized - Not logged in' }, { status: 401 });
     }
 
     // Get current user details to check admin status
     const clerk = await clerkClient();
     const currentUser = await clerk.users.getUser(userId);
     const userEmail = currentUser.primaryEmailAddress?.emailAddress;
-    const userName = `${currentUser.firstName || ""} ${currentUser.lastName || ""}`.trim();
+    const userName = `${currentUser.firstName || ''} ${currentUser.lastName || ''}`.trim();
 
     // Check if current user is admin
     if (!userEmail || !isUserAdmin(userEmail)) {
-      return NextResponse.json(
-        { error: "Forbidden - Admin access required" },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
     }
 
     const body = await req.json();
@@ -39,8 +32,8 @@ export async function POST(req: NextRequest) {
     const {
       title,
       message,
-      type = "general",
-      priority = "medium",
+      type = 'general',
+      priority = 'medium',
       actionUrl,
       recipients, // Array of Clerk user IDs
       sentBy,
@@ -48,24 +41,15 @@ export async function POST(req: NextRequest) {
 
     // Validate required fields
     if (!title) {
-      return NextResponse.json(
-        { error: "Missing required field: title" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Missing required field: title' }, { status: 400 });
     }
 
     if (!message) {
-      return NextResponse.json(
-        { error: "Missing required field: message" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Missing required field: message' }, { status: 400 });
     }
 
     if (!recipients || !Array.isArray(recipients) || recipients.length === 0) {
-      return NextResponse.json(
-        { error: "At least one recipient is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'At least one recipient is required' }, { status: 400 });
     }
 
     // Send bulk notifications using the notification service
@@ -80,14 +64,14 @@ export async function POST(req: NextRequest) {
 
     if (!result.success) {
       return NextResponse.json(
-        { error: result.error || "Failed to send notifications" },
-        { status: 500 }
+        { error: result.error || 'Failed to send notifications' },
+        { status: 500 },
       );
     }
 
     return NextResponse.json({
       success: true,
-      message: "Notifications sent successfully",
+      message: 'Notifications sent successfully',
       stats: {
         total: result.total,
         successful: result.successful,
@@ -95,10 +79,7 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Error sending notification:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    console.error('Error sending notification:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -1,10 +1,9 @@
-"use client";
+'use client';
 
-import { Product } from "@/sanity.types";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Package, Truck, Shield, Award } from "lucide-react";
-import { IProductMock } from "@/mock-data";
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { IProductMock } from '@/mock-data';
+import { Award, Package, Shield, Truck } from 'lucide-react';
 
 interface ProductSpecsProps {
   product: IProductMock;
@@ -18,25 +17,19 @@ const ProductSpecs = ({ product }: ProductSpecsProps) => {
         <CardHeader className="pb-3">
           <div className="flex items-center gap-2">
             <Package className="h-5 w-5 text-shop_orange" />
-            <CardTitle className="text-sm font-semibold">
-              Product Info
-            </CardTitle>
+            <CardTitle className="text-sm font-semibold">Product Info</CardTitle>
           </div>
         </CardHeader>
         <CardContent className="space-y-2">
           <div className="flex justify-between text-sm">
             <span className="text-gray-600">Stock:</span>
             <Badge
-              variant={product?.stock === 0 ? "destructive" : "default"}
+              variant={product?.stock === 0 ? 'destructive' : 'default'}
               className={
-                product?.stock === 0
-                  ? ""
-                  : "bg-green-100 text-green-700 hover:bg-green-200"
+                product?.stock === 0 ? '' : 'bg-green-100 text-green-700 hover:bg-green-200'
               }
             >
-              {product?.stock === 0
-                ? "Out of Stock"
-                : `${product?.stock} Available`}
+              {product?.stock === 0 ? 'Out of Stock' : `${product?.stock} Available`}
             </Badge>
           </div>
           {product?.brand && (
@@ -81,12 +74,10 @@ const ProductSpecs = ({ product }: ProductSpecsProps) => {
         </CardHeader>
         <CardContent className="space-y-2 text-sm">
           <div className="text-gray-600">
-            <span className="font-medium text-shop_dark_green">1 Year</span>{" "}
-            Manufacturer Warranty
+            <span className="font-medium text-shop_dark_green">1 Year</span> Manufacturer Warranty
           </div>
           <div className="text-gray-600">
-            <span className="font-medium text-shop_dark_green">30 Days</span>{" "}
-            Return Policy
+            <span className="font-medium text-shop_dark_green">30 Days</span> Return Policy
           </div>
           <div className="text-gray-600">Free Tech Support</div>
         </CardContent>
@@ -105,14 +96,10 @@ const ProductSpecs = ({ product }: ProductSpecsProps) => {
             <span className="text-green-600 font-medium">✓ Quality Tested</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-green-600 font-medium">
-              ✓ Authentic Product
-            </span>
+            <span className="text-green-600 font-medium">✓ Authentic Product</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-green-600 font-medium">
-              ✓ Secure Packaging
-            </span>
+            <span className="text-green-600 font-medium">✓ Secure Packaging</span>
           </div>
         </CardContent>
       </Card>

@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
-import { client } from "@/sanity/lib/client";
+import { client } from '@/sanity/lib/client';
+import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
@@ -98,19 +98,16 @@ export async function GET() {
     });
 
     // Add cache control headers to prevent stale data
-    response.headers.set(
-      "Cache-Control",
-      "no-cache, no-store, must-revalidate"
-    );
-    response.headers.set("Pragma", "no-cache");
-    response.headers.set("Expires", "0");
+    response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+    response.headers.set('Pragma', 'no-cache');
+    response.headers.set('Expires', '0');
 
     return response;
   } catch (error) {
-    console.error("Error fetching account requests:", error);
+    console.error('Error fetching account requests:', error);
     return NextResponse.json(
-      { success: false, message: "Failed to fetch account requests" },
-      { status: 500 }
+      { success: false, message: 'Failed to fetch account requests' },
+      { status: 500 },
     );
   }
 }

@@ -1,21 +1,19 @@
-import { defineQuery } from "next-sanity";
+import { defineQuery } from 'next-sanity';
 
-const BANNER_QUERY = defineQuery(
-  `*[_type == 'banner'] | order(publishedAt desc)`
-);
+const BANNER_QUERY = defineQuery(`*[_type == 'banner'] | order(publishedAt desc)`);
 const FEATURED_CATEGORY_QUERY = defineQuery(
-  `*[_type == 'category' && featured == true] | order(name desc)`
+  `*[_type == 'category' && featured == true] | order(name desc)`,
 );
 const ALL_PRODUCTS_QUERY = defineQuery(`*[_type=="product"] | order(name asc)`);
 const DEAL_PRODUCTS = defineQuery(
   `*[_type == 'product' && status == 'hot'] | order(name asc){
   ...,"categories": categories[]->title
-}`
+}`,
 );
 const FEATURE_PRODUCTS = defineQuery(
   `*[_type == 'product' && isFeatured == true] | order(name asc){
   ...,"categories": categories[]->title
-}`
+}`,
 );
 const BRANDS_QUERY = defineQuery(`*[_type=='brand'] | order(name asc) `);
 
@@ -25,7 +23,7 @@ const LATEST_BLOG_QUERY = defineQuery(
     blogcategories[]->{
     title
   }
-  }`
+  }`,
 );
 
 const GET_ALL_BLOG = defineQuery(
@@ -35,11 +33,10 @@ const GET_ALL_BLOG = defineQuery(
     title
 }
     }
-  `
+  `,
 );
 
-const SINGLE_BLOG_QUERY =
-  defineQuery(`*[_type == "blog" && slug.current == $slug][0]{
+const SINGLE_BLOG_QUERY = defineQuery(`*[_type == "blog" && slug.current == $slug][0]{
   ..., 
     author->{
     name,
@@ -56,7 +53,7 @@ const BLOG_CATEGORIES = defineQuery(
      blogcategories[]->{
     ...
     }
-  }`
+  }`,
 );
 
 const OTHERS_BLOG_QUERY = defineQuery(`*[
@@ -80,13 +77,9 @@ const OTHERS_BLOG_QUERY = defineQuery(`*[
 }`);
 
 // Address Query
-const ADDRESS_QUERY = defineQuery(
-  `*[_type=="address"] | order(publishedAt desc)`
-);
+const ADDRESS_QUERY = defineQuery(`*[_type=="address"] | order(publishedAt desc)`);
 
-const ALLCATEGORIES_QUERY = defineQuery(
-  `*[_type == 'category'] | order(name asc) [0...$quantity]`
-);
+const ALLCATEGORIES_QUERY = defineQuery(`*[_type == 'category'] | order(name asc) [0...$quantity]`);
 
 const ADMIN_CATEGORIES_QUERY = defineQuery(
   `*[_type == 'category'] | order(title asc) {
@@ -95,7 +88,7 @@ const ADMIN_CATEGORIES_QUERY = defineQuery(
     slug,
     description,
     featured
-  }`
+  }`,
 );
 
 const PRODUCT_BY_SLUG_QUERY = defineQuery(
@@ -103,7 +96,7 @@ const PRODUCT_BY_SLUG_QUERY = defineQuery(
     ...,
     "averageRating": math::avg(*[_type == "review" && product._ref == ^._id && status == "approved"].rating),
     "totalReviews": count(*[_type == "review" && product._ref == ^._id && status == "approved"])
-  }`
+  }`,
 );
 
 const RELATED_PRODUCTS_QUERY = defineQuery(
@@ -120,7 +113,7 @@ const RELATED_PRODUCTS_QUERY = defineQuery(
       title,
       slug
     }
-  }`
+  }`,
 );
 
 const BRAND_QUERY = defineQuery(`*[_type == "product" && slug.current == $slug]{
@@ -128,21 +121,21 @@ const BRAND_QUERY = defineQuery(`*[_type == "product" && slug.current == $slug]{
 }`);
 
 export {
-  BANNER_QUERY,
-  FEATURED_CATEGORY_QUERY,
+  ADDRESS_QUERY,
+  ADMIN_CATEGORIES_QUERY,
   ALL_PRODUCTS_QUERY,
+  ALLCATEGORIES_QUERY,
+  BANNER_QUERY,
+  BLOG_CATEGORIES,
+  BRAND_QUERY,
+  BRANDS_QUERY,
   DEAL_PRODUCTS,
   FEATURE_PRODUCTS,
-  BRANDS_QUERY,
-  LATEST_BLOG_QUERY,
-  SINGLE_BLOG_QUERY,
+  FEATURED_CATEGORY_QUERY,
   GET_ALL_BLOG,
-  BLOG_CATEGORIES,
+  LATEST_BLOG_QUERY,
   OTHERS_BLOG_QUERY,
-  ADDRESS_QUERY,
-  ALLCATEGORIES_QUERY,
-  ADMIN_CATEGORIES_QUERY,
   PRODUCT_BY_SLUG_QUERY,
   RELATED_PRODUCTS_QUERY,
-  BRAND_QUERY,
+  SINGLE_BLOG_QUERY,
 };

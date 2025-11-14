@@ -1,21 +1,13 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Category, Product } from "@/sanity.types";
-import { urlFor } from "@/sanity/lib/image";
-import Image from "next/image";
-import Link from "next/link";
-import {
-  ArrowLeft,
-  ArrowRight,
-  Tag,
-  Grid3X3,
-  Filter,
-  TrendingUp,
-} from "lucide-react";
-import Title from "./Title";
-import CategoryProducts from "./product/CategoryProducts";
-import CategoryDetailSkeleton from "./CategoryDetailSkeleton";
+import { Category, Product } from '@/sanity.types';
+import { urlFor } from '@/sanity/lib/image';
+import { ArrowLeft, ArrowRight, Filter, Grid3X3, Tag, TrendingUp } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useState } from 'react';
+import Title from './Title';
+import CategoryProducts from './product/CategoryProducts';
 
 interface Props {
   categories: Category[];
@@ -127,11 +119,7 @@ const CategoryPageClient = ({
       </div>
 
       {/* Main Content */}
-      <CategoryProducts
-        categories={categories}
-        slug={slug}
-        initialProducts={initialProducts}
-      />
+      <CategoryProducts categories={categories} slug={slug} initialProducts={initialProducts} />
 
       {/* Related Categories Section */}
       {relatedCategories.length > 0 && (
@@ -161,7 +149,7 @@ const CategoryPageClient = ({
                   {category.image ? (
                     <Image
                       src={urlFor(category.image).url()}
-                      alt={category.title || "Category"}
+                      alt={category.title || 'Category'}
                       width={32}
                       height={32}
                       className="w-8 h-8 object-contain"
@@ -188,8 +176,8 @@ const CategoryPageClient = ({
             Discover More Amazing Products
           </h3>
           <p className="text-dark-text mb-6 text-sm lg:text-base">
-            Can&apos;t find what you&apos;re looking for in {categoryTitle}?
-            Explore our complete collection of products across all categories.
+            Can&apos;t find what you&apos;re looking for in {categoryTitle}? Explore our complete
+            collection of products across all categories.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link

@@ -1,13 +1,7 @@
-import { SignInButton, SignUpButton } from "@clerk/nextjs";
-import { Button } from "./ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "./ui/card";
-import Logo from "./common/Logo";
+import { SignInButton, SignUpButton } from '@clerk/nextjs';
+import Logo from './common/Logo';
+import { Button } from './ui/button';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './ui/card';
 
 const NoAccessToCart = ({ details }: { details?: string }) => {
   return (
@@ -17,9 +11,7 @@ const NoAccessToCart = ({ details }: { details?: string }) => {
           <div className="flex justify-center">
             <Logo />
           </div>
-          <CardTitle className="text-2xl font-bold text-center">
-            Welcome Back!
-          </CardTitle>
+          <CardTitle className="text-2xl font-bold text-center">Welcome Back!</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-muted-foreground text-center font-medium">

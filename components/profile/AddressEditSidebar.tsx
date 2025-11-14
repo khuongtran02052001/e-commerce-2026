@@ -1,27 +1,27 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import LocationSelector from '@/components/ui/location-selector';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { showToast } from "@/lib/toast";
-import LocationSelector from "@/components/ui/location-selector";
-import { MapPin, Save, X, Trash2 } from "lucide-react";
+} from '@/components/ui/select';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
+import { Switch } from '@/components/ui/switch';
+import { showToast } from '@/lib/toast';
+import { MapPin, Save, Trash2, X } from 'lucide-react';
+import { useState } from 'react';
 
 interface Address {
   _id?: string;
@@ -32,7 +32,7 @@ interface Address {
   zip: string;
   country: string;
   default: boolean;
-  type: "home" | "office" | "other";
+  type: 'home' | 'office' | 'other';
   phone?: string;
   subArea?: string;
   countryCode?: string;
@@ -57,19 +57,19 @@ export default function AddressEditSidebar({
   const [loading, setLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [formData, setFormData] = useState<Address>({
-    _id: address?._id || "",
-    name: address?.name || "",
-    address: address?.address || "",
-    city: address?.city || "",
-    state: address?.state || "",
-    zip: address?.zip || "",
-    country: address?.country || "",
-    countryCode: address?.countryCode || "",
-    stateCode: address?.stateCode || "",
-    subArea: address?.subArea || "",
+    _id: address?._id || '',
+    name: address?.name || '',
+    address: address?.address || '',
+    city: address?.city || '',
+    state: address?.state || '',
+    zip: address?.zip || '',
+    country: address?.country || '',
+    countryCode: address?.countryCode || '',
+    stateCode: address?.stateCode || '',
+    subArea: address?.subArea || '',
     default: address?.default || false,
-    type: address?.type || "home",
-    phone: address?.phone || "",
+    type: address?.type || 'home',
+    phone: address?.phone || '',
   });
 
   const isEditing = !!address?._id;
@@ -90,8 +90,8 @@ export default function AddressEditSidebar({
       state: location.state,
       stateCode: location.stateCode,
       city: location.city,
-      subArea: location.subArea || "",
-      zip: location.zipCode || "",
+      subArea: location.subArea || '',
+      zip: location.zipCode || '',
     }));
   };
 
@@ -108,8 +108,8 @@ export default function AddressEditSidebar({
       !formData.country
     ) {
       showToast.error(
-        "Validation Error",
-        "Please fill in all required fields including location details."
+        'Validation Error',
+        'Please fill in all required fields including location details.',
       );
       return;
     }
@@ -117,10 +117,10 @@ export default function AddressEditSidebar({
     setLoading(true);
 
     try {
-      const response = await fetch("/api/user/addresses", {
-        method: isEditing ? "PUT" : "POST",
+      const response = await fetch('/api/user/addresses', {
+        method: isEditing ? 'PUT' : 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           ...formData,
@@ -132,10 +132,8 @@ export default function AddressEditSidebar({
 
       if (response.ok) {
         showToast.success(
-          isEditing ? "Address Updated" : "Address Added",
-          `Your address has been successfully ${
-            isEditing ? "updated" : "added"
-          }.`
+          isEditing ? 'Address Updated' : 'Address Added',
+          `Your address has been successfully ${isEditing ? 'updated' : 'added'}.`,
         );
         onClose();
         // Call callback to refresh addresses instead of page reload
@@ -143,20 +141,16 @@ export default function AddressEditSidebar({
           onAddressChange();
         }
       } else {
-        console.error("API Error:", result);
-        throw new Error(
-          result.error || `Failed to ${isEditing ? "update" : "add"} address`
-        );
+        console.error('API Error:', result);
+        throw new Error(result.error || `Failed to ${isEditing ? 'update' : 'add'} address`);
       }
     } catch (error) {
-      console.error("Error saving address:", error);
+      console.error('Error saving address:', error);
       showToast.error(
-        "Error",
+        'Error',
         error instanceof Error
           ? error.message
-          : `Failed to ${
-              isEditing ? "update" : "add"
-            } address. Please try again.`
+          : `Failed to ${isEditing ? 'update' : 'add'} address. Please try again.`,
       );
     } finally {
       setLoading(false);
@@ -166,35 +160,32 @@ export default function AddressEditSidebar({
   const handleDelete = async () => {
     if (!isEditing || !address?._id) return;
 
-    if (!confirm("Are you sure you want to delete this address?")) return;
+    if (!confirm('Are you sure you want to delete this address?')) return;
 
     setDeleteLoading(true);
 
     try {
       const response = await fetch(`/api/user/addresses`, {
-        method: "DELETE",
+        method: 'DELETE',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({ addressId: address._id }),
       });
 
       if (response.ok) {
-        showToast.success(
-          "Address Deleted",
-          "Your address has been successfully deleted."
-        );
+        showToast.success('Address Deleted', 'Your address has been successfully deleted.');
         onClose();
         // Call callback to refresh addresses instead of page reload
         if (onAddressChange) {
           onAddressChange();
         }
       } else {
-        throw new Error("Failed to delete address");
+        throw new Error('Failed to delete address');
       }
     } catch (error) {
-      console.error("Error deleting address:", error);
-      showToast.error("Error", "Failed to delete address. Please try again.");
+      console.error('Error deleting address:', error);
+      showToast.error('Error', 'Failed to delete address. Please try again.');
     } finally {
       setDeleteLoading(false);
     }
@@ -213,12 +204,12 @@ export default function AddressEditSidebar({
         <SheetHeader className="sticky top-0 bg-white z-10 pb-4 border-b">
           <SheetTitle className="flex items-center space-x-2">
             <MapPin className="h-5 w-5" />
-            <span>{isEditing ? "Edit" : "Add"} Shipping Address</span>
+            <span>{isEditing ? 'Edit' : 'Add'} Shipping Address</span>
           </SheetTitle>
           <SheetDescription>
             {isEditing
-              ? "Update your shipping address information."
-              : "Add a new shipping address to your account."}
+              ? 'Update your shipping address information.'
+              : 'Add a new shipping address to your account.'}
           </SheetDescription>
         </SheetHeader>
 
@@ -230,7 +221,7 @@ export default function AddressEditSidebar({
               <Input
                 id="name"
                 value={formData.name}
-                onChange={(e) => handleInputChange("name", e.target.value)}
+                onChange={(e) => handleInputChange('name', e.target.value)}
                 placeholder="e.g., Home, Office, Mom's House"
                 required
                 className="mt-1"
@@ -244,7 +235,7 @@ export default function AddressEditSidebar({
                 id="phone"
                 type="tel"
                 value={formData.phone}
-                onChange={(e) => handleInputChange("phone", e.target.value)}
+                onChange={(e) => handleInputChange('phone', e.target.value)}
                 placeholder="e.g., (555) 123-4567"
                 className="mt-1"
               />
@@ -256,10 +247,7 @@ export default function AddressEditSidebar({
               <Select
                 value={formData.type}
                 onValueChange={(value) =>
-                  handleInputChange(
-                    "type",
-                    value as "home" | "office" | "other"
-                  )
+                  handleInputChange('type', value as 'home' | 'office' | 'other')
                 }
               >
                 <SelectTrigger className="mt-1">
@@ -279,7 +267,7 @@ export default function AddressEditSidebar({
               <Input
                 id="address"
                 value={formData.address}
-                onChange={(e) => handleInputChange("address", e.target.value)}
+                onChange={(e) => handleInputChange('address', e.target.value)}
                 placeholder="Enter your street address (house number, street name, apartment/unit)"
                 required
                 className="mt-1"
@@ -291,11 +279,11 @@ export default function AddressEditSidebar({
               <LocationSelector
                 value={{
                   country: formData.country,
-                  countryCode: formData.countryCode || "",
+                  countryCode: formData.countryCode || '',
                   state: formData.state,
-                  stateCode: formData.stateCode || "",
+                  stateCode: formData.stateCode || '',
                   city: formData.city,
-                  subArea: formData.subArea || "",
+                  subArea: formData.subArea || '',
                   zipCode: formData.zip,
                 }}
                 onChange={handleLocationChange}
@@ -316,9 +304,7 @@ export default function AddressEditSidebar({
               <Switch
                 id="default"
                 checked={formData.default}
-                onCheckedChange={(checked) =>
-                  handleInputChange("default", checked)
-                }
+                onCheckedChange={(checked) => handleInputChange('default', checked)}
               />
             </div>
 
@@ -328,12 +314,12 @@ export default function AddressEditSidebar({
                 {loading ? (
                   <div className="flex items-center space-x-2">
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    <span>{isEditing ? "Updating..." : "Adding..."}</span>
+                    <span>{isEditing ? 'Updating...' : 'Adding...'}</span>
                   </div>
                 ) : (
                   <div className="flex items-center space-x-2">
                     <Save className="h-4 w-4" />
-                    <span>{isEditing ? "Update" : "Add"} Address</span>
+                    <span>{isEditing ? 'Update' : 'Add'} Address</span>
                   </div>
                 )}
               </Button>

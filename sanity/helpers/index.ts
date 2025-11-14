@@ -1,10 +1,10 @@
-import { defineQuery } from "next-sanity";
-import { sanityFetch } from "../lib/live";
-import { writeClient } from "../lib/client";
+import { defineQuery } from 'next-sanity';
+import { writeClient } from '../lib/client';
+import { sanityFetch } from '../lib/live';
 
 export const getProductsByCategory = async (categorySlug: string) => {
   const PRODUCT_BY_CATEGORY_QUERY = defineQuery(
-    `*[_type == 'product' && references(*[_type == "category" && slug.current == $categorySlug]._id)] | order(name asc)`
+    `*[_type == 'product' && references(*[_type == "category" && slug.current == $categorySlug]._id)] | order(name asc)`,
   );
   try {
     const products = await sanityFetch({
@@ -15,7 +15,7 @@ export const getProductsByCategory = async (categorySlug: string) => {
     });
     return products?.data || [];
   } catch (error) {
-    console.error("Error fetching products by category:", error);
+    console.error('Error fetching products by category:', error);
     return [];
   }
 };
@@ -28,7 +28,7 @@ export const getSale = async () => {
     });
     return products?.data || [];
   } catch (error) {
-    console.error("Error fetching products by category:", error);
+    console.error('Error fetching products by category:', error);
     return [];
   }
 };
@@ -44,32 +44,28 @@ export const saveContactMessage = async (contactData: {
 }) => {
   try {
     const doc = {
-      _type: "contact",
+      _type: 'contact',
       name: contactData.name,
       email: contactData.email,
       subject: contactData.subject,
       message: contactData.message,
-      status: "new",
-      priority: "medium",
+      status: 'new',
+      priority: 'medium',
       submittedAt: new Date().toISOString(),
-      ipAddress: contactData.ipAddress || "",
-      userAgent: contactData.userAgent || "",
+      ipAddress: contactData.ipAddress || '',
+      userAgent: contactData.userAgent || '',
     };
 
     const result = await writeClient.create(doc);
     return { success: true, data: result };
   } catch (error) {
-    console.error("Error saving contact message:", error);
-    return { success: false, error: "Failed to save contact message" };
+    console.error('Error saving contact message:', error);
+    return { success: false, error: 'Failed to save contact message' };
   }
 };
-export const getMyOrders = async (
-  userId: string,
-  page: number = 1,
-  limit: number = 5
-) => {
+export const getMyOrders = async (userId: string, page: number = 1, limit: number = 5) => {
   if (!userId) {
-    throw new Error("User ID is required");
+    throw new Error('User ID is required');
   }
 
   const offset = (page - 1) * limit;
@@ -95,9 +91,7 @@ export const getMyOrders = async (
   }`);
 
   // Query for total count
-  const COUNT_QUERY = defineQuery(
-    `count(*[_type == 'order' && clerkUserId == $userId])`
-  );
+  const COUNT_QUERY = defineQuery(`count(*[_type == 'order' && clerkUserId == $userId])`);
 
   try {
     const [orders, totalCount] = await Promise.all([
@@ -124,7 +118,7 @@ export const getMyOrders = async (
       hasPrevPage: page > 1,
     };
   } catch (error) {
-    console.error("Error fetching orders:", error);
+    console.error('Error fetching orders:', error);
     return {
       orders: [],
       totalCount: 0,

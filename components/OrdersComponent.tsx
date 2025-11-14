@@ -1,28 +1,21 @@
-"use client";
-import React, { useState } from "react";
-import { TableBody, TableCell, TableRow } from "./ui/table";
-import PriceFormatter from "./PriceFormatter";
-import { MY_ORDERS_QUERYResult } from "@/sanity.types";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "./ui/tooltip";
-import { format } from "date-fns";
-import { CreditCard, Eye, Download } from "lucide-react";
-import { toast } from "sonner";
-import { Button } from "./ui/button";
-import { ORDER_STATUSES, PAYMENT_STATUSES } from "@/lib/orderStatus";
-import Link from "next/link";
-import Image from "next/image";
-import { urlFor } from "@/sanity/lib/image";
+'use client';
+import { ORDER_STATUSES, PAYMENT_STATUSES } from '@/lib/orderStatus';
+import { MY_ORDERS_QUERYResult } from '@/sanity.types';
+import { urlFor } from '@/sanity/lib/image';
+import { format } from 'date-fns';
+import { CreditCard, Download, Eye } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useState } from 'react';
+import { toast } from 'sonner';
+import PriceFormatter from './PriceFormatter';
+import { Button } from './ui/button';
+import { TableBody, TableCell, TableRow } from './ui/table';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 
 const OrdersComponent = ({ orders }: { orders: MY_ORDERS_QUERYResult }) => {
   const [payingOrderId] = useState<string | null>(null);
-  const [generatingInvoiceId, setGeneratingInvoiceId] = useState<string | null>(
-    null
-  );
+  const [generatingInvoiceId, setGeneratingInvoiceId] = useState<string | null>(null);
 
   // Helper function to render product images with stacked layout
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -42,14 +35,14 @@ const OrdersComponent = ({ orders }: { orders: MY_ORDERS_QUERYResult }) => {
               <div
                 key={index}
                 className={`relative w-8 h-8 rounded-full overflow-hidden border-2 border-white shadow-sm bg-gray-100 ${
-                  index > 0 ? "-ml-2" : ""
+                  index > 0 ? '-ml-2' : ''
                 } z-${30 - index * 10}`}
                 style={{ zIndex: 30 - index * 10 }}
               >
                 {imageUrl ? (
                   <Image
                     src={urlFor(imageUrl).url()}
-                    alt={item.product?.name || "Product"}
+                    alt={item.product?.name || 'Product'}
                     fill
                     className="object-cover"
                   />
@@ -63,9 +56,7 @@ const OrdersComponent = ({ orders }: { orders: MY_ORDERS_QUERYResult }) => {
           })}
           {remainingCount > 0 && (
             <div className="-ml-2 w-8 h-8 rounded-full bg-gray-600 border-2 border-white shadow-sm flex items-center justify-center z-10">
-              <span className="text-xs font-semibold text-white">
-                +{remainingCount}
-              </span>
+              <span className="text-xs font-semibold text-white">+{remainingCount}</span>
             </div>
           )}
         </div>
@@ -86,24 +77,24 @@ const OrdersComponent = ({ orders }: { orders: MY_ORDERS_QUERYResult }) => {
     setGeneratingInvoiceId(orderId);
     try {
       const response = await fetch(`/api/orders/${orderId}/generate-invoice`, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
       });
 
       const data = await response.json();
 
       if (response.ok && data.success) {
-        toast.success(data.message || "Invoice generated successfully!");
+        toast.success(data.message || 'Invoice generated successfully!');
         // Refresh the page to show updated invoice data
         window.location.reload();
       } else {
-        toast.error(data.error || "Failed to generate invoice");
+        toast.error(data.error || 'Failed to generate invoice');
       }
     } catch (error) {
-      console.error("Invoice generation error:", error);
-      toast.error("Failed to generate invoice");
+      console.error('Invoice generation error:', error);
+      toast.error('Failed to generate invoice');
     } finally {
       setGeneratingInvoiceId(null);
     }
@@ -127,17 +118,15 @@ const OrdersComponent = ({ orders }: { orders: MY_ORDERS_QUERYResult }) => {
                   <TableCell className="font-medium text-sm">
                     <div className="flex flex-col">
                       <span className="truncate max-w-20 sm:max-w-none">
-                        {order.orderNumber?.slice(-10) ?? "N/A"}...
+                        {order.orderNumber?.slice(-10) ?? 'N/A'}...
                       </span>
                       <span className="text-xs text-gray-500 md:hidden">
-                        {order?.orderDate &&
-                          format(new Date(order.orderDate), "dd/MM")}
+                        {order?.orderDate && format(new Date(order.orderDate), 'dd/MM')}
                       </span>
                     </div>
                   </TableCell>
                   <TableCell className="hidden md:table-cell text-sm">
-                    {order?.orderDate &&
-                      format(new Date(order.orderDate), "dd/MM/yyyy")}
+                    {order?.orderDate && format(new Date(order.orderDate), 'dd/MM/yyyy')}
                   </TableCell>
                   <TableCell className="text-sm">
                     <div className="flex flex-col">
@@ -150,34 +139,28 @@ const OrdersComponent = ({ orders }: { orders: MY_ORDERS_QUERYResult }) => {
                     </div>
                   </TableCell>
                   <TableCell className="hidden sm:table-cell text-sm text-gray-600">
-                    <span className="truncate max-w-[150px] inline-block">
-                      {order.email}
-                    </span>
+                    <span className="truncate max-w-[150px] inline-block">{order.email}</span>
                   </TableCell>
                   <TableCell className="py-2">
                     {renderProductImages(order.products || [])}
                   </TableCell>
                   <TableCell className="font-medium text-sm">
-                    <PriceFormatter
-                      amount={order?.totalPrice}
-                      className="text-black font-medium"
-                    />
+                    <PriceFormatter amount={order?.totalPrice} className="text-black font-medium" />
                   </TableCell>
                   <TableCell>
                     {order?.status && (
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${
-                          order.paymentStatus === "paid" ||
-                          order.status === "completed" ||
-                          order.status === "delivered"
-                            ? "bg-green-100 text-green-800"
-                            : order.status === "cancelled"
-                            ? "bg-red-100 text-red-800"
-                            : "bg-yellow-100 text-yellow-800"
+                          order.paymentStatus === 'paid' ||
+                          order.status === 'completed' ||
+                          order.status === 'delivered'
+                            ? 'bg-green-100 text-green-800'
+                            : order.status === 'cancelled'
+                              ? 'bg-red-100 text-red-800'
+                              : 'bg-yellow-100 text-yellow-800'
                         }`}
                       >
-                        {order?.status.charAt(0).toUpperCase() +
-                          order?.status.slice(1)}
+                        {order?.status.charAt(0).toUpperCase() + order?.status.slice(1)}
                       </span>
                     )}
                   </TableCell>
@@ -186,24 +169,20 @@ const OrdersComponent = ({ orders }: { orders: MY_ORDERS_QUERYResult }) => {
                     {order?.invoice?.hosted_invoice_url ? (
                       <div className="flex items-center gap-1">
                         <span className="text-xs text-gray-600 truncate max-w-16 lg:max-w-20">
-                          {order?.invoice?.number ||
-                            "INV-" + order.orderNumber?.slice(-6)}
+                          {order?.invoice?.number || 'INV-' + order.orderNumber?.slice(-6)}
                         </span>
                         <Button
                           size="sm"
                           variant="ghost"
                           className="h-6 w-6 p-0 shrink-0"
                           onClick={() => {
-                            window.open(
-                              order.invoice?.hosted_invoice_url,
-                              "_blank"
-                            );
+                            window.open(order.invoice?.hosted_invoice_url, '_blank');
                           }}
                         >
                           <Download className="w-3 h-3" />
                         </Button>
                       </div>
-                    ) : order?.paymentStatus === "paid" ? (
+                    ) : order?.paymentStatus === 'paid' ? (
                       <Button
                         size="sm"
                         variant="outline"
@@ -217,7 +196,7 @@ const OrdersComponent = ({ orders }: { orders: MY_ORDERS_QUERYResult }) => {
                             Gen...
                           </>
                         ) : (
-                          "Generate"
+                          'Generate'
                         )}
                       </Button>
                     ) : (
@@ -226,12 +205,7 @@ const OrdersComponent = ({ orders }: { orders: MY_ORDERS_QUERYResult }) => {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center justify-center gap-1 flex-wrap">
-                      <Button
-                        asChild
-                        size="sm"
-                        variant="outline"
-                        className="h-8 px-2 text-xs"
-                      >
+                      <Button asChild size="sm" variant="outline" className="h-8 px-2 text-xs">
                         <Link href={`/user/orders/${order._id}`}>
                           <Eye className="w-3 h-3 sm:mr-1" />
                           <span className="hidden sm:inline">View</span>
@@ -247,9 +221,7 @@ const OrdersComponent = ({ orders }: { orders: MY_ORDERS_QUERYResult }) => {
                           {payingOrderId === order._id ? (
                             <>
                               <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white sm:mr-1"></div>
-                              <span className="hidden sm:inline">
-                                Paying...
-                              </span>
+                              <span className="hidden sm:inline">Paying...</span>
                             </>
                           ) : (
                             <>

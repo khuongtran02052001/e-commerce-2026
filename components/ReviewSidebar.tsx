@@ -1,6 +1,8 @@
-"use client";
+'use client';
 
-import React, { useState, useCallback } from "react";
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Sheet,
   SheetContent,
@@ -8,14 +10,12 @@ import {
   SheetFooter,
   SheetHeader,
   SheetTitle,
-} from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { StarIcon, Loader2, Star } from "lucide-react";
-import { submitReviewAPI } from "@/lib/reviewAPI";
-import { toast } from "sonner";
+} from '@/components/ui/sheet';
+import { Textarea } from '@/components/ui/textarea';
+import { submitReviewAPI } from '@/lib/reviewAPI';
+import { Loader2, Star, StarIcon } from 'lucide-react';
+import React, { useCallback, useState } from 'react';
+import { toast } from 'sonner';
 
 interface ReviewSidebarProps {
   productId: string;
@@ -37,15 +37,15 @@ const ReviewSidebar = React.memo(
   }: ReviewSidebarProps) => {
     const [rating, setRating] = useState(0);
     const [hoverRating, setHoverRating] = useState(0);
-    const [title, setTitle] = useState("");
-    const [content, setContent] = useState("");
+    const [title, setTitle] = useState('');
+    const [content, setContent] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const resetForm = useCallback(() => {
       setRating(0);
       setHoverRating(0);
-      setTitle("");
-      setContent("");
+      setTitle('');
+      setContent('');
     }, []);
 
     const handleSubmit = useCallback(
@@ -53,17 +53,17 @@ const ReviewSidebar = React.memo(
         e.preventDefault();
 
         if (rating === 0) {
-          toast.error("Please select a rating");
+          toast.error('Please select a rating');
           return;
         }
 
         if (title.trim().length < 5) {
-          toast.error("Title must be at least 5 characters");
+          toast.error('Title must be at least 5 characters');
           return;
         }
 
         if (content.trim().length < 20) {
-          toast.error("Review must be at least 20 characters");
+          toast.error('Review must be at least 20 characters');
           return;
         }
 
@@ -88,13 +88,13 @@ const ReviewSidebar = React.memo(
             toast.error(result.message);
           }
         } catch (error) {
-          toast.error("Failed to submit review. Please try again.");
-          console.error("Error submitting review:", error);
+          toast.error('Failed to submit review. Please try again.');
+          console.error('Error submitting review:', error);
         } finally {
           setIsSubmitting(false);
         }
       },
-      [rating, title, content, productId, onClose, onReviewSubmitted, resetForm]
+      [rating, title, content, productId, onClose, onReviewSubmitted, resetForm],
     );
 
     const handleRatingClick = useCallback((value: number) => {
@@ -117,7 +117,7 @@ const ReviewSidebar = React.memo(
           setTimeout(resetForm, 300);
         }
       },
-      [isSubmitting, onClose, resetForm]
+      [isSubmitting, onClose, resetForm],
     );
 
     const titleLength = title.length;
@@ -127,18 +127,14 @@ const ReviewSidebar = React.memo(
 
     return (
       <Sheet open={isOpen} onOpenChange={handleOpenChange}>
-        <SheetContent
-          side="right"
-          className="w-full sm:max-w-lg overflow-y-auto"
-        >
+        <SheetContent side="right" className="w-full sm:max-w-lg overflow-y-auto">
           <SheetHeader>
             <SheetTitle className="flex items-center gap-2 text-shop_dark_green">
               <Star className="w-5 h-5" />
               Write a Review
             </SheetTitle>
             <SheetDescription className="text-left">
-              Share your experience with{" "}
-              <span className="font-semibold">{productName}</span>
+              Share your experience with <span className="font-semibold">{productName}</span>
             </SheetDescription>
             {isVerifiedPurchase && (
               <div className="bg-green-50 border border-green-200 rounded-md p-3 mt-2">
@@ -149,17 +145,11 @@ const ReviewSidebar = React.memo(
             )}
           </SheetHeader>
 
-          <form
-            onSubmit={handleSubmit}
-            className="flex flex-col h-[calc(100vh-180px)] mt-6"
-          >
+          <form onSubmit={handleSubmit} className="flex flex-col h-[calc(100vh-180px)] mt-6">
             <div className="flex-1 space-y-6 overflow-y-auto px-4">
               {/* Rating Section */}
               <div className="space-y-3">
-                <Label
-                  htmlFor="rating"
-                  className="text-base font-semibold text-shop_dark_green"
-                >
+                <Label htmlFor="rating" className="text-base font-semibold text-shop_dark_green">
                   Your Rating <span className="text-red-500">*</span>
                 </Label>
                 <div className="flex flex-col gap-3">
@@ -179,8 +169,8 @@ const ReviewSidebar = React.memo(
                           size={40}
                           className={`${
                             value <= (hoverRating || rating)
-                              ? "text-shop_light_green fill-shop_light_green"
-                              : "text-gray-300"
+                              ? 'text-shop_light_green fill-shop_light_green'
+                              : 'text-gray-300'
                           } transition-colors`}
                         />
                       </button>
@@ -195,24 +185,19 @@ const ReviewSidebar = React.memo(
                         />
                       </div>
                       <span className="text-sm font-medium text-shop_dark_green min-w-[80px]">
-                        {rating} {rating === 1 ? "star" : "stars"}
+                        {rating} {rating === 1 ? 'star' : 'stars'}
                       </span>
                     </div>
                   )}
                   {rating === 0 && (
-                    <p className="text-sm text-gray-500">
-                      Click to rate this product
-                    </p>
+                    <p className="text-sm text-gray-500">Click to rate this product</p>
                   )}
                 </div>
               </div>
 
               {/* Title Section */}
               <div className="space-y-2">
-                <Label
-                  htmlFor="title"
-                  className="text-base font-semibold text-shop_dark_green"
-                >
+                <Label htmlFor="title" className="text-base font-semibold text-shop_dark_green">
                   Review Title <span className="text-red-500">*</span>
                 </Label>
                 <Input
@@ -224,22 +209,22 @@ const ReviewSidebar = React.memo(
                   required
                   disabled={isSubmitting}
                   className={`border-gray-300 focus:border-shop_light_green ${
-                    titleLength > 0 && !isTitleValid ? "border-red-300" : ""
+                    titleLength > 0 && !isTitleValid ? 'border-red-300' : ''
                   }`}
                 />
                 <div className="flex items-center justify-between">
                   <p
                     className={`text-xs ${
                       titleLength > 0 && !isTitleValid
-                        ? "text-red-500"
+                        ? 'text-red-500'
                         : titleLength >= 5
-                        ? "text-green-600"
-                        : "text-gray-500"
+                          ? 'text-green-600'
+                          : 'text-gray-500'
                     }`}
                   >
                     {titleLength < 5
                       ? `${5 - titleLength} more characters needed`
-                      : "✓ Title looks good"}
+                      : '✓ Title looks good'}
                   </p>
                   <p className="text-xs text-gray-500">{titleLength}/100</p>
                 </div>
@@ -247,10 +232,7 @@ const ReviewSidebar = React.memo(
 
               {/* Content Section */}
               <div className="space-y-2">
-                <Label
-                  htmlFor="content"
-                  className="text-base font-semibold text-shop_dark_green"
-                >
+                <Label htmlFor="content" className="text-base font-semibold text-shop_dark_green">
                   Your Review <span className="text-red-500">*</span>
                 </Label>
                 <Textarea
@@ -263,22 +245,22 @@ const ReviewSidebar = React.memo(
                   required
                   disabled={isSubmitting}
                   className={`border-gray-300 focus:border-shop_light_green resize-none ${
-                    contentLength > 0 && !isContentValid ? "border-red-300" : ""
+                    contentLength > 0 && !isContentValid ? 'border-red-300' : ''
                   }`}
                 />
                 <div className="flex items-center justify-between">
                   <p
                     className={`text-xs ${
                       contentLength > 0 && !isContentValid
-                        ? "text-red-500"
+                        ? 'text-red-500'
                         : contentLength >= 20
-                        ? "text-green-600"
-                        : "text-gray-500"
+                          ? 'text-green-600'
+                          : 'text-gray-500'
                     }`}
                   >
                     {contentLength < 20
                       ? `${20 - contentLength} more characters needed`
-                      : "✓ Review is detailed enough"}
+                      : '✓ Review is detailed enough'}
                   </p>
                   <p className="text-xs text-gray-500">{contentLength}/1000</p>
                 </div>
@@ -286,9 +268,7 @@ const ReviewSidebar = React.memo(
 
               {/* Guidelines */}
               <div className="bg-blue-50 border border-blue-200 rounded-md p-4 space-y-2">
-                <h4 className="text-sm font-semibold text-blue-900">
-                  Review Guidelines
-                </h4>
+                <h4 className="text-sm font-semibold text-blue-900">Review Guidelines</h4>
                 <ul className="text-xs text-blue-700 space-y-1 list-disc list-inside">
                   <li>Be honest and constructive in your feedback</li>
                   <li>Focus on your experience with the product</li>
@@ -312,12 +292,7 @@ const ReviewSidebar = React.memo(
                 </Button>
                 <Button
                   type="submit"
-                  disabled={
-                    isSubmitting ||
-                    rating === 0 ||
-                    !isTitleValid ||
-                    !isContentValid
-                  }
+                  disabled={isSubmitting || rating === 0 || !isTitleValid || !isContentValid}
                   className="w-full sm:flex-1 bg-shop_dark_green hover:bg-shop_light_green text-white disabled:opacity-50"
                 >
                   {isSubmitting ? (
@@ -326,7 +301,7 @@ const ReviewSidebar = React.memo(
                       Submitting...
                     </>
                   ) : (
-                    "Submit Review"
+                    'Submit Review'
                   )}
                 </Button>
               </div>
@@ -335,9 +310,9 @@ const ReviewSidebar = React.memo(
         </SheetContent>
       </Sheet>
     );
-  }
+  },
 );
 
-ReviewSidebar.displayName = "ReviewSidebar";
+ReviewSidebar.displayName = 'ReviewSidebar';
 
 export default ReviewSidebar;

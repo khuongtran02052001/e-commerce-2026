@@ -1,32 +1,24 @@
-"use client";
-import React, { useState } from "react";
-import { format } from "date-fns";
-import { CreditCard, Eye, Download } from "lucide-react";
-import { toast } from "sonner";
-import { Button } from "./ui/button";
-import { Card, CardContent, CardHeader } from "./ui/card";
-import { Badge } from "./ui/badge";
-import { ORDER_STATUSES, PAYMENT_STATUSES } from "@/lib/orderStatus";
-import Link from "next/link";
-import Image from "next/image";
-import { urlFor } from "@/sanity/lib/image";
-import PriceFormatter from "./PriceFormatter";
-import { MY_ORDERS_QUERYResult } from "@/sanity.types";
-import DirectPaymentModal from "./DirectPaymentModal";
+'use client';
+import { ORDER_STATUSES, PAYMENT_STATUSES } from '@/lib/orderStatus';
+import { MY_ORDERS_QUERYResult } from '@/sanity.types';
+import { urlFor } from '@/sanity/lib/image';
+import { format } from 'date-fns';
+import { CreditCard, Download, Eye } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useState } from 'react';
+import { toast } from 'sonner';
+import DirectPaymentModal from './DirectPaymentModal';
+import PriceFormatter from './PriceFormatter';
+import { Badge } from './ui/badge';
+import { Button } from './ui/button';
+import { Card, CardContent, CardHeader } from './ui/card';
 
-const ResponsiveOrdersComponent = ({
-  orders,
-}: {
-  orders: MY_ORDERS_QUERYResult;
-}) => {
+const ResponsiveOrdersComponent = ({ orders }: { orders: MY_ORDERS_QUERYResult }) => {
   const [payingOrderId] = useState<string | null>(null);
-  const [generatingInvoiceId, setGeneratingInvoiceId] = useState<string | null>(
-    null
-  );
+  const [generatingInvoiceId, setGeneratingInvoiceId] = useState<string | null>(null);
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
-  const [selectedOrder, setSelectedOrder] = useState<
-    MY_ORDERS_QUERYResult[0] | null
-  >(null);
+  const [selectedOrder, setSelectedOrder] = useState<MY_ORDERS_QUERYResult[0] | null>(null);
 
   // Helper function to render product images with stacked layout
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -36,7 +28,7 @@ const ResponsiveOrdersComponent = ({
     const maxVisible = isCard ? 2 : 3;
     const displayProducts = products.slice(0, maxVisible);
     const remainingCount = products.length - maxVisible;
-    const imageSize = isCard ? "w-10 h-10" : "w-8 h-8";
+    const imageSize = isCard ? 'w-10 h-10' : 'w-8 h-8';
 
     return (
       <div className="flex items-center">
@@ -47,14 +39,14 @@ const ResponsiveOrdersComponent = ({
               <div
                 key={index}
                 className={`relative ${imageSize} rounded-full overflow-hidden border-2 border-white shadow-sm bg-gray-100 ${
-                  index > 0 ? "-ml-2" : ""
+                  index > 0 ? '-ml-2' : ''
                 }`}
                 style={{ zIndex: 30 - index * 10 }}
               >
                 {imageUrl ? (
                   <Image
                     src={urlFor(imageUrl).url()}
-                    alt={item.product?.name || "Product"}
+                    alt={item.product?.name || 'Product'}
                     fill
                     className="object-cover"
                   />
@@ -70,11 +62,7 @@ const ResponsiveOrdersComponent = ({
             <div
               className={`-ml-2 ${imageSize} rounded-full bg-gray-600 border-2 border-white shadow-sm flex items-center justify-center z-10`}
             >
-              <span
-                className={`${
-                  isCard ? "text-sm" : "text-xs"
-                } font-semibold text-white`}
-              >
+              <span className={`${isCard ? 'text-sm' : 'text-xs'} font-semibold text-white`}>
                 +{remainingCount}
               </span>
             </div>
@@ -106,23 +94,23 @@ const ResponsiveOrdersComponent = ({
     setGeneratingInvoiceId(orderId);
     try {
       const response = await fetch(`/api/orders/${orderId}/generate-invoice`, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
       });
 
       const data = await response.json();
 
       if (response.ok && data.success) {
-        toast.success(data.message || "Invoice generated successfully!");
+        toast.success(data.message || 'Invoice generated successfully!');
         window.location.reload();
       } else {
-        toast.error(data.error || "Failed to generate invoice");
+        toast.error(data.error || 'Failed to generate invoice');
       }
     } catch (error) {
-      console.error("Invoice generation error:", error);
-      toast.error("Failed to generate invoice");
+      console.error('Invoice generation error:', error);
+      toast.error('Failed to generate invoice');
     } finally {
       setGeneratingInvoiceId(null);
     }
@@ -136,15 +124,15 @@ const ResponsiveOrdersComponent = ({
 
   const getStatusBadgeVariant = (order: MY_ORDERS_QUERYResult[number]) => {
     if (
-      order.paymentStatus === "paid" ||
-      order.status === "completed" ||
-      order.status === "delivered"
+      order.paymentStatus === 'paid' ||
+      order.status === 'completed' ||
+      order.status === 'delivered'
     ) {
-      return "bg-green-100 text-green-800";
-    } else if (order.status === "cancelled") {
-      return "bg-red-100 text-red-800";
+      return 'bg-green-100 text-green-800';
+    } else if (order.status === 'cancelled') {
+      return 'bg-red-100 text-red-800';
     } else {
-      return "bg-yellow-100 text-yellow-800";
+      return 'bg-yellow-100 text-yellow-800';
     }
   };
 
@@ -153,21 +141,21 @@ const ResponsiveOrdersComponent = ({
       return (
         <div className="flex items-center gap-2">
           <span className="text-sm text-gray-600 truncate">
-            {order?.invoice?.number || "INV-" + order.orderNumber?.slice(-6)}
+            {order?.invoice?.number || 'INV-' + order.orderNumber?.slice(-6)}
           </span>
           <Button
             size="sm"
             variant="ghost"
             className="h-6 w-6 p-0"
             onClick={() => {
-              window.open(order.invoice?.hosted_invoice_url, "_blank");
+              window.open(order.invoice?.hosted_invoice_url, '_blank');
             }}
           >
             <Download className="w-3 h-3" />
           </Button>
         </div>
       );
-    } else if (order?.paymentStatus === "paid") {
+    } else if (order?.paymentStatus === 'paid') {
       return (
         <Button
           size="sm"
@@ -182,7 +170,7 @@ const ResponsiveOrdersComponent = ({
               Gen...
             </>
           ) : (
-            "Generate"
+            'Generate'
           )}
         </Button>
       );
@@ -198,24 +186,23 @@ const ResponsiveOrdersComponent = ({
         <div className="flex items-center justify-between">
           <div className="space-y-1 flex-1 min-w-0">
             <div className="font-medium text-sm truncate">
-              Order #{order.orderNumber?.slice(-10) ?? "N/A"}...
+              Order #{order.orderNumber?.slice(-10) ?? 'N/A'}...
             </div>
             <div className="text-xs text-gray-500">
-              {order?.orderDate &&
-                format(new Date(order.orderDate), "dd/MM/yyyy")}
+              {order?.orderDate && format(new Date(order.orderDate), 'dd/MM/yyyy')}
             </div>
           </div>
           <Badge
             className={`${getStatusBadgeVariant(
-              order
+              order,
             )} text-xs font-medium px-2 py-1 rounded-full shrink-0 ml-2`}
           >
             {order?.status
               ? order.status.charAt(0).toUpperCase() + order.status.slice(1)
-              : "Pending"}
+              : 'Pending'}
           </Badge>
         </div>
-      </CardHeader>{" "}
+      </CardHeader>{' '}
       <CardContent className="space-y-4">
         {/* Customer Info */}
         <div className="flex items-center gap-2 text-sm">
@@ -244,15 +231,8 @@ const ResponsiveOrdersComponent = ({
 
           {/* Actions */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-            <Button
-              asChild
-              variant="outline"
-              className="flex-1 sm:flex-none min-w-20 h-10"
-            >
-              <Link
-                href={`/user/orders/${order._id}`}
-                className="flex items-center justify-center"
-              >
+            <Button asChild variant="outline" className="flex-1 sm:flex-none min-w-20 h-10">
+              <Link href={`/user/orders/${order._id}`} className="flex items-center justify-center">
                 <Eye className="w-4 h-4 mr-2" />
                 <span className="text-sm">View</span>
               </Link>
@@ -308,77 +288,47 @@ const ResponsiveOrdersComponent = ({
           <table className="w-full">
             <thead>
               <tr className="border-b">
-                <th className="text-left py-3 px-2 font-medium text-sm text-gray-700">
-                  Order #
-                </th>
-                <th className="text-left py-3 px-2 font-medium text-sm text-gray-700">
-                  Date
-                </th>
-                <th className="text-left py-3 px-2 font-medium text-sm text-gray-700">
-                  Customer
-                </th>
-                <th className="text-left py-3 px-2 font-medium text-sm text-gray-700">
-                  Email
-                </th>
-                <th className="text-left py-3 px-2 font-medium text-sm text-gray-700">
-                  Products
-                </th>
-                <th className="text-left py-3 px-2 font-medium text-sm text-gray-700">
-                  Total
-                </th>
-                <th className="text-left py-3 px-2 font-medium text-sm text-gray-700">
-                  Status
-                </th>
-                <th className="text-left py-3 px-2 font-medium text-sm text-gray-700">
-                  Invoice
-                </th>
-                <th className="text-left py-3 px-2 font-medium text-sm text-gray-700">
-                  Actions
-                </th>
+                <th className="text-left py-3 px-2 font-medium text-sm text-gray-700">Order #</th>
+                <th className="text-left py-3 px-2 font-medium text-sm text-gray-700">Date</th>
+                <th className="text-left py-3 px-2 font-medium text-sm text-gray-700">Customer</th>
+                <th className="text-left py-3 px-2 font-medium text-sm text-gray-700">Email</th>
+                <th className="text-left py-3 px-2 font-medium text-sm text-gray-700">Products</th>
+                <th className="text-left py-3 px-2 font-medium text-sm text-gray-700">Total</th>
+                <th className="text-left py-3 px-2 font-medium text-sm text-gray-700">Status</th>
+                <th className="text-left py-3 px-2 font-medium text-sm text-gray-700">Invoice</th>
+                <th className="text-left py-3 px-2 font-medium text-sm text-gray-700">Actions</th>
               </tr>
             </thead>
             <tbody>
               {orders.map((order) => (
-                <tr
-                  key={order._id}
-                  className="border-b hover:bg-gray-50 transition-colors"
-                >
+                <tr key={order._id} className="border-b hover:bg-gray-50 transition-colors">
                   <td className="py-4 px-2">
                     <div className="font-medium text-sm">
-                      {order.orderNumber?.slice(-10) ?? "N/A"}...
+                      {order.orderNumber?.slice(-10) ?? 'N/A'}...
                     </div>
                   </td>
                   <td className="py-4 px-2 text-sm">
-                    {order?.orderDate &&
-                      format(new Date(order.orderDate), "dd/MM/yyyy")}
+                    {order?.orderDate && format(new Date(order.orderDate), 'dd/MM/yyyy')}
                   </td>
                   <td className="py-4 px-2">
-                    <div className="font-medium text-sm">
-                      {order.customerName}
-                    </div>
+                    <div className="font-medium text-sm">{order.customerName}</div>
                   </td>
                   <td className="py-4 px-2 text-sm text-gray-600">
                     <div className="truncate max-w-40">{order.email}</div>
                   </td>
+                  <td className="py-4 px-2">{renderProductImages(order.products || [])}</td>
                   <td className="py-4 px-2">
-                    {renderProductImages(order.products || [])}
-                  </td>
-                  <td className="py-4 px-2">
-                    <PriceFormatter
-                      amount={order?.totalPrice}
-                      className="font-medium text-sm"
-                    />
+                    <PriceFormatter amount={order?.totalPrice} className="font-medium text-sm" />
                   </td>
                   <td className="py-4 px-2">
                     <Badge
                       className={`${getStatusBadgeVariant(
-                        order
+                        order,
                       )} text-xs font-medium px-2 py-1 rounded-full`}
                     >
                       {order?.status
-                        ? order.status.charAt(0).toUpperCase() +
-                          order.status.slice(1)
-                        : "Pending"}
+                        ? order.status.charAt(0).toUpperCase() + order.status.slice(1)
+                        : 'Pending'}
                     </Badge>
                   </td>
                   <td className="py-4 px-2">{renderInvoiceSection(order)}</td>
@@ -408,9 +358,7 @@ const ResponsiveOrdersComponent = ({
                           {payingOrderId === order._id ? (
                             <>
                               <div className="animate-spin rounded-full h-3 w-3 xl:mr-1"></div>
-                              <span className="hidden xl:inline ml-1 text-xs">
-                                Paying...
-                              </span>
+                              <span className="hidden xl:inline ml-1 text-xs">Paying...</span>
                             </>
                           ) : (
                             <>

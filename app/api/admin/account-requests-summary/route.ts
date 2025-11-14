@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
-import { client } from "@/sanity/lib/client";
+import { client } from '@/sanity/lib/client';
+import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
@@ -32,10 +32,10 @@ export async function GET() {
       recentRequests,
     });
   } catch (error) {
-    console.error("Error fetching account requests summary:", error);
+    console.error('Error fetching account requests summary:', error);
     return NextResponse.json(
-      { success: false, message: "Failed to fetch account requests summary" },
-      { status: 500 }
+      { success: false, message: 'Failed to fetch account requests summary' },
+      { status: 500 },
     );
   }
 }

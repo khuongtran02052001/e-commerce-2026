@@ -1,11 +1,10 @@
-import { Button } from "./ui/button";
-import { HiMinus, HiPlus } from "react-icons/hi2";
-import { toast } from "sonner";
-import useCartStore from "@/store";
-import { Product } from "@/sanity.types";
-import { twMerge } from "tailwind-merge";
+import useCartStore from '@/store';
+import { HiMinus, HiPlus } from 'react-icons/hi2';
+import { toast } from 'sonner';
+import { twMerge } from 'tailwind-merge';
+import { Button } from './ui/button';
 // import { trackAddToCart, trackRemoveFromCart } from "@/lib/analytics";
-import { IProductMock } from "@/mock-data";
+import { IProductMock } from '@/mock-data';
 
 interface Props {
   product: IProductMock;
@@ -21,7 +20,7 @@ const QuantityButtons = ({ product, className, borderStyle }: Props) => {
   const handleRemoveProduct = () => {
     removeItem(product.id);
     if (itemCount > 1) {
-      toast.success("Quantity Decreased successfully!");
+      toast.success('Quantity Decreased successfully!');
     } else {
       toast.success(`${product?.name?.substring(0, 12)} removed successfully!`);
     }
@@ -37,7 +36,7 @@ const QuantityButtons = ({ product, className, borderStyle }: Props) => {
   const handleAddToCart = () => {
     if ((product?.stock as number) > itemCount) {
       addItem(product);
-      toast.success("Quantity Increased successfully!");
+      toast.success('Quantity Increased successfully!');
       // Firebase Analytics event
       // trackAddToCart({
       //   productId: product.id,
@@ -46,17 +45,11 @@ const QuantityButtons = ({ product, className, borderStyle }: Props) => {
       //   quantity: itemCount + 1,
       // });
     } else {
-      toast.error("Can not add more than available stock");
+      toast.error('Can not add more than available stock');
     }
   };
   return (
-    <div
-      className={twMerge(
-        "flex items-center gap-1 pb-1 text-base",
-        borderStyle,
-        className
-      )}
-    >
+    <div className={twMerge('flex items-center gap-1 pb-1 text-base', borderStyle, className)}>
       <Button
         variant="outline"
         size="icon"
@@ -66,9 +59,7 @@ const QuantityButtons = ({ product, className, borderStyle }: Props) => {
       >
         <HiMinus />
       </Button>
-      <span className="font-semibold text-sm w-6 text-center text-dark-color">
-        {itemCount}
-      </span>
+      <span className="font-semibold text-sm w-6 text-center text-dark-color">{itemCount}</span>
       <Button
         variant="outline"
         size="icon"

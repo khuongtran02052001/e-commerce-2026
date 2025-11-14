@@ -1,21 +1,21 @@
-"use client";
+'use client';
 
-import { useState, useTransition, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import ResponsiveOrdersComponent from "@/components/ResponsiveOrdersComponent";
-import { Card } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import ResponsiveOrdersComponent from '@/components/ResponsiveOrdersComponent';
+import { Card } from '@/components/ui/card';
 import {
   Pagination,
   PaginationContent,
+  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-  PaginationEllipsis,
-} from "@/components/ui/pagination";
-import { Skeleton } from "@/components/ui/skeleton";
-import { MY_ORDERS_QUERYResult } from "@/sanity.types";
+} from '@/components/ui/pagination';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Skeleton } from '@/components/ui/skeleton';
+import { MY_ORDERS_QUERYResult } from '@/sanity.types';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState, useTransition } from 'react';
 
 interface OrdersClientProps {
   initialOrders: MY_ORDERS_QUERYResult;
@@ -53,22 +53,22 @@ export default function OrdersClient({
           items.push(i);
         }
         if (totalPages > 5) {
-          items.push("ellipsis");
+          items.push('ellipsis');
           items.push(totalPages);
         }
       } else if (currentPage >= totalPages - 3) {
         items.push(1);
-        items.push("ellipsis");
+        items.push('ellipsis');
         for (let i = totalPages - 4; i <= totalPages; i++) {
           items.push(i);
         }
       } else {
         items.push(1);
-        items.push("ellipsis");
+        items.push('ellipsis');
         for (let i = currentPage - 1; i <= currentPage + 1; i++) {
           items.push(i);
         }
-        items.push("ellipsis");
+        items.push('ellipsis');
         items.push(totalPages);
       }
     } else {
@@ -149,9 +149,7 @@ export default function OrdersClient({
         ) : (
           <div className="text-center py-10">
             <p className="text-gray-500 text-lg">No orders found.</p>
-            <p className="text-gray-400 text-sm mt-2">
-              Start shopping to see your orders here.
-            </p>
+            <p className="text-gray-400 text-sm mt-2">Start shopping to see your orders here.</p>
           </div>
         )}
       </div>
@@ -167,20 +165,17 @@ export default function OrdersClient({
                   size="default"
                   onClick={(e) => {
                     e.preventDefault();
-                    if (hasPrevPage && !isPending)
-                      handlePageChange(currentPage - 1);
+                    if (hasPrevPage && !isPending) handlePageChange(currentPage - 1);
                   }}
                   className={
-                    !hasPrevPage || isPending
-                      ? "pointer-events-none opacity-50"
-                      : "hover:bg-accent"
+                    !hasPrevPage || isPending ? 'pointer-events-none opacity-50' : 'hover:bg-accent'
                   }
                 />
               </PaginationItem>
 
               {generatePaginationItems().map((item, index) => (
                 <PaginationItem key={index}>
-                  {item === "ellipsis" ? (
+                  {item === 'ellipsis' ? (
                     <PaginationEllipsis />
                   ) : (
                     <PaginationLink
@@ -189,15 +184,13 @@ export default function OrdersClient({
                       size="icon"
                       onClick={(e) => {
                         e.preventDefault();
-                        if (typeof item === "number" && !isPending)
-                          handlePageChange(item);
+                        if (typeof item === 'number' && !isPending) handlePageChange(item);
                       }}
                       className={
                         currentPage === item
-                          ? "bg-primary text-primary-foreground hover:bg-primary/80" +
-                            (isPending ? " opacity-50" : "")
-                          : "hover:bg-accent" +
-                            (isPending ? " opacity-50 pointer-events-none" : "")
+                          ? 'bg-primary text-primary-foreground hover:bg-primary/80' +
+                            (isPending ? ' opacity-50' : '')
+                          : 'hover:bg-accent' + (isPending ? ' opacity-50 pointer-events-none' : '')
                       }
                     >
                       {item}
@@ -212,13 +205,10 @@ export default function OrdersClient({
                   size="default"
                   onClick={(e) => {
                     e.preventDefault();
-                    if (hasNextPage && !isPending)
-                      handlePageChange(currentPage + 1);
+                    if (hasNextPage && !isPending) handlePageChange(currentPage + 1);
                   }}
                   className={
-                    !hasNextPage || isPending
-                      ? "pointer-events-none opacity-50"
-                      : "hover:bg-accent"
+                    !hasNextPage || isPending ? 'pointer-events-none opacity-50' : 'hover:bg-accent'
                   }
                 />
               </PaginationItem>

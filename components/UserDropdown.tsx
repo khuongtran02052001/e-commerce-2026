@@ -1,39 +1,30 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import Link from "next/link";
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { useUserData } from '@/contexts/UserDataContext';
+import { useIsAdmin } from '@/lib/adminUtils';
+import { useClerk, useUser } from '@clerk/nextjs';
 import {
-  User,
-  Settings,
-  Package,
+  Briefcase,
+  Crown,
   Heart,
   LogOut,
-  UserCircle,
   Logs,
+  Package,
+  Settings,
   Shield,
-  Briefcase,
+  User,
+  UserCircle,
   Wallet,
-  Crown,
-} from "lucide-react";
-import { useUser, useClerk } from "@clerk/nextjs";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { useIsAdmin } from "@/lib/adminUtils";
-import { useUserData } from "@/contexts/UserDataContext";
+} from 'lucide-react';
+import Link from 'next/link';
+import { useState } from 'react';
 
 const UserDropdown = () => {
   const { user } = useUser();
   const { signOut } = useClerk();
   const [open, setOpen] = useState(false);
-  const {
-    ordersCount,
-    isEmployee,
-    walletBalance,
-    isLoading: isLoadingOrders,
-  } = useUserData();
+  const { ordersCount, isEmployee, walletBalance, isLoading: isLoadingOrders } = useUserData();
 
   // Check if user is admin
   const isAdmin = useIsAdmin(user?.primaryEmailAddress?.emailAddress);
@@ -57,7 +48,7 @@ const UserDropdown = () => {
             {user.imageUrl ? (
               <img
                 src={user.imageUrl}
-                alt={user.fullName || "User"}
+                alt={user.fullName || 'User'}
                 className="w-8 h-8 rounded-full object-cover border-2 border-shop_light_green/20 group-hover:border-shop_light_green/40 transition-colors"
               />
             ) : (
@@ -67,7 +58,7 @@ const UserDropdown = () => {
           </div>
           <div className="hidden lg:flex flex-col items-start">
             <span className="text-sm font-medium text-gray-800 group-hover:text-shop_light_green transition-colors">
-              {user.firstName || "User"}
+              {user.firstName || 'User'}
             </span>
           </div>
         </button>
@@ -79,7 +70,7 @@ const UserDropdown = () => {
             {user.imageUrl ? (
               <img
                 src={user.imageUrl}
-                alt={user.fullName || "User"}
+                alt={user.fullName || 'User'}
                 className="w-12 h-12 rounded-full object-cover"
               />
             ) : (
@@ -87,11 +78,9 @@ const UserDropdown = () => {
             )}
             <div>
               <h3 className="font-semibold text-gray-800">
-                {user.fullName || user.firstName || "User"}
+                {user.fullName || user.firstName || 'User'}
               </h3>
-              <p className="text-sm text-gray-500">
-                {user.primaryEmailAddress?.emailAddress}
-              </p>
+              <p className="text-sm text-gray-500">{user.primaryEmailAddress?.emailAddress}</p>
             </div>
           </div>
         </div>
@@ -102,9 +91,7 @@ const UserDropdown = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Wallet className="w-4 h-4 text-shop_dark_green" />
-                  <span className="text-sm font-medium text-gray-700">
-                    Wallet Balance
-                  </span>
+                  <span className="text-sm font-medium text-gray-700">Wallet Balance</span>
                 </div>
                 <span className="text-lg font-bold text-shop_dark_green">
                   ${walletBalance.toFixed(2)}

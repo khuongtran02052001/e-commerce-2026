@@ -265,13 +265,11 @@ Each action automatically updates:
 To use the system:
 
 1. **Assign Employees:**
-
    - Go to `/admin/employees`
    - Select a user and assign a role
    - User will see role-specific interface
 
 2. **Process Orders:**
-
    - Employees visit `/admin/orders`
    - See only relevant orders
    - Take actions based on their role

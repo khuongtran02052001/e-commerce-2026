@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState, useCallback } from "react";
-import { useUser } from "@clerk/nextjs";
-import { ServerCartContent } from "./ServerCartContent";
-import { CartSkeleton } from "./CartSkeleton";
-import { trackCartView } from "@/lib/analytics";
+import { trackCartView } from '@/lib/analytics';
+import { useUser } from '@clerk/nextjs';
+import { useCallback, useEffect, useState } from 'react';
+import { CartSkeleton } from './CartSkeleton';
+import { ServerCartContent } from './ServerCartContent';
 
 interface Address {
   _id: string;
@@ -45,7 +45,7 @@ export function ClientCartContent() {
 
     const userEmail = user.emailAddresses[0]?.emailAddress;
     if (!userEmail) {
-      setError("Email not found. Please contact support.");
+      setError('Email not found. Please contact support.');
       setLoading(false);
       return;
     }
@@ -54,18 +54,16 @@ export function ClientCartContent() {
       setLoading(true);
 
       // Fetch user data from API endpoint
-      const response = await fetch(
-        `/api/user-data?email=${encodeURIComponent(userEmail)}`
-      );
+      const response = await fetch(`/api/user-data?email=${encodeURIComponent(userEmail)}`);
 
       if (!response.ok) {
-        throw new Error("Failed to fetch user data");
+        throw new Error('Failed to fetch user data');
       }
 
       const data = await response.json();
       setUserData(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load user data");
+      setError(err instanceof Error ? err.message : 'Failed to load user data');
     } finally {
       setLoading(false);
     }
@@ -79,20 +77,16 @@ export function ClientCartContent() {
 
     try {
       // Only fetch addresses to refresh them
-      const response = await fetch(
-        `/api/user-data?email=${encodeURIComponent(userEmail)}`
-      );
+      const response = await fetch(`/api/user-data?email=${encodeURIComponent(userEmail)}`);
 
       if (!response.ok) {
-        throw new Error("Failed to refresh addresses");
+        throw new Error('Failed to refresh addresses');
       }
 
       const data = await response.json();
-      setUserData((prev) =>
-        prev ? { ...prev, addresses: data.addresses } : data
-      );
+      setUserData((prev) => (prev ? { ...prev, addresses: data.addresses } : data));
     } catch (err) {
-      console.error("Failed to refresh addresses:", err);
+      console.error('Failed to refresh addresses:', err);
       // Don't show error toast for refresh failures
     }
   };
@@ -120,14 +114,12 @@ export function ClientCartContent() {
   if (!user) {
     return (
       <div className="text-center py-10">
-        <p className="text-muted-foreground">
-          Please sign in to view your cart.
-        </p>
+        <p className="text-muted-foreground">Please sign in to view your cart.</p>
       </div>
     );
   }
 
-  const userEmail = user.emailAddresses[0]?.emailAddress || "";
+  const userEmail = user.emailAddresses[0]?.emailAddress || '';
 
   return (
     <ServerCartContent

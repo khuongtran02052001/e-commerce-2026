@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth, currentUser } from "@clerk/nextjs/server";
-import { backendClient } from "@/sanity/lib/backendClient";
+import { backendClient } from '@/sanity/lib/backendClient';
+import { auth, currentUser } from '@clerk/nextjs/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
@@ -8,18 +8,12 @@ export async function POST(request: NextRequest) {
     const user = await currentUser();
 
     if (!userId || !user) {
-      return NextResponse.json(
-        { error: "User not authenticated" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'User not authenticated' }, { status: 401 });
     }
 
     const userEmail = user.emailAddresses[0]?.emailAddress;
     if (!userEmail) {
-      return NextResponse.json(
-        { error: "User email not found" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'User email not found' }, { status: 400 });
     }
 
     const body = await request.json();
@@ -27,30 +21,24 @@ export async function POST(request: NextRequest) {
 
     // Validate required fields
     if (!name || !address || !city || !state || !zip) {
-      return NextResponse.json(
-        { error: "All fields are required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'All fields are required' }, { status: 400 });
     }
 
     // If this is set as default, unset all other default addresses for this email
     if (isDefault) {
       const existingAddresses = await backendClient.fetch(
         `*[_type == "address" && email == $email]`,
-        { email: userEmail }
+        { email: userEmail },
       );
 
       for (const existingAddress of existingAddresses) {
-        await backendClient
-          .patch(existingAddress._id)
-          .set({ default: false })
-          .commit();
+        await backendClient.patch(existingAddress._id).set({ default: false }).commit();
       }
     }
 
     // Create new address
     const newAddress = await backendClient.create({
-      _type: "address",
+      _type: 'address',
       name,
       email: userEmail,
       address,
@@ -64,13 +52,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       addressId: newAddress._id,
-      message: "Address created successfully",
+      message: 'Address created successfully',
     });
   } catch (error) {
-    console.error("Error creating address:", error);
-    return NextResponse.json(
-      { error: "Failed to create address" },
-      { status: 500 }
-    );
+    console.error('Error creating address:', error);
+    return NextResponse.json({ error: 'Failed to create address' }, { status: 500 });
   }
 }

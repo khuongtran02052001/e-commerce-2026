@@ -1,8 +1,8 @@
-import { auth, currentUser } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
-import { sanityFetch } from "@/sanity/lib/live";
-import { USER_BY_CLERK_ID_QUERY } from "@/sanity/queries/userQueries";
-import ProfileClient from "@/components/profile/ProfileClient";
+import ProfileClient from '@/components/profile/ProfileClient';
+import { sanityFetch } from '@/sanity/lib/live';
+import { USER_BY_CLERK_ID_QUERY } from '@/sanity/queries/userQueries';
+import { auth, currentUser } from '@clerk/nextjs/server';
+import { redirect } from 'next/navigation';
 
 interface SanityUser {
   _id: string;
@@ -27,7 +27,7 @@ interface SanityUser {
     zip: string;
     country: string;
     default: boolean;
-    type: "home" | "office" | "other";
+    type: 'home' | 'office' | 'other';
     createdAt: string;
     phone?: string;
   }>;
@@ -45,13 +45,13 @@ export default async function ProfilePage() {
   const { userId } = await auth();
 
   if (!userId) {
-    redirect("/sign-in");
+    redirect('/sign-in');
   }
 
   const clerkUser = await currentUser();
 
   if (!clerkUser) {
-    redirect("/sign-in");
+    redirect('/sign-in');
   }
 
   // Fetch user data from Sanity
@@ -63,7 +63,7 @@ export default async function ProfilePage() {
     });
     sanityUser = data;
   } catch (error) {
-    console.error("Error fetching user from Sanity:", error);
+    console.error('Error fetching user from Sanity:', error);
   }
 
   // Combine Clerk and Sanity data - serialize Clerk objects to plain data

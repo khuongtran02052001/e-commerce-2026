@@ -126,10 +126,10 @@
 //   try {
 //     // Get user's current balance
 //     const user = await backendClient.fetch(
-//       `*[_type == "user" && clerkUserId == $userId][0]{ 
-//         _id, 
-//         walletBalance, 
-//         walletTransactions 
+//       `*[_type == "user" && clerkUserId == $userId][0]{
+//         _id,
+//         walletBalance,
+//         walletTransactions
 //       }`,
 //       { userId }
 //     );
@@ -192,10 +192,10 @@
 //     }
 
 //     const user = await backendClient.fetch(
-//       `*[_type == "user" && clerkUserId == $userId][0]{ 
-//         _id, 
-//         walletBalance, 
-//         walletTransactions 
+//       `*[_type == "user" && clerkUserId == $userId][0]{
+//         _id,
+//         walletBalance,
+//         walletTransactions
 //       }`,
 //       { userId }
 //     );
@@ -283,10 +283,10 @@
 //     }
 
 //     const user = await backendClient.fetch(
-//       `*[_type == "user" && clerkUserId == $userId][0]{ 
-//         _id, 
-//         walletBalance, 
-//         withdrawalRequests 
+//       `*[_type == "user" && clerkUserId == $userId][0]{
+//         _id,
+//         walletBalance,
+//         withdrawalRequests
 //       }`,
 //       { userId }
 //     );
@@ -390,9 +390,9 @@
 //     }
 
 //     const user = await backendClient.fetch(
-//       `*[_type == "user" && clerkUserId == $userId][0]{ 
-//         _id, 
-//         withdrawalRequests 
+//       `*[_type == "user" && clerkUserId == $userId][0]{
+//         _id,
+//         withdrawalRequests
 //       }`,
 //       { userId }
 //     );

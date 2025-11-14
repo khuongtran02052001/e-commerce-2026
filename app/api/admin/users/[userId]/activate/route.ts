@@ -1,25 +1,19 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth, clerkClient } from "@clerk/nextjs/server";
-import { isUserAdmin } from "@/lib/adminUtils";
-import { writeClient } from "@/sanity/lib/client";
+import { isUserAdmin } from '@/lib/adminUtils';
+import { writeClient } from '@/sanity/lib/client';
+import { auth, clerkClient } from '@clerk/nextjs/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 // Disable caching to ensure changes are reflected immediately
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-export async function POST(
-  req: NextRequest,
-  { params }: { params: Promise<{ userId: string }> }
-) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ userId: string }> }) {
   try {
     // Get authenticated user
     const { userId: currentUserId } = await auth();
 
     if (!currentUserId) {
-      return NextResponse.json(
-        { error: "Unauthorized - Not logged in" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized - Not logged in' }, { status: 401 });
     }
 
     // Get current user details to check admin status
@@ -29,46 +23,37 @@ export async function POST(
 
     // Check if current user is admin
     if (!adminEmail || !isUserAdmin(adminEmail)) {
-      return NextResponse.json(
-        { error: "Forbidden - Admin access required" },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
     }
 
     const { userId: targetUserId } = await params;
     const { action } = await req.json(); // "activate" or "deactivate"
 
-    if (!["activate", "deactivate"].includes(action)) {
+    if (!['activate', 'deactivate'].includes(action)) {
       return NextResponse.json(
         { error: "Invalid action. Use 'activate' or 'deactivate'" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     // Get target user from Clerk
     const targetUser = await clerk.users.getUser(targetUserId);
     if (!targetUser) {
-      return NextResponse.json(
-        { error: "User not found in Clerk" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'User not found in Clerk' }, { status: 404 });
     }
 
     const userEmail = targetUser.primaryEmailAddress?.emailAddress;
     if (!userEmail) {
-      return NextResponse.json(
-        { error: "User email not found" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'User email not found' }, { status: 400 });
     }
 
     // Check if user exists in Sanity
     const existingUser = await writeClient.fetch(
       `*[_type == "user" && clerkUserId == $clerkUserId][0]`,
-      { clerkUserId: targetUserId }
+      { clerkUserId: targetUserId },
     );
 
-    if (action === "activate") {
+    if (action === 'activate') {
       if (existingUser) {
         // Update existing user to active
         await writeClient
@@ -83,12 +68,12 @@ export async function POST(
       } else {
         // Create new user in Sanity with active status
         await writeClient.create({
-          _type: "user",
+          _type: 'user',
           clerkUserId: targetUserId,
           email: userEmail,
-          firstName: targetUser.firstName || "",
-          lastName: targetUser.lastName || "",
-          profileImageUrl: targetUser.imageUrl || "",
+          firstName: targetUser.firstName || '',
+          lastName: targetUser.lastName || '',
+          profileImageUrl: targetUser.imageUrl || '',
           isActive: true,
           activatedAt: new Date().toISOString(),
           activatedBy: adminEmail,
@@ -98,8 +83,8 @@ export async function POST(
             emailNotifications: true,
             smsNotifications: false,
             newsletter: false,
-            preferredCurrency: "USD",
-            preferredLanguage: "en",
+            preferredCurrency: 'USD',
+            preferredLanguage: 'en',
           },
           loyaltyPoints: 0,
           totalSpent: 0,
@@ -144,17 +129,11 @@ export async function POST(
           },
         });
       } else {
-        return NextResponse.json(
-          { error: "User not found in Sanity" },
-          { status: 404 }
-        );
+        return NextResponse.json({ error: 'User not found in Sanity' }, { status: 404 });
       }
     }
   } catch (error) {
-    console.error("Error activating/deactivating user:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    console.error('Error activating/deactivating user:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

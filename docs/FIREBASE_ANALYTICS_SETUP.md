@@ -66,7 +66,7 @@ NEXT_PUBLIC_BASE_URL=https://yourdomain.com
 Client-side events are tracked using the Firebase Analytics SDK:
 
 ```typescript
-import { trackAddToCart } from "@/lib/analytics";
+import { trackAddToCart } from '@/lib/analytics';
 
 trackAddToCart({
   productId: product._id,
@@ -81,15 +81,15 @@ trackAddToCart({
 Server-side events are tracked via API calls to `/api/analytics/track`:
 
 ```typescript
-await fetch("/api/analytics/track", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
+await fetch('/api/analytics/track', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
-    eventName: "order_placed",
+    eventName: 'order_placed',
     eventParams: {
       orderId: order._id,
       amount: totalAmount,
-      status: "pending",
+      status: 'pending',
       userId: userId,
     },
   }),
@@ -186,11 +186,8 @@ To add new custom events:
 Example:
 
 ```typescript
-export function trackCustomEvent(params: {
-  eventParam: string;
-  userId?: string;
-}) {
-  trackEvent("custom_event", params);
+export function trackCustomEvent(params: { eventParam: string; userId?: string }) {
+  trackEvent('custom_event', params);
 }
 ```
 

@@ -1,6 +1,6 @@
-import Container from "@/components/Container";
-import { Card, CardContent } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import Container from '@/components/Container';
+import { Card, CardContent } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const DealPageSkeleton = () => {
   return (
@@ -39,7 +39,7 @@ const DealPageSkeleton = () => {
                     <div
                       key={item}
                       className={`bg-white/10 backdrop-blur-sm rounded-lg p-3 sm:p-4 ${
-                        index === 2 ? "col-span-2 sm:col-span-1" : ""
+                        index === 2 ? 'col-span-2 sm:col-span-1' : ''
                       }`}
                     >
                       <div className="flex items-center gap-2 mb-1">

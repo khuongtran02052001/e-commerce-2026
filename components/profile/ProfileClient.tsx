@@ -1,25 +1,25 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import {
-  User,
-  Mail,
-  Phone,
-  MapPin,
   Calendar,
-  Shield,
-  Edit,
-  Plus,
-  Home,
   CheckCircle,
-} from "lucide-react";
-import ProfileEditSidebar from "./ProfileEditSidebar";
-import AddressEditSidebar from "./AddressEditSidebar";
+  Edit,
+  Home,
+  Mail,
+  MapPin,
+  Phone,
+  Plus,
+  Shield,
+  User,
+} from 'lucide-react';
+import { useState } from 'react';
+import AddressEditSidebar from './AddressEditSidebar';
+import ProfileEditSidebar from './ProfileEditSidebar';
 
 interface EmailAddress {
   emailAddress: string;
@@ -45,7 +45,7 @@ interface Address {
   zip: string;
   country: string;
   default: boolean;
-  type: "home" | "office" | "other";
+  type: 'home' | 'office' | 'other';
   createdAt?: string;
   phone?: string;
 }
@@ -93,11 +93,10 @@ export default function ProfileClient({ userData }: ProfileClientProps) {
     clerk.firstName && clerk.lastName
       ? `${clerk.firstName} ${clerk.lastName}`
       : sanity?.firstName && sanity?.lastName
-      ? `${sanity.firstName} ${sanity.lastName}`
-      : clerk.firstName || sanity?.firstName || "User";
+        ? `${sanity.firstName} ${sanity.lastName}`
+        : clerk.firstName || sanity?.firstName || 'User';
 
-  const displayEmail =
-    clerk.emailAddresses?.[0]?.emailAddress || sanity?.email || "";
+  const displayEmail = clerk.emailAddresses?.[0]?.emailAddress || sanity?.email || '';
 
   const handleEditProfile = () => {
     setProfileSidebarOpen(true);
@@ -131,9 +130,7 @@ export default function ProfileClient({ userData }: ProfileClientProps) {
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900">
-                    {displayName}
-                  </h1>
+                  <h1 className="text-2xl font-bold text-gray-900">{displayName}</h1>
                   <p className="text-gray-600 flex items-center mt-1">
                     <Mail className="h-4 w-4 mr-2" />
                     {displayEmail}
@@ -146,10 +143,7 @@ export default function ProfileClient({ userData }: ProfileClientProps) {
                   )}
                 </div>
               </div>
-              <Button
-                onClick={handleEditProfile}
-                className="flex items-center space-x-2"
-              >
+              <Button onClick={handleEditProfile} className="flex items-center space-x-2">
                 <Edit className="h-4 w-4" />
                 <span>Edit Profile</span>
               </Button>
@@ -163,9 +157,7 @@ export default function ProfileClient({ userData }: ProfileClientProps) {
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Member Since</p>
-                  <p className="font-medium">
-                    {new Date(clerk.createdAt).toLocaleDateString()}
-                  </p>
+                  <p className="font-medium">{new Date(clerk.createdAt).toLocaleDateString()}</p>
                 </div>
               </div>
 
@@ -187,10 +179,7 @@ export default function ProfileClient({ userData }: ProfileClientProps) {
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Account Status</p>
-                  <Badge
-                    variant="outline"
-                    className="text-green-600 border-green-200"
-                  >
+                  <Badge variant="outline" className="text-green-600 border-green-200">
                     Active
                   </Badge>
                 </div>
@@ -213,68 +202,46 @@ export default function ProfileClient({ userData }: ProfileClientProps) {
           <CardContent className="space-y-4">
             <div className="space-y-3">
               <div>
-                <label className="text-sm font-medium text-gray-500">
-                  First Name
-                </label>
+                <label className="text-sm font-medium text-gray-500">First Name</label>
                 <p className="text-gray-900 bg-gray-50 p-2 rounded-md">
-                  {clerk.firstName || "Not provided"}
+                  {clerk.firstName || 'Not provided'}
                 </p>
-                <p className="text-xs text-gray-400 mt-1">
-                  From Clerk (Read-only)
-                </p>
+                <p className="text-xs text-gray-400 mt-1">From Clerk (Read-only)</p>
               </div>
 
               <div>
-                <label className="text-sm font-medium text-gray-500">
-                  Last Name
-                </label>
+                <label className="text-sm font-medium text-gray-500">Last Name</label>
                 <p className="text-gray-900 bg-gray-50 p-2 rounded-md">
-                  {clerk.lastName || "Not provided"}
+                  {clerk.lastName || 'Not provided'}
                 </p>
-                <p className="text-xs text-gray-400 mt-1">
-                  From Clerk (Read-only)
-                </p>
+                <p className="text-xs text-gray-400 mt-1">From Clerk (Read-only)</p>
               </div>
 
               <div>
-                <label className="text-sm font-medium text-gray-500">
-                  Email
-                </label>
-                <p className="text-gray-900 bg-gray-50 p-2 rounded-md">
-                  {displayEmail}
-                </p>
-                <p className="text-xs text-gray-400 mt-1">
-                  From Clerk (Read-only)
-                </p>
+                <label className="text-sm font-medium text-gray-500">Email</label>
+                <p className="text-gray-900 bg-gray-50 p-2 rounded-md">{displayEmail}</p>
+                <p className="text-xs text-gray-400 mt-1">From Clerk (Read-only)</p>
               </div>
 
               {sanity && (
                 <>
                   <Separator className="my-4" />
                   <div>
-                    <label className="text-sm font-medium text-gray-500">
-                      Phone Number
-                    </label>
+                    <label className="text-sm font-medium text-gray-500">Phone Number</label>
                     <p className="text-gray-900 bg-white border p-2 rounded-md">
-                      {sanity.phone || "Not provided"}
+                      {sanity.phone || 'Not provided'}
                     </p>
-                    <p className="text-xs text-blue-500 mt-1">
-                      Editable in profile
-                    </p>
+                    <p className="text-xs text-blue-500 mt-1">Editable in profile</p>
                   </div>
 
                   <div>
-                    <label className="text-sm font-medium text-gray-500">
-                      Date of Birth
-                    </label>
+                    <label className="text-sm font-medium text-gray-500">Date of Birth</label>
                     <p className="text-gray-900 bg-white border p-2 rounded-md">
                       {sanity.dateOfBirth
                         ? new Date(sanity.dateOfBirth).toLocaleDateString()
-                        : "Not provided"}
+                        : 'Not provided'}
                     </p>
-                    <p className="text-xs text-blue-500 mt-1">
-                      Editable in profile
-                    </p>
+                    <p className="text-xs text-blue-500 mt-1">Editable in profile</p>
                   </div>
                 </>
               )}
@@ -294,31 +261,23 @@ export default function ProfileClient({ userData }: ProfileClientProps) {
             <div className="space-y-4">
               <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
                 <span className="text-gray-700">Reward Points</span>
-                <span className="font-bold text-blue-600">
-                  {sanity?.rewardPoints || 0}
-                </span>
+                <span className="font-bold text-blue-600">{sanity?.rewardPoints || 0}</span>
               </div>
 
               <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
                 <span className="text-gray-700">Total Spent</span>
-                <span className="font-bold text-green-600">
-                  ${sanity?.totalSpent || 0}
-                </span>
+                <span className="font-bold text-green-600">${sanity?.totalSpent || 0}</span>
               </div>
 
               <div className="flex justify-between items-center p-3 bg-purple-50 rounded-lg">
                 <span className="text-gray-700">Loyalty Points</span>
-                <span className="font-bold text-purple-600">
-                  {sanity?.loyaltyPoints || 0}
-                </span>
+                <span className="font-bold text-purple-600">{sanity?.loyaltyPoints || 0}</span>
               </div>
 
               <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                 <span className="text-gray-700">Last Login</span>
                 <span className="font-medium text-gray-600">
-                  {sanity?.lastLogin
-                    ? new Date(sanity.lastLogin).toLocaleDateString()
-                    : "Today"}
+                  {sanity?.lastLogin ? new Date(sanity.lastLogin).toLocaleDateString() : 'Today'}
                 </span>
               </div>
             </div>
@@ -334,10 +293,7 @@ export default function ProfileClient({ userData }: ProfileClientProps) {
               <MapPin className="h-5 w-5" />
               <span>Shipping Addresses</span>
             </CardTitle>
-            <Button
-              onClick={handleAddAddress}
-              className="flex items-center space-x-2"
-            >
+            <Button onClick={handleAddAddress} className="flex items-center space-x-2">
               <Plus className="h-4 w-4" />
               <span>Add Address</span>
             </Button>
@@ -357,10 +313,7 @@ export default function ProfileClient({ userData }: ProfileClientProps) {
                       <span className="font-medium">{address.name}</span>
                     </div>
                     {address.default && (
-                      <Badge
-                        variant="outline"
-                        className="text-green-600 border-green-200"
-                      >
+                      <Badge variant="outline" className="text-green-600 border-green-200">
                         Default
                       </Badge>
                     )}
@@ -374,11 +327,7 @@ export default function ProfileClient({ userData }: ProfileClientProps) {
                   </div>
 
                   <div className="flex justify-end">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleEditAddress(address)}
-                    >
+                    <Button variant="outline" size="sm" onClick={() => handleEditAddress(address)}>
                       <Edit className="h-3 w-3 mr-1" />
                       Edit
                     </Button>

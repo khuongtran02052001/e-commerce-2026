@@ -1,18 +1,11 @@
-import { FC } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "./ui/table";
-import PriceFormatter from "./PriceFormatter";
-import { MY_ORDERS_QUERYResult } from "@/sanity.types";
-import Image from "next/image";
-import { urlFor } from "@/sanity/lib/image";
-import { Button } from "./ui/button";
+import { MY_ORDERS_QUERYResult } from '@/sanity.types';
+import { urlFor } from '@/sanity/lib/image';
+import Image from 'next/image';
+import { FC } from 'react';
+import PriceFormatter from './PriceFormatter';
+import { Button } from './ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 
 interface OrderDetailsDialogProps {
   order: MY_ORDERS_QUERYResult[number] | null;
@@ -20,11 +13,7 @@ interface OrderDetailsDialogProps {
   onClose: () => void;
 }
 
-const OrderDetailsDialog: FC<OrderDetailsDialogProps> = ({
-  order,
-  isOpen,
-  onClose,
-}) => {
+const OrderDetailsDialog: FC<OrderDetailsDialogProps> = ({ order, isOpen, onClose }) => {
   if (!order) return null;
 
   return (
@@ -41,25 +30,23 @@ const OrderDetailsDialog: FC<OrderDetailsDialogProps> = ({
             <strong>Email:</strong> {order.email}
           </p>
           <p>
-            <strong>Date:</strong>{" "}
+            <strong>Date:</strong>{' '}
             {order.orderDate && new Date(order.orderDate).toLocaleDateString()}
           </p>
           <p>
-            <strong>Status:</strong>{" "}
-            <span className="capitalize text-green-600 font-medium">
-              {order.status}
-            </span>
+            <strong>Status:</strong>{' '}
+            <span className="capitalize text-green-600 font-medium">{order.status}</span>
           </p>
           {order?.paymentStatus && (
             <p>
-              <strong>Payment Status:</strong>{" "}
+              <strong>Payment Status:</strong>{' '}
               <span
                 className={`capitalize font-medium ${
-                  order.paymentStatus === "paid"
-                    ? "text-green-600"
-                    : order.paymentStatus === "failed"
-                    ? "text-red-600"
-                    : "text-yellow-600"
+                  order.paymentStatus === 'paid'
+                    ? 'text-green-600'
+                    : order.paymentStatus === 'failed'
+                      ? 'text-red-600'
+                      : 'text-yellow-600'
                 }`}
               >
                 {order.paymentStatus}
@@ -68,10 +55,10 @@ const OrderDetailsDialog: FC<OrderDetailsDialogProps> = ({
           )}
           {order?.paymentMethod && (
             <p>
-              <strong>Payment Method:</strong>{" "}
+              <strong>Payment Method:</strong>{' '}
               <span className="capitalize">
-                {order.paymentMethod === "cash_on_delivery"
-                  ? "Cash on Delivery"
+                {order.paymentMethod === 'cash_on_delivery'
+                  ? 'Cash on Delivery'
                   : order.paymentMethod}
               </span>
             </p>
@@ -84,9 +71,7 @@ const OrderDetailsDialog: FC<OrderDetailsDialogProps> = ({
           {order?.invoice?.hosted_invoice_url && (
             <Button
               className="bg-blue-600 hover:bg-blue-700 text-white mt-2"
-              onClick={() =>
-                window.open(order?.invoice?.hosted_invoice_url, "_blank")
-              }
+              onClick={() => window.open(order?.invoice?.hosted_invoice_url, '_blank')}
             >
               View Invoice
             </Button>
@@ -133,30 +118,21 @@ const OrderDetailsDialog: FC<OrderDetailsDialogProps> = ({
             {order?.amountDiscount !== 0 && (
               <div className="w-full flex items-center justify-between">
                 <strong>Discount: </strong>
-                <PriceFormatter
-                  amount={order?.amountDiscount}
-                  className="text-black font-bold"
-                />
+                <PriceFormatter amount={order?.amountDiscount} className="text-black font-bold" />
               </div>
             )}
             {order?.amountDiscount !== 0 && (
               <div className="w-full flex items-center justify-between">
                 <strong>Subtotal: </strong>
                 <PriceFormatter
-                  amount={
-                    (order?.totalPrice as number) +
-                    (order?.amountDiscount as number)
-                  }
+                  amount={(order?.totalPrice as number) + (order?.amountDiscount as number)}
                   className="text-black font-bold"
                 />
               </div>
             )}
             <div className="w-full flex items-center justify-between">
               <strong>Total: </strong>
-              <PriceFormatter
-                amount={order?.totalPrice}
-                className="text-black font-bold"
-              />
+              <PriceFormatter amount={order?.totalPrice} className="text-black font-bold" />
             </div>
           </div>
         </div>

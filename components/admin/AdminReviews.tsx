@@ -1,27 +1,9 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect, useCallback } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import {
-  StarIcon,
-  CheckCircle,
-  XCircle,
-  Eye,
-  Clock,
-  Check,
-  RefreshCw,
-} from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Textarea } from "@/components/ui/textarea";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -29,42 +11,46 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
 import {
-  getReviewsByStatusAPI,
-  approveReviewAPI,
-  rejectReviewAPI,
   AdminReview,
-} from "@/lib/adminReviewAPI";
-import { toast } from "sonner";
-import Link from "next/link";
+  approveReviewAPI,
+  getReviewsByStatusAPI,
+  rejectReviewAPI,
+} from '@/lib/adminReviewAPI';
+import { Check, CheckCircle, Clock, Eye, RefreshCw, StarIcon, XCircle } from 'lucide-react';
+import Link from 'next/link';
+import React, { useCallback, useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 const AdminReviews: React.FC = React.memo(() => {
   const [pendingReviews, setPendingReviews] = useState<AdminReview[]>([]);
   const [approvedReviews, setApprovedReviews] = useState<AdminReview[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [processingId, setProcessingId] = useState<string | null>(null);
-  const [rejectNotes, setRejectNotes] = useState("");
-  const [activeTab, setActiveTab] = useState("pending");
+  const [rejectNotes, setRejectNotes] = useState('');
+  const [activeTab, setActiveTab] = useState('pending');
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const loadPendingReviews = useCallback(async () => {
     try {
-      const data = await getReviewsByStatusAPI("pending");
+      const data = await getReviewsByStatusAPI('pending');
       setPendingReviews(data.reviews);
     } catch (error) {
-      console.error("Error loading pending reviews:", error);
-      toast.error("Failed to load pending reviews");
+      console.error('Error loading pending reviews:', error);
+      toast.error('Failed to load pending reviews');
     }
   }, []);
 
   const loadApprovedReviews = useCallback(async () => {
     try {
-      const data = await getReviewsByStatusAPI("approved");
+      const data = await getReviewsByStatusAPI('approved');
       setApprovedReviews(data.reviews);
     } catch (error) {
-      console.error("Error loading approved reviews:", error);
-      toast.error("Failed to load approved reviews");
+      console.error('Error loading approved reviews:', error);
+      toast.error('Failed to load approved reviews');
     }
   }, []);
 
@@ -78,10 +64,10 @@ const AdminReviews: React.FC = React.memo(() => {
     setIsRefreshing(true);
     try {
       await Promise.all([loadPendingReviews(), loadApprovedReviews()]);
-      toast.success("Reviews refreshed successfully");
+      toast.success('Reviews refreshed successfully');
     } catch (error) {
-      console.error("Error refreshing reviews:", error);
-      toast.error("Failed to refresh reviews");
+      console.error('Error refreshing reviews:', error);
+      toast.error('Failed to refresh reviews');
     } finally {
       setIsRefreshing(false);
     }
@@ -97,19 +83,19 @@ const AdminReviews: React.FC = React.memo(() => {
       try {
         const result = await approveReviewAPI(reviewId);
         if (result.success) {
-          toast.success("Review approved successfully");
+          toast.success('Review approved successfully');
           await loadAllReviews();
         } else {
           toast.error(result.message);
         }
       } catch (error) {
-        console.error("Error approving review:", error);
-        toast.error("Failed to approve review");
+        console.error('Error approving review:', error);
+        toast.error('Failed to approve review');
       } finally {
         setProcessingId(null);
       }
     },
-    [loadAllReviews]
+    [loadAllReviews],
   );
 
   const handleReject = useCallback(
@@ -118,20 +104,20 @@ const AdminReviews: React.FC = React.memo(() => {
       try {
         const result = await rejectReviewAPI(reviewId, rejectNotes);
         if (result.success) {
-          toast.success("Review rejected");
-          setRejectNotes("");
+          toast.success('Review rejected');
+          setRejectNotes('');
           await loadAllReviews();
         } else {
           toast.error(result.message);
         }
       } catch (error) {
-        console.error("Error rejecting review:", error);
-        toast.error("Failed to reject review");
+        console.error('Error rejecting review:', error);
+        toast.error('Failed to reject review');
       } finally {
         setProcessingId(null);
       }
     },
-    [rejectNotes, loadAllReviews]
+    [rejectNotes, loadAllReviews],
   );
 
   const renderReviewCard = useCallback(
@@ -174,17 +160,14 @@ const AdminReviews: React.FC = React.memo(() => {
                     </Badge>
                   )}
                   {!isPending && (
-                    <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200">
-                      Approved
-                    </Badge>
+                    <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200">Approved</Badge>
                   )}
                   <span className="text-sm text-gray-500">
                     Submitted: {new Date(review.createdAt).toLocaleDateString()}
                   </span>
                   {review.approvedAt && (
                     <span className="text-xs text-gray-400">
-                      Approved:{" "}
-                      {new Date(review.approvedAt).toLocaleDateString()}
+                      Approved: {new Date(review.approvedAt).toLocaleDateString()}
                     </span>
                   )}
                 </div>
@@ -199,8 +182,8 @@ const AdminReviews: React.FC = React.memo(() => {
                       size={16}
                       className={`${
                         index < review.rating
-                          ? "text-shop_light_green fill-shop_light_green"
-                          : "text-gray-300"
+                          ? 'text-shop_light_green fill-shop_light_green'
+                          : 'text-gray-300'
                       }`}
                     />
                   ))}
@@ -210,9 +193,7 @@ const AdminReviews: React.FC = React.memo(() => {
 
               {/* Review Content */}
               <h5 className="font-semibold mb-2">{review.title}</h5>
-              <p className="text-gray-700 leading-relaxed mb-4">
-                {review.content}
-              </p>
+              <p className="text-gray-700 leading-relaxed mb-4">{review.content}</p>
 
               {/* Actions - Only show for pending reviews */}
               {isPending && (
@@ -224,7 +205,7 @@ const AdminReviews: React.FC = React.memo(() => {
                     size="sm"
                   >
                     <CheckCircle size={16} className="mr-1" />
-                    {processingId === review._id ? "Processing..." : "Approve"}
+                    {processingId === review._id ? 'Processing...' : 'Approve'}
                   </Button>
 
                   <Dialog>
@@ -242,8 +223,8 @@ const AdminReviews: React.FC = React.memo(() => {
                       <DialogHeader>
                         <DialogTitle>Reject Review</DialogTitle>
                         <DialogDescription>
-                          Add optional notes about why this review is being
-                          rejected (for internal use only)
+                          Add optional notes about why this review is being rejected (for internal
+                          use only)
                         </DialogDescription>
                       </DialogHeader>
                       <div className="space-y-4">
@@ -254,10 +235,7 @@ const AdminReviews: React.FC = React.memo(() => {
                           rows={4}
                         />
                         <div className="flex justify-end gap-3">
-                          <Button
-                            variant="outline"
-                            onClick={() => setRejectNotes("")}
-                          >
+                          <Button variant="outline" onClick={() => setRejectNotes('')}>
                             Cancel
                           </Button>
                           <Button
@@ -265,9 +243,7 @@ const AdminReviews: React.FC = React.memo(() => {
                             onClick={() => handleReject(review._id)}
                             disabled={processingId === review._id}
                           >
-                            {processingId === review._id
-                              ? "Processing..."
-                              : "Reject Review"}
+                            {processingId === review._id ? 'Processing...' : 'Reject Review'}
                           </Button>
                         </div>
                       </div>
@@ -319,22 +295,18 @@ const AdminReviews: React.FC = React.memo(() => {
                                     size={14}
                                     className={`${
                                       index < review.rating
-                                        ? "text-shop_light_green fill-shop_light_green"
-                                        : "text-gray-300"
+                                        ? 'text-shop_light_green fill-shop_light_green'
+                                        : 'text-gray-300'
                                     }`}
                                   />
                                 ))}
                               </div>
                               <span className="text-sm text-gray-600">
-                                {new Date(
-                                  review.createdAt
-                                ).toLocaleDateString()}
+                                {new Date(review.createdAt).toLocaleDateString()}
                               </span>
                             </div>
                             <h5 className="font-medium mb-2">{review.title}</h5>
-                            <p className="text-gray-700 leading-relaxed">
-                              {review.content}
-                            </p>
+                            <p className="text-gray-700 leading-relaxed">{review.content}</p>
                           </div>
                         </div>
                       </div>
@@ -352,7 +324,7 @@ const AdminReviews: React.FC = React.memo(() => {
         </CardContent>
       </Card>
     ),
-    [processingId, rejectNotes, handleApprove, handleReject]
+    [processingId, rejectNotes, handleApprove, handleReject],
   );
 
   const ReviewSkeleton = () => (
@@ -417,8 +389,7 @@ const AdminReviews: React.FC = React.memo(() => {
                 Review Management
               </CardTitle>
               <CardDescription>
-                Manage customer reviews - approve pending reviews and view
-                approved ones
+                Manage customer reviews - approve pending reviews and view approved ones
               </CardDescription>
             </div>
             <Button
@@ -428,20 +399,13 @@ const AdminReviews: React.FC = React.memo(() => {
               size="sm"
               className="gap-2"
             >
-              <RefreshCw
-                size={16}
-                className={isRefreshing ? "animate-spin" : ""}
-              />
-              {isRefreshing ? "Refreshing..." : "Refresh"}
+              <RefreshCw size={16} className={isRefreshing ? 'animate-spin' : ''} />
+              {isRefreshing ? 'Refreshing...' : 'Refresh'}
             </Button>
           </div>
         </CardHeader>
         <CardContent>
-          <Tabs
-            value={activeTab}
-            onValueChange={setActiveTab}
-            className="w-full"
-          >
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-6">
               <TabsTrigger value="pending" className="flex items-center gap-2">
                 <Clock size={16} />
@@ -468,9 +432,7 @@ const AdminReviews: React.FC = React.memo(() => {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {pendingReviews.map((review) =>
-                    renderReviewCard(review, true)
-                  )}
+                  {pendingReviews.map((review) => renderReviewCard(review, true))}
                 </div>
               )}
             </TabsContent>
@@ -490,9 +452,7 @@ const AdminReviews: React.FC = React.memo(() => {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {approvedReviews.map((review) =>
-                    renderReviewCard(review, false)
-                  )}
+                  {approvedReviews.map((review) => renderReviewCard(review, false))}
                 </div>
               )}
             </TabsContent>
@@ -503,6 +463,6 @@ const AdminReviews: React.FC = React.memo(() => {
   );
 });
 
-AdminReviews.displayName = "AdminReviews";
+AdminReviews.displayName = 'AdminReviews';
 
 export default AdminReviews;

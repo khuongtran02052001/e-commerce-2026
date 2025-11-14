@@ -1,8 +1,8 @@
-import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
-import { client } from "@/sanity/lib/client";
+import { client } from '@/sanity/lib/client';
+import { auth } from '@clerk/nextjs/server';
+import { NextResponse } from 'next/server';
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 /**
@@ -14,7 +14,7 @@ export async function GET() {
     const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // Fetch all data in parallel
@@ -28,7 +28,7 @@ export async function GET() {
           isEmployee,
           walletBalance
         }`,
-        { userId }
+        { userId },
       ),
       // Get orders count
       client.fetch(`count(*[_type == "order" && userId == $userId])`, {
@@ -40,7 +40,7 @@ export async function GET() {
           _id,
           read
         }`,
-        { userId }
+        { userId },
       ),
     ]);
 
@@ -55,14 +55,14 @@ export async function GET() {
       {
         status: 200,
         headers: {
-          "Cache-Control": "private, no-cache, no-store, must-revalidate",
-          "CDN-Cache-Control": "no-store",
-          "Vercel-CDN-Cache-Control": "no-store",
+          'Cache-Control': 'private, no-cache, no-store, must-revalidate',
+          'CDN-Cache-Control': 'no-store',
+          'Vercel-CDN-Cache-Control': 'no-store',
         },
-      }
+      },
     );
   } catch (error) {
-    console.error("Error fetching combined user data:", error);
+    console.error('Error fetching combined user data:', error);
     return NextResponse.json(
       {
         user: null,
@@ -71,7 +71,7 @@ export async function GET() {
         unreadNotifications: 0,
         walletBalance: 0,
       },
-      { status: 200 }
+      { status: 200 },
     );
   }
 }

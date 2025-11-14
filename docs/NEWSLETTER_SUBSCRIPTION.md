@@ -306,7 +306,7 @@ The NewsletterForm is already integrated in the Footer component and will appear
 To use it elsewhere:
 
 ```tsx
-import NewsletterForm from "@/components/NewsletterForm";
+import NewsletterForm from '@/components/NewsletterForm';
 
 function MyComponent() {
   return (

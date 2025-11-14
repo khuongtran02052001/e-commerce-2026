@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
-import { saveContactMessage } from "@/sanity/helpers";
+import { saveContactMessage } from '@/sanity/helpers';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
@@ -8,27 +8,19 @@ export async function POST(request: NextRequest) {
 
     // Basic validation
     if (!name || !email || !subject || !message) {
-      return NextResponse.json(
-        { error: "All fields are required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'All fields are required' }, { status: 400 });
     }
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { error: "Please provide a valid email address" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Please provide a valid email address' }, { status: 400 });
     }
 
     // Get client info
     const ipAddress =
-      request.headers.get("x-forwarded-for") ||
-      request.headers.get("x-real-ip") ||
-      "unknown";
-    const userAgent = request.headers.get("user-agent") || "unknown";
+      request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
+    const userAgent = request.headers.get('user-agent') || 'unknown';
 
     // Save to Sanity
     const result = await saveContactMessage({
@@ -46,20 +38,20 @@ export async function POST(request: NextRequest) {
           message: "Message sent successfully! We'll get back to you soon.",
           id: result.data?._id,
         },
-        { status: 200 }
+        { status: 200 },
       );
     } else {
-      console.error("Sanity save failed:", result.error);
+      console.error('Sanity save failed:', result.error);
       return NextResponse.json(
-        { error: result.error || "Failed to send message. Please try again." },
-        { status: 500 }
+        { error: result.error || 'Failed to send message. Please try again.' },
+        { status: 500 },
       );
     }
   } catch (error) {
-    console.error("Contact API Error:", error);
+    console.error('Contact API Error:', error);
     return NextResponse.json(
-      { error: "Something went wrong. Please try again later." },
-      { status: 500 }
+      { error: 'Something went wrong. Please try again later.' },
+      { status: 500 },
     );
   }
 }

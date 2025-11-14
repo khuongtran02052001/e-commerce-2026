@@ -1,6 +1,6 @@
-import Container from "@/components/Container";
-import { Card, CardContent } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import Container from '@/components/Container';
+import { Card, CardContent } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const BlogPageSkeleton = () => {
   return (
@@ -40,7 +40,7 @@ const BlogPageSkeleton = () => {
                   <div
                     key={item}
                     className={`bg-white/10 backdrop-blur-sm rounded-lg p-3 sm:p-4 ${
-                      index === 2 ? "col-span-2 sm:col-span-1" : ""
+                      index === 2 ? 'col-span-2 sm:col-span-1' : ''
                     }`}
                   >
                     <div className="flex items-center gap-2 mb-1">
@@ -73,15 +73,11 @@ const BlogPageSkeleton = () => {
             <Card
               key={item}
               className={`overflow-hidden border-0 shadow-lg ${
-                index === 0 ? "md:col-span-2 lg:col-span-2" : ""
+                index === 0 ? 'md:col-span-2 lg:col-span-2' : ''
               }`}
             >
               {/* Image Skeleton */}
-              <Skeleton
-                className={`w-full ${
-                  index === 0 ? "h-64 md:h-80" : "h-48 md:h-56"
-                }`}
-              />
+              <Skeleton className={`w-full ${index === 0 ? 'h-64 md:h-80' : 'h-48 md:h-56'}`} />
 
               <CardContent className="p-4 sm:p-6">
                 {/* Meta Information */}
@@ -98,16 +94,8 @@ const BlogPageSkeleton = () => {
 
                 {/* Title */}
                 <div className="space-y-2 mb-3">
-                  <Skeleton
-                    className={`h-5 w-full ${
-                      index === 0 ? "sm:h-6 md:h-7" : ""
-                    }`}
-                  />
-                  <Skeleton
-                    className={`h-5 w-3/4 ${
-                      index === 0 ? "sm:h-6 md:h-7" : ""
-                    }`}
-                  />
+                  <Skeleton className={`h-5 w-full ${index === 0 ? 'sm:h-6 md:h-7' : ''}`} />
+                  <Skeleton className={`h-5 w-3/4 ${index === 0 ? 'sm:h-6 md:h-7' : ''}`} />
                 </div>
 
                 {/* Excerpt (for featured post) */}

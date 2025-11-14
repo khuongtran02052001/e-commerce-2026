@@ -1,10 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
-import {
-  sendOrderConfirmationEmail,
-  OrderConfirmationData,
-} from "@/lib/emailService";
-import { getEmailImageUrl } from "@/lib/emailImageUtils";
+import { getEmailImageUrl } from '@/lib/emailImageUtils';
+import { OrderConfirmationData, sendOrderConfirmationEmail } from '@/lib/emailService';
+import { auth } from '@clerk/nextjs/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 // Extended interface for email preparation that can handle Sanity images
 interface EmailOrderItem {
@@ -40,16 +37,13 @@ export async function POST(request: NextRequest) {
     const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { orderData }: { orderData: EmailOrderData } = await request.json();
 
     if (!orderData) {
-      return NextResponse.json(
-        { error: "Order data is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Order data is required' }, { status: 400 });
     }
 
     // Convert EmailOrderData to OrderConfirmationData with proper image URLs
@@ -69,25 +63,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         success: true,
         messageId: emailResult.messageId,
-        message: "Email sent successfully",
+        message: 'Email sent successfully',
       });
     } else {
-      console.error(
-        "Failed to send order confirmation email:",
-        emailResult.error
-      );
+      console.error('Failed to send order confirmation email:', emailResult.error);
       return NextResponse.json(
         {
           success: false,
-          error: emailResult.error || "Failed to send email",
+          error: emailResult.error || 'Failed to send email',
         },
-        { status: 500 }
+        { status: 500 },
       );
     }
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error occurred";
-    console.error("Email sending error:", error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    console.error('Email sending error:', error);
     return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

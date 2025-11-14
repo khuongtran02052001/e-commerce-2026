@@ -1,95 +1,82 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
-import { writeClient, client } from "@/sanity/lib/client";
+import { client, writeClient } from '@/sanity/lib/client';
+import { auth } from '@clerk/nextjs/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
     const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { email, applicationType } = await request.json(); // applicationType: "premium" | "business"
 
     if (!email || !applicationType) {
       return NextResponse.json(
-        { error: "Email and application type are required" },
-        { status: 400 }
+        { error: 'Email and application type are required' },
+        { status: 400 },
       );
     }
 
     // Check if user exists
-    const existingUser = await client.fetch(
-      `*[_type == "userType" && email == $email][0]`,
-      { email }
-    );
+    const existingUser = await client.fetch(`*[_type == "userType" && email == $email][0]`, {
+      email,
+    });
 
     if (!existingUser) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    if (applicationType === "premium") {
+    if (applicationType === 'premium') {
       // Cancel premium application - only if pending or rejected
-      if (
-        existingUser.premiumStatus !== "pending" &&
-        existingUser.premiumStatus !== "rejected"
-      ) {
+      if (existingUser.premiumStatus !== 'pending' && existingUser.premiumStatus !== 'rejected') {
         return NextResponse.json(
-          { error: "Cannot cancel premium application in current status" },
-          { status: 400 }
+          { error: 'Cannot cancel premium application in current status' },
+          { status: 400 },
         );
       }
 
       const result = await writeClient
         .patch(existingUser._id)
         .set({
-          premiumStatus: "cancelled",
+          premiumStatus: 'cancelled',
           updatedAt: new Date().toISOString(),
         })
         .commit();
 
       return NextResponse.json({
         success: true,
-        message: "Premium application cancelled. You can apply again.",
+        message: 'Premium application cancelled. You can apply again.',
         user: result,
       });
-    } else if (applicationType === "business") {
+    } else if (applicationType === 'business') {
       // Cancel business application - only if pending or rejected
-      if (
-        existingUser.businessStatus !== "pending" &&
-        existingUser.businessStatus !== "rejected"
-      ) {
+      if (existingUser.businessStatus !== 'pending' && existingUser.businessStatus !== 'rejected') {
         return NextResponse.json(
-          { error: "Cannot cancel business application in current status" },
-          { status: 400 }
+          { error: 'Cannot cancel business application in current status' },
+          { status: 400 },
         );
       }
 
       const result = await writeClient
         .patch(existingUser._id)
         .set({
-          businessStatus: "cancelled",
+          businessStatus: 'cancelled',
           updatedAt: new Date().toISOString(),
         })
         .commit();
 
       return NextResponse.json({
         success: true,
-        message: "Business application cancelled. You can apply again.",
+        message: 'Business application cancelled. You can apply again.',
         user: result,
       });
     } else {
-      return NextResponse.json(
-        { error: "Invalid application type" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Invalid application type' }, { status: 400 });
     }
   } catch (error) {
-    console.error("Error cancelling application:", error);
-    return NextResponse.json(
-      { error: "Failed to cancel application" },
-      { status: 500 }
-    );
+    console.error('Error cancelling application:', error);
+    return NextResponse.json({ error: 'Failed to cancel application' }, { status: 500 });
   }
 }

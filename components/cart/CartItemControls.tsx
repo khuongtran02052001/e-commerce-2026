@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import QuantityButtons from "@/components/QuantityButtons";
-import { Trash2 } from "lucide-react";
-import useCartStore from "@/store";
-import { Product } from "@/sanity.types";
-import { toast } from "sonner";
+import QuantityButtons from '@/components/QuantityButtons';
+import { Button } from '@/components/ui/button';
+import { Product } from '@/sanity.types';
+import useCartStore from '@/store';
+import { Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface CartItemControlsProps {
   product: Product;
@@ -16,7 +16,7 @@ export function CartItemControls({ product }: CartItemControlsProps) {
 
   const handleRemove = () => {
     deleteCartProduct(product._id);
-    toast.success("Item removed from cart");
+    toast.success('Item removed from cart');
   };
 
   return (

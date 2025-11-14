@@ -1,19 +1,19 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils';
 import {
-  LayoutDashboard,
-  Users,
-  Package,
-  ShoppingCart,
   BarChart3,
-  TrendingUp,
-  Shield,
   Bell,
-  UserCheck,
+  LayoutDashboard,
+  Package,
+  Shield,
+  ShoppingCart,
   Star,
-} from "lucide-react";
+  TrendingUp,
+  UserCheck,
+  Users,
+} from 'lucide-react';
+import Link from 'next/link';
 
 interface AdminSidebarProps {
   currentPath: string;
@@ -21,52 +21,52 @@ interface AdminSidebarProps {
 
 const adminRoutes = [
   {
-    label: "Dashboard",
+    label: 'Dashboard',
     icon: LayoutDashboard,
-    href: "/admin",
-    description: "Overview & Quick Stats",
+    href: '/admin',
+    description: 'Overview & Quick Stats',
   },
   {
-    label: "Analytics",
+    label: 'Analytics',
     icon: BarChart3,
-    href: "/admin/analytics",
-    description: "Business Insights",
+    href: '/admin/analytics',
+    description: 'Business Insights',
   },
   {
-    label: "Users",
+    label: 'Users',
     icon: Users,
-    href: "/admin/users",
-    description: "Customer Management",
+    href: '/admin/users',
+    description: 'Customer Management',
   },
   {
-    label: "Account Requests",
+    label: 'Account Requests',
     icon: UserCheck,
-    href: "/admin/account-requests",
-    description: "Premium & Business Approvals",
+    href: '/admin/account-requests',
+    description: 'Premium & Business Approvals',
   },
   {
-    label: "Products",
+    label: 'Products',
     icon: Package,
-    href: "/admin/products",
-    description: "Inventory Management",
+    href: '/admin/products',
+    description: 'Inventory Management',
   },
   {
-    label: "Orders",
+    label: 'Orders',
     icon: ShoppingCart,
-    href: "/admin/orders",
-    description: "Order Management",
+    href: '/admin/orders',
+    description: 'Order Management',
   },
   {
-    label: "Reviews",
+    label: 'Reviews',
     icon: Star,
-    href: "/admin/reviews",
-    description: "Approve & Manage Reviews",
+    href: '/admin/reviews',
+    description: 'Approve & Manage Reviews',
   },
   {
-    label: "Notifications",
+    label: 'Notifications',
     icon: Bell,
-    href: "/admin/notifications",
-    description: "Send & Manage Notifications",
+    href: '/admin/notifications',
+    description: 'Send & Manage Notifications',
   },
 ];
 
@@ -95,39 +95,32 @@ const AdminSidebar = ({ currentPath }: AdminSidebarProps) => {
               key={route.href}
               href={route.href}
               className={cn(
-                "flex items-center gap-3 p-4 rounded-xl transition-all duration-200 group",
+                'flex items-center gap-3 p-4 rounded-xl transition-all duration-200 group',
                 isActive
-                  ? "bg-gradient-to-r from-shop_light_green to-shop_dark_green text-white shadow-lg"
-                  : "hover:bg-shop_light_bg hover:shadow-md text-dark-color"
+                  ? 'bg-gradient-to-r from-shop_light_green to-shop_dark_green text-white shadow-lg'
+                  : 'hover:bg-shop_light_bg hover:shadow-md text-dark-color',
               )}
             >
               <Icon
                 className={cn(
-                  "w-5 h-5 transition-transform group-hover:scale-110",
-                  isActive ? "text-white" : "text-shop_light_green"
+                  'w-5 h-5 transition-transform group-hover:scale-110',
+                  isActive ? 'text-white' : 'text-shop_light_green',
                 )}
               />
               <div className="flex-1">
                 <div
                   className={cn(
-                    "font-semibold text-sm",
-                    isActive ? "text-white" : "text-dark-color"
+                    'font-semibold text-sm',
+                    isActive ? 'text-white' : 'text-dark-color',
                   )}
                 >
                   {route.label}
                 </div>
-                <div
-                  className={cn(
-                    "text-xs",
-                    isActive ? "text-white/80" : "text-light-color"
-                  )}
-                >
+                <div className={cn('text-xs', isActive ? 'text-white/80' : 'text-light-color')}>
                   {route.description}
                 </div>
               </div>
-              {isActive && (
-                <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
-              )}
+              {isActive && <div className="w-2 h-2 bg-white rounded-full animate-pulse" />}
             </Link>
           );
         })}

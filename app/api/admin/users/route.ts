@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth, clerkClient, type User } from "@clerk/nextjs/server";
-import { isUserAdmin } from "@/lib/adminUtils";
+import { isUserAdmin } from '@/lib/adminUtils';
+import { auth, clerkClient, type User } from '@clerk/nextjs/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(req: NextRequest) {
   try {
@@ -8,10 +8,7 @@ export async function GET(req: NextRequest) {
     const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json(
-        { error: "Unauthorized - Not logged in" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized - Not logged in' }, { status: 401 });
     }
 
     // Get current user details to check admin status
@@ -21,24 +18,21 @@ export async function GET(req: NextRequest) {
 
     // Check if current user is admin
     if (!userEmail || !isUserAdmin(userEmail)) {
-      return NextResponse.json(
-        { error: "Forbidden - Admin access required" },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
     }
 
     // Get pagination params
     const { searchParams } = new URL(req.url);
-    const limit = parseInt(searchParams.get("limit") || "10");
-    const offset = parseInt(searchParams.get("offset") || "0");
-    const query = searchParams.get("query") || "";
+    const limit = parseInt(searchParams.get('limit') || '10');
+    const offset = parseInt(searchParams.get('offset') || '0');
+    const query = searchParams.get('query') || '';
 
     // Fetch users from Clerk
     const usersResponse = await clerk.users.getUserList({
       limit,
       offset,
       query: query || undefined,
-      orderBy: "-created_at",
+      orderBy: '-created_at',
     });
 
     // Format user data
@@ -51,8 +45,7 @@ export async function GET(req: NextRequest) {
       imageUrl: user.imageUrl,
       createdAt: user.createdAt,
       lastSignInAt: user.lastSignInAt,
-      emailVerified:
-        user.primaryEmailAddress?.verification?.status === "verified",
+      emailVerified: user.primaryEmailAddress?.verification?.status === 'verified',
       banned: user.banned,
       locked: user.locked,
       twoFactorEnabled: user.twoFactorEnabled,
@@ -67,11 +60,8 @@ export async function GET(req: NextRequest) {
       hasNextPage: offset + limit < (usersResponse.totalCount || 0),
     });
   } catch (error) {
-    console.error("Error fetching users:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    console.error('Error fetching users:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -82,10 +72,7 @@ export async function DELETE(req: NextRequest) {
     const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json(
-        { error: "Unauthorized - Not logged in" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized - Not logged in' }, { status: 401 });
     }
 
     // Get current user details to check admin status
@@ -95,28 +82,19 @@ export async function DELETE(req: NextRequest) {
 
     // Check if current user is admin
     if (!userEmail || !isUserAdmin(userEmail)) {
-      return NextResponse.json(
-        { error: "Forbidden - Admin access required" },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
     }
 
     const body = await req.json();
     const { userIds } = body; // Array of user IDs to delete
 
     if (!userIds || !Array.isArray(userIds) || userIds.length === 0) {
-      return NextResponse.json(
-        { error: "User IDs array is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'User IDs array is required' }, { status: 400 });
     }
 
     // Prevent admin from deleting themselves
     if (userIds.includes(userId)) {
-      return NextResponse.json(
-        { error: "Cannot delete your own admin account" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Cannot delete your own admin account' }, { status: 400 });
     }
 
     // Delete users from Clerk
@@ -130,7 +108,7 @@ export async function DELETE(req: NextRequest) {
         deleteResults.push({
           userId: userIdToDelete,
           success: false,
-          error: error instanceof Error ? error.message : "Unknown error",
+          error: error instanceof Error ? error.message : 'Unknown error',
         });
       }
     }
@@ -140,14 +118,11 @@ export async function DELETE(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: `Successfully deleted ${successCount} user(s)${failureCount > 0 ? `, failed to delete ${failureCount}` : ""}`,
+      message: `Successfully deleted ${successCount} user(s)${failureCount > 0 ? `, failed to delete ${failureCount}` : ''}`,
       results: deleteResults,
     });
   } catch (error) {
-    console.error("Error deleting users:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    console.error('Error deleting users:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

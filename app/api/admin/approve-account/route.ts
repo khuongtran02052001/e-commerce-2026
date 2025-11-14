@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
-import { client } from "@/sanity/lib/client";
-import { backendClient } from "@/sanity/lib/backendClient";
+import { backendClient } from '@/sanity/lib/backendClient';
+import { client } from '@/sanity/lib/client';
+import { auth } from '@clerk/nextjs/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,8 +9,8 @@ export async function POST(request: NextRequest) {
     const { userId: adminUserId } = await auth();
     if (!adminUserId) {
       return NextResponse.json(
-        { success: false, message: "Admin authentication required" },
-        { status: 401 }
+        { success: false, message: 'Admin authentication required' },
+        { status: 401 },
       );
     }
 
@@ -19,15 +19,15 @@ export async function POST(request: NextRequest) {
 
     if (!userId || !type) {
       return NextResponse.json(
-        { success: false, message: "Missing required fields" },
-        { status: 400 }
+        { success: false, message: 'Missing required fields' },
+        { status: 400 },
       );
     }
 
-    if (!["premium", "business"].includes(type)) {
+    if (!['premium', 'business'].includes(type)) {
       return NextResponse.json(
-        { success: false, message: "Invalid account type" },
-        { status: 400 }
+        { success: false, message: 'Invalid account type' },
+        { status: 400 },
       );
     }
 
@@ -44,41 +44,36 @@ export async function POST(request: NextRequest) {
         rejectionReason
       }
     `,
-      { userId }
+      { userId },
     );
 
     if (!user) {
-      return NextResponse.json(
-        { success: false, message: "User not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ success: false, message: 'User not found' }, { status: 404 });
     }
 
-    const currentStatus =
-      type === "premium" ? user.premiumStatus : user.businessStatus;
+    const currentStatus = type === 'premium' ? user.premiumStatus : user.businessStatus;
 
-    if (currentStatus !== "pending") {
+    if (currentStatus !== 'pending') {
       return NextResponse.json(
         { success: false, message: `${type} account is not in pending status` },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     // For business accounts, ensure user has premium status first
-    if (type === "business" && user.premiumStatus !== "active") {
+    if (type === 'business' && user.premiumStatus !== 'active') {
       return NextResponse.json(
         {
           success: false,
-          message:
-            "User must have an active premium account before applying for business account",
+          message: 'User must have an active premium account before applying for business account',
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     // Update the user status
     const updateData: Record<string, string | null> = {
-      [`${type}Status`]: "active",
+      [`${type}Status`]: 'active',
       [`${type}ApprovedAt`]: new Date().toISOString(),
     };
 
@@ -90,36 +85,25 @@ export async function POST(request: NextRequest) {
     // Try with both methods to see which one works
     try {
       const result = await backendClient.patch(userId).set(updateData).commit();
-      console.log(
-        "Successfully updated user with backendClient:",
-        userId,
-        result
-      );
+      console.log('Successfully updated user with backendClient:', userId, result);
     } catch (backendError) {
-      console.log(
-        "backendClient failed, trying with writeClient...",
-        backendError
-      );
+      console.log('backendClient failed, trying with writeClient...', backendError);
       // Import writeClient locally to avoid import issues
-      const { writeClient } = await import("@/sanity/lib/client");
+      const { writeClient } = await import('@/sanity/lib/client');
       const result = await writeClient.patch(userId).set(updateData).commit();
-      console.log(
-        "Successfully updated user with writeClient:",
-        userId,
-        result
-      );
+      console.log('Successfully updated user with writeClient:', userId, result);
     }
     return NextResponse.json({
       success: true,
       message: `🎉 ${
-        type === "premium" ? "Premium" : "Business"
+        type === 'premium' ? 'Premium' : 'Business'
       } account approved successfully for ${user.firstName} ${user.lastName}!`,
     });
   } catch (error) {
-    console.error("Error approving account:", error);
+    console.error('Error approving account:', error);
     return NextResponse.json(
-      { success: false, message: "Failed to approve account" },
-      { status: 500 }
+      { success: false, message: 'Failed to approve account' },
+      { status: 500 },
     );
   }
 }

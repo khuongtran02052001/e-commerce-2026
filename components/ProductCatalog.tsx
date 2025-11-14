@@ -1,37 +1,19 @@
-"use client";
+'use client';
 
-import { useState, useMemo } from "react";
-import { BRANDS_QUERYResult, Category, Product } from "@/sanity.types";
-import ProductCard from "./ProductCard";
-import { motion, AnimatePresence } from "motion/react";
-import {
-  Search,
-  SlidersHorizontal,
-  Grid3X3,
-  LayoutGrid,
-  X,
-  ChevronDown,
-} from "lucide-react";
-import NoProductAvailable from "./product/NoProductAvailable";
-import { Input } from "./ui/input";
-import { Button } from "./ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "./ui/select";
-import { Badge } from "./ui/badge";
-import { Separator } from "./ui/separator";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "./ui/collapsible";
-import { Checkbox } from "./ui/checkbox";
-import { Slider } from "./ui/slider";
-import { IBrandMock, ICategoryMock, IProductMock } from "@/mock-data";
+import { IBrandMock, ICategoryMock, IProductMock } from '@/mock-data';
+import { ChevronDown, Grid3X3, LayoutGrid, Search, SlidersHorizontal, X } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
+import { useMemo, useState } from 'react';
+import NoProductAvailable from './product/NoProductAvailable';
+import ProductCard from './ProductCard';
+import { Badge } from './ui/badge';
+import { Button } from './ui/button';
+import { Checkbox } from './ui/checkbox';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
+import { Input } from './ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { Separator } from './ui/separator';
+import { Slider } from './ui/slider';
 
 interface Props {
   initialProducts: IProductMock[];
@@ -39,23 +21,17 @@ interface Props {
   brands: IBrandMock[];
 }
 
-type SortOption =
-  | "name-asc"
-  | "name-desc"
-  | "price-low"
-  | "price-high"
-  | "newest"
-  | "popular";
+type SortOption = 'name-asc' | 'name-desc' | 'price-low' | 'price-high' | 'newest' | 'popular';
 
 const ProductCatalog = ({ initialProducts, categories, brands }: Props) => {
   const [products] = useState<IProductMock[]>(initialProducts);
   const [loading] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
-  const [sortBy, setSortBy] = useState<SortOption>("name-asc");
-  const [viewMode, setViewMode] = useState<"grid" | "large">("grid");
+  const [sortBy, setSortBy] = useState<SortOption>('name-asc');
+  const [viewMode, setViewMode] = useState<'grid' | 'large'>('grid');
   const [showFilters, setShowFilters] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState({
     categories: true,
@@ -79,7 +55,7 @@ const ProductCatalog = ({ initialProducts, categories, brands }: Props) => {
       filtered = filtered.filter(
         (product) =>
           product.name?.toLowerCase().includes(lowerSearchQuery) ||
-          product.description?.toLowerCase().includes(lowerSearchQuery)
+          product.description?.toLowerCase().includes(lowerSearchQuery),
       );
     }
 
@@ -107,40 +83,31 @@ const ProductCatalog = ({ initialProducts, categories, brands }: Props) => {
     // Sort products
     filtered.sort((a, b) => {
       switch (sortBy) {
-        case "name-asc":
-          return (a.name || "").localeCompare(b.name || "");
-        case "name-desc":
-          return (b.name || "").localeCompare(a.name || "");
-        case "price-low":
+        case 'name-asc':
+          return (a.name || '').localeCompare(b.name || '');
+        case 'name-desc':
+          return (b.name || '').localeCompare(a.name || '');
+        case 'price-low':
           return (a.price || 0) - (b.price || 0);
-        case "price-high":
+        case 'price-high':
           return (b.price || 0) - (a.price || 0);
-        case "newest":
-          return (
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-          );
+        case 'newest':
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
         default:
           return 0;
       }
     });
 
     return filtered;
-  }, [
-    products,
-    searchQuery,
-    selectedCategories,
-    selectedBrands,
-    priceRange,
-    sortBy,
-  ]);
+  }, [products, searchQuery, selectedCategories, selectedBrands, priceRange, sortBy]);
 
   // Reset all filters
   const resetFilters = () => {
-    setSearchQuery("");
+    setSearchQuery('');
     setSelectedCategories([]);
     setSelectedBrands([]);
     setPriceRange([0, maxPrice]);
-    setSortBy("name-asc");
+    setSortBy('name-asc');
   };
 
   // Get active filter count
@@ -153,18 +120,14 @@ const ProductCatalog = ({ initialProducts, categories, brands }: Props) => {
   // Handle category toggle
   const toggleCategory = (categoryId: string) => {
     setSelectedCategories((prev) =>
-      prev.includes(categoryId)
-        ? prev.filter((id) => id !== categoryId)
-        : [...prev, categoryId]
+      prev.includes(categoryId) ? prev.filter((id) => id !== categoryId) : [...prev, categoryId],
     );
   };
 
   // Handle brand toggle
   const toggleBrand = (brandId: string) => {
     setSelectedBrands((prev) =>
-      prev.includes(brandId)
-        ? prev.filter((id) => id !== brandId)
-        : [...prev, brandId]
+      prev.includes(brandId) ? prev.filter((id) => id !== brandId) : [...prev, brandId],
     );
   };
 
@@ -186,10 +149,7 @@ const ProductCatalog = ({ initialProducts, categories, brands }: Props) => {
 
           <div className="flex items-center gap-3 w-full lg:w-auto">
             {/* Sort */}
-            <Select
-              value={sortBy}
-              onValueChange={(value: SortOption) => setSortBy(value)}
-            >
+            <Select value={sortBy} onValueChange={(value: SortOption) => setSortBy(value)}>
               <SelectTrigger className="w-full lg:w-48">
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
@@ -205,17 +165,17 @@ const ProductCatalog = ({ initialProducts, categories, brands }: Props) => {
             {/* View Mode Toggle */}
             <div className="flex border rounded-md">
               <Button
-                variant={viewMode === "grid" ? "default" : "ghost"}
+                variant={viewMode === 'grid' ? 'default' : 'ghost'}
                 size="sm"
-                onClick={() => setViewMode("grid")}
+                onClick={() => setViewMode('grid')}
                 className="rounded-r-none"
               >
                 <Grid3X3 className="w-4 h-4" />
               </Button>
               <Button
-                variant={viewMode === "large" ? "default" : "ghost"}
+                variant={viewMode === 'large' ? 'default' : 'ghost'}
                 size="sm"
-                onClick={() => setViewMode("large")}
+                onClick={() => setViewMode('large')}
                 className="rounded-l-none"
               >
                 <LayoutGrid className="w-4 h-4" />
@@ -231,10 +191,7 @@ const ProductCatalog = ({ initialProducts, categories, brands }: Props) => {
               <SlidersHorizontal className="w-4 h-4 mr-2" />
               Filters
               {activeFilterCount > 0 && (
-                <Badge
-                  variant="destructive"
-                  className="ml-2 px-1.5 py-0.5 text-xs"
-                >
+                <Badge variant="destructive" className="ml-2 px-1.5 py-0.5 text-xs">
                   {activeFilterCount}
                 </Badge>
               )}
@@ -245,16 +202,11 @@ const ProductCatalog = ({ initialProducts, categories, brands }: Props) => {
         {/* Active Filters */}
         {activeFilterCount > 0 && (
           <div className="flex items-center gap-2 mt-4 pt-4 border-t">
-            <span className="text-sm font-medium text-gray-600">
-              Active filters:
-            </span>
+            <span className="text-sm font-medium text-gray-600">Active filters:</span>
             {searchQuery && (
               <Badge variant="secondary" className="gap-1">
                 Search: {searchQuery}
-                <X
-                  className="w-3 h-3 cursor-pointer"
-                  onClick={() => setSearchQuery("")}
-                />
+                <X className="w-3 h-3 cursor-pointer" onClick={() => setSearchQuery('')} />
               </Badge>
             )}
             {selectedCategories.map((catId) => {
@@ -262,10 +214,7 @@ const ProductCatalog = ({ initialProducts, categories, brands }: Props) => {
               return category ? (
                 <Badge key={catId} variant="secondary" className="gap-1">
                   {category.title}
-                  <X
-                    className="w-3 h-3 cursor-pointer"
-                    onClick={() => toggleCategory(catId)}
-                  />
+                  <X className="w-3 h-3 cursor-pointer" onClick={() => toggleCategory(catId)} />
                 </Badge>
               ) : null;
             })}
@@ -274,10 +223,7 @@ const ProductCatalog = ({ initialProducts, categories, brands }: Props) => {
               return brand ? (
                 <Badge key={brandId} variant="secondary" className="gap-1">
                   {brand.title}
-                  <X
-                    className="w-3 h-3 cursor-pointer"
-                    onClick={() => toggleBrand(brandId)}
-                  />
+                  <X className="w-3 h-3 cursor-pointer" onClick={() => toggleBrand(brandId)} />
                 </Badge>
               ) : null;
             })}
@@ -290,12 +236,7 @@ const ProductCatalog = ({ initialProducts, categories, brands }: Props) => {
                 />
               </Badge>
             )}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={resetFilters}
-              className="ml-auto"
-            >
+            <Button variant="ghost" size="sm" onClick={resetFilters} className="ml-auto">
               Clear all
             </Button>
           </div>
@@ -314,11 +255,7 @@ const ProductCatalog = ({ initialProducts, categories, brands }: Props) => {
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-semibold text-lg">Filters</h3>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowFilters(false)}
-                >
+                <Button variant="ghost" size="sm" onClick={() => setShowFilters(false)}>
                   <X className="w-4 h-4" />
                 </Button>
               </div>
@@ -334,25 +271,20 @@ const ProductCatalog = ({ initialProducts, categories, brands }: Props) => {
                   <CollapsibleTrigger className="flex items-center justify-between w-full text-left">
                     <span className="font-medium">Categories</span>
                     <ChevronDown
-                      className={`w-4 h-4 transition-transform ${isFilterOpen.categories ? "rotate-180" : ""
-                        }`}
+                      className={`w-4 h-4 transition-transform ${
+                        isFilterOpen.categories ? 'rotate-180' : ''
+                      }`}
                     />
                   </CollapsibleTrigger>
                   <CollapsibleContent className="mt-3 space-y-2">
                     {categories.map((category) => (
-                      <div
-                        key={category.id}
-                        className="flex items-center space-x-2"
-                      >
+                      <div key={category.id} className="flex items-center space-x-2">
                         <Checkbox
                           id={category.id}
                           checked={selectedCategories.includes(category.id)}
                           onCheckedChange={() => toggleCategory(category.id)}
                         />
-                        <label
-                          htmlFor={category.id}
-                          className="text-sm flex-1 cursor-pointer"
-                        >
+                        <label htmlFor={category.id} className="text-sm flex-1 cursor-pointer">
                           {category.title}
                         </label>
                       </div>
@@ -365,32 +297,25 @@ const ProductCatalog = ({ initialProducts, categories, brands }: Props) => {
                 {/* Brands */}
                 <Collapsible
                   open={isFilterOpen.brands}
-                  onOpenChange={(open) =>
-                    setIsFilterOpen((prev) => ({ ...prev, brands: open }))
-                  }
+                  onOpenChange={(open) => setIsFilterOpen((prev) => ({ ...prev, brands: open }))}
                 >
                   <CollapsibleTrigger className="flex items-center justify-between w-full text-left">
                     <span className="font-medium">Brands</span>
                     <ChevronDown
-                      className={`w-4 h-4 transition-transform ${isFilterOpen.brands ? "rotate-180" : ""
-                        }`}
+                      className={`w-4 h-4 transition-transform ${
+                        isFilterOpen.brands ? 'rotate-180' : ''
+                      }`}
                     />
                   </CollapsibleTrigger>
                   <CollapsibleContent className="mt-3 space-y-2">
                     {brands.map((brand) => (
-                      <div
-                        key={brand.id}
-                        className="flex items-center space-x-2"
-                      >
+                      <div key={brand.id} className="flex items-center space-x-2">
                         <Checkbox
                           id={brand.id}
                           checked={selectedBrands.includes(brand.id)}
                           onCheckedChange={() => toggleBrand(brand.id)}
                         />
-                        <label
-                          htmlFor={brand.id}
-                          className="text-sm flex-1 cursor-pointer"
-                        >
+                        <label htmlFor={brand.id} className="text-sm flex-1 cursor-pointer">
                           {brand.title}
                         </label>
                       </div>
@@ -403,24 +328,21 @@ const ProductCatalog = ({ initialProducts, categories, brands }: Props) => {
                 {/* Price Range */}
                 <Collapsible
                   open={isFilterOpen.price}
-                  onOpenChange={(open) =>
-                    setIsFilterOpen((prev) => ({ ...prev, price: open }))
-                  }
+                  onOpenChange={(open) => setIsFilterOpen((prev) => ({ ...prev, price: open }))}
                 >
                   <CollapsibleTrigger className="flex items-center justify-between w-full text-left">
                     <span className="font-medium">Price Range</span>
                     <ChevronDown
-                      className={`w-4 h-4 transition-transform ${isFilterOpen.price ? "rotate-180" : ""
-                        }`}
+                      className={`w-4 h-4 transition-transform ${
+                        isFilterOpen.price ? 'rotate-180' : ''
+                      }`}
                     />
                   </CollapsibleTrigger>
                   <CollapsibleContent className="mt-3 space-y-4">
                     <div className="px-2">
                       <Slider
                         value={priceRange}
-                        onValueChange={(value) =>
-                          setPriceRange(value as [number, number])
-                        }
+                        onValueChange={(value) => setPriceRange(value as [number, number])}
                         max={maxPrice}
                         min={0}
                         step={10}
@@ -450,10 +372,11 @@ const ProductCatalog = ({ initialProducts, categories, brands }: Props) => {
           {/* Products */}
           {loading ? (
             <div
-              className={`grid gap-4 ${viewMode === "grid"
-                ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-                : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-                }`}
+              className={`grid gap-4 ${
+                viewMode === 'grid'
+                  ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
+                  : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+              }`}
             >
               {Array.from({ length: 12 }).map((_, index) => (
                 <div
@@ -472,10 +395,11 @@ const ProductCatalog = ({ initialProducts, categories, brands }: Props) => {
             </div>
           ) : filteredProducts.length > 0 ? (
             <div
-              className={`grid gap-4 ${viewMode === "grid"
-                ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-                : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-                }`}
+              className={`grid gap-4 ${
+                viewMode === 'grid'
+                  ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
+                  : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+              }`}
             >
               <AnimatePresence>
                 {filteredProducts.map((product) => (

@@ -1,23 +1,17 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth, clerkClient } from "@clerk/nextjs/server";
-import { isUserAdmin } from "@/lib/adminUtils";
-import { writeClient } from "@/sanity/lib/client";
-import { sendOrderStatusNotification } from "@/lib/notificationService";
-import { addWalletCredit } from "@/actions/walletActions";
+import { addWalletCredit } from '@/actions/walletActions';
+import { isUserAdmin } from '@/lib/adminUtils';
+import { sendOrderStatusNotification } from '@/lib/notificationService';
+import { writeClient } from '@/sanity/lib/client';
+import { auth, clerkClient } from '@clerk/nextjs/server';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     // Get authenticated user
     const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json(
-        { error: "Unauthorized - Not logged in" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized - Not logged in' }, { status: 401 });
     }
 
     // Get current user details to check admin status
@@ -27,10 +21,7 @@ export async function PATCH(
 
     // Check if current user is admin
     if (!userEmail || !isUserAdmin(userEmail)) {
-      return NextResponse.json(
-        { error: "Forbidden - Admin access required" },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
     }
 
     const { id } = await params;
@@ -53,57 +44,56 @@ export async function PATCH(
           lastName
         }
       }`,
-      { id }
+      { id },
     );
 
     if (!currentOrder) {
-      return NextResponse.json({ error: "Order not found" }, { status: 404 });
+      return NextResponse.json({ error: 'Order not found' }, { status: 404 });
     }
 
     // Validate update data
     const allowedFields = [
-      "status",
-      "totalPrice",
-      "paymentStatus",
-      "trackingNumber",
-      "notes",
-      "estimatedDelivery",
-      "actualDelivery",
+      'status',
+      'totalPrice',
+      'paymentStatus',
+      'trackingNumber',
+      'notes',
+      'estimatedDelivery',
+      'actualDelivery',
       // Employee tracking fields
-      "addressConfirmedBy",
-      "addressConfirmedAt",
-      "orderConfirmedBy",
-      "orderConfirmedAt",
-      "packedBy",
-      "packedAt",
-      "packingNotes",
-      "dispatchedBy",
-      "dispatchedAt",
-      "assignedWarehouseBy",
-      "assignedWarehouseAt",
-      "assignedDeliverymanId",
-      "assignedDeliverymanName",
-      "deliveredBy",
-      "deliveredAt",
-      "deliveryNotes",
-      "deliveryAttempts",
-      "rescheduledDate",
-      "rescheduledReason",
+      'addressConfirmedBy',
+      'addressConfirmedAt',
+      'orderConfirmedBy',
+      'orderConfirmedAt',
+      'packedBy',
+      'packedAt',
+      'packingNotes',
+      'dispatchedBy',
+      'dispatchedAt',
+      'assignedWarehouseBy',
+      'assignedWarehouseAt',
+      'assignedDeliverymanId',
+      'assignedDeliverymanName',
+      'deliveredBy',
+      'deliveredAt',
+      'deliveryNotes',
+      'deliveryAttempts',
+      'rescheduledDate',
+      'rescheduledReason',
       // Cash collection
-      "cashCollected",
-      "cashCollectedAmount",
-      "cashCollectedAt",
-      "paymentReceivedBy",
-      "paymentReceivedAt",
+      'cashCollected',
+      'cashCollectedAmount',
+      'cashCollectedAt',
+      'paymentReceivedBy',
+      'paymentReceivedAt',
       // Cancellation fields
-      "cancelledAt",
-      "cancelledBy",
-      "refundedToWallet",
-      "refundAmount",
+      'cancelledAt',
+      'cancelledBy',
+      'refundedToWallet',
+      'refundAmount',
     ];
 
-    const filteredUpdateData: Record<string, string | number | boolean | Date> =
-      {};
+    const filteredUpdateData: Record<string, string | number | boolean | Date> = {};
     Object.keys(updateData).forEach((key) => {
       if (allowedFields.includes(key) && updateData[key] !== undefined) {
         filteredUpdateData[key] = updateData[key];
@@ -117,19 +107,14 @@ export async function PATCH(
     let walletRefunded = false;
     let refundAmount = 0;
 
-    if (
-      updateData.status === "cancelled" &&
-      currentOrder.status !== "cancelled"
-    ) {
+    if (updateData.status === 'cancelled' && currentOrder.status !== 'cancelled') {
       // Order is being cancelled, check if we need to refund
-      const isPaidOrder = currentOrder.paymentStatus === "paid";
-      const amountToRefund =
-        currentOrder.amountPaid || currentOrder.totalPrice || 0;
+      const isPaidOrder = currentOrder.paymentStatus === 'paid';
+      const amountToRefund = currentOrder.amountPaid || currentOrder.totalPrice || 0;
 
       if (isPaidOrder && amountToRefund > 0) {
         // Get the user's clerkUserId
-        const userClerkId =
-          currentOrder.clerkUserId || currentOrder.user?.clerkUserId;
+        const userClerkId = currentOrder.clerkUserId || currentOrder.user?.clerkUserId;
 
         if (userClerkId) {
           try {
@@ -138,7 +123,7 @@ export async function PATCH(
               amountToRefund,
               `Refund for cancelled order #${currentOrder.orderNumber}`,
               id,
-              userEmail || "admin"
+              userEmail || 'admin',
             );
 
             if (refundResult.success) {
@@ -149,54 +134,44 @@ export async function PATCH(
               filteredUpdateData.refundedToWallet = true;
               filteredUpdateData.refundAmount = refundAmount;
               filteredUpdateData.cancelledAt = new Date().toISOString();
-              filteredUpdateData.cancelledBy = userEmail || "admin";
-              filteredUpdateData.paymentStatus = "refunded";
+              filteredUpdateData.cancelledBy = userEmail || 'admin';
+              filteredUpdateData.paymentStatus = 'refunded';
 
               console.log(
-                `✅ Refunded $${refundAmount} to user wallet for order ${currentOrder.orderNumber}`
+                `✅ Refunded $${refundAmount} to user wallet for order ${currentOrder.orderNumber}`,
               );
             } else {
-              console.error(
-                "Failed to add refund to wallet:",
-                refundResult.message
-              );
+              console.error('Failed to add refund to wallet:', refundResult.message);
             }
           } catch (walletError) {
-            console.error("Error processing wallet refund:", walletError);
+            console.error('Error processing wallet refund:', walletError);
           }
         } else {
-          console.warn(
-            `⚠️ Cannot process refund: No clerkUserId found for order ${id}`
-          );
+          console.warn(`⚠️ Cannot process refund: No clerkUserId found for order ${id}`);
         }
       }
 
       // Always add cancellation metadata
       if (!filteredUpdateData.cancelledAt) {
         filteredUpdateData.cancelledAt = new Date().toISOString();
-        filteredUpdateData.cancelledBy = userEmail || "admin";
+        filteredUpdateData.cancelledBy = userEmail || 'admin';
       }
     }
 
     // Update the order in Sanity
-    const updatedOrder = await writeClient
-      .patch(id)
-      .set(filteredUpdateData)
-      .commit();
+    const updatedOrder = await writeClient.patch(id).set(filteredUpdateData).commit();
 
     // Track order status update and send notification if status was changed
     if (updateData.status && updateData.status !== currentOrder.status) {
       // Track analytics
       try {
         await fetch(
-          `${
-            process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
-          }/api/analytics/track`,
+          `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/analytics/track`,
           {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              eventName: "order_status_update",
+              eventName: 'order_status_update',
               eventParams: {
                 orderId: id,
                 status: updateData.status,
@@ -204,19 +179,15 @@ export async function PATCH(
                 adminUserId: userId,
               },
             }),
-          }
+          },
         );
       } catch (analyticsError) {
-        console.error(
-          "Failed to track order status update event:",
-          analyticsError
-        );
+        console.error('Failed to track order status update event:', analyticsError);
       }
 
       // Send notification to user
       try {
-        const userClerkId =
-          currentOrder.clerkUserId || currentOrder.user?.clerkUserId;
+        const userClerkId = currentOrder.clerkUserId || currentOrder.user?.clerkUserId;
 
         if (userClerkId) {
           await sendOrderStatusNotification({
@@ -227,51 +198,35 @@ export async function PATCH(
             previousStatus: currentOrder.status,
           });
         } else {
-          console.warn(
-            `⚠️ Cannot send notification: No clerkUserId found for order ${id}`
-          );
+          console.warn(`⚠️ Cannot send notification: No clerkUserId found for order ${id}`);
         }
       } catch (notificationError) {
-        console.error(
-          "Failed to send order status notification:",
-          notificationError
-        );
+        console.error('Failed to send order status notification:', notificationError);
         // Don't fail the request if notification fails
       }
     }
 
     return NextResponse.json({
       message: walletRefunded
-        ? `Order updated successfully. $${refundAmount.toFixed(
-            2
-          )} refunded to customer's wallet.`
-        : "Order updated successfully",
+        ? `Order updated successfully. $${refundAmount.toFixed(2)} refunded to customer's wallet.`
+        : 'Order updated successfully',
       order: updatedOrder,
       walletRefunded,
       refundAmount: walletRefunded ? refundAmount : 0,
     });
   } catch (error) {
-    console.error("Error updating order:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    console.error('Error updating order:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     // Get authenticated user
     const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json(
-        { error: "Unauthorized - Not logged in" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized - Not logged in' }, { status: 401 });
     }
 
     // Get current user details to check admin status
@@ -281,10 +236,7 @@ export async function GET(
 
     // Check if current user is admin
     if (!userEmail || !isUserAdmin(userEmail)) {
-      return NextResponse.json(
-        { error: "Forbidden - Admin access required" },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
     }
 
     const { id } = await params;
@@ -366,15 +318,12 @@ export async function GET(
     const order = await writeClient.fetch(query, { id });
 
     if (!order) {
-      return NextResponse.json({ error: "Order not found" }, { status: 404 });
+      return NextResponse.json({ error: 'Order not found' }, { status: 404 });
     }
 
     return NextResponse.json({ order });
   } catch (error) {
-    console.error("Error fetching order:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    console.error('Error fetching order:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

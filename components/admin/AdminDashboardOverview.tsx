@@ -1,28 +1,28 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState } from "react";
-import { motion } from "motion/react";
+import { DashboardOverviewSkeleton } from '@/components/admin/SkeletonLoaders';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
-  TrendingUp,
-  Users,
-  Package,
-  ShoppingCart,
+  Activity,
+  ArrowDownRight,
+  ArrowUpRight,
+  Building2,
+  Calendar,
+  Crown,
   DollarSign,
   Eye,
-  ArrowUpRight,
-  ArrowDownRight,
-  Activity,
-  Calendar,
+  Package,
   RefreshCw,
+  ShoppingCart,
+  TrendingUp,
   UserCheck,
-  Crown,
-  Building2,
-} from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { DashboardOverviewSkeleton } from "@/components/admin/SkeletonLoaders";
-import Link from "next/link";
+  Users,
+} from 'lucide-react';
+import { motion } from 'motion/react';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 interface DashboardStats {
   totalRevenue: number;
@@ -44,8 +44,7 @@ interface AccountRequestsSummary {
 
 const AdminDashboardOverview = () => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [accountRequests, setAccountRequests] =
-    useState<AccountRequestsSummary | null>(null);
+  const [accountRequests, setAccountRequests] = useState<AccountRequestsSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -55,13 +54,13 @@ const AdminDashboardOverview = () => {
 
       // Fetch both dashboard stats and account requests summary
       const [statsResponse, requestsResponse] = await Promise.all([
-        fetch("/api/admin/stats"),
-        fetch("/api/admin/account-requests-summary"),
+        fetch('/api/admin/stats'),
+        fetch('/api/admin/account-requests-summary'),
       ]);
 
       if (!statsResponse.ok || !requestsResponse.ok) {
         throw new Error(
-          `HTTP error! stats: ${statsResponse.status}, requests: ${requestsResponse.status}`
+          `HTTP error! stats: ${statsResponse.status}, requests: ${requestsResponse.status}`,
         );
       }
 
@@ -77,10 +76,8 @@ const AdminDashboardOverview = () => {
       setStats(statsData);
       setAccountRequests(requestsData);
     } catch (error) {
-      console.error("Error fetching stats:", error);
-      setError(
-        error instanceof Error ? error.message : "Failed to fetch stats"
-      );
+      console.error('Error fetching stats:', error);
+      setError(error instanceof Error ? error.message : 'Failed to fetch stats');
     } finally {
       setLoading(false);
     }
@@ -92,86 +89,84 @@ const AdminDashboardOverview = () => {
 
   const statCards = [
     {
-      title: "Total Revenue",
+      title: 'Total Revenue',
       value: stats?.totalRevenue || 0,
       change: stats?.revenueChange || 0,
       icon: DollarSign,
-      format: "currency",
-      color: "from-green-500 to-emerald-600",
-      href: "/admin/analytics",
+      format: 'currency',
+      color: 'from-green-500 to-emerald-600',
+      href: '/admin/analytics',
     },
     {
-      title: "Total Orders",
+      title: 'Total Orders',
       value: stats?.totalOrders || 0,
       change: stats?.ordersChange || 0,
       icon: ShoppingCart,
-      format: "number",
-      color: "from-blue-500 to-cyan-600",
-      href: "/admin/orders",
+      format: 'number',
+      color: 'from-blue-500 to-cyan-600',
+      href: '/admin/orders',
     },
     {
-      title: "Total Users",
+      title: 'Total Users',
       value: stats?.totalUsers || 0,
       change: stats?.usersChange || 0,
       icon: Users,
-      format: "number",
-      color: "from-purple-500 to-pink-600",
-      href: "/admin/users",
+      format: 'number',
+      color: 'from-purple-500 to-pink-600',
+      href: '/admin/users',
     },
     {
-      title: "Total Products",
+      title: 'Total Products',
       value: stats?.totalProducts || 0,
       change: stats?.productsChange || 0,
       icon: Package,
-      format: "number",
-      color: "from-orange-500 to-red-600",
-      href: "/admin/products",
+      format: 'number',
+      color: 'from-orange-500 to-red-600',
+      href: '/admin/products',
     },
   ];
 
   const quickActions = [
     {
-      title: "View Analytics",
-      description: "Detailed business insights",
+      title: 'View Analytics',
+      description: 'Detailed business insights',
       icon: TrendingUp,
-      href: "/admin/analytics",
-      color: "from-shop_light_green to-shop_dark_green",
+      href: '/admin/analytics',
+      color: 'from-shop_light_green to-shop_dark_green',
     },
     {
-      title: "Account Requests",
-      description: `${
-        accountRequests?.totalPendingRequests || 0
-      } pending requests`,
+      title: 'Account Requests',
+      description: `${accountRequests?.totalPendingRequests || 0} pending requests`,
       icon: UserCheck,
-      href: "/admin/account-requests",
-      color: "from-amber-500 to-orange-600",
+      href: '/admin/account-requests',
+      color: 'from-amber-500 to-orange-600',
       badge: accountRequests?.totalPendingRequests || 0,
     },
     {
-      title: "Manage Orders",
-      description: "Process and track orders",
+      title: 'Manage Orders',
+      description: 'Process and track orders',
       icon: ShoppingCart,
-      href: "/admin/orders",
-      color: "from-shop_light_blue to-shop_dark_blue",
+      href: '/admin/orders',
+      color: 'from-shop_light_blue to-shop_dark_blue',
     },
     {
-      title: "User Management",
-      description: "View and manage customers",
+      title: 'User Management',
+      description: 'View and manage customers',
       icon: Users,
-      href: "/admin/users",
-      color: "from-shop_orange to-shop_light_orange",
+      href: '/admin/users',
+      color: 'from-shop_orange to-shop_light_orange',
     },
     {
-      title: "Product Catalog",
-      description: "Manage inventory",
+      title: 'Product Catalog',
+      description: 'Manage inventory',
       icon: Package,
-      href: "/admin/products",
-      color: "from-shop_light_pink to-shop_orange",
+      href: '/admin/products',
+      color: 'from-shop_light_pink to-shop_orange',
     },
   ];
 
   const formatValue = (value: number, format: string) => {
-    if (format === "currency") {
+    if (format === 'currency') {
       return `$${value.toLocaleString()}`;
     }
     return value.toLocaleString();
@@ -193,10 +188,7 @@ const AdminDashboardOverview = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-red-500">{error}</p>
-            <Button
-              onClick={fetchStats}
-              className="bg-red-600 hover:bg-red-700"
-            >
+            <Button onClick={fetchStats} className="bg-red-600 hover:bg-red-700">
               Try Again
             </Button>
           </CardContent>
@@ -214,12 +206,7 @@ const AdminDashboardOverview = () => {
             <Activity className="w-8 h-8 text-shop_light_green" />
             Dashboard Overview
           </h1>
-          <Button
-            onClick={fetchStats}
-            variant="outline"
-            size="sm"
-            className="ml-4"
-          >
+          <Button onClick={fetchStats} variant="outline" size="sm" className="ml-4">
             <RefreshCw className="w-4 h-4 mr-2" />
             Refresh
           </Button>
@@ -261,16 +248,11 @@ const AdminDashboardOverview = () => {
                       ) : (
                         <ArrowDownRight className="w-4 h-4 text-red-500" />
                       )}
-                      <Badge
-                        variant={isPositive ? "default" : "destructive"}
-                        className="text-xs"
-                      >
-                        {isPositive ? "+" : ""}
+                      <Badge variant={isPositive ? 'default' : 'destructive'} className="text-xs">
+                        {isPositive ? '+' : ''}
                         {stat.change}%
                       </Badge>
-                      <span className="text-xs text-light-color">
-                        vs last month
-                      </span>
+                      <span className="text-xs text-light-color">vs last month</span>
                     </div>
                   </CardContent>
                 </Card>
@@ -284,12 +266,8 @@ const AdminDashboardOverview = () => {
       {accountRequests && accountRequests.totalPendingRequests > 0 && (
         <div className="space-y-4">
           <div className="text-center">
-            <h2 className="text-2xl font-bold text-dark-color mb-2">
-              Pending Account Requests
-            </h2>
-            <p className="text-light-color">
-              Review and approve user account applications
-            </p>
+            <h2 className="text-2xl font-bold text-dark-color mb-2">Pending Account Requests</h2>
+            <p className="text-light-color">Review and approve user account applications</p>
           </div>
 
           <Card className="border-2 border-amber-200 bg-gradient-to-br from-amber-50 to-amber-100">
@@ -348,9 +326,7 @@ const AdminDashboardOverview = () => {
       {/* Quick Actions */}
       <div className="space-y-6">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-dark-color mb-2">
-            Quick Actions
-          </h2>
+          <h2 className="text-2xl font-bold text-dark-color mb-2">Quick Actions</h2>
           <p className="text-light-color">Navigate to key admin sections</p>
         </div>
 
@@ -385,9 +361,7 @@ const AdminDashboardOverview = () => {
                           <h3 className="font-semibold text-dark-color group-hover:text-shop_dark_green transition-colors">
                             {action.title}
                           </h3>
-                          <p className="text-sm text-light-color">
-                            {action.description}
-                          </p>
+                          <p className="text-sm text-light-color">{action.description}</p>
                         </div>
                         <Button
                           variant="ghost"
@@ -418,9 +392,7 @@ const AdminDashboardOverview = () => {
           <div className="text-center py-8 text-light-color">
             <Eye className="w-12 h-12 mx-auto mb-3 opacity-50" />
             <p>Recent business activities will appear here</p>
-            <p className="text-sm">
-              Check individual sections for detailed information
-            </p>
+            <p className="text-sm">Check individual sections for detailed information</p>
           </div>
         </CardContent>
       </Card>

@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { X, Check, LucideIcon } from "lucide-react";
-import { useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from 'framer-motion';
+import { Check, LucideIcon, X } from 'lucide-react';
+import { useEffect } from 'react';
 
 interface FeatureDetail {
   icon: LucideIcon;
@@ -25,15 +25,15 @@ const FeatureModal = ({ isOpen, onClose, feature }: FeatureModalProps) => {
   // Close on Escape key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === 'Escape') onClose();
     };
     if (isOpen) {
-      document.addEventListener("keydown", handleEscape);
-      document.body.style.overflow = "hidden";
+      document.addEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'hidden';
     }
     return () => {
-      document.removeEventListener("keydown", handleEscape);
-      document.body.style.overflow = "unset";
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'unset';
     };
   }, [isOpen, onClose]);
 
@@ -61,7 +61,7 @@ const FeatureModal = ({ isOpen, onClose, feature }: FeatureModalProps) => {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
               className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden pointer-events-auto"
               onClick={(e) => e.stopPropagation()}
             >
@@ -79,17 +79,13 @@ const FeatureModal = ({ isOpen, onClose, feature }: FeatureModalProps) => {
                   <div
                     className={`${feature.bgColor} w-16 h-16 lg:w-20 lg:h-20 rounded-2xl flex items-center justify-center shadow-lg`}
                   >
-                    <IconComponent
-                      className={`w-8 h-8 lg:w-10 lg:h-10 ${feature.iconColor}`}
-                    />
+                    <IconComponent className={`w-8 h-8 lg:w-10 lg:h-10 ${feature.iconColor}`} />
                   </div>
                   <div>
                     <h2 className="text-2xl lg:text-3xl font-bold text-dark-color mb-2">
                       {feature.title}
                     </h2>
-                    <p className="text-light-color text-sm lg:text-base">
-                      {feature.description}
-                    </p>
+                    <p className="text-light-color text-sm lg:text-base">{feature.description}</p>
                   </div>
                 </div>
               </div>
@@ -116,9 +112,7 @@ const FeatureModal = ({ isOpen, onClose, feature }: FeatureModalProps) => {
                         <div
                           className={`flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-r ${feature.color} flex items-center justify-center mt-0.5`}
                         >
-                          <span className="text-white text-xs font-bold">
-                            {index + 1}
-                          </span>
+                          <span className="text-white text-xs font-bold">{index + 1}</span>
                         </div>
                         <p className="text-dark-text text-sm lg:text-base leading-relaxed">
                           {detail}
@@ -145,12 +139,8 @@ const FeatureModal = ({ isOpen, onClose, feature }: FeatureModalProps) => {
                         transition={{ delay: 0.3 + index * 0.05 }}
                         className="flex items-start gap-3 p-3 bg-white rounded-xl border border-gray-100 hover:border-shop_light_blue hover:shadow-md hoverEffect"
                       >
-                        <Check
-                          className={`flex-shrink-0 w-5 h-5 ${feature.iconColor} mt-0.5`}
-                        />
-                        <p className="text-dark-text text-sm leading-relaxed">
-                          {benefit}
-                        </p>
+                        <Check className={`flex-shrink-0 w-5 h-5 ${feature.iconColor} mt-0.5`} />
+                        <p className="text-dark-text text-sm leading-relaxed">{benefit}</p>
                       </motion.div>
                     ))}
                   </div>

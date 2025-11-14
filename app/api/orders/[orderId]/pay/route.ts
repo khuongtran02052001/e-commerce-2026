@@ -1,13 +1,13 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth, currentUser } from "@clerk/nextjs/server";
-import { client } from "@/sanity/lib/client";
-import Stripe from "stripe";
-import { urlFor } from "@/sanity/lib/image";
-import { ORDER_STATUSES, PAYMENT_STATUSES } from "@/lib/orderStatus";
+import { ORDER_STATUSES, PAYMENT_STATUSES } from '@/lib/orderStatus';
+import { client } from '@/sanity/lib/client';
+import { urlFor } from '@/sanity/lib/image';
+import { auth, currentUser } from '@clerk/nextjs/server';
+import { NextRequest, NextResponse } from 'next/server';
+import Stripe from 'stripe';
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ orderId: string }> }
+  { params }: { params: Promise<{ orderId: string }> },
 ) {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
@@ -17,7 +17,7 @@ export async function POST(
     const user = await currentUser();
 
     if (!userId || !user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { orderId } = await params;
@@ -48,30 +48,21 @@ export async function POST(
         },
         address
       }`,
-      { orderId, userId }
+      { orderId, userId },
     );
 
     if (!order) {
-      return NextResponse.json({ error: "Order not found" }, { status: 404 });
+      return NextResponse.json({ error: 'Order not found' }, { status: 404 });
     }
 
     // Check if order is already paid
-    if (
-      order.status === ORDER_STATUSES.PAID ||
-      order.paymentStatus === PAYMENT_STATUSES.PAID
-    ) {
-      return NextResponse.json(
-        { error: "Order is already paid" },
-        { status: 400 }
-      );
+    if (order.status === ORDER_STATUSES.PAID || order.paymentStatus === PAYMENT_STATUSES.PAID) {
+      return NextResponse.json({ error: 'Order is already paid' }, { status: 400 });
     }
 
     // Check if order is eligible for payment (not cancelled)
     if (order.status === ORDER_STATUSES.CANCELLED) {
-      return NextResponse.json(
-        { error: "Cannot pay for cancelled order" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Cannot pay for cancelled order' }, { status: 400 });
     }
 
     // Convert order products to Stripe line items
@@ -96,15 +87,12 @@ export async function POST(
           item.product.images.length > 0
         ) {
           try {
-            const imageUrl = urlFor(item.product.images[0])
-              .width(800)
-              .height(600)
-              .url();
+            const imageUrl = urlFor(item.product.images[0]).width(800).height(600).url();
             if (imageUrl) {
               productImages = [imageUrl];
             }
           } catch (error) {
-            console.warn("Failed to convert image URL:", error);
+            console.warn('Failed to convert image URL:', error);
             productImages = [];
           }
         }
@@ -112,28 +100,28 @@ export async function POST(
         return {
           quantity: item.quantity || 1,
           price_data: {
-            currency: order.currency?.toLowerCase() || "usd",
+            currency: order.currency?.toLowerCase() || 'usd',
             unit_amount: unitAmount,
             product_data: {
-              name: item.product?.name || "Product",
+              name: item.product?.name || 'Product',
               description: `Product from order ${order.orderNumber}`,
               images: productImages,
               metadata: {
-                productId: item.product?._id?.toString() || "",
+                productId: item.product?._id?.toString() || '',
                 orderId: order._id,
-                quantity: item.quantity?.toString() || "1",
+                quantity: item.quantity?.toString() || '1',
               },
             },
           },
         };
-      }
+      },
     );
 
     // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
+      payment_method_types: ['card'],
       line_items: lineItems,
-      mode: "payment",
+      mode: 'payment',
       success_url: `${process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXTAUTH_URL}/success?session_id={CHECKOUT_SESSION_ID}&order_id=${order._id}`,
       cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXTAUTH_URL}/orders?payment=cancelled`,
       metadata: {
@@ -142,7 +130,7 @@ export async function POST(
         orderDate: new Date().toISOString(),
         itemCount: order.products.length.toString(),
         shippingAddress: JSON.stringify(order.address),
-        orderAmount: order.totalPrice?.toString() || "",
+        orderAmount: order.totalPrice?.toString() || '',
       },
       customer_email: order.email,
     });
@@ -151,18 +139,17 @@ export async function POST(
       success: true,
       sessionId: session.id,
       url: session.url,
-      message: "Payment session created successfully",
+      message: 'Payment session created successfully',
     });
   } catch (error: unknown) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
-    console.error("Payment session creation error:", error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Payment session creation error:', error);
     return NextResponse.json(
       {
-        error: errorMessage || "Failed to create payment session",
+        error: errorMessage || 'Failed to create payment session',
         details: error instanceof Error ? error.stack : null,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

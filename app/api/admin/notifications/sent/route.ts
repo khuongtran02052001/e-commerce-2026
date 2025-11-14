@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth, clerkClient } from "@clerk/nextjs/server";
-import { isUserAdmin } from "@/lib/adminUtils";
-import { client } from "@/sanity/lib/client";
+import { isUserAdmin } from '@/lib/adminUtils';
+import { client } from '@/sanity/lib/client';
+import { auth, clerkClient } from '@clerk/nextjs/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 interface SentNotification {
   _id?: string;
@@ -23,10 +23,7 @@ export async function GET(req: NextRequest) {
     const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json(
-        { error: "Unauthorized - Not logged in" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized - Not logged in' }, { status: 401 });
     }
 
     // Get current user details to check admin status
@@ -36,55 +33,46 @@ export async function GET(req: NextRequest) {
 
     // Check if current user is admin
     if (!userEmail || !isUserAdmin(userEmail)) {
-      return NextResponse.json(
-        { error: "Forbidden - Admin access required" },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
     }
 
     // Get query parameters
     const { searchParams } = new URL(req.url);
-    const limit = parseInt(searchParams.get("limit") || "20");
-    const offset = parseInt(searchParams.get("offset") || "0");
-    const type = searchParams.get("type") || "";
-    const priority = searchParams.get("priority") || "";
-    const dateFilter = searchParams.get("dateFilter") || "";
+    const limit = parseInt(searchParams.get('limit') || '20');
+    const offset = parseInt(searchParams.get('offset') || '0');
+    const type = searchParams.get('type') || '';
+    const priority = searchParams.get('priority') || '';
+    const dateFilter = searchParams.get('dateFilter') || '';
 
     // Build filter conditions
     const filterConditions = [];
-    if (type && type !== "all") {
+    if (type && type !== 'all') {
       filterConditions.push(`type == "${type}"`);
     }
-    if (priority && priority !== "all") {
+    if (priority && priority !== 'all') {
       filterConditions.push(`priority == "${priority}"`);
     }
 
     // Add date filter conditions
-    if (dateFilter && dateFilter !== "all") {
+    if (dateFilter && dateFilter !== 'all') {
       const now = new Date();
-      let dateCondition = "";
+      let dateCondition = '';
 
       switch (dateFilter) {
-        case "today":
+        case 'today':
           const todayStart = new Date(
             now.getFullYear(),
             now.getMonth(),
-            now.getDate()
+            now.getDate(),
           ).toISOString();
           dateCondition = `sentAt >= "${todayStart}"`;
           break;
-        case "week":
-          const weekStart = new Date(
-            now.getTime() - 7 * 24 * 60 * 60 * 1000
-          ).toISOString();
+        case 'week':
+          const weekStart = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
           dateCondition = `sentAt >= "${weekStart}"`;
           break;
-        case "month":
-          const monthStart = new Date(
-            now.getFullYear(),
-            now.getMonth(),
-            1
-          ).toISOString();
+        case 'month':
+          const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
           dateCondition = `sentAt >= "${monthStart}"`;
           break;
       }
@@ -97,9 +85,7 @@ export async function GET(req: NextRequest) {
     // Build GROQ query
     const query = `
       *[_type == "sentNotification"${
-        filterConditions.length > 0
-          ? ` && (${filterConditions.join(" && ")})`
-          : ""
+        filterConditions.length > 0 ? ` && (${filterConditions.join(' && ')})` : ''
       }] | order(sentAt desc) [${offset}...${offset + limit}] {
         _id,
         notificationId,
@@ -118,9 +104,7 @@ export async function GET(req: NextRequest) {
     // Get count query
     const countQuery = `
       count(*[_type == "sentNotification"${
-        filterConditions.length > 0
-          ? ` && (${filterConditions.join(" && ")})`
-          : ""
+        filterConditions.length > 0 ? ` && (${filterConditions.join(' && ')})` : ''
       }])
     `;
 
@@ -158,10 +142,7 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Error fetching sent notifications:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    console.error('Error fetching sent notifications:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

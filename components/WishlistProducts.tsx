@@ -1,28 +1,28 @@
-"use client";
+'use client';
 
-import useCartStore from "@/store";
-import { useState } from "react";
-import PriceFormatter from "./PriceFormatter";
-import { Button } from "./ui/button";
-import AddToCartButton from "./AddToCartButton";
-import Image from "next/image";
-import Link from "next/link";
-import { Product } from "@/sanity.types";
-import { urlFor } from "@/sanity/lib/image";
-import Container from "./Container";
-import { Heart, X, Trash2, AlertTriangle } from "lucide-react";
-import { toast } from "sonner";
+import { cn } from '@/lib/utils';
+import { Product } from '@/sanity.types';
+import { urlFor } from '@/sanity/lib/image';
+import useCartStore from '@/store';
+import * as DialogPrimitive from '@radix-ui/react-dialog';
+import { AlertTriangle, Heart, Trash2, X } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useState } from 'react';
+import { toast } from 'sonner';
+import AddToCartButton from './AddToCartButton';
+import Container from './Container';
+import PriceFormatter from './PriceFormatter';
+import { Button } from './ui/button';
 import {
   Dialog,
   DialogDescription,
-  DialogTitle,
-  DialogPortal,
-  DialogOverlay,
-  DialogHeader,
   DialogFooter,
-} from "./ui/dialog";
-import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { cn } from "@/lib/utils";
+  DialogHeader,
+  DialogOverlay,
+  DialogPortal,
+  DialogTitle,
+} from './ui/dialog';
 
 const WishlistProducts = () => {
   const [visibleProducts, setVisibleProducts] = useState(8);
@@ -40,7 +40,7 @@ const WishlistProducts = () => {
   const confirmResetFavorite = () => {
     resetFavorite();
     setShowDeleteModal(false);
-    toast.success("All products removed from wishlist");
+    toast.success('All products removed from wishlist');
   };
 
   return (
@@ -48,101 +48,97 @@ const WishlistProducts = () => {
       {favoriteProduct.length > 0 ? (
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {favoriteProduct
-              ?.slice(0, visibleProducts)
-              .map((product: Product) => (
-                <div
-                  key={product._id}
-                  className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 flex flex-col gap-4 relative group hover:shadow-md transition-all duration-200"
+            {favoriteProduct?.slice(0, visibleProducts).map((product: Product) => (
+              <div
+                key={product._id}
+                className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 flex flex-col gap-4 relative group hover:shadow-md transition-all duration-200"
+              >
+                <button
+                  onClick={() => {
+                    removeFromFavorite(product._id);
+                    toast.success('Product removed from wishlist');
+                  }}
+                  className="absolute top-3 right-3 z-10 p-1.5 rounded-full bg-white/80 hover:bg-red-50 hover:text-red-600 transition-all duration-200 shadow-sm"
+                  aria-label="Remove from wishlist"
                 >
-                  <button
-                    onClick={() => {
-                      removeFromFavorite(product._id);
-                      toast.success("Product removed from wishlist");
-                    }}
-                    className="absolute top-3 right-3 z-10 p-1.5 rounded-full bg-white/80 hover:bg-red-50 hover:text-red-600 transition-all duration-200 shadow-sm"
-                    aria-label="Remove from wishlist"
-                  >
-                    <X size={16} />
-                  </button>
+                  <X size={16} />
+                </button>
 
+                <Link
+                  href={{
+                    pathname: `/product/${product?.slug?.current}`,
+                    query: { id: product?._id },
+                  }}
+                  className="block rounded-lg overflow-hidden bg-gray-50"
+                >
+                  <Image
+                    src={
+                      product?.images && product.images[0]
+                        ? urlFor(product.images[0]).url()
+                        : '/placeholder.jpg'
+                    }
+                    alt={product?.name ?? 'Product'}
+                    width={200}
+                    height={200}
+                    className={`w-full h-48 object-contain group-hover:scale-105 transition-transform duration-200 ${
+                      product?.stock && product.stock === 0 ? 'opacity-50' : ''
+                    }`}
+                  />
+                </Link>
+
+                <div className="flex flex-col gap-2 flex-1">
                   <Link
                     href={{
                       pathname: `/product/${product?.slug?.current}`,
                       query: { id: product?._id },
                     }}
-                    className="block rounded-lg overflow-hidden bg-gray-50"
                   >
-                    <Image
-                      src={
-                        product?.images && product.images[0]
-                          ? urlFor(product.images[0]).url()
-                          : "/placeholder.jpg"
-                      }
-                      alt={product?.name ?? "Product"}
-                      width={200}
-                      height={200}
-                      className={`w-full h-48 object-contain group-hover:scale-105 transition-transform duration-200 ${
-                        product?.stock && product.stock === 0
-                          ? "opacity-50"
-                          : ""
-                      }`}
-                    />
+                    <h3 className="font-semibold text-gray-900 line-clamp-2 text-sm leading-tight hover:text-shop_dark_green transition-colors">
+                      {product?.name}
+                    </h3>
                   </Link>
 
-                  <div className="flex flex-col gap-2 flex-1">
-                    <Link
-                      href={{
-                        pathname: `/product/${product?.slug?.current}`,
-                        query: { id: product?._id },
-                      }}
+                  {product?.categories && product?.categories.length > 0 && (
+                    <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                      {product.categories
+                        .slice(0, 2)
+                        .map((cat) => cat)
+                        .join(', ')}
+                    </span>
+                  )}
+
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`text-xs px-2 py-1 rounded-full font-medium ${
+                        product?.stock && product.stock > 0
+                          ? 'text-green-700 bg-green-100'
+                          : 'text-red-700 bg-red-100'
+                      }`}
                     >
-                      <h3 className="font-semibold text-gray-900 line-clamp-2 text-sm leading-tight hover:text-shop_dark_green transition-colors">
-                        {product?.name}
-                      </h3>
-                    </Link>
+                      {product?.stock && product.stock > 0
+                        ? `${product.stock} in stock`
+                        : 'Out of stock'}
+                    </span>
+                  </div>
 
-                    {product?.categories && product?.categories.length > 0 && (
-                      <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
-                        {product.categories
-                          .slice(0, 2)
-                          .map((cat) => cat)
-                          .join(", ")}
-                      </span>
-                    )}
-
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={`text-xs px-2 py-1 rounded-full font-medium ${
-                          product?.stock && product.stock > 0
-                            ? "text-green-700 bg-green-100"
-                            : "text-red-700 bg-red-100"
-                        }`}
-                      >
-                        {product?.stock && product.stock > 0
-                          ? `${product.stock} in stock`
-                          : "Out of stock"}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center justify-between mt-auto pt-2">
-                      <div className="flex flex-col">
-                        <PriceFormatter
-                          amount={product?.price}
-                          className="text-lg font-bold text-gray-900"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="mt-2">
-                      <AddToCartButton
-                        product={product}
-                        className="w-full h-10 text-sm font-semibold rounded-lg"
+                  <div className="flex items-center justify-between mt-auto pt-2">
+                    <div className="flex flex-col">
+                      <PriceFormatter
+                        amount={product?.price}
+                        className="text-lg font-bold text-gray-900"
                       />
                     </div>
                   </div>
+
+                  <div className="mt-2">
+                    <AddToCartButton
+                      product={product}
+                      className="w-full h-10 text-sm font-semibold rounded-lg"
+                    />
+                  </div>
                 </div>
-              ))}
+              </div>
+            ))}
           </div>
           {visibleProducts < favoriteProduct.length && (
             <div className="mt-8 text-center">
@@ -183,22 +179,16 @@ const WishlistProducts = () => {
           <div className="relative mb-4">
             <div className="absolute -top-1 -right-1 h-4 w-4 animate-ping rounded-full bg-red-100" />
             <div className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-red-400" />
-            <Heart
-              className="h-16 w-16 text-muted-foreground/60"
-              strokeWidth={1}
-            />
+            <Heart className="h-16 w-16 text-muted-foreground/60" strokeWidth={1} />
           </div>
           <div className="space-y-3 max-w-md">
             <h2 className="text-3xl font-bold tracking-tight text-gray-900">
               Your wishlist is empty
             </h2>
-            <p className="text-lg text-muted-foreground">
-              Save products you love for later
-            </p>
+            <p className="text-lg text-muted-foreground">Save products you love for later</p>
             <p className="text-sm text-muted-foreground/80 leading-relaxed">
-              Add items to your wishlist by clicking the heart icon on any
-              product. You can easily move them to your cart when you&apos;re
-              ready to purchase.
+              Add items to your wishlist by clicking the heart icon on any product. You can easily
+              move them to your cart when you&apos;re ready to purchase.
             </p>
           </div>
 
@@ -248,7 +238,7 @@ const WishlistProducts = () => {
           <DialogOverlay />
           <DialogPrimitive.Content
             className={cn(
-              "fixed left-[50%] top-[50%] z-50 grid w-full max-w-md translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-300 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 sm:rounded-lg"
+              'fixed left-[50%] top-[50%] z-50 grid w-full max-w-md translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-300 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 sm:rounded-lg',
             )}
           >
             <DialogHeader className="text-center space-y-4">
@@ -260,10 +250,10 @@ const WishlistProducts = () => {
                   Clear Wishlist
                 </DialogTitle>
                 <DialogDescription className="text-gray-600 leading-relaxed">
-                  You&apos;re about to remove{" "}
+                  You&apos;re about to remove{' '}
                   <span className="font-semibold text-red-600">
                     {favoriteProduct.length} products
-                  </span>{" "}
+                  </span>{' '}
                   from your wishlist. This action cannot be undone.
                 </DialogDescription>
               </div>

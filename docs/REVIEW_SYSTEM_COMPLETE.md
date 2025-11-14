@@ -203,12 +203,10 @@
    ```
 
 2. **Deploy Schema to Sanity**:
-
    - The schema will auto-deploy when you visit Sanity Studio
    - Or manually deploy if needed
 
 3. **Test the Flow**:
-
    - Submit a test review as a user
    - Approve it as an admin
    - Verify it appears on product page

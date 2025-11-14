@@ -1,8 +1,8 @@
-import { Metadata } from "next";
-import { notFound } from "next/navigation";
-import { getOrderById } from "@/sanity/queries";
-import { currentUser } from "@clerk/nextjs/server";
-import OrderDetailsPage from "@/components/OrderDetailsPage";
+import OrderDetailsPage from '@/components/OrderDetailsPage';
+import { getOrderById } from '@/sanity/queries';
+import { currentUser } from '@clerk/nextjs/server';
+import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 
 interface Props {
   params: Promise<{
@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!order) {
     return {
-      title: "Order Not Found",
+      title: 'Order Not Found',
     };
   }
 

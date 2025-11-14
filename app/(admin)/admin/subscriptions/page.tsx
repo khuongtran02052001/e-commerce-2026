@@ -1,9 +1,9 @@
-import AdminPremiumFeature from "@/components/admin/AdminPremiumFeature";
-import { Metadata } from "next";
+import AdminPremiumFeature from '@/components/admin/AdminPremiumFeature';
+import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: "Newsletter Subscriptions - Admin Panel",
-  description: "Manage newsletter subscriptions",
+  title: 'Newsletter Subscriptions - Admin Panel',
+  description: 'Manage newsletter subscriptions',
 };
 
 export default function SubscriptionsPage() {

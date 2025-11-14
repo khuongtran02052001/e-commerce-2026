@@ -1,4 +1,4 @@
-import AdminPremiumFeature from "@/components/admin/AdminPremiumFeature";
+import AdminPremiumFeature from '@/components/admin/AdminPremiumFeature';
 
 const AdminPage = () => {
   return (

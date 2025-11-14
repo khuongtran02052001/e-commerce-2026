@@ -159,7 +159,6 @@ NEXT_PUBLIC_COMPANY_CITY=New York, NY 10001, USA
 2. Sign up for a free account
 3. Create a new application
 4. Get your credentials from the **API Keys** section:
-
    - **Publishable Key** → `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`
    - **Secret Key** → `CLERK_SECRET_KEY`
 
@@ -181,13 +180,11 @@ NEXT_PUBLIC_COMPANY_CITY=New York, NY 10001, USA
 1. Visit [Stripe.com](https://stripe.com/)
 2. Create a free account
 3. Get your credentials from the **Developers** section:
-
    - Go to **API Keys**
    - **Publishable Key** → `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
    - **Secret Key** → `STRIPE_SECRET_KEY`
 
 4. **Set up Webhooks:**
-
    - Go to **Developers** → **Webhooks**
    - Click **Add endpoint**
    - Endpoint URL: `http://localhost:3000/api/webhooks/stripe` (for local testing)
@@ -208,7 +205,6 @@ NEXT_PUBLIC_COMPANY_CITY=New York, NY 10001, USA
 2. Create a new project
 3. Add a web app to your project
 4. Get your configuration from **Project Settings** → **General**:
-
    - Copy all the config values to your `.env` file
 
 5. **Enable Firestore Database:**
@@ -224,12 +220,10 @@ NEXT_PUBLIC_COMPANY_CITY=New York, NY 10001, USA
 
 1. Use your Gmail account or create a new one
 2. **Enable 2-Step Verification:**
-
    - Go to [Google Account Security](https://myaccount.google.com/security)
    - Enable **2-Step Verification**
 
 3. **Generate App Password:**
-
    - Go to [App Passwords](https://myaccount.google.com/apppasswords)
    - Select **Mail** and **Other (Custom name)**
    - Generate password

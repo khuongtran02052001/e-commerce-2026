@@ -25,8 +25,7 @@ const [currentPage, setCurrentPage] = useState(1);
 const [perPage, setPerPage] = useState(20);
 
 // Calculate pagination
-const totalPages =
-  perPage === -1 ? 1 : Math.ceil(filteredOrders.length / perPage);
+const totalPages = perPage === -1 ? 1 : Math.ceil(filteredOrders.length / perPage);
 const paginatedOrders =
   perPage === -1
     ? filteredOrders
@@ -171,7 +170,7 @@ const handlePageChange = (page: number) => {
 };
 
 const handlePerPageChange = (value: string) => {
-  const newPerPage = value === "all" ? -1 : parseInt(value);
+  const newPerPage = value === 'all' ? -1 : parseInt(value);
   setPerPage(newPerPage);
   setCurrentPage(1); // Reset to first page
 };
@@ -196,10 +195,7 @@ const handlePerPageChange = (value: string) => {
 ### Per Page Selector:
 
 ```tsx
-<Select
-  value={perPage === -1 ? "all" : perPage.toString()}
-  onValueChange={handlePerPageChange}
->
+<Select value={perPage === -1 ? 'all' : perPage.toString()} onValueChange={handlePerPageChange}>
   <SelectTrigger className="w-24">
     <SelectValue />
   </SelectTrigger>
@@ -233,7 +229,7 @@ const handlePerPageChange = (value: string) => {
     return (
       <Button
         key={pageNum}
-        variant={currentPage === pageNum ? "default" : "outline"}
+        variant={currentPage === pageNum ? 'default' : 'outline'}
         size="sm"
         onClick={() => handlePageChange(pageNum)}
       >

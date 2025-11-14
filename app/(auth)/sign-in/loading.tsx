@@ -1,4 +1,4 @@
-import { Loader2, Shield } from "lucide-react";
+import { Loader2, Shield } from 'lucide-react';
 
 const SignInLoading = () => {
   return (
@@ -16,10 +16,7 @@ const SignInLoading = () => {
 
               <div className="space-y-4">
                 {[1, 2, 3].map((item) => (
-                  <div
-                    key={item}
-                    className="flex items-center space-x-3 animate-pulse"
-                  >
+                  <div key={item} className="flex items-center space-x-3 animate-pulse">
                     <div className="w-6 h-6 bg-gray-200 rounded-full"></div>
                     <div className="h-4 bg-gray-200 rounded w-2/3"></div>
                   </div>

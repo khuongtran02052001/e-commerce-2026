@@ -46,14 +46,12 @@ export interface ProductReviewsData {
 }
 
 // Submit a new review
-export async function submitReviewAPI(
-  data: SubmitReviewData
-): Promise<ReviewResponse> {
+export async function submitReviewAPI(data: SubmitReviewData): Promise<ReviewResponse> {
   try {
-    const response = await fetch("/api/user/reviews", {
-      method: "POST",
+    const response = await fetch('/api/user/reviews', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify(data),
     });
@@ -63,55 +61,51 @@ export async function submitReviewAPI(
     if (!response.ok) {
       return {
         success: false,
-        message: result.error || "Failed to submit review",
+        message: result.error || 'Failed to submit review',
       };
     }
 
     return result;
   } catch (error) {
-    console.error("Error submitting review:", error);
+    console.error('Error submitting review:', error);
     return {
       success: false,
-      message: "Failed to submit review. Please try again.",
-      error: error instanceof Error ? error.message : "Unknown error",
+      message: 'Failed to submit review. Please try again.',
+      error: error instanceof Error ? error.message : 'Unknown error',
     };
   }
 }
 
 // Get reviews for a product
-export async function getProductReviewsAPI(
-  productId: string
-): Promise<ProductReviewsData | null> {
+export async function getProductReviewsAPI(productId: string): Promise<ProductReviewsData | null> {
   try {
     const response = await fetch(`/api/user/reviews?productId=${productId}`, {
-      method: "GET",
+      method: 'GET',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
     });
 
     if (!response.ok) {
-      console.error("Failed to fetch reviews");
+      console.error('Failed to fetch reviews');
       return null;
     }
 
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error("Error fetching product reviews:", error);
+    console.error('Error fetching product reviews:', error);
     return null;
   }
 }
 
 // Mark a review as helpful
-export async function markReviewHelpfulAPI(
-  reviewId: string
-): Promise<ReviewResponse> {
+export async function markReviewHelpfulAPI(reviewId: string): Promise<ReviewResponse> {
   try {
-    const response = await fetch("/api/user/reviews", {
-      method: "PATCH",
+    const response = await fetch('/api/user/reviews', {
+      method: 'PATCH',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({ reviewId }),
     });
@@ -121,17 +115,17 @@ export async function markReviewHelpfulAPI(
     if (!response.ok) {
       return {
         success: false,
-        message: result.error || "Failed to update review",
+        message: result.error || 'Failed to update review',
       };
     }
 
     return result;
   } catch (error) {
-    console.error("Error marking review as helpful:", error);
+    console.error('Error marking review as helpful:', error);
     return {
       success: false,
-      message: "Failed to update review",
-      error: error instanceof Error ? error.message : "Unknown error",
+      message: 'Failed to update review',
+      error: error instanceof Error ? error.message : 'Unknown error',
     };
   }
 }

@@ -1,5 +1,5 @@
-import { Card, CardContent, CardHeader } from "./ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent, CardHeader } from './ui/card';
 
 export const OrdersPageSkeleton = () => {
   return (
@@ -281,10 +281,7 @@ export const OrderDetailsSkeleton = () => {
                 {Array(3)
                   .fill(0)
                   .map((_, i) => (
-                    <div
-                      key={i}
-                      className="flex items-center gap-4 p-4 border rounded-lg"
-                    >
+                    <div key={i} className="flex items-center gap-4 p-4 border rounded-lg">
                       <Skeleton className="w-16 h-16 rounded-md" />
                       <div className="flex-1 min-w-0">
                         <Skeleton className="h-5 w-48 mb-2" />

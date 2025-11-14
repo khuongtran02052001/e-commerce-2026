@@ -1,30 +1,30 @@
+import { categoriesData } from '@/constants';
+import { useOutsideClick } from '@/hooks';
+import useStore from '@/store';
+import { ClerkLoaded, SignedIn } from '@clerk/nextjs';
 import {
-  X,
-  Home,
-  ShoppingBag,
   BookOpen,
   Flame,
-  User,
-  ShoppingCart,
-  Heart,
-  Package,
-  Tag,
-  Phone,
-  HelpCircle,
-  Info,
   Grid3X3,
+  Heart,
+  HelpCircle,
+  Home,
+  Info,
   Logs,
-} from "lucide-react";
-import { usePathname } from "next/navigation";
-import { FC } from "react";
-import { motion } from "motion/react";
-import Logo from "./Logo";
-import Link from "next/link";
-import { useOutsideClick } from "@/hooks";
-import SocialMedia from "../common/SocialMedia";
-import { categoriesData } from "@/constants";
-import { ClerkLoaded, SignedIn } from "@clerk/nextjs";
-import useStore from "@/store";
+  Package,
+  Phone,
+  ShoppingBag,
+  ShoppingCart,
+  Tag,
+  User,
+  X,
+} from 'lucide-react';
+import { motion } from 'motion/react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { FC } from 'react';
+import SocialMedia from '../common/SocialMedia';
+import Logo from './Logo';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -38,31 +38,31 @@ const Sidebar: FC<SidebarProps> = ({ isOpen, onClose }) => {
 
   // Enhanced menu sections with icons
   const userMenuItems = [
-    { title: "My Account", href: "/account", icon: User },
-    { title: "My Orders", href: "/orders", icon: Package },
-    { title: "Wishlist", href: "/wishlist", icon: Heart },
-    { title: "Shopping Cart", href: "/cart", icon: ShoppingCart },
+    { title: 'My Account', href: '/account', icon: User },
+    { title: 'My Orders', href: '/orders', icon: Package },
+    { title: 'Wishlist', href: '/wishlist', icon: Heart },
+    { title: 'Shopping Cart', href: '/cart', icon: ShoppingCart },
   ];
 
   const mainMenuItems = [
-    { title: "Home", href: "/", icon: Home },
-    { title: "Shop", href: "/shop", icon: ShoppingBag },
-    { title: "Categories", href: "/category", icon: Grid3X3 },
-    { title: "Brands", href: "/brands", icon: Tag },
-    { title: "Blog", href: "/blog", icon: BookOpen },
-    { title: "Hot Deal", href: "/deal", icon: Flame },
+    { title: 'Home', href: '/', icon: Home },
+    { title: 'Shop', href: '/shop', icon: ShoppingBag },
+    { title: 'Categories', href: '/category', icon: Grid3X3 },
+    { title: 'Brands', href: '/brands', icon: Tag },
+    { title: 'Blog', href: '/blog', icon: BookOpen },
+    { title: 'Hot Deal', href: '/deal', icon: Flame },
   ];
 
   const supportMenuItems = [
-    { title: "Help Center", href: "/help", icon: HelpCircle },
-    { title: "Customer Service", href: "/support", icon: Phone },
-    { title: "About Us", href: "/about", icon: Info },
+    { title: 'Help Center', href: '/help', icon: HelpCircle },
+    { title: 'Customer Service', href: '/support', icon: Phone },
+    { title: 'About Us', href: '/about', icon: Info },
   ];
 
   return (
     <div
       className={`fixed inset-y-0 h-screen left-0 z-50 w-full bg-primary/50 shadow-xl transform ${
-        isOpen ? "translate-x-0" : "-translate-x-full"
+        isOpen ? 'translate-x-0' : '-translate-x-full'
       } transition-transform ease-in-out duration-300`}
     >
       <motion.div
@@ -111,9 +111,7 @@ const Sidebar: FC<SidebarProps> = ({ isOpen, onClose }) => {
               className="flex flex-col items-center gap-2 p-3 rounded-lg bg-shop_dark_green/30 hover:bg-shop_dark_green/50 transition-colors duration-200 text-center relative"
             >
               <Heart size={20} className="text-pink-400" />
-              <span className="text-xs font-medium text-zinc-300">
-                Wishlist
-              </span>
+              <span className="text-xs font-medium text-zinc-300">Wishlist</span>
               {favoriteProduct?.length > 0 && (
                 <span className="absolute -top-1 -right-1 bg-pink-500 text-white h-4 w-4 rounded-full text-xs font-semibold flex items-center justify-center">
                   {favoriteProduct.length}
@@ -130,9 +128,7 @@ const Sidebar: FC<SidebarProps> = ({ isOpen, onClose }) => {
                   className="flex flex-col items-center gap-2 p-3 rounded-lg bg-shop_dark_green/30 hover:bg-shop_dark_green/50 transition-colors duration-200 text-center"
                 >
                   <Logs size={20} className="text-blue-400" />
-                  <span className="text-xs font-medium text-zinc-300">
-                    Orders
-                  </span>
+                  <span className="text-xs font-medium text-zinc-300">Orders</span>
                 </Link>
               </SignedIn>
             </ClerkLoaded>
@@ -154,8 +150,8 @@ const Sidebar: FC<SidebarProps> = ({ isOpen, onClose }) => {
                   href={item.href}
                   className={`flex items-center gap-3 p-2 rounded-md text-sm font-medium tracking-wide transition-all duration-200 hover:text-shop_light_green hover:bg-shop_dark_green/30 ${
                     pathname === item.href
-                      ? "text-shop_light_green bg-shop_dark_green/50"
-                      : "text-zinc-300"
+                      ? 'text-shop_light_green bg-shop_dark_green/50'
+                      : 'text-zinc-300'
                   }`}
                 >
                   <Icon size={18} />
@@ -181,8 +177,8 @@ const Sidebar: FC<SidebarProps> = ({ isOpen, onClose }) => {
                   href={item.href}
                   className={`flex items-center gap-3 p-2 rounded-md text-sm font-medium tracking-wide transition-all duration-200 hover:text-shop_light_green hover:bg-shop_dark_green/30 ${
                     pathname === item.href
-                      ? "text-shop_light_green bg-shop_dark_green/50"
-                      : "text-zinc-300"
+                      ? 'text-shop_light_green bg-shop_dark_green/50'
+                      : 'text-zinc-300'
                   }`}
                 >
                   <Icon size={18} />
@@ -231,9 +227,7 @@ const Sidebar: FC<SidebarProps> = ({ isOpen, onClose }) => {
               className="flex flex-col items-center gap-1 p-3 rounded-lg bg-shop_dark_green/30 hover:bg-shop_dark_green/50 transition-colors duration-200 text-center"
             >
               <Flame size={20} className="text-shop_orange" />
-              <span className="text-xs font-medium text-zinc-300">
-                Hot Deals
-              </span>
+              <span className="text-xs font-medium text-zinc-300">Hot Deals</span>
             </Link>
             <Link
               onClick={onClose}
@@ -241,9 +235,7 @@ const Sidebar: FC<SidebarProps> = ({ isOpen, onClose }) => {
               className="flex flex-col items-center gap-1 p-3 rounded-lg bg-shop_dark_green/30 hover:bg-shop_dark_green/50 transition-colors duration-200 text-center"
             >
               <Heart size={20} className="text-shop_light_green" />
-              <span className="text-xs font-medium text-zinc-300">
-                Wishlist
-              </span>
+              <span className="text-xs font-medium text-zinc-300">Wishlist</span>
             </Link>
           </div>
         </div>
@@ -263,8 +255,8 @@ const Sidebar: FC<SidebarProps> = ({ isOpen, onClose }) => {
                   href={item.href}
                   className={`flex items-center gap-3 p-2 rounded-md text-sm font-medium tracking-wide transition-all duration-200 hover:text-shop_light_green hover:bg-shop_dark_green/30 ${
                     pathname === item.href
-                      ? "text-shop_light_green bg-shop_dark_green/50"
-                      : "text-zinc-300"
+                      ? 'text-shop_light_green bg-shop_dark_green/50'
+                      : 'text-zinc-300'
                   }`}
                 >
                   <Icon size={18} />
@@ -280,12 +272,8 @@ const Sidebar: FC<SidebarProps> = ({ isOpen, onClose }) => {
 
         {/* Promotional Banner */}
         <div className="bg-gradient-to-r from-shop_dark_green to-shop_btn_dark_green rounded-lg p-4 text-center">
-          <h4 className="text-sm font-bold text-shop_light_green mb-1">
-            Special Offer!
-          </h4>
-          <p className="text-xs text-zinc-300 mb-2">
-            Get 20% off on your first order
-          </p>
+          <h4 className="text-sm font-bold text-shop_light_green mb-1">Special Offer!</h4>
+          <p className="text-xs text-zinc-300 mb-2">Get 20% off on your first order</p>
           <Link
             onClick={onClose}
             href="/deal"

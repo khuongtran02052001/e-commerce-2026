@@ -1,13 +1,13 @@
 // Employee role types and permissions
 export type EmployeeRole =
-  | "callcenter"
-  | "packer"
-  | "warehouse"
-  | "deliveryman"
-  | "incharge"
-  | "accounts";
+  | 'callcenter'
+  | 'packer'
+  | 'warehouse'
+  | 'deliveryman'
+  | 'incharge'
+  | 'accounts';
 
-export type EmployeeStatus = "active" | "inactive" | "suspended";
+export type EmployeeStatus = 'active' | 'inactive' | 'suspended';
 
 export interface Employee {
   _id: string;
@@ -93,7 +93,7 @@ export interface OrderEmployeeTracking {
 export interface OrderStatusHistoryItem {
   status: string;
   changedBy: string; // employee email
-  changedByRole: EmployeeRole | "admin" | "system";
+  changedByRole: EmployeeRole | 'admin' | 'system';
   changedAt: string;
   notes?: string;
 }
@@ -208,12 +208,12 @@ export const ROLE_PERMISSIONS: Record<EmployeeRole, EmployeePermissions> = {
 // Helper function to get role display name
 export const getRoleDisplayName = (role: EmployeeRole): string => {
   const roleNames: Record<EmployeeRole, string> = {
-    callcenter: "Call Center",
-    packer: "Packer",
-    warehouse: "Warehouse",
-    deliveryman: "Delivery Man",
-    incharge: "In-Charge",
-    accounts: "Accounts",
+    callcenter: 'Call Center',
+    packer: 'Packer',
+    warehouse: 'Warehouse',
+    deliveryman: 'Delivery Man',
+    incharge: 'In-Charge',
+    accounts: 'Accounts',
   };
   return roleNames[role];
 };
@@ -221,12 +221,12 @@ export const getRoleDisplayName = (role: EmployeeRole): string => {
 // Helper function to get role badge color
 export const getRoleBadgeColor = (role: EmployeeRole): string => {
   const colors: Record<EmployeeRole, string> = {
-    callcenter: "bg-blue-100 text-blue-800",
-    packer: "bg-purple-100 text-purple-800",
-    warehouse: "bg-orange-100 text-orange-800",
-    deliveryman: "bg-green-100 text-green-800",
-    incharge: "bg-red-100 text-red-800",
-    accounts: "bg-yellow-100 text-yellow-800",
+    callcenter: 'bg-blue-100 text-blue-800',
+    packer: 'bg-purple-100 text-purple-800',
+    warehouse: 'bg-orange-100 text-orange-800',
+    deliveryman: 'bg-green-100 text-green-800',
+    incharge: 'bg-red-100 text-red-800',
+    accounts: 'bg-yellow-100 text-yellow-800',
   };
   return colors[role];
 };
@@ -234,7 +234,7 @@ export const getRoleBadgeColor = (role: EmployeeRole): string => {
 // Helper function to check if user has permission
 export const hasPermission = (
   role: EmployeeRole,
-  permission: keyof EmployeePermissions
+  permission: keyof EmployeePermissions,
 ): boolean => {
   return ROLE_PERMISSIONS[role][permission];
 };

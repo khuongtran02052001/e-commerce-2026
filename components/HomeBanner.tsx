@@ -1,9 +1,9 @@
-import Image from "next/image";
-import { banner_1 } from "@/images";
-import Link from "next/link";
-import { ShoppingBag, Star, TrendingUp, Zap } from "lucide-react";
-import Container from "./Container";
-import Title from "./Title";
+import { banner_1 } from '@/images';
+import { ShoppingBag, Star, TrendingUp, Zap } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import Container from './Container';
+import Title from './Title';
 
 const HomeBanner = async () => {
   return (
@@ -50,18 +50,18 @@ const HomeBanner = async () => {
                 {[
                   {
                     icon: Star,
-                    text: "Premium Quality",
-                    color: "text-yellow-500",
+                    text: 'Premium Quality',
+                    color: 'text-yellow-500',
                   },
                   {
                     icon: TrendingUp,
-                    text: "Best Deals",
-                    color: "text-green-500",
+                    text: 'Best Deals',
+                    color: 'text-green-500',
                   },
                   {
                     icon: ShoppingBag,
-                    text: "Free Shipping",
-                    color: "text-blue-500",
+                    text: 'Free Shipping',
+                    color: 'text-blue-500',
                   },
                 ].map((feature, index) => (
                   <div
@@ -69,9 +69,7 @@ const HomeBanner = async () => {
                     className="flex items-center gap-2 bg-white/70 backdrop-blur-sm px-3 py-2 rounded-lg shadow-md border border-white/20 hover:bg-white/90 transition-all duration-300 hover:scale-105"
                   >
                     <feature.icon className={`w-4 h-4 ${feature.color}`} />
-                    <span className="text-sm font-medium text-gray-700">
-                      {feature.text}
-                    </span>
+                    <span className="text-sm font-medium text-gray-700">{feature.text}</span>
                   </div>
                 ))}
               </div>
@@ -102,17 +100,15 @@ const HomeBanner = async () => {
               {/* Stats */}
               <div className="grid grid-cols-3 gap-6 pt-8 animate-fadeInUp delay-800">
                 {[
-                  { value: "50K+", label: "Happy Customers" },
-                  { value: "4.9★", label: "Customer Rating" },
-                  { value: "24/7", label: "Support" },
+                  { value: '50K+', label: 'Happy Customers' },
+                  { value: '4.9★', label: 'Customer Rating' },
+                  { value: '24/7', label: 'Support' },
                 ].map((stat, index) => (
                   <div key={index} className="text-center">
                     <div className="text-2xl sm:text-3xl font-bold text-shop_dark_green">
                       {stat.value}
                     </div>
-                    <div className="text-sm text-gray-600 font-medium">
-                      {stat.label}
-                    </div>
+                    <div className="text-sm text-gray-600 font-medium">{stat.label}</div>
                   </div>
                 ))}
               </div>

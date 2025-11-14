@@ -1,12 +1,11 @@
-import Container from "./Container";
-import Title from "./Title";
+import Container from './Container';
+import Title from './Title';
 // import { getLatestBlogs } from "@/sanity/queries";
-import Image from "next/image";
-import { urlFor } from "@/sanity/lib/image";
-import dayjs from "dayjs";
-import { Calendar } from "lucide-react";
-import Link from "next/link";
-import { mockBlogs } from "@/mock-data";
+import { mockBlogs } from '@/mock-data';
+import dayjs from 'dayjs';
+import { Calendar } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
 
 const LatestBlog = async () => {
   // const blogs = await getLatestBlogs();
@@ -27,7 +26,7 @@ const LatestBlog = async () => {
           Stay updated with our latest insights, tips, and industry news
         </p>
         <Link
-          href={"/blog"}
+          href={'/blog'}
           className="inline-flex items-center gap-2 mt-6 px-6 py-3 bg-shop_light_pink text-shop_dark_green font-semibold rounded-full hover:bg-shop_dark_green hover:text-white border-2 border-shop_dark_green hoverEffect"
         >
           View All Posts
@@ -61,7 +60,7 @@ const LatestBlog = async () => {
                 <Link href={`/blog/${blog?.slug}`}>
                   <Image
                     src={blog?.mainImageUrl}
-                    alt={blog?.title || "Blog image"}
+                    alt={blog?.title || 'Blog image'}
                     width={500}
                     height={300}
                     className="w-full h-48 object-cover group-hover:scale-110 hoverEffect"
@@ -88,7 +87,7 @@ const LatestBlog = async () => {
               {/* Date */}
               <div className="flex items-center gap-2 text-sm text-light-color mb-3">
                 <Calendar size={16} className="text-shop_light_green" />
-                <span>{dayjs(blog.publishedAt).format("MMM D, YYYY")}</span>
+                <span>{dayjs(blog.publishedAt).format('MMM D, YYYY')}</span>
               </div>
 
               {/* Title */}

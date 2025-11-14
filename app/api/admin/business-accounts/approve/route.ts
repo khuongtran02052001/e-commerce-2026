@@ -1,22 +1,19 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
-import { writeClient } from "@/sanity/lib/client";
+import { writeClient } from '@/sanity/lib/client';
+import { auth } from '@clerk/nextjs/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
     const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { accountId, approve, adminEmail, reason } = await request.json();
 
-    if (!accountId || typeof approve !== "boolean" || !adminEmail) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 }
-      );
+    if (!accountId || typeof approve !== 'boolean' || !adminEmail) {
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
     // Check if user is admin (implement your own admin check logic)
@@ -28,8 +25,8 @@ export async function POST(request: NextRequest) {
         .patch(accountId)
         .set({
           isBusiness: true,
-          businessStatus: "active",
-          membershipType: "business",
+          businessStatus: 'active',
+          membershipType: 'business',
           businessApprovedBy: adminEmail,
           businessApprovedAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
@@ -38,7 +35,7 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json({
         success: true,
-        message: "Business account approved successfully",
+        message: 'Business account approved successfully',
         account: result,
       });
     } else {
@@ -47,25 +44,22 @@ export async function POST(request: NextRequest) {
         .patch(accountId)
         .set({
           isBusiness: false,
-          businessStatus: "rejected",
+          businessStatus: 'rejected',
           businessApprovedBy: adminEmail,
           businessApprovedAt: new Date().toISOString(),
-          rejectionReason: reason || "No reason provided",
+          rejectionReason: reason || 'No reason provided',
           updatedAt: new Date().toISOString(),
         })
         .commit();
 
       return NextResponse.json({
         success: true,
-        message: "Business account rejected",
+        message: 'Business account rejected',
         account: result,
       });
     }
   } catch (error) {
-    console.error("Error updating business account:", error);
-    return NextResponse.json(
-      { error: "Failed to update business account" },
-      { status: 500 }
-    );
+    console.error('Error updating business account:', error);
+    return NextResponse.json({ error: 'Failed to update business account' }, { status: 500 });
   }
 }

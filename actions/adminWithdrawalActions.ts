@@ -1,8 +1,8 @@
-"use server";
+'use server';
 
-import { auth } from "@clerk/nextjs/server";
-import { backendClient } from "@/sanity/lib/backendClient";
-import { isAdmin } from "@/lib/adminUtils";
+import { isAdmin } from '@/lib/adminUtils';
+import { backendClient } from '@/sanity/lib/backendClient';
+import { auth } from '@clerk/nextjs/server';
 
 /**
  * Admin: Get all pending withdrawal requests
@@ -30,19 +30,19 @@ export async function getAllWithdrawalRequests(): Promise<{
     const { userId: clerkUserId } = await auth();
 
     if (!clerkUserId) {
-      return { success: false, message: "Unauthorized" };
+      return { success: false, message: 'Unauthorized' };
     }
 
     // Verify admin status - check both database field and environment variable
     const adminUser = await backendClient.fetch(
       `*[_type == "user" && clerkUserId == $clerkUserId][0]{ email, isAdmin }`,
-      { clerkUserId }
+      { clerkUserId },
     );
 
     if (!isAdmin(adminUser)) {
       return {
         success: false,
-        message: "Admin access required to view withdrawal requests",
+        message: 'Admin access required to view withdrawal requests',
       };
     }
 
@@ -54,7 +54,7 @@ export async function getAllWithdrawalRequests(): Promise<{
         name,
         email,
         withdrawalRequests
-      }`
+      }`,
     );
 
     const allRequests: any[] = [];
@@ -72,8 +72,7 @@ export async function getAllWithdrawalRequests(): Promise<{
 
     // Sort by requested date (newest first)
     allRequests.sort(
-      (a, b) =>
-        new Date(b.requestedAt).getTime() - new Date(a.requestedAt).getTime()
+      (a, b) => new Date(b.requestedAt).getTime() - new Date(a.requestedAt).getTime(),
     );
 
     return {
@@ -81,8 +80,8 @@ export async function getAllWithdrawalRequests(): Promise<{
       requests: allRequests,
     };
   } catch (error) {
-    console.error("Error fetching withdrawal requests:", error);
-    return { success: false, message: "Failed to fetch withdrawal requests" };
+    console.error('Error fetching withdrawal requests:', error);
+    return { success: false, message: 'Failed to fetch withdrawal requests' };
   }
 }
 
@@ -92,25 +91,25 @@ export async function getAllWithdrawalRequests(): Promise<{
 export async function approveWithdrawal(
   userId: string,
   requestId: string,
-  transactionId?: string
+  transactionId?: string,
 ): Promise<{ success: boolean; message: string }> {
   try {
     const { userId: clerkUserId } = await auth();
 
     if (!clerkUserId) {
-      return { success: false, message: "Unauthorized" };
+      return { success: false, message: 'Unauthorized' };
     }
 
     // Verify admin status - check both database field and environment variable
     const adminUser = await backendClient.fetch(
       `*[_type == "user" && clerkUserId == $clerkUserId][0]{ email, isAdmin }`,
-      { clerkUserId }
+      { clerkUserId },
     );
 
     if (!isAdmin(adminUser)) {
       return {
         success: false,
-        message: "Admin access required to approve withdrawals",
+        message: 'Admin access required to approve withdrawals',
       };
     }
 
@@ -121,25 +120,23 @@ export async function approveWithdrawal(
         walletBalance, 
         withdrawalRequests
       }`,
-      { userId }
+      { userId },
     );
 
     if (!user) {
-      return { success: false, message: "User not found" };
+      return { success: false, message: 'User not found' };
     }
 
-    const request = user.withdrawalRequests.find(
-      (r: any) => r.id === requestId
-    );
+    const request = user.withdrawalRequests.find((r: any) => r.id === requestId);
 
     if (!request) {
-      return { success: false, message: "Withdrawal request not found" };
+      return { success: false, message: 'Withdrawal request not found' };
     }
 
-    if (request.status !== "pending") {
+    if (request.status !== 'pending') {
       return {
         success: false,
-        message: "Only pending requests can be approved",
+        message: 'Only pending requests can be approved',
       };
     }
 
@@ -148,26 +145,23 @@ export async function approveWithdrawal(
       r.id === requestId
         ? {
             ...r,
-            status: "processing",
+            status: 'processing',
             processedAt: new Date().toISOString(),
             processedBy: adminUser.email,
-            transactionId: transactionId || "",
+            transactionId: transactionId || '',
           }
-        : r
+        : r,
     );
 
-    await backendClient
-      .patch(user._id)
-      .set({ withdrawalRequests: updatedRequests })
-      .commit();
+    await backendClient.patch(user._id).set({ withdrawalRequests: updatedRequests }).commit();
 
     return {
       success: true,
-      message: "Withdrawal approved and processing",
+      message: 'Withdrawal approved and processing',
     };
   } catch (error) {
-    console.error("Error approving withdrawal:", error);
-    return { success: false, message: "Failed to approve withdrawal" };
+    console.error('Error approving withdrawal:', error);
+    return { success: false, message: 'Failed to approve withdrawal' };
   }
 }
 
@@ -176,25 +170,25 @@ export async function approveWithdrawal(
  */
 export async function completeWithdrawal(
   userId: string,
-  requestId: string
+  requestId: string,
 ): Promise<{ success: boolean; message: string }> {
   try {
     const { userId: clerkUserId } = await auth();
 
     if (!clerkUserId) {
-      return { success: false, message: "Unauthorized" };
+      return { success: false, message: 'Unauthorized' };
     }
 
     // Verify admin status - check both database field and environment variable
     const adminUser = await backendClient.fetch(
       `*[_type == "user" && clerkUserId == $clerkUserId][0]{ email, isAdmin }`,
-      { clerkUserId }
+      { clerkUserId },
     );
 
     if (!isAdmin(adminUser)) {
       return {
         success: false,
-        message: "Admin access required to complete withdrawals",
+        message: 'Admin access required to complete withdrawals',
       };
     }
 
@@ -204,25 +198,23 @@ export async function completeWithdrawal(
         _id, 
         withdrawalRequests
       }`,
-      { userId }
+      { userId },
     );
 
     if (!user) {
-      return { success: false, message: "User not found" };
+      return { success: false, message: 'User not found' };
     }
 
-    const request = user.withdrawalRequests.find(
-      (r: any) => r.id === requestId
-    );
+    const request = user.withdrawalRequests.find((r: any) => r.id === requestId);
 
     if (!request) {
-      return { success: false, message: "Withdrawal request not found" };
+      return { success: false, message: 'Withdrawal request not found' };
     }
 
-    if (request.status !== "processing") {
+    if (request.status !== 'processing') {
       return {
         success: false,
-        message: "Only processing requests can be completed",
+        message: 'Only processing requests can be completed',
       };
     }
 
@@ -231,25 +223,22 @@ export async function completeWithdrawal(
       r.id === requestId
         ? {
             ...r,
-            status: "completed",
+            status: 'completed',
             processedAt: new Date().toISOString(),
             processedBy: adminUser.email,
           }
-        : r
+        : r,
     );
 
-    await backendClient
-      .patch(user._id)
-      .set({ withdrawalRequests: updatedRequests })
-      .commit();
+    await backendClient.patch(user._id).set({ withdrawalRequests: updatedRequests }).commit();
 
     return {
       success: true,
-      message: "Withdrawal marked as completed",
+      message: 'Withdrawal marked as completed',
     };
   } catch (error) {
-    console.error("Error completing withdrawal:", error);
-    return { success: false, message: "Failed to complete withdrawal" };
+    console.error('Error completing withdrawal:', error);
+    return { success: false, message: 'Failed to complete withdrawal' };
   }
 }
 
@@ -259,25 +248,25 @@ export async function completeWithdrawal(
 export async function rejectWithdrawal(
   userId: string,
   requestId: string,
-  reason: string
+  reason: string,
 ): Promise<{ success: boolean; message: string }> {
   try {
     const { userId: clerkUserId } = await auth();
 
     if (!clerkUserId) {
-      return { success: false, message: "Unauthorized" };
+      return { success: false, message: 'Unauthorized' };
     }
 
     // Verify admin status - check both database field and environment variable
     const adminUser = await backendClient.fetch(
       `*[_type == "user" && clerkUserId == $clerkUserId][0]{ email, isAdmin }`,
-      { clerkUserId }
+      { clerkUserId },
     );
 
     if (!isAdmin(adminUser)) {
       return {
         success: false,
-        message: "Admin access required to reject withdrawals",
+        message: 'Admin access required to reject withdrawals',
       };
     }
 
@@ -287,25 +276,23 @@ export async function rejectWithdrawal(
         _id, 
         withdrawalRequests
       }`,
-      { userId }
+      { userId },
     );
 
     if (!user) {
-      return { success: false, message: "User not found" };
+      return { success: false, message: 'User not found' };
     }
 
-    const request = user.withdrawalRequests.find(
-      (r: any) => r.id === requestId
-    );
+    const request = user.withdrawalRequests.find((r: any) => r.id === requestId);
 
     if (!request) {
-      return { success: false, message: "Withdrawal request not found" };
+      return { success: false, message: 'Withdrawal request not found' };
     }
 
-    if (request.status !== "pending") {
+    if (request.status !== 'pending') {
       return {
         success: false,
-        message: "Only pending requests can be rejected",
+        message: 'Only pending requests can be rejected',
       };
     }
 
@@ -314,25 +301,22 @@ export async function rejectWithdrawal(
       r.id === requestId
         ? {
             ...r,
-            status: "rejected",
+            status: 'rejected',
             processedAt: new Date().toISOString(),
             processedBy: adminUser.email,
             rejectionReason: reason,
           }
-        : r
+        : r,
     );
 
-    await backendClient
-      .patch(user._id)
-      .set({ withdrawalRequests: updatedRequests })
-      .commit();
+    await backendClient.patch(user._id).set({ withdrawalRequests: updatedRequests }).commit();
 
     return {
       success: true,
-      message: "Withdrawal request rejected",
+      message: 'Withdrawal request rejected',
     };
   } catch (error) {
-    console.error("Error rejecting withdrawal:", error);
-    return { success: false, message: "Failed to reject withdrawal" };
+    console.error('Error rejecting withdrawal:', error);
+    return { success: false, message: 'Failed to reject withdrawal' };
   }
 }

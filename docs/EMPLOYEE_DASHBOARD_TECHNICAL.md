@@ -128,34 +128,34 @@ interface EmployeeNavProps {
 ```typescript
 const navItems = [
   {
-    href: "/employee/orders",
-    label: "Orders",
+    href: '/employee/orders',
+    label: 'Orders',
     icon: ShoppingCart,
-    roles: ["callcenter", "incharge"],
+    roles: ['callcenter', 'incharge'],
   },
   {
-    href: "/employee/packing",
-    label: "Packing",
+    href: '/employee/packing',
+    label: 'Packing',
     icon: Package,
-    roles: ["packer", "incharge"],
+    roles: ['packer', 'incharge'],
   },
   {
-    href: "/employee/deliveries",
-    label: "Deliveries",
+    href: '/employee/deliveries',
+    label: 'Deliveries',
     icon: Truck,
-    roles: ["deliveryman", "incharge"],
+    roles: ['deliveryman', 'incharge'],
   },
   {
-    href: "/employee/payments",
-    label: "Payments",
+    href: '/employee/payments',
+    label: 'Payments',
     icon: DollarSign,
-    roles: ["accounts", "incharge"],
+    roles: ['accounts', 'incharge'],
   },
   {
-    href: "/employee/dashboard",
-    label: "Dashboard",
+    href: '/employee/dashboard',
+    label: 'Dashboard',
     icon: LayoutDashboard,
-    roles: ["incharge"],
+    roles: ['incharge'],
   },
 ];
 ```
@@ -178,8 +178,8 @@ interface OrdersListProps {
 const [orders, setOrders] = useState<Order[]>([]);
 const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
 const [loading, setLoading] = useState(true);
-const [searchQuery, setSearchQuery] = useState("");
-const [statusFilter, setStatusFilter] = useState("all");
+const [searchQuery, setSearchQuery] = useState('');
+const [statusFilter, setStatusFilter] = useState('all');
 const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 const [isRefreshing, setIsRefreshing] = useState(false);
 ```
@@ -218,7 +218,7 @@ interface OrderDetailSheetProps {
 **State**:
 
 ```typescript
-const [notes, setNotes] = useState("");
+const [notes, setNotes] = useState('');
 const [confirmingAddress, setConfirmingAddress] = useState(false);
 const [confirmingOrder, setConfirmingOrder] = useState(false);
 ```
@@ -231,10 +231,9 @@ const [confirmingOrder, setConfirmingOrder] = useState(false);
 **Conditional Actions**:
 
 ```typescript
-const canConfirmAddress =
-  employee.role === "callcenter" && !order.addressConfirmedBy;
+const canConfirmAddress = employee.role === 'callcenter' && !order.addressConfirmedBy;
 const canConfirmOrder =
-  (employee.role === "callcenter" || employee.role === "incharge") &&
+  (employee.role === 'callcenter' || employee.role === 'incharge') &&
   order.addressConfirmedBy &&
   !order.orderConfirmedBy;
 ```
@@ -268,7 +267,7 @@ export async function getCurrentEmployee(): Promise<Employee | null>;
 ```typescript
 export async function assignEmployeeRole(
   userId: string,
-  role: EmployeeRole
+  role: EmployeeRole,
 ): Promise<{ success: boolean; message: string; employee?: Employee }>;
 ```
 
@@ -291,7 +290,7 @@ export async function assignEmployeeRole(
 ```typescript
 export async function confirmAddress(
   orderId: string,
-  notes?: string
+  notes?: string,
 ): Promise<{ success: boolean; message: string }>;
 ```
 
@@ -320,7 +319,7 @@ await backendClient
 ```typescript
 export async function confirmOrder(
   orderId: string,
-  notes?: string
+  notes?: string,
 ): Promise<{ success: boolean; message: string }>;
 ```
 
@@ -338,7 +337,7 @@ export async function confirmOrder(
 
 ```typescript
 if (!order.addressConfirmedBy) {
-  return { success: false, message: "Please confirm the address first" };
+  return { success: false, message: 'Please confirm the address first' };
 }
 ```
 
@@ -361,13 +360,13 @@ export async function getOrdersForEmployee(): Promise<Order[]>;
 
 ```typescript
 switch (employee.employeeRole) {
-  case "callcenter":
+  case 'callcenter':
     filter = `*[_type == "order" && (status == "pending" || !defined(orderConfirmedBy))]`;
     break;
-  case "packer":
+  case 'packer':
     filter = `*[_type == "order" && defined(orderConfirmedBy) && !defined(packedBy)]`;
     break;
-  case "deliveryman":
+  case 'deliveryman':
     filter = `*[_type == "order" && assignedDeliverymanId == $employeeId]`;
     break;
   // ... other roles
@@ -383,12 +382,7 @@ switch (employee.employeeRole) {
 #### EmployeeRole
 
 ```typescript
-export type EmployeeRole =
-  | "callcenter"
-  | "packer"
-  | "deliveryman"
-  | "incharge"
-  | "accounts";
+export type EmployeeRole = 'callcenter' | 'packer' | 'deliveryman' | 'incharge' | 'accounts';
 ```
 
 #### Employee Interface
@@ -591,18 +585,18 @@ export default async function OrdersPage() {
 export async function confirmAddress(orderId: string) {
   const { userId: clerkUserId } = await auth();
   if (!clerkUserId) {
-    return { success: false, message: "Unauthorized" };
+    return { success: false, message: 'Unauthorized' };
   }
 
   const employee = await backendClient.fetch(
     `*[_type == "user" && clerkUserId == $clerkUserId && isEmployee == true && employeeRole == "callcenter"][0]`,
-    { clerkUserId }
+    { clerkUserId },
   );
 
   if (!employee) {
     return {
       success: false,
-      message: "Only call center employees can confirm addresses",
+      message: 'Only call center employees can confirm addresses',
     };
   }
 
@@ -637,12 +631,12 @@ export async function confirmAddress(orderId: string) {
 ```typescript
 try {
   // ... action logic
-  return { success: true, message: "Operation completed" };
+  return { success: true, message: 'Operation completed' };
 } catch (error) {
-  console.error("Error:", error);
+  console.error('Error:', error);
   return {
     success: false,
-    message: error instanceof Error ? error.message : "Operation failed",
+    message: error instanceof Error ? error.message : 'Operation failed',
   };
 }
 ```
@@ -661,7 +655,7 @@ const handleAction = async () => {
       toast.error(result.message);
     }
   } catch (error) {
-    toast.error("An unexpected error occurred");
+    toast.error('An unexpected error occurred');
   } finally {
     setLoading(false);
   }
@@ -713,35 +707,30 @@ const handleAction = async () => {
 ### Planned Features
 
 1. **Packer Module**
-
    - View confirmed orders
    - Mark as packed
    - Generate packing slips
    - Assign to deliveryman
 
 2. **Delivery Module**
-
    - My deliveries view
    - Route optimization
    - Cash collection tracking
    - GPS integration
 
 3. **Accounts Module**
-
    - Cash receipt management
    - Daily reconciliation
    - Payment reports
    - Financial analytics
 
 4. **Analytics Dashboard**
-
    - Real-time metrics
    - Employee performance
    - Order trends
    - Revenue tracking
 
 5. **Notifications**
-
    - Real-time alerts
    - New order notifications
    - Assignment notifications

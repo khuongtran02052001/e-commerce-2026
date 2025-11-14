@@ -1,21 +1,21 @@
-import { type SchemaTypeDefinition } from "sanity";
+import { type SchemaTypeDefinition } from 'sanity';
 
-import { blockContentType } from "./blockContentType";
-import { categoryType } from "./categoryType";
-import { productType } from "./productType";
-import { orderType } from "./orderType";
-import { bannerType } from "./bannerType";
-import { brandType } from "./brandTypes";
-import { blogType } from "./blogType";
-import { blogCategoryType } from "./blogCategoryType";
-import { authorType } from "./authType";
-import { addressType } from "./addressType";
-import { contactType } from "./contactType";
-import { sentNotificationType } from "./sentNotificationType";
-import { userType } from "./userType";
-import { userAccessRequestType } from "./userAccessRequestType";
-import { reviewType } from "./reviewType";
-import { subscriptionType } from "./subscriptionType";
+import { addressType } from './addressType';
+import { authorType } from './authType';
+import { bannerType } from './bannerType';
+import { blockContentType } from './blockContentType';
+import { blogCategoryType } from './blogCategoryType';
+import { blogType } from './blogType';
+import { brandType } from './brandTypes';
+import { categoryType } from './categoryType';
+import { contactType } from './contactType';
+import { orderType } from './orderType';
+import { productType } from './productType';
+import { reviewType } from './reviewType';
+import { sentNotificationType } from './sentNotificationType';
+import { subscriptionType } from './subscriptionType';
+import { userAccessRequestType } from './userAccessRequestType';
+import { userType } from './userType';
 
 export const schema: { types: SchemaTypeDefinition[] } = {
   types: [

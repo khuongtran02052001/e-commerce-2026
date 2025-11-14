@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server";
-import { auth, currentUser, clerkClient } from "@clerk/nextjs/server";
-import { client } from "@/sanity/lib/client";
-import { isUserAdmin } from "@/lib/adminUtils";
+import { isUserAdmin } from '@/lib/adminUtils';
+import { client } from '@/sanity/lib/client';
+import { auth, clerkClient, currentUser } from '@clerk/nextjs/server';
+import { NextResponse } from 'next/server';
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 export const revalidate = 60; // Cache for 60 seconds
 
 export async function GET() {
@@ -13,16 +13,13 @@ export async function GET() {
     const user = await currentUser();
 
     if (!userId || !user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // Check if user is admin
     const userEmail = user.emailAddresses[0]?.emailAddress;
     if (!isUserAdmin(userEmail)) {
-      return NextResponse.json(
-        { error: "Forbidden: Admin access required" },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
     }
 
     // Calculate date ranges for comparison
@@ -53,7 +50,7 @@ export async function GET() {
           currentMonthStart: currentMonthStart.toISOString(),
           lastMonthStart: lastMonthStart.toISOString(),
           lastMonthEnd: lastMonthEnd.toISOString(),
-        }
+        },
       ),
 
       // Get total users from Clerk
@@ -63,7 +60,7 @@ export async function GET() {
           const usersResponse = await clerk.users.getUserList({ limit: 1 });
           return usersResponse.totalCount || 0;
         } catch (error) {
-          console.error("Error fetching users from Clerk:", error);
+          console.error('Error fetching users from Clerk:', error);
           return 0;
         }
       })(),
@@ -95,14 +92,9 @@ export async function GET() {
       totalOrders: allStats.totalOrders || 0,
       totalUsers,
       totalProducts: allStats.totalProducts || 0,
-      revenueChange: Number(
-        calculateChange(recentRevenue, lastMonthRevenue).toFixed(1)
-      ),
+      revenueChange: Number(calculateChange(recentRevenue, lastMonthRevenue).toFixed(1)),
       ordersChange: Number(
-        calculateChange(
-          allStats.recentOrders || 0,
-          allStats.lastMonthOrders || 0
-        ).toFixed(1)
+        calculateChange(allStats.recentOrders || 0, allStats.lastMonthOrders || 0).toFixed(1),
       ),
       usersChange: totalUsers > 0 ? 5.2 : 0,
       productsChange: allStats.totalProducts > 0 ? 2.1 : 0,
@@ -118,14 +110,11 @@ export async function GET() {
 
     return NextResponse.json(stats, {
       headers: {
-        "Cache-Control": "private, max-age=60, stale-while-revalidate=30",
+        'Cache-Control': 'private, max-age=60, stale-while-revalidate=30',
       },
     });
   } catch (error) {
-    console.error("Error fetching admin stats:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    console.error('Error fetching admin stats:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -1,13 +1,12 @@
-"use client";
-import { Product } from "@/sanity.types";
-import useCartStore from "@/store";
-import { Heart } from "lucide-react";
-import BreadcrumbLink from "@/components/BreadcrumbLink";
-import React, { useEffect, useState } from "react";
-import { toast } from "sonner";
-import isArray from "js-isarray";
-import _ from "lodash";
-import { IProductMock } from "@/mock-data";
+'use client';
+import BreadcrumbLink from '@/components/BreadcrumbLink';
+import { IProductMock } from '@/mock-data';
+import useCartStore from '@/store';
+import isArray from 'js-isarray';
+import _ from 'lodash';
+import { Heart } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 // import { trackWishlistAdd, trackWishlistRemove } from "@/lib/analytics";
 
 const FavoriteButton = ({
@@ -21,10 +20,7 @@ const FavoriteButton = ({
   const [existingProduct, setExistingProduct] = useState<IProductMock | null>(null);
 
   useEffect(() => {
-    const availableItem = _.find(
-      favoriteProduct,
-      (item) => item?.id === product?.id
-    );
+    const availableItem = _.find(favoriteProduct, (item) => item?.id === product?.id);
     setExistingProduct(availableItem || null);
   }, [product, favoriteProduct]);
 
@@ -34,15 +30,10 @@ const FavoriteButton = ({
       const isRemoving = !!existingProduct;
 
       addToFavorite(product).then(() => {
-        toast.success(
-          isRemoving ? "Removed from wishlist" : "Added to wishlist",
-          {
-            description: isRemoving
-              ? "Product removed successfully!"
-              : "Product added successfully!",
-            duration: 3000,
-          }
-        );
+        toast.success(isRemoving ? 'Removed from wishlist' : 'Added to wishlist', {
+          description: isRemoving ? 'Product removed successfully!' : 'Product added successfully!',
+          duration: 3000,
+        });
 
         // Track wishlist analytics
         // if (isRemoving) {
@@ -63,20 +54,20 @@ const FavoriteButton = ({
     <>
       {!showProduct ? (
         <BreadcrumbLink
-          href={"/wishlist"}
+          href={'/wishlist'}
           className="group relative hover:text-shop_light_green hoverEffect"
         >
           <Heart className="group-hover:text-shop_light_green hoverEffect mt-.5" />
           {/* {isArray(favoriteProduct) && favoriteProduct.length > 0 && ( */}
           <span
             className={`absolute -top-1 -right-1 bg-shop_btn_dark_green text-white rounded-full text-xs font-semibold flex items-center justify-center min-w-[14px] h-[14px] ${
-              favoriteProduct.length > 9 ? "px-1" : ""
+              favoriteProduct.length > 9 ? 'px-1' : ''
             }`}
           >
             {/* {favoriteProduct.length > 9 ? "9+" : favoriteProduct.length} */}
             {isArray(favoriteProduct) && favoriteProduct.length > 0
               ? favoriteProduct.length > 9
-                ? "9+"
+                ? '9+'
                 : favoriteProduct.length
               : 0}
           </span>
@@ -88,7 +79,7 @@ const FavoriteButton = ({
           className="group relative hover:text-shop_light_green hoverEffect border border-shop_light_green/80 p-1.5 rounded-sm "
         >
           <Heart
-            fill={existingProduct ? "#063c28" : "#fff"}
+            fill={existingProduct ? '#063c28' : '#fff'}
             className="text-shop_light_green/80 group-hover:text-shop_light_green hoverEffect mt-.5"
           />
         </button>

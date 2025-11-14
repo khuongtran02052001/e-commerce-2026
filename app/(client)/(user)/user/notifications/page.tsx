@@ -1,43 +1,37 @@
-"use client";
+'use client';
 
-import { useUser } from "@clerk/nextjs";
-import { useEffect, useState } from "react";
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useUser } from '@clerk/nextjs';
 import {
   Bell,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  ExternalLink,
+  Eye,
+  Gift,
   Info,
   Package,
-  ShoppingCart,
-  Gift,
   Settings,
-  ExternalLink,
-  Clock,
+  ShoppingCart,
   Trash2,
-  Eye,
-  X,
-  ChevronRight,
-  ChevronLeft,
-} from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
-import Link from "next/link";
-import { toast } from "sonner";
+} from 'lucide-react';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 interface Notification {
   id: string;
   title: string;
   message: string;
-  type: "promo" | "order" | "system" | "marketing" | "general";
+  type: 'promo' | 'order' | 'system' | 'marketing' | 'general';
   read: boolean;
-  priority: "low" | "medium" | "high" | "urgent";
+  priority: 'low' | 'medium' | 'high' | 'urgent';
   sentAt: string;
   readAt?: string;
   sentBy?: string;
@@ -52,20 +46,17 @@ export default function UserNotificationsPage() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
-  const [selectedNotification, setSelectedNotification] =
-    useState<Notification | null>(null);
+  const [selectedNotification, setSelectedNotification] = useState<Notification | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [selectedNotifications, setSelectedNotifications] = useState<string[]>(
-    []
-  );
+  const [selectedNotifications, setSelectedNotifications] = useState<string[]>([]);
   const [isDeletingBulk, setIsDeletingBulk] = useState(false);
 
   const fetchNotifications = async () => {
     try {
       setLoading(true);
-      const response = await fetch("/api/user/notifications");
+      const response = await fetch('/api/user/notifications');
       if (response.ok) {
         const data = await response.json();
         if (data.success) {
@@ -81,8 +72,8 @@ export default function UserNotificationsPage() {
         }
       }
     } catch (error) {
-      console.error("Error fetching notifications:", error);
-      toast.error("Failed to fetch notifications");
+      console.error('Error fetching notifications:', error);
+      toast.error('Failed to fetch notifications');
     } finally {
       setLoading(false);
     }
@@ -114,10 +105,10 @@ export default function UserNotificationsPage() {
 
   const markAsRead = async (notificationId: string) => {
     try {
-      const response = await fetch("/api/user/notifications", {
-        method: "PATCH",
+      const response = await fetch('/api/user/notifications', {
+        method: 'PATCH',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({ notificationId }),
       });
@@ -130,7 +121,7 @@ export default function UserNotificationsPage() {
                 read: true,
                 readAt: new Date().toISOString(),
               }
-            : notification
+            : notification,
         );
         setAllNotifications(updatedNotifs);
         setUnreadCount((prev) => Math.max(0, prev - 1));
@@ -138,36 +129,29 @@ export default function UserNotificationsPage() {
         // Update selected notification if it's the one being marked
         if (selectedNotification?.id === notificationId) {
           setSelectedNotification((prev) =>
-            prev
-              ? { ...prev, read: true, readAt: new Date().toISOString() }
-              : null
+            prev ? { ...prev, read: true, readAt: new Date().toISOString() } : null,
           );
         }
       }
     } catch (error) {
-      console.error("Error marking notification as read:", error);
+      console.error('Error marking notification as read:', error);
     }
   };
 
   const deleteNotification = async (notificationId: string) => {
     try {
-      const response = await fetch(
-        `/api/user/notifications?id=${notificationId}`,
-        {
-          method: "DELETE",
-        }
-      );
+      const response = await fetch(`/api/user/notifications?id=${notificationId}`, {
+        method: 'DELETE',
+      });
 
       if (response.ok) {
         const updatedNotifs = allNotifications.filter(
-          (notification) => notification.id !== notificationId
+          (notification) => notification.id !== notificationId,
         );
         setAllNotifications(updatedNotifs);
         setTotalPages(Math.ceil(updatedNotifs.length / NOTIFICATIONS_PER_PAGE));
 
-        const notification = allNotifications.find(
-          (n) => n.id === notificationId
-        );
+        const notification = allNotifications.find((n) => n.id === notificationId);
         if (notification && !notification.read) {
           setUnreadCount((prev) => Math.max(0, prev - 1));
         }
@@ -179,30 +163,28 @@ export default function UserNotificationsPage() {
         }
 
         // Remove from selected if it was selected
-        setSelectedNotifications((prev) =>
-          prev.filter((id) => id !== notificationId)
-        );
+        setSelectedNotifications((prev) => prev.filter((id) => id !== notificationId));
 
-        toast.success("Notification deleted");
+        toast.success('Notification deleted');
       } else {
-        toast.error("Failed to delete notification");
+        toast.error('Failed to delete notification');
       }
     } catch (error) {
-      console.error("Error deleting notification:", error);
-      toast.error("Failed to delete notification");
+      console.error('Error deleting notification:', error);
+      toast.error('Failed to delete notification');
     }
   };
 
   const handleBulkDelete = async () => {
     if (selectedNotifications.length === 0) {
-      toast.error("No notifications selected");
+      toast.error('No notifications selected');
       return;
     }
 
     setIsDeletingBulk(true);
     try {
       const deletePromises = selectedNotifications.map((id) =>
-        fetch(`/api/user/notifications?id=${id}`, { method: "DELETE" })
+        fetch(`/api/user/notifications?id=${id}`, { method: 'DELETE' }),
       );
 
       const results = await Promise.all(deletePromises);
@@ -210,14 +192,14 @@ export default function UserNotificationsPage() {
 
       if (successCount > 0) {
         const updatedNotifs = allNotifications.filter(
-          (notification) => !selectedNotifications.includes(notification.id)
+          (notification) => !selectedNotifications.includes(notification.id),
         );
         setAllNotifications(updatedNotifs);
         setTotalPages(Math.ceil(updatedNotifs.length / NOTIFICATIONS_PER_PAGE));
 
         // Update unread count
         const deletedUnreadCount = allNotifications.filter(
-          (n) => selectedNotifications.includes(n.id) && !n.read
+          (n) => selectedNotifications.includes(n.id) && !n.read,
         ).length;
         setUnreadCount((prev) => Math.max(0, prev - deletedUnreadCount));
 
@@ -225,22 +207,17 @@ export default function UserNotificationsPage() {
         toast.success(`${successCount} notification(s) deleted`);
 
         // Adjust page if needed
-        if (
-          notifications.length === selectedNotifications.length &&
-          currentPage > 1
-        ) {
+        if (notifications.length === selectedNotifications.length && currentPage > 1) {
           setCurrentPage(currentPage - 1);
         }
       }
 
       if (results.length > successCount) {
-        toast.error(
-          `Failed to delete ${results.length - successCount} notification(s)`
-        );
+        toast.error(`Failed to delete ${results.length - successCount} notification(s)`);
       }
     } catch (error) {
-      console.error("Error deleting notifications:", error);
-      toast.error("Failed to delete notifications");
+      console.error('Error deleting notifications:', error);
+      toast.error('Failed to delete notifications');
     } finally {
       setIsDeletingBulk(false);
     }
@@ -250,15 +227,12 @@ export default function UserNotificationsPage() {
     setSelectedNotifications((prev) =>
       prev.includes(notificationId)
         ? prev.filter((id) => id !== notificationId)
-        : [...prev, notificationId]
+        : [...prev, notificationId],
     );
   };
 
   const toggleSelectAll = () => {
-    if (
-      selectedNotifications.length === notifications.length &&
-      notifications.length > 0
-    ) {
+    if (selectedNotifications.length === notifications.length && notifications.length > 0) {
       setSelectedNotifications([]);
     } else {
       setSelectedNotifications(notifications.map((n) => n.id));
@@ -266,17 +240,17 @@ export default function UserNotificationsPage() {
   };
 
   const getNotificationIcon = (type: string) => {
-    const iconClass = "h-5 w-5";
+    const iconClass = 'h-5 w-5';
     switch (type) {
-      case "order":
+      case 'order':
         return <Package className={`${iconClass} text-blue-600`} />;
-      case "promo":
+      case 'promo':
         return <Gift className={`${iconClass} text-purple-600`} />;
-      case "marketing":
+      case 'marketing':
         return <ShoppingCart className={`${iconClass} text-green-600`} />;
-      case "system":
+      case 'system':
         return <Settings className={`${iconClass} text-gray-600`} />;
-      case "general":
+      case 'general':
       default:
         return <Info className={`${iconClass} text-blue-600`} />;
     }
@@ -284,41 +258,33 @@ export default function UserNotificationsPage() {
 
   const getNotificationColor = (type: string) => {
     switch (type) {
-      case "order":
-        return "bg-blue-100 text-blue-800";
-      case "promo":
-        return "bg-purple-100 text-purple-800";
-      case "marketing":
-        return "bg-green-100 text-green-800";
-      case "system":
-        return "bg-gray-100 text-gray-800";
-      case "general":
+      case 'order':
+        return 'bg-blue-100 text-blue-800';
+      case 'promo':
+        return 'bg-purple-100 text-purple-800';
+      case 'marketing':
+        return 'bg-green-100 text-green-800';
+      case 'system':
+        return 'bg-gray-100 text-gray-800';
+      case 'general':
       default:
-        return "bg-blue-100 text-blue-800";
+        return 'bg-blue-100 text-blue-800';
     }
   };
 
   const getPriorityBadge = (priority: string) => {
     switch (priority) {
-      case "urgent":
+      case 'urgent':
         return (
           <Badge variant="destructive" className="text-xs">
             Urgent
           </Badge>
         );
-      case "high":
-        return (
-          <Badge className="bg-orange-500 hover:bg-orange-600 text-xs">
-            High
-          </Badge>
-        );
-      case "medium":
-        return (
-          <Badge className="bg-yellow-500 hover:bg-yellow-600 text-xs">
-            Medium
-          </Badge>
-        );
-      case "low":
+      case 'high':
+        return <Badge className="bg-orange-500 hover:bg-orange-600 text-xs">High</Badge>;
+      case 'medium':
+        return <Badge className="bg-yellow-500 hover:bg-yellow-600 text-xs">Medium</Badge>;
+      case 'low':
       default:
         return (
           <Badge variant="secondary" className="text-xs">
@@ -331,22 +297,19 @@ export default function UserNotificationsPage() {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
-    const diffInMinutes = Math.floor(
-      (now.getTime() - date.getTime()) / (1000 * 60)
-    );
+    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
 
-    if (diffInMinutes < 1) return "Just now";
+    if (diffInMinutes < 1) return 'Just now';
     if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
     if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h ago`;
-    if (diffInMinutes < 10080)
-      return `${Math.floor(diffInMinutes / 1440)}d ago`;
+    if (diffInMinutes < 10080) return `${Math.floor(diffInMinutes / 1440)}d ago`;
 
     return date.toLocaleDateString();
   };
 
   const truncateMessage = (message: string, maxLength: number = 100) => {
     if (message.length <= maxLength) return message;
-    return message.substring(0, maxLength) + "...";
+    return message.substring(0, maxLength) + '...';
   };
 
   if (loading) {
@@ -397,17 +360,10 @@ export default function UserNotificationsPage() {
             <h1 className="text-2xl font-bold text-gray-900">Notifications</h1>
             <div className="text-gray-600 flex items-center gap-2">
               <span>Stay updated with your account activity</span>
-              {unreadCount > 0 && (
-                <Badge variant="destructive">{unreadCount} unread</Badge>
-              )}
+              {unreadCount > 0 && <Badge variant="destructive">{unreadCount} unread</Badge>}
             </div>
           </div>
-          <Button
-            onClick={fetchNotifications}
-            variant="outline"
-            size="sm"
-            disabled={loading}
-          >
+          <Button onClick={fetchNotifications} variant="outline" size="sm" disabled={loading}>
             <Bell className="h-4 w-4 mr-2" />
             Refresh
           </Button>
@@ -418,9 +374,7 @@ export default function UserNotificationsPage() {
             <CardContent className="pt-6">
               <div className="text-center py-12">
                 <Bell className="mx-auto h-12 w-12 text-gray-400" />
-                <h3 className="mt-2 text-sm font-medium text-gray-900">
-                  No notifications
-                </h3>
+                <h3 className="mt-2 text-sm font-medium text-gray-900">No notifications</h3>
                 <p className="mt-1 text-sm text-gray-500">
                   You&apos;re all caught up! Check back later for updates.
                 </p>
@@ -452,7 +406,7 @@ export default function UserNotificationsPage() {
                         disabled={isDeletingBulk}
                       >
                         <Trash2 className="h-4 w-4 mr-2" />
-                        {isDeletingBulk ? "Deleting..." : "Delete Selected"}
+                        {isDeletingBulk ? 'Deleting...' : 'Delete Selected'}
                       </Button>
                     </div>
                   </div>
@@ -465,8 +419,7 @@ export default function UserNotificationsPage() {
               <Checkbox
                 id="select-all"
                 checked={
-                  selectedNotifications.length === notifications.length &&
-                  notifications.length > 0
+                  selectedNotifications.length === notifications.length && notifications.length > 0
                 }
                 onCheckedChange={toggleSelectAll}
               />
@@ -483,30 +436,20 @@ export default function UserNotificationsPage() {
                 <Card
                   key={notification.id}
                   className={`hover:shadow-md transition-shadow ${
-                    !notification.read
-                      ? "border-l-4 border-l-blue-500 bg-blue-50/20"
-                      : ""
+                    !notification.read ? 'border-l-4 border-l-blue-500 bg-blue-50/20' : ''
                   } ${
-                    selectedNotifications.includes(notification.id)
-                      ? "ring-2 ring-blue-500"
-                      : ""
+                    selectedNotifications.includes(notification.id) ? 'ring-2 ring-blue-500' : ''
                   }`}
                 >
                   <CardHeader className="pb-2">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex items-start gap-3 flex-1 min-w-0">
                         <Checkbox
-                          checked={selectedNotifications.includes(
-                            notification.id
-                          )}
-                          onCheckedChange={() =>
-                            toggleNotificationSelection(notification.id)
-                          }
+                          checked={selectedNotifications.includes(notification.id)}
+                          onCheckedChange={() => toggleNotificationSelection(notification.id)}
                           className="mt-1"
                         />
-                        <div className="mt-0.5">
-                          {getNotificationIcon(notification.type)}
-                        </div>
+                        <div className="mt-0.5">{getNotificationIcon(notification.type)}</div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap mb-1">
                             <CardTitle className="text-base font-semibold">
@@ -517,11 +460,7 @@ export default function UserNotificationsPage() {
                             )}
                           </div>
                           <div className="flex items-center gap-2 flex-wrap">
-                            <Badge
-                              className={`text-xs ${getNotificationColor(
-                                notification.type
-                              )}`}
-                            >
+                            <Badge className={`text-xs ${getNotificationColor(notification.type)}`}>
                               {notification.type}
                             </Badge>
                             {getPriorityBadge(notification.priority)}
@@ -570,16 +509,14 @@ export default function UserNotificationsPage() {
                 <CardContent className="pt-4">
                   <div className="flex items-center justify-between">
                     <div className="text-sm text-gray-600">
-                      Page {currentPage} of {totalPages} (
-                      {allNotifications.length} total notifications)
+                      Page {currentPage} of {totalPages} ({allNotifications.length} total
+                      notifications)
                     </div>
                     <div className="flex items-center gap-2">
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() =>
-                          setCurrentPage((prev) => Math.max(1, prev - 1))
-                        }
+                        onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                         disabled={currentPage === 1}
                       >
                         <ChevronLeft className="h-4 w-4 mr-1" />
@@ -588,11 +525,7 @@ export default function UserNotificationsPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() =>
-                          setCurrentPage((prev) =>
-                            Math.min(totalPages, prev + 1)
-                          )
-                        }
+                        onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
                         disabled={currentPage === totalPages}
                       >
                         Next
@@ -616,14 +549,10 @@ export default function UserNotificationsPage() {
                 <div className="flex items-start gap-3">
                   {getNotificationIcon(selectedNotification.type)}
                   <div className="flex-1 min-w-0">
-                    <SheetTitle className="text-xl mb-2">
-                      {selectedNotification.title}
-                    </SheetTitle>
+                    <SheetTitle className="text-xl mb-2">{selectedNotification.title}</SheetTitle>
                     <div className="flex items-center gap-2 flex-wrap">
                       <Badge
-                        className={`text-xs ${getNotificationColor(
-                          selectedNotification.type
-                        )}`}
+                        className={`text-xs ${getNotificationColor(selectedNotification.type)}`}
                       >
                         {selectedNotification.type}
                       </Badge>
@@ -666,9 +595,7 @@ export default function UserNotificationsPage() {
 
                 {/* Message Content */}
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-900 mb-2">
-                    Message
-                  </h3>
+                  <h3 className="text-sm font-semibold text-gray-900 mb-2">Message</h3>
                   <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
                     <p className="text-sm text-gray-700 whitespace-pre-wrap">
                       {selectedNotification.message}
@@ -679,29 +606,21 @@ export default function UserNotificationsPage() {
                 {/* Action Button */}
                 {selectedNotification.actionUrl && (
                   <div>
-                    <h3 className="text-sm font-semibold text-gray-900 mb-2">
-                      Quick Action
-                    </h3>
-                    <Button
-                      asChild
-                      className="w-full"
-                      onClick={() => setIsSidebarOpen(false)}
-                    >
+                    <h3 className="text-sm font-semibold text-gray-900 mb-2">Quick Action</h3>
+                    <Button asChild className="w-full" onClick={() => setIsSidebarOpen(false)}>
                       <Link
                         href={selectedNotification.actionUrl}
                         target={
-                          selectedNotification.actionUrl.startsWith("http")
-                            ? "_blank"
-                            : undefined
+                          selectedNotification.actionUrl.startsWith('http') ? '_blank' : undefined
                         }
                         rel={
-                          selectedNotification.actionUrl.startsWith("http")
-                            ? "noopener noreferrer"
+                          selectedNotification.actionUrl.startsWith('http')
+                            ? 'noopener noreferrer'
                             : undefined
                         }
                         className="flex items-center justify-center"
                       >
-                        {selectedNotification.actionUrl.startsWith("http") ? (
+                        {selectedNotification.actionUrl.startsWith('http') ? (
                           <>
                             Open Link
                             <ExternalLink className="h-4 w-4 ml-2" />
@@ -725,7 +644,7 @@ export default function UserNotificationsPage() {
                       className="flex-1"
                       onClick={() => {
                         markAsRead(selectedNotification.id);
-                        toast.success("Marked as read");
+                        toast.success('Marked as read');
                       }}
                     >
                       <Eye className="h-4 w-4 mr-2" />

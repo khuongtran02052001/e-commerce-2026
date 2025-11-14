@@ -1,26 +1,8 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { motion } from "motion/react";
-import {
-  Mail,
-  Phone,
-  MessageSquare,
-  Clock,
-  ChevronRight,
-  Search,
-  ShoppingBag,
-  CreditCard,
-  Truck,
-  RotateCcw,
-  Shield,
-  BookOpen,
-  Video,
-} from "lucide-react";
-import Link from "next/link";
-import Container from "@/components/Container";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import Container from '@/components/Container';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -28,144 +10,161 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import {
+  BookOpen,
+  ChevronRight,
+  Clock,
+  CreditCard,
+  Mail,
+  MessageSquare,
+  Phone,
+  RotateCcw,
+  Search,
+  Shield,
+  ShoppingBag,
+  Truck,
+  Video,
+} from 'lucide-react';
+import { motion } from 'motion/react';
+import Link from 'next/link';
+import { useState } from 'react';
 
 const HelpPage = () => {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
 
   const helpCategories = [
     {
-      title: "Getting Started",
+      title: 'Getting Started',
       icon: BookOpen,
-      description: "Learn the basics of shopping with us",
-      color: "from-shop_light_green to-shop_dark_green",
+      description: 'Learn the basics of shopping with us',
+      color: 'from-shop_light_green to-shop_dark_green',
       links: [
-        { title: "How to Create an Account", href: "/faq#account-1" },
-        { title: "Placing Your First Order", href: "/faq#shopping-1" },
-        { title: "Setting Up Payment Methods", href: "/faq#payment-1" },
-        { title: "Managing Your Profile", href: "/faq#account-3" },
+        { title: 'How to Create an Account', href: '/faq#account-1' },
+        { title: 'Placing Your First Order', href: '/faq#shopping-1' },
+        { title: 'Setting Up Payment Methods', href: '/faq#payment-1' },
+        { title: 'Managing Your Profile', href: '/faq#account-3' },
       ],
     },
     {
-      title: "Orders & Shopping",
+      title: 'Orders & Shopping',
       icon: ShoppingBag,
-      description: "Everything about placing and managing orders",
-      color: "from-shop_orange to-shop_light_orange",
+      description: 'Everything about placing and managing orders',
+      color: 'from-shop_orange to-shop_light_orange',
       links: [
-        { title: "How to Place an Order", href: "/faq#shopping-1" },
-        { title: "Modifying Your Order", href: "/faq#shopping-2" },
-        { title: "Order Tracking", href: "/faq#shopping-3" },
-        { title: "Out of Stock Items", href: "/faq#shopping-4" },
+        { title: 'How to Place an Order', href: '/faq#shopping-1' },
+        { title: 'Modifying Your Order', href: '/faq#shopping-2' },
+        { title: 'Order Tracking', href: '/faq#shopping-3' },
+        { title: 'Out of Stock Items', href: '/faq#shopping-4' },
       ],
     },
     {
-      title: "Payments & Billing",
+      title: 'Payments & Billing',
       icon: CreditCard,
-      description: "Payment methods, billing, and refunds",
-      color: "from-light-blue to-dark-blue",
+      description: 'Payment methods, billing, and refunds',
+      color: 'from-light-blue to-dark-blue',
       links: [
-        { title: "Accepted Payment Methods", href: "/faq#payment-1" },
-        { title: "Payment Security", href: "/faq#payment-2" },
-        { title: "When You&apos;ll Be Charged", href: "/faq#payment-3" },
-        { title: "Refunds & Returns", href: "/faq#payment-4" },
+        { title: 'Accepted Payment Methods', href: '/faq#payment-1' },
+        { title: 'Payment Security', href: '/faq#payment-2' },
+        { title: 'When You&apos;ll Be Charged', href: '/faq#payment-3' },
+        { title: 'Refunds & Returns', href: '/faq#payment-4' },
       ],
     },
     {
-      title: "Shipping & Delivery",
+      title: 'Shipping & Delivery',
       icon: Truck,
-      description: "Shipping options, costs, and delivery info",
-      color: "from-shop_light_green to-light-green",
+      description: 'Shipping options, costs, and delivery info',
+      color: 'from-shop_light_green to-light-green',
       links: [
-        { title: "Shipping Costs", href: "/faq#shipping-1" },
-        { title: "Delivery Times", href: "/faq#shipping-2" },
-        { title: "International Shipping", href: "/faq#shipping-3" },
-        { title: "Lost or Damaged Packages", href: "/faq#shipping-4" },
+        { title: 'Shipping Costs', href: '/faq#shipping-1' },
+        { title: 'Delivery Times', href: '/faq#shipping-2' },
+        { title: 'International Shipping', href: '/faq#shipping-3' },
+        { title: 'Lost or Damaged Packages', href: '/faq#shipping-4' },
       ],
     },
     {
-      title: "Returns & Exchanges",
+      title: 'Returns & Exchanges',
       icon: RotateCcw,
-      description: "Return policy, exchanges, and refunds",
-      color: "from-dark-red to-light-orange",
+      description: 'Return policy, exchanges, and refunds',
+      color: 'from-dark-red to-light-orange',
       links: [
-        { title: "Return Policy", href: "/faq#returns-1" },
-        { title: "How to Return Items", href: "/faq#returns-2" },
-        { title: "Refund Timeline", href: "/faq#returns-3" },
-        { title: "Exchanges", href: "/faq#returns-4" },
+        { title: 'Return Policy', href: '/faq#returns-1' },
+        { title: 'How to Return Items', href: '/faq#returns-2' },
+        { title: 'Refund Timeline', href: '/faq#returns-3' },
+        { title: 'Exchanges', href: '/faq#returns-4' },
       ],
     },
     {
-      title: "Account & Security",
+      title: 'Account & Security',
       icon: Shield,
-      description: "Account management and security features",
-      color: "from-shop_dark_green to-shop_btn_dark_green",
+      description: 'Account management and security features',
+      color: 'from-shop_dark_green to-shop_btn_dark_green',
       links: [
-        { title: "Account Security", href: "/faq#account-1" },
-        { title: "Password Reset", href: "/faq#account-2" },
-        { title: "Update Information", href: "/faq#account-3" },
-        { title: "Delete Account", href: "/faq#account-4" },
+        { title: 'Account Security', href: '/faq#account-1' },
+        { title: 'Password Reset', href: '/faq#account-2' },
+        { title: 'Update Information', href: '/faq#account-3' },
+        { title: 'Delete Account', href: '/faq#account-4' },
       ],
     },
   ];
 
   const quickActions = [
     {
-      title: "Track Your Order",
-      description: "Check the status of your recent purchases",
+      title: 'Track Your Order',
+      description: 'Check the status of your recent purchases',
       icon: Search,
-      action: "Track Order",
-      href: "/orders",
-      color: "bg-shop_light_green",
+      action: 'Track Order',
+      href: '/orders',
+      color: 'bg-shop_light_green',
     },
     {
-      title: "Contact Support",
-      description: "Get help from our customer service team",
+      title: 'Contact Support',
+      description: 'Get help from our customer service team',
       icon: MessageSquare,
-      action: "Contact Us",
-      href: "/contact",
-      color: "bg-shop_orange",
+      action: 'Contact Us',
+      href: '/contact',
+      color: 'bg-shop_orange',
     },
     {
-      title: "Return an Item",
-      description: "Start a return or exchange process",
+      title: 'Return an Item',
+      description: 'Start a return or exchange process',
       icon: RotateCcw,
-      action: "Start Return",
-      href: "/orders",
-      color: "bg-dark-blue",
+      action: 'Start Return',
+      href: '/orders',
+      color: 'bg-dark-blue',
     },
   ];
 
   const supportChannels = [
     {
-      title: "Live Chat",
-      description: "Chat with our support team in real-time",
+      title: 'Live Chat',
+      description: 'Chat with our support team in real-time',
       icon: MessageSquare,
-      availability: "24/7 Available",
-      response: "Instant response",
-      action: "Start Chat",
-      color:
-        "border-shop_light_green text-shop_light_green hover:bg-shop_light_green",
+      availability: '24/7 Available',
+      response: 'Instant response',
+      action: 'Start Chat',
+      color: 'border-shop_light_green text-shop_light_green hover:bg-shop_light_green',
     },
     {
-      title: "Email Support",
-      description: "Send us a detailed message about your issue",
+      title: 'Email Support',
+      description: 'Send us a detailed message about your issue',
       icon: Mail,
-      availability: "Always Open",
-      response: "Within 2 hours",
-      action: "Send Email",
-      color: "border-shop_orange text-shop_orange hover:bg-shop_orange",
-      href: "/contact",
+      availability: 'Always Open',
+      response: 'Within 2 hours',
+      action: 'Send Email',
+      color: 'border-shop_orange text-shop_orange hover:bg-shop_orange',
+      href: '/contact',
     },
     {
-      title: "Phone Support",
-      description: "Speak directly with a support representative",
+      title: 'Phone Support',
+      description: 'Speak directly with a support representative',
       icon: Phone,
-      availability: "Mon-Fri 9AM-6PM EST",
-      response: "Immediate",
-      action: "Call Now",
-      color: "border-dark-blue text-dark-blue hover:bg-dark-blue",
-      phone: "+1 (555) 123-4567",
+      availability: 'Mon-Fri 9AM-6PM EST',
+      response: 'Immediate',
+      action: 'Call Now',
+      color: 'border-dark-blue text-dark-blue hover:bg-dark-blue',
+      phone: '+1 (555) 123-4567',
     },
   ];
 
@@ -184,8 +183,8 @@ const HelpPage = () => {
             </Badge>
             <h1 className="text-5xl lg:text-6xl font-bold mb-6">Help Center</h1>
             <p className="text-xl lg:text-2xl text-white/90 max-w-3xl mx-auto leading-relaxed">
-              Find answers, get support, and resolve issues quickly. We&apos;re
-              here to help you have the best shopping experience.
+              Find answers, get support, and resolve issues quickly. We&apos;re here to help you
+              have the best shopping experience.
             </p>
           </motion.div>
         </Container>
@@ -249,9 +248,7 @@ const HelpPage = () => {
                         <h3 className="text-lg font-semibold text-shop_dark_green mb-2">
                           {action.title}
                         </h3>
-                        <p className="text-gray-600 mb-4">
-                          {action.description}
-                        </p>
+                        <p className="text-gray-600 mb-4">{action.description}</p>
                         <Button
                           variant="outline"
                           className="border-shop_light_green text-shop_light_green hover:bg-shop_light_green hover:text-white"
@@ -294,9 +291,7 @@ const HelpPage = () => {
                       >
                         <Icon className="w-6 h-6 text-white" />
                       </div>
-                      <CardTitle className="text-shop_dark_green">
-                        {category.title}
-                      </CardTitle>
+                      <CardTitle className="text-shop_dark_green">{category.title}</CardTitle>
                       <CardDescription>{category.description}</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-2">
@@ -345,27 +340,18 @@ const HelpPage = () => {
                       <div className="inline-flex items-center justify-center w-14 h-14 bg-gray-100 rounded-full mb-4 mx-auto">
                         <Icon className="w-7 h-7 text-gray-600" />
                       </div>
-                      <CardTitle className="text-shop_dark_green">
-                        {channel.title}
-                      </CardTitle>
-                      <CardDescription className="mb-4">
-                        {channel.description}
-                      </CardDescription>
+                      <CardTitle className="text-shop_dark_green">{channel.title}</CardTitle>
+                      <CardDescription className="mb-4">{channel.description}</CardDescription>
                       <div className="space-y-1">
                         <div className="text-sm text-gray-600">
                           <Clock className="w-4 h-4 inline mr-1" />
                           {channel.availability}
                         </div>
-                        <div className="text-sm text-gray-600">
-                          Response: {channel.response}
-                        </div>
+                        <div className="text-sm text-gray-600">Response: {channel.response}</div>
                       </div>
                     </CardHeader>
                     <CardFooter>
-                      <Link
-                        href={channel.href || "/contact"}
-                        className="w-full"
-                      >
+                      <Link href={channel.href || '/contact'} className="w-full">
                         <Button
                           variant="outline"
                           className={`w-full ${channel.color} hover:text-white transition-all duration-200`}

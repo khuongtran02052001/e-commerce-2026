@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth, clerkClient } from "@clerk/nextjs/server";
-import { isUserAdmin } from "@/lib/adminUtils";
-import { client } from "@/sanity/lib/client";
+import { isUserAdmin } from '@/lib/adminUtils';
+import { client } from '@/sanity/lib/client';
+import { auth, clerkClient } from '@clerk/nextjs/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(req: NextRequest) {
   try {
@@ -9,10 +9,7 @@ export async function GET(req: NextRequest) {
     const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json(
-        { error: "Unauthorized - Not logged in" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized - Not logged in' }, { status: 401 });
     }
 
     // Get current user details to check admin status
@@ -22,23 +19,20 @@ export async function GET(req: NextRequest) {
 
     // Check if current user is admin
     if (!userEmail || !isUserAdmin(userEmail)) {
-      return NextResponse.json(
-        { error: "Forbidden - Admin access required" },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
     }
 
     // Get query parameters
     const { searchParams } = new URL(req.url);
-    const productId = searchParams.get("id");
-    const limit = parseInt(searchParams.get("limit") || "10");
-    const offset = parseInt(searchParams.get("offset") || "0");
-    const category = searchParams.get("category") || "";
-    const search = searchParams.get("search") || "";
-    const sortBy = searchParams.get("sortBy") || "_createdAt";
-    const sortOrder = searchParams.get("sortOrder") || "desc";
+    const productId = searchParams.get('id');
+    const limit = parseInt(searchParams.get('limit') || '10');
+    const offset = parseInt(searchParams.get('offset') || '0');
+    const category = searchParams.get('category') || '';
+    const search = searchParams.get('search') || '';
+    const sortBy = searchParams.get('sortBy') || '_createdAt';
+    const sortOrder = searchParams.get('sortOrder') || 'desc';
 
-    console.log("API Params - category:", category, "search:", search);
+    console.log('API Params - category:', category, 'search:', search);
 
     // If requesting a specific product by ID, return full details
     if (productId) {
@@ -81,10 +75,7 @@ export async function GET(req: NextRequest) {
       const product = await client.fetch(productQuery);
 
       if (!product) {
-        return NextResponse.json(
-          { error: "Product not found" },
-          { status: 404 }
-        );
+        return NextResponse.json({ error: 'Product not found' }, { status: 404 });
       }
 
       // Transform the data to match our interface
@@ -116,20 +107,14 @@ export async function GET(req: NextRequest) {
     const filterConditions = [];
     if (category) {
       // Use references to filter by category
-      filterConditions.push(
-        `references(*[_type == "category" && title == "${category}"]._id)`
-      );
+      filterConditions.push(`references(*[_type == "category" && title == "${category}"]._id)`);
     }
     if (search) {
-      filterConditions.push(
-        `(name match "${search}*" || description match "${search}*")`
-      );
+      filterConditions.push(`(name match "${search}*" || description match "${search}*")`);
     } // Build GROQ query
     const query = `
       *[_type == "product"${
-        filterConditions.length > 0
-          ? ` && (${filterConditions.join(" && ")})`
-          : ""
+        filterConditions.length > 0 ? ` && (${filterConditions.join(' && ')})` : ''
       }] | order(${sortBy} ${sortOrder}) [${offset}...${offset + limit}] {
         _id,
         _createdAt,
@@ -166,9 +151,7 @@ export async function GET(req: NextRequest) {
     // Get count query
     const countQuery = `
       count(*[_type == "product"${
-        filterConditions.length > 0
-          ? ` && (${filterConditions.join(" && ")})`
-          : ""
+        filterConditions.length > 0 ? ` && (${filterConditions.join(' && ')})` : ''
       }])
     `;
 
@@ -191,10 +174,7 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Error fetching products:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    console.error('Error fetching products:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -1,10 +1,9 @@
-import React, { Suspense } from "react";
-import Container from "@/components/Container";
-import Title from "@/components/Title";
+import Container from '@/components/Container';
+import Title from '@/components/Title';
+import { Suspense } from 'react';
 // import { getAllProducts, getCategories, getAllBrands } from "@/sanity/queries";
-import ProductCatalog from "@/components/ProductCatalog";
+import ProductCatalog from '@/components/ProductCatalog';
 
-import { ArrowRight, Package, Filter, Search } from "lucide-react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -12,8 +11,9 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { mockBrands, mockCategories, mockProducts } from "@/mock-data";
+} from '@/components/ui/breadcrumb';
+import { mockBrands, mockCategories, mockProducts } from '@/mock-data';
+import { ArrowRight, Filter, Package, Search } from 'lucide-react';
 
 const ProductPage = async () => {
   // const [products, categories, brands] = await Promise.all([
@@ -21,10 +21,9 @@ const ProductPage = async () => {
   //   getCategories(),
   //   getAllBrands(),
   // ]);
-  const products = mockProducts
-  const categories = mockCategories
-  const brands = mockBrands
-
+  const products = mockProducts;
+  const categories = mockCategories;
+  const brands = mockBrands;
 
   return (
     <div className="bg-gradient-to-b from-gray-50 to-white min-h-screen">
@@ -42,9 +41,7 @@ const ProductPage = async () => {
                   </BreadcrumbItem>
                   <BreadcrumbSeparator className="text-white/60" />
                   <BreadcrumbItem>
-                    <BreadcrumbPage className="text-white font-medium">
-                      Products
-                    </BreadcrumbPage>
+                    <BreadcrumbPage className="text-white font-medium">Products</BreadcrumbPage>
                   </BreadcrumbItem>
                 </BreadcrumbList>
               </Breadcrumb>
@@ -59,9 +56,8 @@ const ProductPage = async () => {
               </div>
 
               <p className="text-lg md:text-xl text-white/90 leading-relaxed mb-8">
-                Discover our complete collection of premium products. From
-                cutting-edge electronics to stylish accessories, find everything
-                you need in one place.
+                Discover our complete collection of premium products. From cutting-edge electronics
+                to stylish accessories, find everything you need in one place.
               </p>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -70,12 +66,8 @@ const ProductPage = async () => {
                     <Package className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <p className="font-semibold text-white">
-                      {products?.length || 0}+ Products
-                    </p>
-                    <p className="text-sm text-white/70">
-                      Premium Quality Items
-                    </p>
+                    <p className="font-semibold text-white">{products?.length || 0}+ Products</p>
+                    <p className="text-sm text-white/70">Premium Quality Items</p>
                   </div>
                 </div>
 
@@ -84,9 +76,7 @@ const ProductPage = async () => {
                     <Filter className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <p className="font-semibold text-white">
-                      {categories?.length || 0} Categories
-                    </p>
+                    <p className="font-semibold text-white">{categories?.length || 0} Categories</p>
                     <p className="text-sm text-white/70">Easy to Navigate</p>
                   </div>
                 </div>
@@ -118,11 +108,7 @@ const ProductPage = async () => {
             </div>
           }
         >
-          <ProductCatalog
-            initialProducts={products}
-            categories={categories}
-            brands={brands}
-          />
+          <ProductCatalog initialProducts={products} categories={categories} brands={brands} />
         </Suspense>
       </Container>
 
@@ -130,12 +116,10 @@ const ProductPage = async () => {
       <div className="bg-shop_light_bg border-t">
         <Container>
           <div className="py-12 text-center">
-            <Title className="text-2xl mb-4">
-              Can&apos;t find what you&apos;re looking for?
-            </Title>
+            <Title className="text-2xl mb-4">Can&apos;t find what you&apos;re looking for?</Title>
             <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
-              Our customer support team is here to help you find the perfect
-              product. Get in touch with us for personalized recommendations.
+              Our customer support team is here to help you find the perfect product. Get in touch
+              with us for personalized recommendations.
             </p>
             <button className="inline-flex items-center gap-2 bg-shop_dark_green text-white px-8 py-3 rounded-lg font-semibold hover:bg-shop_dark_green/90 transition-colors">
               Contact Support

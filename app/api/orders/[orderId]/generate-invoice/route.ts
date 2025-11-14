@@ -1,24 +1,21 @@
-import { NextRequest, NextResponse } from "next/server";
-import { currentUser } from "@clerk/nextjs/server";
-import { writeClient } from "@/sanity/lib/client";
-import stripe from "@/lib/stripe";
+import stripe from '@/lib/stripe';
+import { writeClient } from '@/sanity/lib/client';
+import { currentUser } from '@clerk/nextjs/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ orderId: string }> }
+  { params }: { params: Promise<{ orderId: string }> },
 ) {
   try {
     const user = await currentUser();
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { orderId } = await params;
     if (!orderId) {
-      return NextResponse.json(
-        { error: "Order ID is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Order ID is required' }, { status: 400 });
     }
 
     // Get the order from Sanity
@@ -49,19 +46,19 @@ export async function POST(
         stripePaymentIntentId,
         invoice
       }`,
-      { orderId, clerkUserId: user.id }
+      { orderId, clerkUserId: user.id },
     );
 
     if (!order) {
       console.error(`Order not found: ${orderId}`);
-      return NextResponse.json({ error: "Order not found" }, { status: 404 });
+      return NextResponse.json({ error: 'Order not found' }, { status: 404 });
     }
 
     // Check if order is paid and doesn't already have an invoice
-    if (order.paymentStatus !== "paid" && order.status !== "paid") {
+    if (order.paymentStatus !== 'paid' && order.status !== 'paid') {
       return NextResponse.json(
-        { error: "Cannot generate invoice for unpaid order" },
-        { status: 400 }
+        { error: 'Cannot generate invoice for unpaid order' },
+        { status: 400 },
       );
     }
 
@@ -71,24 +68,21 @@ export async function POST(
         {
           success: true,
           invoice: order.invoice,
-          message: "Invoice already exists",
+          message: 'Invoice already exists',
         },
-        { status: 200 }
+        { status: 200 },
       );
     }
 
     // Validate required fields
     if (!order.products || order.products.length === 0) {
       console.error(`No products found for order: ${orderId}`);
-      return NextResponse.json(
-        { error: "No products found in order" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'No products found in order' }, { status: 400 });
     }
 
     // Validate currency
-    const currency = (order.currency || "USD").toLowerCase();
-    if (!["usd", "eur", "gbp", "cad", "aud"].includes(currency)) {
+    const currency = (order.currency || 'USD').toLowerCase();
+    if (!['usd', 'eur', 'gbp', 'cad', 'aud'].includes(currency)) {
       console.warn(`Unsupported currency: ${currency}, defaulting to USD`);
     }
 
@@ -98,8 +92,8 @@ export async function POST(
     // If we don't have a valid Stripe customer ID, create one
     if (
       !stripeCustomerId ||
-      stripeCustomerId.includes("@") ||
-      !stripeCustomerId.startsWith("cus_")
+      stripeCustomerId.includes('@') ||
+      !stripeCustomerId.startsWith('cus_')
     ) {
       try {
         // First, try to find existing customer by email
@@ -128,8 +122,8 @@ export async function POST(
       } catch (customerError) {
         console.error(`Failed to create/find Stripe customer:`, customerError);
         return NextResponse.json(
-          { error: "Failed to create or find Stripe customer" },
-          { status: 500 }
+          { error: 'Failed to create or find Stripe customer' },
+          { status: 500 },
         );
       }
     }
@@ -140,11 +134,11 @@ export async function POST(
       description: `Invoice for Order ${order.orderNumber}`,
       metadata: {
         orderId: order._id,
-        orderNumber: order.orderNumber || "",
-        customerName: order.customerName || "",
+        orderNumber: order.orderNumber || '',
+        customerName: order.customerName || '',
       },
       auto_advance: false,
-      collection_method: "charge_automatically",
+      collection_method: 'charge_automatically',
     });
 
     // Add invoice items for products
@@ -167,10 +161,7 @@ export async function POST(
           },
         });
       } catch (error) {
-        console.error(
-          `Failed to add invoice item for product ${item.product._id}:`,
-          error
-        );
+        console.error(`Failed to add invoice item for product ${item.product._id}:`, error);
         throw error;
       }
     }
@@ -183,9 +174,9 @@ export async function POST(
           invoice: invoice.id,
           amount: Math.round(order.tax * 100),
           currency: currency,
-          description: "Tax",
+          description: 'Tax',
           metadata: {
-            type: "tax",
+            type: 'tax',
           },
         });
       } catch (error) {
@@ -202,9 +193,9 @@ export async function POST(
           invoice: invoice.id,
           amount: Math.round(order.shipping * 100),
           currency: currency,
-          description: "Shipping",
+          description: 'Shipping',
           metadata: {
-            type: "shipping",
+            type: 'shipping',
           },
         });
       } catch (error) {
@@ -215,7 +206,7 @@ export async function POST(
 
     // Finalize the invoice
     if (!invoice.id) {
-      throw new Error("Failed to create invoice - no invoice ID");
+      throw new Error('Failed to create invoice - no invoice ID');
     }
 
     const finalizedInvoice = await stripe.invoices.finalizeInvoice(invoice.id);
@@ -245,29 +236,29 @@ export async function POST(
           number: finalizedInvoice.number,
           hosted_invoice_url: finalizedInvoice.hosted_invoice_url,
         },
-        message: "Invoice generated successfully",
+        message: 'Invoice generated successfully',
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
-    console.error("Invoice generation error:", error);
+    console.error('Invoice generation error:', error);
 
     // Provide more specific error messages
-    let errorMessage = "Failed to generate invoice";
+    let errorMessage = 'Failed to generate invoice';
     let statusCode = 500;
 
     if (error instanceof Error) {
-      if (error.message.includes("No such customer")) {
-        errorMessage = "Customer not found in Stripe. Please contact support.";
+      if (error.message.includes('No such customer')) {
+        errorMessage = 'Customer not found in Stripe. Please contact support.';
         statusCode = 400;
-      } else if (error.message.includes("currency")) {
-        errorMessage = "Invalid currency specified";
+      } else if (error.message.includes('currency')) {
+        errorMessage = 'Invalid currency specified';
         statusCode = 400;
-      } else if (error.message.includes("amount")) {
-        errorMessage = "Invalid amount specified";
+      } else if (error.message.includes('amount')) {
+        errorMessage = 'Invalid amount specified';
         statusCode = 400;
-      } else if (error.message.includes("invoice_id")) {
-        errorMessage = "Invoice creation failed. Please try again.";
+      } else if (error.message.includes('invoice_id')) {
+        errorMessage = 'Invoice creation failed. Please try again.';
         statusCode = 500;
       }
     }
@@ -276,13 +267,13 @@ export async function POST(
       {
         error: errorMessage,
         details:
-          process.env.NODE_ENV === "development"
+          process.env.NODE_ENV === 'development'
             ? error instanceof Error
               ? error.message
               : String(error)
             : undefined,
       },
-      { status: statusCode }
+      { status: statusCode },
     );
   }
 }

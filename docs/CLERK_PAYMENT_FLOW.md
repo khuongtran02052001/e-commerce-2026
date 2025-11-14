@@ -147,13 +147,11 @@ The Clerk payment system now has a complete payment interface before marking the
 ## Future Enhancements
 
 1. **Real payment gateway integration**
-
    - Integrate with actual payment processor
    - Real-time payment validation
    - Webhook handling for payment status
 
 2. **Payment methods**
-
    - Add credit card form
    - Add wallet balance payment
    - Add multiple payment options

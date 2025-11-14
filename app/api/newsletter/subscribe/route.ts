@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
-import { subscribeToNewsletter } from "@/actions/subscriptionActions";
-import { sendMail } from "@/lib/emailService";
+import { subscribeToNewsletter } from '@/actions/subscriptionActions';
+import { sendMail } from '@/lib/emailService';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,20 +9,18 @@ export async function POST(request: NextRequest) {
 
     // Validate email presence
     if (!email) {
-      return NextResponse.json({ error: "Email is required" }, { status: 400 });
+      return NextResponse.json({ error: 'Email is required' }, { status: 400 });
     }
 
     // Get client info
     const ipAddress =
-      request.headers.get("x-forwarded-for") ||
-      request.headers.get("x-real-ip") ||
-      "unknown";
-    const userAgent = request.headers.get("user-agent") || "unknown";
+      request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
+    const userAgent = request.headers.get('user-agent') || 'unknown';
 
     // Subscribe to newsletter
     const result = await subscribeToNewsletter({
       email,
-      source: "footer",
+      source: 'footer',
       ipAddress,
       userAgent,
     });
@@ -34,20 +32,20 @@ export async function POST(request: NextRequest) {
           error: result.message,
           alreadySubscribed: result.alreadySubscribed || false,
         },
-        { status: result.alreadySubscribed ? 200 : 400 }
+        { status: result.alreadySubscribed ? 200 : 400 },
       );
     }
 
     // Send welcome email
     const emailResult = await sendMail({
       email,
-      subject: "Welcome to ShopCart Newsletter! 🎉",
+      subject: 'Welcome to ShopCart Newsletter! 🎉',
       text: `Thank you for subscribing to our newsletter! You're now part of our exclusive community.`,
       html: generateWelcomeEmailHTML(email),
     });
 
     if (!emailResult.success) {
-      console.error("Failed to send welcome email:", emailResult.error);
+      console.error('Failed to send welcome email:', emailResult.error);
       // Still return success for subscription even if email fails
     }
 
@@ -56,13 +54,13 @@ export async function POST(request: NextRequest) {
         message: result.message,
         subscriptionId: result.data?.subscriptionId,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
-    console.error("Newsletter subscription API error:", error);
+    console.error('Newsletter subscription API error:', error);
     return NextResponse.json(
-      { error: "Something went wrong. Please try again later." },
-      { status: 500 }
+      { error: 'Something went wrong. Please try again later.' },
+      { status: 500 },
     );
   }
 }
@@ -352,7 +350,7 @@ function generateWelcomeEmailHTML(email: string): string {
             <div class="cta-section">
                 <p style="margin-bottom: 20px; color: #495057;">Start exploring amazing deals today!</p>
                 <a href="${
-                  process.env.NEXT_PUBLIC_BASE_URL || "https://shopcart.com"
+                  process.env.NEXT_PUBLIC_BASE_URL || 'https://shopcart.com'
                 }" class="cta-button">
                     Shop Now →
                 </a>
@@ -387,11 +385,8 @@ function generateWelcomeEmailHTML(email: string): string {
                 <p>
                     You received this email because you subscribed to ShopCart Newsletter with ${email}.<br>
                     <a href="${
-                      process.env.NEXT_PUBLIC_BASE_URL ||
-                      "https://shopcartpro.org"
-                    }/unsubscribe?email=${encodeURIComponent(
-    email
-  )}">Unsubscribe</a>
+                      process.env.NEXT_PUBLIC_BASE_URL || 'https://shopcartpro.org'
+                    }/unsubscribe?email=${encodeURIComponent(email)}">Unsubscribe</a>
                 </p>
             </div>
         </div>

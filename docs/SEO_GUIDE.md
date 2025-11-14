@@ -67,10 +67,10 @@ This document outlines the comprehensive SEO implementation for ShopCart e-comme
 
 ```typescript
 export const metadata: Metadata = {
-  metadataBase: new URL("https://shopcartpro.reactbd.org"),
+  metadataBase: new URL('https://shopcartpro.reactbd.org'),
   title: {
-    template: "%s | ShopCart - Premium Online Shopping",
-    default: "ShopCart - Your Trusted Online Shopping Destination",
+    template: '%s | ShopCart - Premium Online Shopping',
+    default: 'ShopCart - Your Trusted Online Shopping Destination',
   },
   // ... rest of configuration
 };
@@ -435,33 +435,28 @@ Sitemap: https://shopcartpro.reactbd.org/sitemap.xml
 ### Tools
 
 1. **Google Search Console**
-
    - Submit sitemap
    - Monitor indexing status
    - Check for errors
    - View search analytics
 
 2. **Google Rich Results Test**
-
    - URL: https://search.google.com/test/rich-results
    - Test product pages
    - Validate structured data
    - Check for errors/warnings
 
 3. **Schema.org Validator**
-
    - URL: https://validator.schema.org/
    - Validate all schemas
    - Check syntax errors
 
 4. **Facebook Sharing Debugger**
-
    - URL: https://developers.facebook.com/tools/debug/
    - Test Open Graph tags
    - Clear cache when needed
 
 5. **Twitter Card Validator**
-
    - URL: https://cards-dev.twitter.com/validator
    - Test Twitter Cards
    - Preview appearance
@@ -535,7 +530,6 @@ When adding new page types:
 When adding/editing products in Sanity CMS:
 
 1. **Fill all SEO fields**:
-
    - Product name (concise, keyword-rich)
    - Description (detailed, unique)
    - Images (high-quality, descriptive filenames)

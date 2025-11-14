@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -211,7 +211,7 @@
 }
 @layer utilities {
   :root {
-    --font-poppins: "Poppins", sans-serif;
+    --font-poppins: 'Poppins', sans-serif;
   }
   body {
     font-family: var(--font-poppins);
@@ -490,7 +490,7 @@
   --sonner-toast-width: 356px;
 }
 
-[data-sonner-toaster][data-theme="light"] {
+[data-sonner-toaster][data-theme='light'] {
   --sonner-loading-bar: #3b9c3c;
   --sonner-success: #3b9c3c;
   --sonner-success-bg: #f0f9f0;
@@ -506,25 +506,25 @@
   --sonner-info-border: #a5b4fc;
 }
 
-[data-sonner-toast][data-type="success"] {
+[data-sonner-toast][data-type='success'] {
   background: var(--sonner-success-bg);
   border: 1px solid var(--sonner-success-border);
   color: var(--color-shop_dark_green);
 }
 
-[data-sonner-toast][data-type="error"] {
+[data-sonner-toast][data-type='error'] {
   background: var(--sonner-error-bg);
   border: 1px solid var(--sonner-error-border);
   color: var(--color-dark-red);
 }
 
-[data-sonner-toast][data-type="warning"] {
+[data-sonner-toast][data-type='warning'] {
   background: var(--sonner-warning-bg);
   border: 1px solid var(--sonner-warning-border);
   color: var(--color-shop_orange);
 }
 
-[data-sonner-toast][data-type="info"] {
+[data-sonner-toast][data-type='info'] {
   background: var(--sonner-info-bg);
   border: 1px solid var(--sonner-info-border);
   color: var(--color-light-blue);
@@ -596,13 +596,15 @@
 
 /* Grid-based Accordion Animation */
 .admin-accordion-grid {
-  transition: grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+  transition:
+    grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1),
     opacity 0.3s ease-in-out;
 }
 
 /* Legacy accordion support (can be removed if not used) */
 .admin-accordion-content {
-  transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+  transition:
+    max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
     opacity 0.3s ease-in-out;
 }
 
@@ -703,7 +705,8 @@
 
 /* Enhanced easing for smooth mobile menu animation */
 .mobile-menu-container {
-  transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+  transition:
+    max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
     opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
     margin-top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }

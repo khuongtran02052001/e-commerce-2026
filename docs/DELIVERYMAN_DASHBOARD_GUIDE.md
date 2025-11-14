@@ -203,30 +203,25 @@ Based on order status:
 ### COD Order Delivery Process:
 
 1. **Assigned Tab**: Order appears as ready for delivery
-
    - Payment badge shows "COD - Pending" in red
 
 2. **Start Delivery**: Deliveryman clicks "Start Delivery"
-
    - Order moves to "Delivering" tab
    - Status changes to `out_for_delivery`
 
 3. **At Customer Location**: Open order details
-
    - See orange "Cash Collection Required" section
    - Check "I have collected cash from customer"
    - Confirm amount (defaults to order total, editable)
    - "Mark as Delivered" button becomes enabled
 
 4. **Complete Delivery**: Click "Mark as Delivered"
-
    - `cashCollected = true`
    - `cashCollectedAmount` = confirmed amount
    - `paymentStatus = "paid"`
    - Order moves to both "Delivered" and "Collections" tabs
 
 5. **Collections Tab**: Order shows pending submission
-
    - Displays amount collected
    - Shows "Pending submission to Accounts" badge
    - Deliveryman sees total cash to submit
@@ -239,7 +234,6 @@ Based on order status:
 ### Pre-Paid Order Delivery Process:
 
 1. **Assigned Tab**: Order appears
-
    - Payment badge shows "Paid" in green
 
 2. **Start & Deliver**: Same process as COD

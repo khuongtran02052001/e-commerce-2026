@@ -1,12 +1,11 @@
-import Container from "@/components/Container";
-import { Skeleton } from "@/components/ui/skeleton";
+import Container from '@/components/Container';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const CategoryPageSkeleton = () => {
   // Generate different widths for more realistic skeleton
-  const randomWidths = ["w-16", "w-20", "w-24", "w-28", "w-32", "w-36", "w-40"];
+  const randomWidths = ['w-16', 'w-20', 'w-24', 'w-28', 'w-32', 'w-36', 'w-40'];
 
-  const getRandomWidth = () =>
-    randomWidths[Math.floor(Math.random() * randomWidths.length)];
+  const getRandomWidth = () => randomWidths[Math.floor(Math.random() * randomWidths.length)];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-shop_light_bg via-white to-shop_light_pink">
@@ -79,9 +78,7 @@ const CategoryPageSkeleton = () => {
                   {/* Footer */}
                   <div className="flex items-center justify-between">
                     <Skeleton className={`h-3 ${getRandomWidth()} max-w-16`} />
-                    {index % 3 === 0 && (
-                      <Skeleton className="h-4 w-8 rounded" />
-                    )}
+                    {index % 3 === 0 && <Skeleton className="h-4 w-8 rounded" />}
                   </div>
                 </div>
 

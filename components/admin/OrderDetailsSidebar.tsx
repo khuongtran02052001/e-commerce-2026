@@ -1,42 +1,31 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
+} from '@/components/ui/select';
 import {
-  Package,
-  User,
-  CreditCard,
-  MapPin,
-  Calendar,
-  DollarSign,
-  Truck,
-  Save,
-  X,
-} from "lucide-react";
-import { Order } from "./types";
-import { showToast } from "@/lib/toast";
-import { trackOrderFullfillment, trackOrderDetails } from "@/lib/analytics";
-import { OrderDetailsSkeleton } from "./SkeletonLoaders";
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
+import { Textarea } from '@/components/ui/textarea';
+import { trackOrderDetails, trackOrderFullfillment } from '@/lib/analytics';
+import { showToast } from '@/lib/toast';
+import { Calendar, DollarSign, Package, Save, Truck, User, X } from 'lucide-react';
+import React, { useState } from 'react';
+import { OrderDetailsSkeleton } from './SkeletonLoaders';
+import { Order } from './types';
 
 interface OrderDetailsSidebarProps {
   isOpen: boolean;
@@ -55,83 +44,83 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
 }) => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [formData, setFormData] = useState({
-    status: order?.status || "",
+    status: order?.status || '',
     totalPrice: order?.totalPrice || 0,
-    paymentStatus: order?.paymentStatus || "",
-    trackingNumber: order?.trackingNumber || "",
-    notes: order?.notes || "",
-    estimatedDelivery: order?.estimatedDelivery || "",
-    packingNotes: order?.packingNotes || "",
-    deliveryNotes: order?.deliveryNotes || "",
+    paymentStatus: order?.paymentStatus || '',
+    trackingNumber: order?.trackingNumber || '',
+    notes: order?.notes || '',
+    estimatedDelivery: order?.estimatedDelivery || '',
+    packingNotes: order?.packingNotes || '',
+    deliveryNotes: order?.deliveryNotes || '',
     deliveryAttempts: order?.deliveryAttempts || 0,
-    rescheduledDate: order?.rescheduledDate || "",
-    rescheduledReason: order?.rescheduledReason || "",
+    rescheduledDate: order?.rescheduledDate || '',
+    rescheduledReason: order?.rescheduledReason || '',
     cashCollectedAmount: order?.cashCollectedAmount || 0,
   });
 
   React.useEffect(() => {
     if (order) {
       setFormData({
-        status: order.status || "",
+        status: order.status || '',
         totalPrice: order.totalPrice || 0,
-        paymentStatus: order.paymentStatus || "",
-        trackingNumber: order.trackingNumber || "",
-        notes: order.notes || "",
-        estimatedDelivery: order.estimatedDelivery || "",
-        packingNotes: order.packingNotes || "",
-        deliveryNotes: order.deliveryNotes || "",
+        paymentStatus: order.paymentStatus || '',
+        trackingNumber: order.trackingNumber || '',
+        notes: order.notes || '',
+        estimatedDelivery: order.estimatedDelivery || '',
+        packingNotes: order.packingNotes || '',
+        deliveryNotes: order.deliveryNotes || '',
         deliveryAttempts: order.deliveryAttempts || 0,
-        rescheduledDate: order.rescheduledDate || "",
-        rescheduledReason: order.rescheduledReason || "",
+        rescheduledDate: order.rescheduledDate || '',
+        rescheduledReason: order.rescheduledReason || '',
         cashCollectedAmount: order.cashCollectedAmount || 0,
       });
     }
   }, [order]);
 
   const formatCurrency = (amount: number): string => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
     }).format(amount);
   };
 
   const formatDate = (dateString: string): string => {
-    if (!dateString) return "Not set";
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
+    if (!dateString) return 'Not set';
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
     });
   };
 
   const getStatusColor = (status: string): string => {
     switch (status.toLowerCase()) {
-      case "completed":
-        return "bg-green-100 text-green-800";
-      case "delivered":
-        return "bg-green-100 text-green-800";
-      case "out_for_delivery":
-        return "bg-blue-100 text-blue-800";
-      case "ready_for_delivery":
-        return "bg-cyan-100 text-cyan-800";
-      case "packed":
-        return "bg-purple-100 text-purple-800";
-      case "order_confirmed":
-        return "bg-emerald-100 text-emerald-800";
-      case "address_confirmed":
-        return "bg-yellow-100 text-yellow-800";
-      case "pending":
-        return "bg-orange-100 text-orange-800";
-      case "cancelled":
-        return "bg-red-100 text-red-800";
-      case "failed_delivery":
-        return "bg-red-100 text-red-800";
-      case "rescheduled":
-        return "bg-amber-100 text-amber-800";
+      case 'completed':
+        return 'bg-green-100 text-green-800';
+      case 'delivered':
+        return 'bg-green-100 text-green-800';
+      case 'out_for_delivery':
+        return 'bg-blue-100 text-blue-800';
+      case 'ready_for_delivery':
+        return 'bg-cyan-100 text-cyan-800';
+      case 'packed':
+        return 'bg-purple-100 text-purple-800';
+      case 'order_confirmed':
+        return 'bg-emerald-100 text-emerald-800';
+      case 'address_confirmed':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'pending':
+        return 'bg-orange-100 text-orange-800';
+      case 'cancelled':
+        return 'bg-red-100 text-red-800';
+      case 'failed_delivery':
+        return 'bg-red-100 text-red-800';
+      case 'rescheduled':
+        return 'bg-amber-100 text-amber-800';
       default:
-        return "bg-gray-100 text-gray-800";
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
@@ -148,15 +137,15 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
     setIsUpdating(true);
     try {
       const response = await fetch(`/api/admin/orders/${order._id}`, {
-        method: "PATCH",
+        method: 'PATCH',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(formData),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to update order");
+        throw new Error('Failed to update order');
       }
 
       const result = await response.json();
@@ -168,7 +157,7 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
           status: formData.status,
           previousStatus: order.status,
           value: formData.totalPrice,
-          userId: order.clerkUserId || "",
+          userId: order.clerkUserId || '',
         });
       }
 
@@ -180,11 +169,11 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
         value: formData.totalPrice,
         itemCount: order.products?.length || 0,
         paymentMethod: order.paymentMethod,
-        userId: order.clerkUserId || "",
+        userId: order.clerkUserId || '',
         products:
           order.products?.map((p) => ({
-            productId: p.product?._id || "",
-            name: p.product?.name || "Unknown Product",
+            productId: p.product?._id || '',
+            name: p.product?.name || 'Unknown Product',
             quantity: p.quantity,
             price: p.product?.price || 0,
           })) || [],
@@ -194,11 +183,11 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
       if (result.walletRefunded && result.refundAmount) {
         showToast.success(
           `Order updated successfully! $${result.refundAmount.toFixed(
-            2
-          )} refunded to customer's wallet.`
+            2,
+          )} refunded to customer's wallet.`,
         );
       } else {
-        showToast.success("Order updated successfully");
+        showToast.success('Order updated successfully');
       }
 
       // Refresh the orders list immediately to get the latest data
@@ -207,8 +196,8 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
       // Close the sidebar immediately after refresh
       onClose();
     } catch (error) {
-      console.error("Error updating order:", error);
-      showToast.error("Failed to update order");
+      console.error('Error updating order:', error);
+      showToast.error('Failed to update order');
     } finally {
       setIsUpdating(false);
     }
@@ -218,8 +207,8 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
     if (isUpdating) {
       e.preventDefault();
       showToast.warning(
-        "Action in Progress",
-        "Please wait for the current action to complete before closing."
+        'Action in Progress',
+        'Please wait for the current action to complete before closing.',
       );
     }
   };
@@ -233,14 +222,12 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2">
             <Package className="w-5 h-5" />
-            {order
-              ? `Order Details - #${order.orderNumber}`
-              : "Loading Order Details..."}
+            {order ? `Order Details - #${order.orderNumber}` : 'Loading Order Details...'}
           </SheetTitle>
           <SheetDescription>
             {order
-              ? "View and manage order information, status, and tracking details."
-              : "Loading order information..."}
+              ? 'View and manage order information, status, and tracking details.'
+              : 'Loading order information...'}
           </SheetDescription>
         </SheetHeader>
 
@@ -260,12 +247,12 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
                 <CardContent className="space-y-4">
                   <div>
                     <p className="text-sm text-orange-700 mb-2">
-                      <strong>Requested At:</strong>{" "}
-                      {formatDate(order.cancellationRequestedAt || "")}
+                      <strong>Requested At:</strong>{' '}
+                      {formatDate(order.cancellationRequestedAt || '')}
                     </p>
                     <p className="text-sm text-orange-700 mb-4">
-                      <strong>Reason:</strong>{" "}
-                      {order.cancellationRequestReason || "No reason provided"}
+                      <strong>Reason:</strong>{' '}
+                      {order.cancellationRequestReason || 'No reason provided'}
                     </p>
                   </div>
                   <div className="flex gap-3">
@@ -274,29 +261,23 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
                         setIsUpdating(true);
                         try {
                           const { rejectCancellationRequest } = await import(
-                            "@/actions/orderCancellationActions"
+                            '@/actions/orderCancellationActions'
                           );
-                          const result = await rejectCancellationRequest(
-                            order._id
-                          );
+                          const result = await rejectCancellationRequest(order._id);
 
                           if (result.success) {
                             showToast.success(result.message);
                             // Wait for order update to complete before closing
                             await onOrderUpdate(order._id);
                             // Small delay to ensure the UI has updated
-                            await new Promise((resolve) =>
-                              setTimeout(resolve, 300)
-                            );
+                            await new Promise((resolve) => setTimeout(resolve, 300));
                             onClose();
                           } else {
                             showToast.error(result.message);
                           }
                         } catch (error) {
-                          console.error("Error rejecting cancellation:", error);
-                          showToast.error(
-                            "Failed to reject cancellation request"
-                          );
+                          console.error('Error rejecting cancellation:', error);
+                          showToast.error('Failed to reject cancellation request');
                         } finally {
                           setIsUpdating(false);
                         }
@@ -304,36 +285,30 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
                       disabled={isUpdating}
                       className="bg-green-600 hover:bg-green-700"
                     >
-                      {isUpdating ? "Processing..." : "✓ Confirm Order"}
+                      {isUpdating ? 'Processing...' : '✓ Confirm Order'}
                     </Button>
                     <Button
                       onClick={async () => {
                         setIsUpdating(true);
                         try {
                           const { approveCancellationRequest } = await import(
-                            "@/actions/orderCancellationActions"
+                            '@/actions/orderCancellationActions'
                           );
-                          const result = await approveCancellationRequest(
-                            order._id
-                          );
+                          const result = await approveCancellationRequest(order._id);
 
                           if (result.success) {
                             showToast.success(result.message);
                             // Wait for order update to complete before closing
                             await onOrderUpdate(order._id);
                             // Small delay to ensure the UI has updated
-                            await new Promise((resolve) =>
-                              setTimeout(resolve, 300)
-                            );
+                            await new Promise((resolve) => setTimeout(resolve, 300));
                             onClose();
                           } else {
                             showToast.error(result.message);
                           }
                         } catch (error) {
-                          console.error("Error approving cancellation:", error);
-                          showToast.error(
-                            "Failed to approve cancellation request"
-                          );
+                          console.error('Error approving cancellation:', error);
+                          showToast.error('Failed to approve cancellation request');
                         } finally {
                           setIsUpdating(false);
                         }
@@ -341,7 +316,7 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
                       disabled={isUpdating}
                       variant="destructive"
                     >
-                      {isUpdating ? "Processing..." : "✗ Approve Cancellation"}
+                      {isUpdating ? 'Processing...' : '✗ Approve Cancellation'}
                     </Button>
                   </div>
                 </CardContent>
@@ -349,12 +324,10 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
             )}
 
             {/* Debug Information - Remove this after testing */}
-            {process.env.NODE_ENV === "development" && (
+            {process.env.NODE_ENV === 'development' && (
               <Card className="border-yellow-200 bg-yellow-50">
                 <CardHeader>
-                  <CardTitle className="text-sm text-yellow-800">
-                    Debug Info (Dev Only)
-                  </CardTitle>
+                  <CardTitle className="text-sm text-yellow-800">Debug Info (Dev Only)</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <details className="text-xs">
@@ -371,7 +344,7 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
                           })),
                         },
                         null,
-                        2
+                        2,
                       )}
                     </pre>
                   </details>
@@ -384,9 +357,7 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
               <CardHeader className="pb-4">
                 <CardTitle className="flex items-center justify-between">
                   <span>Order Status</span>
-                  <Badge className={getStatusColor(order.status)}>
-                    {order.status}
-                  </Badge>
+                  <Badge className={getStatusColor(order.status)}>{order.status}</Badge>
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -395,37 +366,23 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
                     <Label htmlFor="status">Status</Label>
                     <Select
                       value={formData.status}
-                      onValueChange={(value) =>
-                        handleInputChange("status", value)
-                      }
+                      onValueChange={(value) => handleInputChange('status', value)}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Select status" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="pending">🔴 Pending</SelectItem>
-                        <SelectItem value="address_confirmed">
-                          🟡 Address Confirmed
-                        </SelectItem>
-                        <SelectItem value="order_confirmed">
-                          🟢 Order Confirmed
-                        </SelectItem>
+                        <SelectItem value="address_confirmed">🟡 Address Confirmed</SelectItem>
+                        <SelectItem value="order_confirmed">🟢 Order Confirmed</SelectItem>
                         <SelectItem value="packed">📦 Packed</SelectItem>
-                        <SelectItem value="ready_for_delivery">
-                          ✅ Ready for Delivery
-                        </SelectItem>
-                        <SelectItem value="out_for_delivery">
-                          🚚 Out for Delivery
-                        </SelectItem>
+                        <SelectItem value="ready_for_delivery">✅ Ready for Delivery</SelectItem>
+                        <SelectItem value="out_for_delivery">🚚 Out for Delivery</SelectItem>
                         <SelectItem value="delivered">📬 Delivered</SelectItem>
                         <SelectItem value="completed">✔️ Completed</SelectItem>
                         <SelectItem value="cancelled">❌ Cancelled</SelectItem>
-                        <SelectItem value="rescheduled">
-                          📅 Rescheduled
-                        </SelectItem>
-                        <SelectItem value="failed_delivery">
-                          ⚠️ Failed Delivery
-                        </SelectItem>
+                        <SelectItem value="rescheduled">📅 Rescheduled</SelectItem>
+                        <SelectItem value="failed_delivery">⚠️ Failed Delivery</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -433,9 +390,7 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
                     <Label htmlFor="paymentStatus">Payment Status</Label>
                     <Select
                       value={formData.paymentStatus}
-                      onValueChange={(value) =>
-                        handleInputChange("paymentStatus", value)
-                      }
+                      onValueChange={(value) => handleInputChange('paymentStatus', value)}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Select payment status" />
@@ -446,9 +401,7 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
                         <SelectItem value="failed">Failed</SelectItem>
                         <SelectItem value="refunded">Refunded</SelectItem>
                         <SelectItem value="stripe">Stripe</SelectItem>
-                        <SelectItem value="cash_on_delivery">
-                          Cash on Delivery
-                        </SelectItem>
+                        <SelectItem value="cash_on_delivery">Cash on Delivery</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -495,36 +448,25 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
                       type="number"
                       step="0.01"
                       value={formData.totalPrice}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "totalPrice",
-                          parseFloat(e.target.value)
-                        )
-                      }
+                      onChange={(e) => handleInputChange('totalPrice', parseFloat(e.target.value))}
                     />
                     <p className="text-xs text-gray-500 mt-1">
                       Original: {formatCurrency(order.totalPrice || 0)}
                     </p>
                   </div>
                   <div>
-                    <Label className="text-sm font-medium">
-                      Payment Method
-                    </Label>
-                    <p className="text-sm capitalize">
-                      {order.paymentMethod || "Not specified"}
-                    </p>
+                    <Label className="text-sm font-medium">Payment Method</Label>
+                    <p className="text-sm capitalize">{order.paymentMethod || 'Not specified'}</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label className="text-sm font-medium">Currency</Label>
-                    <p className="text-sm">{order.currency || "USD"}</p>
+                    <p className="text-sm">{order.currency || 'USD'}</p>
                   </div>
                   <div>
                     <Label className="text-sm font-medium">Subtotal</Label>
-                    <p className="text-sm font-medium">
-                      {formatCurrency(order.subtotal || 0)}
-                    </p>
+                    <p className="text-sm font-medium">{formatCurrency(order.subtotal || 0)}</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
@@ -534,9 +476,7 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
                   </div>
                   <div>
                     <Label className="text-sm font-medium">Shipping</Label>
-                    <p className="text-sm">
-                      {formatCurrency(order.shipping || 0)}
-                    </p>
+                    <p className="text-sm">{formatCurrency(order.shipping || 0)}</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
@@ -551,11 +491,9 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
                     <p className="text-sm font-medium">
                       {formatCurrency(
                         order.products?.reduce(
-                          (sum, item) =>
-                            sum +
-                            (item.product?.price || 0) * (item.quantity || 1),
-                          0
-                        ) || 0
+                          (sum, item) => sum + (item.product?.price || 0) * (item.quantity || 1),
+                          0,
+                        ) || 0,
                       )}
                     </p>
                   </div>
@@ -577,9 +515,7 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
                   <Input
                     id="trackingNumber"
                     value={formData.trackingNumber}
-                    onChange={(e) =>
-                      handleInputChange("trackingNumber", e.target.value)
-                    }
+                    onChange={(e) => handleInputChange('trackingNumber', e.target.value)}
                     placeholder="Enter tracking number"
                   />
                 </div>
@@ -589,22 +525,17 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
                     id="estimatedDelivery"
                     type="datetime-local"
                     value={formData.estimatedDelivery}
-                    onChange={(e) =>
-                      handleInputChange("estimatedDelivery", e.target.value)
-                    }
+                    onChange={(e) => handleInputChange('estimatedDelivery', e.target.value)}
                   />
                 </div>
                 {order.address && (
                   <div>
-                    <Label className="text-sm font-medium">
-                      Shipping Address
-                    </Label>
+                    <Label className="text-sm font-medium">Shipping Address</Label>
                     <div className="text-sm bg-gray-50 p-3 rounded-md">
                       <p>{order.address.name}</p>
                       <p>{order.address.address}</p>
                       <p>
-                        {order.address.city}, {order.address.state}{" "}
-                        {order.address.zip}
+                        {order.address.city}, {order.address.state} {order.address.zip}
                       </p>
                     </div>
                   </div>
@@ -623,12 +554,8 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label className="text-sm font-medium">
-                      Address Confirmed By
-                    </Label>
-                    <p className="text-sm">
-                      {order.addressConfirmedBy || "Not confirmed"}
-                    </p>
+                    <Label className="text-sm font-medium">Address Confirmed By</Label>
+                    <p className="text-sm">{order.addressConfirmedBy || 'Not confirmed'}</p>
                     {order.addressConfirmedAt && (
                       <p className="text-xs text-gray-500">
                         {formatDate(order.addressConfirmedAt)}
@@ -636,49 +563,33 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
                     )}
                   </div>
                   <div>
-                    <Label className="text-sm font-medium">
-                      Order Confirmed By
-                    </Label>
-                    <p className="text-sm">
-                      {order.orderConfirmedBy || "Not confirmed"}
-                    </p>
+                    <Label className="text-sm font-medium">Order Confirmed By</Label>
+                    <p className="text-sm">{order.orderConfirmedBy || 'Not confirmed'}</p>
                     {order.orderConfirmedAt && (
-                      <p className="text-xs text-gray-500">
-                        {formatDate(order.orderConfirmedAt)}
-                      </p>
+                      <p className="text-xs text-gray-500">{formatDate(order.orderConfirmedAt)}</p>
                     )}
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label className="text-sm font-medium">Packed By</Label>
-                    <p className="text-sm">{order.packedBy || "Not packed"}</p>
+                    <p className="text-sm">{order.packedBy || 'Not packed'}</p>
                     {order.packedAt && (
-                      <p className="text-xs text-gray-500">
-                        {formatDate(order.packedAt)}
-                      </p>
+                      <p className="text-xs text-gray-500">{formatDate(order.packedAt)}</p>
                     )}
                   </div>
                   <div>
                     <Label className="text-sm font-medium">Dispatched By</Label>
-                    <p className="text-sm">
-                      {order.dispatchedBy || "Not dispatched"}
-                    </p>
+                    <p className="text-sm">{order.dispatchedBy || 'Not dispatched'}</p>
                     {order.dispatchedAt && (
-                      <p className="text-xs text-gray-500">
-                        {formatDate(order.dispatchedAt)}
-                      </p>
+                      <p className="text-xs text-gray-500">{formatDate(order.dispatchedAt)}</p>
                     )}
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label className="text-sm font-medium">
-                      Warehouse Assigned By
-                    </Label>
-                    <p className="text-sm">
-                      {order.assignedWarehouseBy || "Not assigned"}
-                    </p>
+                    <Label className="text-sm font-medium">Warehouse Assigned By</Label>
+                    <p className="text-sm">{order.assignedWarehouseBy || 'Not assigned'}</p>
                     {order.assignedWarehouseAt && (
                       <p className="text-xs text-gray-500">
                         {formatDate(order.assignedWarehouseAt)}
@@ -687,27 +598,17 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
                   </div>
                   <div>
                     <Label className="text-sm font-medium">Delivered By</Label>
-                    <p className="text-sm">
-                      {order.deliveredBy || "Not delivered"}
-                    </p>
+                    <p className="text-sm">{order.deliveredBy || 'Not delivered'}</p>
                     {order.deliveredAt && (
-                      <p className="text-xs text-gray-500">
-                        {formatDate(order.deliveredAt)}
-                      </p>
+                      <p className="text-xs text-gray-500">{formatDate(order.deliveredAt)}</p>
                     )}
                   </div>
                 </div>
                 <div>
-                  <Label className="text-sm font-medium">
-                    Assigned Deliveryman
-                  </Label>
-                  <p className="text-sm">
-                    {order.assignedDeliverymanName || "Not assigned"}
-                  </p>
+                  <Label className="text-sm font-medium">Assigned Deliveryman</Label>
+                  <p className="text-sm">{order.assignedDeliverymanName || 'Not assigned'}</p>
                   {order.assignedDeliverymanId && (
-                    <p className="text-xs text-gray-500">
-                      ID: {order.assignedDeliverymanId}
-                    </p>
+                    <p className="text-xs text-gray-500">ID: {order.assignedDeliverymanId}</p>
                   )}
                 </div>
               </CardContent>
@@ -727,9 +628,7 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
                   <Textarea
                     id="packingNotes"
                     value={formData.packingNotes}
-                    onChange={(e) =>
-                      handleInputChange("packingNotes", e.target.value)
-                    }
+                    onChange={(e) => handleInputChange('packingNotes', e.target.value)}
                     placeholder="Enter packing notes"
                     className="min-h-20"
                   />
@@ -739,9 +638,7 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
                   <Textarea
                     id="deliveryNotes"
                     value={formData.deliveryNotes}
-                    onChange={(e) =>
-                      handleInputChange("deliveryNotes", e.target.value)
-                    }
+                    onChange={(e) => handleInputChange('deliveryNotes', e.target.value)}
                     placeholder="Enter delivery notes"
                     className="min-h-20"
                   />
@@ -755,10 +652,7 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
                       min="0"
                       value={formData.deliveryAttempts}
                       onChange={(e) =>
-                        handleInputChange(
-                          "deliveryAttempts",
-                          parseInt(e.target.value)
-                        )
+                        handleInputChange('deliveryAttempts', parseInt(e.target.value))
                       }
                     />
                   </div>
@@ -768,9 +662,7 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
                       id="rescheduledDate"
                       type="date"
                       value={formData.rescheduledDate}
-                      onChange={(e) =>
-                        handleInputChange("rescheduledDate", e.target.value)
-                      }
+                      onChange={(e) => handleInputChange('rescheduledDate', e.target.value)}
                     />
                   </div>
                 </div>
@@ -779,9 +671,7 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
                   <Textarea
                     id="rescheduledReason"
                     value={formData.rescheduledReason}
-                    onChange={(e) =>
-                      handleInputChange("rescheduledReason", e.target.value)
-                    }
+                    onChange={(e) => handleInputChange('rescheduledReason', e.target.value)}
                     placeholder="Enter reason for rescheduling"
                     className="min-h-[60px]"
                   />
@@ -800,11 +690,9 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label className="text-sm font-medium">
-                      Cash Collected
-                    </Label>
+                    <Label className="text-sm font-medium">Cash Collected</Label>
                     <p className="text-sm font-semibold">
-                      {order.cashCollected ? "✅ Yes" : "❌ No"}
+                      {order.cashCollected ? '✅ Yes' : '❌ No'}
                     </p>
                   </div>
                   <div>
@@ -816,10 +704,7 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
                       min="0"
                       value={formData.cashCollectedAmount}
                       onChange={(e) =>
-                        handleInputChange(
-                          "cashCollectedAmount",
-                          parseFloat(e.target.value)
-                        )
+                        handleInputChange('cashCollectedAmount', parseFloat(e.target.value))
                       }
                     />
                   </div>
@@ -828,22 +713,14 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
                   <div>
                     <Label className="text-sm font-medium">Collected At</Label>
                     <p className="text-sm">
-                      {order.cashCollectedAt
-                        ? formatDate(order.cashCollectedAt)
-                        : "Not collected"}
+                      {order.cashCollectedAt ? formatDate(order.cashCollectedAt) : 'Not collected'}
                     </p>
                   </div>
                   <div>
-                    <Label className="text-sm font-medium">
-                      Payment Received By
-                    </Label>
-                    <p className="text-sm">
-                      {order.paymentReceivedBy || "Not received"}
-                    </p>
+                    <Label className="text-sm font-medium">Payment Received By</Label>
+                    <p className="text-sm">{order.paymentReceivedBy || 'Not received'}</p>
                     {order.paymentReceivedAt && (
-                      <p className="text-xs text-gray-500">
-                        {formatDate(order.paymentReceivedAt)}
-                      </p>
+                      <p className="text-xs text-gray-500">{formatDate(order.paymentReceivedAt)}</p>
                     )}
                   </div>
                 </div>
@@ -868,7 +745,7 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
                     const lineTotal = price * quantity;
 
                     // Debug logging to help identify the issue
-                    console.log("Product debug info:", {
+                    console.log('Product debug info:', {
                       name: product?.name,
                       price: price,
                       quantity: quantity,
@@ -890,7 +767,7 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
                         )}
                         <div className="flex-1 min-w-0">
                           <p className="font-medium text-gray-900 truncate mb-1">
-                            {product?.name || "Unknown Product"}
+                            {product?.name || 'Unknown Product'}
                           </p>
                           <div className="text-sm text-gray-600">
                             <p>
@@ -902,17 +779,12 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
                                 No price data found - check order source data
                               </p>
                             )}
-                            {process.env.NODE_ENV === "development" &&
-                              price === 0 && (
-                                <p className="text-xs text-orange-600 mt-1">
-                                  Available fields:{" "}
-                                  {Object.keys(item).join(", ")} | Product
-                                  fields:{" "}
-                                  {product
-                                    ? Object.keys(product).join(", ")
-                                    : "No product data"}
-                                </p>
-                              )}
+                            {process.env.NODE_ENV === 'development' && price === 0 && (
+                              <p className="text-xs text-orange-600 mt-1">
+                                Available fields: {Object.keys(item).join(', ')} | Product fields:{' '}
+                                {product ? Object.keys(product).join(', ') : 'No product data'}
+                              </p>
+                            )}
                           </div>
                         </div>
                         <div className="text-right">
@@ -927,20 +799,18 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
                   {/* Order Total */}
                   <div className="border-t border-gray-200 pt-4 mt-4 bg-white rounded-lg p-4">
                     <div className="flex justify-between items-center">
-                      <p className="font-semibold text-lg text-gray-700">
-                        Order Total:
-                      </p>
+                      <p className="font-semibold text-lg text-gray-700">Order Total:</p>
                       <p className="font-bold text-2xl text-green-600">
                         {formatCurrency(order.totalPrice || 0)}
                       </p>
                     </div>
                     <div className="text-xs text-gray-500 mt-2">
-                      Items calculated total:{" "}
+                      Items calculated total:{' '}
                       {formatCurrency(
                         order.products?.reduce((sum, item) => {
                           const price = item.product?.price || 0;
                           return sum + price * (item.quantity || 1);
-                        }, 0) || 0
+                        }, 0) || 0,
                       )}
                     </div>
                   </div>
@@ -963,22 +833,14 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
                 </div>
                 {order.estimatedDelivery && (
                   <div>
-                    <Label className="text-sm font-medium">
-                      Estimated Delivery
-                    </Label>
-                    <p className="text-sm">
-                      {formatDate(order.estimatedDelivery)}
-                    </p>
+                    <Label className="text-sm font-medium">Estimated Delivery</Label>
+                    <p className="text-sm">{formatDate(order.estimatedDelivery)}</p>
                   </div>
                 )}
                 {order.actualDelivery && (
                   <div>
-                    <Label className="text-sm font-medium">
-                      Actual Delivery
-                    </Label>
-                    <p className="text-sm">
-                      {formatDate(order.actualDelivery)}
-                    </p>
+                    <Label className="text-sm font-medium">Actual Delivery</Label>
+                    <p className="text-sm">{formatDate(order.actualDelivery)}</p>
                   </div>
                 )}
               </CardContent>
@@ -992,7 +854,7 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
               <CardContent>
                 <Textarea
                   value={formData.notes}
-                  onChange={(e) => handleInputChange("notes", e.target.value)}
+                  onChange={(e) => handleInputChange('notes', e.target.value)}
                   placeholder="Add notes about this order..."
                   rows={4}
                 />
@@ -1008,7 +870,7 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
                 size="lg"
               >
                 <Save className="w-5 h-5 mr-2" />
-                {isUpdating ? "Updating..." : "Update Order"}
+                {isUpdating ? 'Updating...' : 'Update Order'}
               </Button>
               <Button
                 onClick={onClose}

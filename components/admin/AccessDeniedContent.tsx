@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useRouter } from "next/navigation";
-import { Shield, ArrowLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import Container from "@/components/Container";
+import Container from '@/components/Container';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ArrowLeft, Shield } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export default function AccessDeniedContent() {
   const router = useRouter();
@@ -21,14 +21,10 @@ export default function AccessDeniedContent() {
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-gray-600">
-              You don&apos;t have permission to access the admin panel. Please
-              contact an administrator if you believe this is an error.
+              You don&apos;t have permission to access the admin panel. Please contact an
+              administrator if you believe this is an error.
             </p>
-            <Button
-              onClick={() => router.push("/")}
-              className="w-full"
-              variant="outline"
-            >
+            <Button onClick={() => router.push('/')} className="w-full" variant="outline">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Home
             </Button>

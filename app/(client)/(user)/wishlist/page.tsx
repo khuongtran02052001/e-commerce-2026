@@ -1,9 +1,9 @@
-import { currentUser } from "@clerk/nextjs/server";
-import Container from "@/components/Container";
-import NoAccessToCart from "@/components/NoAccessToCart";
-import WishlistProducts from "@/components/WishlistProducts";
-import { Heart } from "lucide-react";
-import DynamicBreadcrumb from "@/components/DynamicBreadcrumb";
+import Container from '@/components/Container';
+import DynamicBreadcrumb from '@/components/DynamicBreadcrumb';
+import NoAccessToCart from '@/components/NoAccessToCart';
+import WishlistProducts from '@/components/WishlistProducts';
+import { currentUser } from '@clerk/nextjs/server';
+import { Heart } from 'lucide-react';
 
 const WishListPage = async () => {
   const user = await currentUser();
@@ -18,9 +18,7 @@ const WishListPage = async () => {
         <Heart className="w-6 h-6 text-red-500" />
         <div>
           <h1 className="text-3xl font-bold text-gray-900">My Wishlist</h1>
-          <p className="text-gray-600 mt-1">
-            Save your favorite items for later
-          </p>
+          <p className="text-gray-600 mt-1">Save your favorite items for later</p>
         </div>
       </div>
 

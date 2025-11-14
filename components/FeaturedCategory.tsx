@@ -1,9 +1,9 @@
-import Container from "./Container";
-import Image from "next/image";
-import { urlFor } from "@/sanity/lib/image";
-import Link from "next/link";
-import { Category } from "@/sanity.types";
-import { getFeaturedCategory } from "@/sanity/queries";
+import { Category } from '@/sanity.types';
+import { urlFor } from '@/sanity/lib/image';
+import { getFeaturedCategory } from '@/sanity/queries';
+import Image from 'next/image';
+import Link from 'next/link';
+import Container from './Container';
 
 const FeaturedCategory = async () => {
   const featuredCategories = await getFeaturedCategory(4);
@@ -28,16 +28,10 @@ const FeaturedCategory = async () => {
               )}
             </div>
             <div className="flex-1">
-              <h3 className="text-sm font-semibold uppercase">
-                {category?.title}
-              </h3>
-              <Link
-                href={`/category/${category?.slug?.current}`}
-                className="absolute inset-0"
-              />
+              <h3 className="text-sm font-semibold uppercase">{category?.title}</h3>
+              <Link href={`/category/${category?.slug?.current}`} className="absolute inset-0" />
               <p className="text-xs font-bold mt-2">
-                Starting at{" "}
-                <span className="text-shop_dark_green">${category?.range}</span>
+                Starting at <span className="text-shop_dark_green">${category?.range}</span>
               </p>
             </div>
           </div>

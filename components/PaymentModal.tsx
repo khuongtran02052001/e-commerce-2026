@@ -1,16 +1,11 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
-import { Loader2, CreditCard, X, ExternalLink } from "lucide-react";
-import PriceFormatter from "./PriceFormatter";
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { CreditCard, ExternalLink, Loader2, X } from 'lucide-react';
+import React, { useState } from 'react';
+import { toast } from 'sonner';
+import PriceFormatter from './PriceFormatter';
 
 interface PaymentModalProps {
   isOpen: boolean;
@@ -38,29 +33,28 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
 
     try {
       const response = await fetch(`/api/orders/${orderId}/pay-now`, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to process payment");
+        throw new Error(data.error || 'Failed to process payment');
       }
 
       if (data.success && data.checkoutUrl) {
         // Redirect directly to Stripe Checkout
-        toast.success("Redirecting to secure payment...");
+        toast.success('Redirecting to secure payment...');
         window.location.href = data.checkoutUrl;
       } else {
-        throw new Error("Payment initialization failed");
+        throw new Error('Payment initialization failed');
       }
     } catch (error) {
-      console.error("Payment error:", error);
-      const errorMessage =
-        error instanceof Error ? error.message : "Payment failed";
+      console.error('Payment error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Payment failed';
       toast.error(errorMessage);
     } finally {
       setIsProcessing(false);
@@ -96,16 +90,11 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
           <div className="p-4 bg-gray-50 rounded-lg border border-gray-100 animate-in slide-in-from-top-2 duration-200">
             <div className="flex justify-between items-center mb-2">
               <span className="text-sm text-gray-600">Order Number</span>
-              <span className="font-medium">
-                #{orderNumber?.slice(-10) || "N/A"}
-              </span>
+              <span className="font-medium">#{orderNumber?.slice(-10) || 'N/A'}</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-sm text-gray-600">Total Amount</span>
-              <PriceFormatter
-                amount={orderTotal}
-                className="font-semibold text-lg"
-              />
+              <PriceFormatter amount={orderTotal} className="font-semibold text-lg" />
             </div>
           </div>
 

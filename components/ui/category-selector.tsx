@@ -1,10 +1,10 @@
-"use client";
-import { Category } from "@/sanity.types";
-import { useRouter } from "next/navigation";
-import React, { useState } from "react";
-import { Popover, PopoverContent, PopoverTrigger } from "./popover";
-import { Button } from "./button";
-import { Check, ChevronsUpDown } from "lucide-react";
+'use client';
+import { cn } from '@/lib/utils';
+import { Category } from '@/sanity.types';
+import { Check, ChevronsUpDown } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { Button } from './button';
 import {
   Command,
   CommandEmpty,
@@ -12,8 +12,8 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "./command";
-import { cn } from "@/lib/utils";
+} from './command';
+import { Popover, PopoverContent, PopoverTrigger } from './popover';
 
 interface Props {
   categories: Category[];
@@ -21,7 +21,7 @@ interface Props {
 
 const CategorySelector = ({ categories }: Props) => {
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState('');
   const router = useRouter();
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -34,7 +34,7 @@ const CategorySelector = ({ categories }: Props) => {
         >
           {value
             ? categories.find((category) => category?._id === value)?.title
-            : "Filter by Category"}
+            : 'Filter by Category'}
           <ChevronsUpDown className="opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -44,11 +44,9 @@ const CategorySelector = ({ categories }: Props) => {
             placeholder="Search category..."
             className="h-9"
             onKeyDown={(e) => {
-              if (e.key === "Enter") {
+              if (e.key === 'Enter') {
                 const selectedCategory = categories.find((c) =>
-                  c.title
-                    ?.toLowerCase()
-                    .includes(e.currentTarget.value.toLowerCase())
+                  c.title?.toLowerCase().includes(e.currentTarget.value.toLowerCase()),
                 );
                 if (selectedCategory?.slug?.current) {
                   setValue(selectedCategory?._id);
@@ -66,17 +64,14 @@ const CategorySelector = ({ categories }: Props) => {
                   key={category?._id}
                   value={category?.title}
                   onSelect={() => {
-                    setValue(value === category?._id ? "" : category?._id);
+                    setValue(value === category?._id ? '' : category?._id);
                     router.push(`/categories/${category.slug?.current}`);
                     setOpen(false);
                   }}
                 >
                   {category?.title}
                   <Check
-                    className={cn(
-                      "ml-auto",
-                      value === category._id ? "opacity-100" : "opacity-0"
-                    )}
+                    className={cn('ml-auto', value === category._id ? 'opacity-100' : 'opacity-0')}
                   />
                 </CommandItem>
               ))}

@@ -23,13 +23,11 @@ Created API endpoints that use server-side Sanity client with proper authenticat
 API route handler with three endpoints:
 
 - **GET** `/api/user/reviews?productId={id}`
-
   - Fetches approved reviews for a product
   - Returns reviews with rating statistics
   - Public endpoint (no auth required)
 
 - **POST** `/api/user/reviews`
-
   - Submits a new review
   - Requires authentication (Clerk)
   - Validates user hasn't already reviewed
@@ -81,14 +79,14 @@ markReviewHelpfulAPI(reviewId: string): Promise<{
 **Before:**
 
 ```typescript
-import { submitReview } from "@/actions/reviewActions";
+import { submitReview } from '@/actions/reviewActions';
 const result = await submitReview(reviewData);
 ```
 
 **After:**
 
 ```typescript
-import { submitReviewAPI } from "@/lib/reviewAPI";
+import { submitReviewAPI } from '@/lib/reviewAPI';
 const result = await submitReviewAPI(reviewData);
 ```
 
@@ -103,7 +101,7 @@ const result = await submitReviewAPI(reviewData);
 **Before:**
 
 ```typescript
-import { getProductReviews, markReviewHelpful } from "@/actions/reviewActions";
+import { getProductReviews, markReviewHelpful } from '@/actions/reviewActions';
 const data = await getProductReviews(productId);
 await markReviewHelpful(reviewId);
 ```
@@ -111,7 +109,7 @@ await markReviewHelpful(reviewId);
 **After:**
 
 ```typescript
-import { getProductReviewsAPI, markReviewHelpfulAPI } from "@/lib/reviewAPI";
+import { getProductReviewsAPI, markReviewHelpfulAPI } from '@/lib/reviewAPI';
 const data = await getProductReviewsAPI(productId);
 await markReviewHelpfulAPI(reviewId);
 ```

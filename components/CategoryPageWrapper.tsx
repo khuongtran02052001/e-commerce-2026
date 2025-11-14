@@ -1,23 +1,15 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { Category, Product } from "@/sanity.types";
-import { client } from "@/sanity/lib/client";
-import { urlFor } from "@/sanity/lib/image";
-import Image from "next/image";
-import Link from "next/link";
-import {
-  ArrowLeft,
-  ArrowRight,
-  Package,
-  Tag,
-  Grid3X3,
-  Filter,
-  TrendingUp,
-} from "lucide-react";
-import Title from "./Title";
-import CategoryProducts from "./product/CategoryProducts";
-import CategoryDetailSkeleton from "./CategoryDetailSkeleton";
+import { Category, Product } from '@/sanity.types';
+import { client } from '@/sanity/lib/client';
+import { urlFor } from '@/sanity/lib/image';
+import { ArrowLeft, ArrowRight, Filter, Grid3X3, Package, Tag, TrendingUp } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import CategoryDetailSkeleton from './CategoryDetailSkeleton';
+import Title from './Title';
+import CategoryProducts from './product/CategoryProducts';
 
 interface Props {
   slug: string;
@@ -49,9 +41,7 @@ const CategoryPageWrapper = ({ slug }: Props) => {
         setCategories(fetchedCategories);
 
         // Find current category
-        const current = fetchedCategories.find(
-          (cat: Category) => cat.slug?.current === slug
-        );
+        const current = fetchedCategories.find((cat: Category) => cat.slug?.current === slug);
         setCurrentCategory(current || null);
 
         // Fetch products for the current category
@@ -69,8 +59,8 @@ const CategoryPageWrapper = ({ slug }: Props) => {
         });
         setProducts(fetchedProducts);
       } catch (err) {
-        console.error("Error fetching categories:", err);
-        setError("Failed to load category data");
+        console.error('Error fetching categories:', err);
+        setError('Failed to load category data');
       } finally {
         setCategoryLoading(false);
       }
@@ -89,9 +79,7 @@ const CategoryPageWrapper = ({ slug }: Props) => {
     return (
       <div className="flex flex-col items-center justify-center py-20 bg-white rounded-lg">
         <Package className="w-16 h-16 text-gray-400 mb-4" />
-        <h3 className="text-xl font-semibold text-gray-800 mb-2">
-          Error Loading Category
-        </h3>
+        <h3 className="text-xl font-semibold text-gray-800 mb-2">Error Loading Category</h3>
         <p className="text-gray-600 mb-4">{error}</p>
         <Link
           href="/category"
@@ -105,9 +93,7 @@ const CategoryPageWrapper = ({ slug }: Props) => {
   }
 
   const categoryTitle = currentCategory?.title || slug;
-  const relatedCategories = categories
-    .filter((cat) => cat.slug?.current !== slug)
-    .slice(0, 6);
+  const relatedCategories = categories.filter((cat) => cat.slug?.current !== slug).slice(0, 6);
 
   return (
     <>
@@ -200,11 +186,7 @@ const CategoryPageWrapper = ({ slug }: Props) => {
       </div>
 
       {/* Main Content */}
-      <CategoryProducts
-        categories={categories}
-        slug={slug}
-        initialProducts={products}
-      />
+      <CategoryProducts categories={categories} slug={slug} initialProducts={products} />
 
       {/* Related Categories Section */}
       {relatedCategories.length > 0 && (
@@ -234,7 +216,7 @@ const CategoryPageWrapper = ({ slug }: Props) => {
                   {category.image ? (
                     <Image
                       src={urlFor(category.image).url()}
-                      alt={category.title || "Category"}
+                      alt={category.title || 'Category'}
                       width={32}
                       height={32}
                       className="w-8 h-8 object-contain"
@@ -261,8 +243,8 @@ const CategoryPageWrapper = ({ slug }: Props) => {
             Discover More Amazing Products
           </h3>
           <p className="text-dark-text mb-6 text-sm lg:text-base">
-            Can&apos;t find what you&apos;re looking for in {categoryTitle}?
-            Explore our complete collection of products across all categories.
+            Can&apos;t find what you&apos;re looking for in {categoryTitle}? Explore our complete
+            collection of products across all categories.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link

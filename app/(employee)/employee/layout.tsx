@@ -1,13 +1,9 @@
-import { PaidFeatureMessage } from "@/components/employee/PaidFeatureMessage";
+import { PaidFeatureMessage } from '@/components/employee/PaidFeatureMessage';
 
 // Employee features are only available in the paid version
 // Anyone can access this route to see the upgrade message
 
-export default async function EmployeeLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default async function EmployeeLayout({ children }: { children: React.ReactNode }) {
   // Show paid feature message instead of actual employee dashboard
   return <PaidFeatureMessage />;
 }

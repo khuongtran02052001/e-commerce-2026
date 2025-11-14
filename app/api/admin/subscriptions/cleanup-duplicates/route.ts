@@ -1,29 +1,26 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
-import { client, writeClient } from "@/sanity/lib/client";
-import { isUserAdmin } from "@/lib/adminUtils";
+import { isUserAdmin } from '@/lib/adminUtils';
+import { client, writeClient } from '@/sanity/lib/client';
+import { auth } from '@clerk/nextjs/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
     const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // Check if user is admin
-    const user = await client.fetch(
-      `*[_type == "user" && clerkUserId == $userId][0]`,
-      { userId }
-    );
+    const user = await client.fetch(`*[_type == "user" && clerkUserId == $userId][0]`, { userId });
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const isAdmin = isUserAdmin(user.email);
     if (!isAdmin) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     // Find all subscriptions
@@ -33,7 +30,7 @@ export async function POST(request: NextRequest) {
         email,
         status,
         subscribedAt
-      }`
+      }`,
     );
 
     // Group by email (normalized)
@@ -63,9 +60,7 @@ export async function POST(request: NextRequest) {
 
     // Delete duplicates
     if (duplicatesToDelete.length > 0) {
-      const deletePromises = duplicatesToDelete.map((id) =>
-        writeClient.delete(id)
-      );
+      const deletePromises = duplicatesToDelete.map((id) => writeClient.delete(id));
       await Promise.all(deletePromises);
     }
 
@@ -77,13 +72,10 @@ export async function POST(request: NextRequest) {
         duplicatesRemoved: duplicatesToDelete.length,
         affectedEmails: duplicateEmails,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
-    console.error("Error cleaning up duplicates:", error);
-    return NextResponse.json(
-      { error: "Failed to cleanup duplicates" },
-      { status: 500 }
-    );
+    console.error('Error cleaning up duplicates:', error);
+    return NextResponse.json({ error: 'Failed to cleanup duplicates' }, { status: 500 });
   }
 }

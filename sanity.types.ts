@@ -15,49 +15,49 @@
 // Source: schema.json
 export type Subscription = {
   _id: string;
-  _type: "subscription";
+  _type: 'subscription';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
   email?: string;
-  status?: "active" | "unsubscribed" | "pending";
+  status?: 'active' | 'unsubscribed' | 'pending';
   subscribedAt?: string;
   unsubscribedAt?: string;
-  source?: "footer" | "popup" | "checkout" | "other";
+  source?: 'footer' | 'popup' | 'checkout' | 'other';
   ipAddress?: string;
   userAgent?: string;
 };
 
 export type Review = {
   _id: string;
-  _type: "review";
+  _type: 'review';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
   product?: {
     _ref: string;
-    _type: "reference";
+    _type: 'reference';
     _weak?: boolean;
-    [internalGroqTypeReferenceTo]?: "product";
+    [internalGroqTypeReferenceTo]?: 'product';
   };
   user?: {
     _ref: string;
-    _type: "reference";
+    _type: 'reference';
     _weak?: boolean;
-    [internalGroqTypeReferenceTo]?: "user";
+    [internalGroqTypeReferenceTo]?: 'user';
   };
   rating?: number;
   title?: string;
   content?: string;
   isVerifiedPurchase?: boolean;
-  status?: "pending" | "approved" | "rejected";
+  status?: 'pending' | 'approved' | 'rejected';
   helpful?: number;
   helpfulBy?: Array<{
     _ref: string;
-    _type: "reference";
+    _type: 'reference';
     _weak?: boolean;
     _key: string;
-    [internalGroqTypeReferenceTo]?: "user";
+    [internalGroqTypeReferenceTo]?: 'user';
   }>;
   adminNotes?: string;
   createdAt?: string;
@@ -68,7 +68,7 @@ export type Review = {
 
 export type UserAccessRequest = {
   _id: string;
-  _type: "userAccessRequest";
+  _type: 'userAccessRequest';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -76,36 +76,36 @@ export type UserAccessRequest = {
   email?: string;
   firstName?: string;
   lastName?: string;
-  status?: "pending" | "approved" | "rejected";
+  status?: 'pending' | 'approved' | 'rejected';
   requestedAt?: string;
   approvedAt?: string;
   approvedBy?: {
     _ref: string;
-    _type: "reference";
+    _type: 'reference';
     _weak?: boolean;
-    [internalGroqTypeReferenceTo]?: "user";
+    [internalGroqTypeReferenceTo]?: 'user';
   };
   rejectedAt?: string;
   rejectedBy?: {
     _ref: string;
-    _type: "reference";
+    _type: 'reference';
     _weak?: boolean;
-    [internalGroqTypeReferenceTo]?: "user";
+    [internalGroqTypeReferenceTo]?: 'user';
   };
   notes?: string;
 };
 
 export type SentNotification = {
   _id: string;
-  _type: "sentNotification";
+  _type: 'sentNotification';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
   notificationId?: string;
   title?: string;
   message?: string;
-  type?: "promo" | "order" | "system" | "marketing" | "general";
-  priority?: "low" | "medium" | "high" | "urgent";
+  type?: 'promo' | 'order' | 'system' | 'marketing' | 'general';
+  priority?: 'low' | 'medium' | 'high' | 'urgent';
   sentAt?: string;
   sentBy?: string;
   actionUrl?: string;
@@ -122,7 +122,7 @@ export type SentNotification = {
 
 export type Contact = {
   _id: string;
-  _type: "contact";
+  _type: 'contact';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -130,8 +130,8 @@ export type Contact = {
   email?: string;
   subject?: string;
   message?: string;
-  status?: "new" | "read" | "replied" | "closed";
-  priority?: "low" | "medium" | "high" | "urgent";
+  status?: 'new' | 'read' | 'replied' | 'closed';
+  priority?: 'low' | 'medium' | 'high' | 'urgent';
   submittedAt?: string;
   ipAddress?: string;
   userAgent?: string;
@@ -139,7 +139,7 @@ export type Contact = {
 
 export type Address = {
   _id: string;
-  _type: "address";
+  _type: 'address';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -147,9 +147,9 @@ export type Address = {
   email?: string;
   user?: {
     _ref: string;
-    _type: "reference";
+    _type: 'reference';
     _weak?: boolean;
-    [internalGroqTypeReferenceTo]?: "user";
+    [internalGroqTypeReferenceTo]?: 'user';
   };
   phone?: string;
   address?: string;
@@ -160,14 +160,14 @@ export type Address = {
   countryCode?: string;
   stateCode?: string;
   subArea?: string;
-  type?: "home" | "office" | "other";
+  type?: 'home' | 'office' | 'other';
   default?: boolean;
   createdAt?: string;
 };
 
 export type User = {
   _id: string;
-  _type: "user";
+  _type: 'user';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -180,43 +180,43 @@ export type User = {
   profileImage?: {
     asset?: {
       _ref: string;
-      _type: "reference";
+      _type: 'reference';
       _weak?: boolean;
-      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
     };
     media?: unknown;
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
-    _type: "image";
+    _type: 'image';
   };
   addresses?: Array<{
     _ref: string;
-    _type: "reference";
+    _type: 'reference';
     _weak?: boolean;
     _key: string;
-    [internalGroqTypeReferenceTo]?: "address";
+    [internalGroqTypeReferenceTo]?: 'address';
   }>;
   preferences?: {
     newsletter?: boolean;
     emailNotifications?: boolean;
     smsNotifications?: boolean;
-    preferredCurrency?: "USD" | "EUR" | "GBP" | "CAD";
-    preferredLanguage?: "en" | "es" | "fr" | "de";
+    preferredCurrency?: 'USD' | 'EUR' | 'GBP' | 'CAD';
+    preferredLanguage?: 'en' | 'es' | 'fr' | 'de';
   };
   rewardPoints?: number;
   wishlist?: Array<{
     _ref: string;
-    _type: "reference";
+    _type: 'reference';
     _weak?: boolean;
     _key: string;
-    [internalGroqTypeReferenceTo]?: "product";
+    [internalGroqTypeReferenceTo]?: 'product';
   }>;
   cart?: Array<{
     product?: {
       _ref: string;
-      _type: "reference";
+      _type: 'reference';
       _weak?: boolean;
-      [internalGroqTypeReferenceTo]?: "product";
+      [internalGroqTypeReferenceTo]?: 'product';
     };
     quantity?: number;
     addedAt?: string;
@@ -226,17 +226,17 @@ export type User = {
   }>;
   orders?: Array<{
     _ref: string;
-    _type: "reference";
+    _type: 'reference';
     _weak?: boolean;
     _key: string;
-    [internalGroqTypeReferenceTo]?: "order";
+    [internalGroqTypeReferenceTo]?: 'order';
   }>;
   loyaltyPoints?: number;
   totalSpent?: number;
   walletBalance?: number;
   walletTransactions?: Array<{
     id?: string;
-    type?: "credit_refund" | "credit_manual" | "debit_order" | "debit_withdrawal";
+    type?: 'credit_refund' | 'credit_manual' | 'debit_order' | 'debit_withdrawal';
     amount?: number;
     balanceBefore?: number;
     balanceAfter?: number;
@@ -245,13 +245,13 @@ export type User = {
     withdrawalRequestId?: string;
     processedBy?: string;
     createdAt?: string;
-    status?: "completed" | "pending" | "failed" | "cancelled";
+    status?: 'completed' | 'pending' | 'failed' | 'cancelled';
     _key: string;
   }>;
   withdrawalRequests?: Array<{
     id?: string;
     amount?: number;
-    method?: "bank" | "paypal" | "stripe" | "check";
+    method?: 'bank' | 'paypal' | 'stripe' | 'check';
     bankDetails?: {
       accountHolderName?: string;
       bankName?: string;
@@ -260,7 +260,7 @@ export type User = {
       swiftCode?: string;
     };
     paypalEmail?: string;
-    status?: "pending" | "approved" | "processing" | "completed" | "rejected" | "cancelled";
+    status?: 'pending' | 'approved' | 'processing' | 'completed' | 'rejected' | 'cancelled';
     requestedAt?: string;
     processedAt?: string;
     processedBy?: string;
@@ -271,24 +271,24 @@ export type User = {
   }>;
   lastLogin?: string;
   isActive?: boolean;
-  premiumStatus?: "none" | "pending" | "active" | "rejected" | "cancelled";
+  premiumStatus?: 'none' | 'pending' | 'active' | 'rejected' | 'cancelled';
   premiumAppliedAt?: string;
   premiumApprovedBy?: string;
   premiumApprovedAt?: string;
   premiumRejectedAt?: string;
   rejectionReason?: string;
   isBusiness?: boolean;
-  businessStatus?: "none" | "pending" | "active" | "rejected" | "cancelled";
+  businessStatus?: 'none' | 'pending' | 'active' | 'rejected' | 'cancelled';
   businessApprovedBy?: string;
   businessApprovedAt?: string;
   businessRejectedAt?: string;
   businessAppliedAt?: string;
-  membershipType?: "standard" | "premium" | "business" | "vip";
+  membershipType?: 'standard' | 'premium' | 'business' | 'vip';
   activatedAt?: string;
   activatedBy?: string;
   isEmployee?: boolean;
-  employeeRole?: "callcenter" | "packer" | "warehouse" | "deliveryman" | "incharge" | "accounts";
-  employeeStatus?: "active" | "inactive" | "suspended";
+  employeeRole?: 'callcenter' | 'packer' | 'warehouse' | 'deliveryman' | 'incharge' | 'accounts';
+  employeeStatus?: 'active' | 'inactive' | 'suspended';
   employeeAssignedBy?: string;
   employeeAssignedAt?: string;
   employeeSuspendedBy?: string;
@@ -310,9 +310,9 @@ export type User = {
     id?: string;
     title?: string;
     message?: string;
-    type?: "promo" | "order" | "system" | "marketing" | "general";
+    type?: 'promo' | 'order' | 'system' | 'marketing' | 'general';
     read?: boolean;
-    priority?: "low" | "medium" | "high" | "urgent";
+    priority?: 'low' | 'medium' | 'high' | 'urgent';
     sentAt?: string;
     readAt?: string;
     sentBy?: string;
@@ -323,7 +323,7 @@ export type User = {
 
 export type Blogcategory = {
   _id: string;
-  _type: "blogcategory";
+  _type: 'blogcategory';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -334,7 +334,7 @@ export type Blogcategory = {
 
 export type Blog = {
   _id: string;
-  _type: "blog";
+  _type: 'blog';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -342,67 +342,70 @@ export type Blog = {
   slug?: Slug;
   author?: {
     _ref: string;
-    _type: "reference";
+    _type: 'reference';
     _weak?: boolean;
-    [internalGroqTypeReferenceTo]?: "author";
+    [internalGroqTypeReferenceTo]?: 'author';
   };
   mainImage?: {
     asset?: {
       _ref: string;
-      _type: "reference";
+      _type: 'reference';
       _weak?: boolean;
-      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
     };
     media?: unknown;
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
-    _type: "image";
+    _type: 'image';
   };
   blogcategories?: Array<{
     _ref: string;
-    _type: "reference";
+    _type: 'reference';
     _weak?: boolean;
     _key: string;
-    [internalGroqTypeReferenceTo]?: "blogcategory";
+    [internalGroqTypeReferenceTo]?: 'blogcategory';
   }>;
   publishedAt?: string;
   isLatest?: boolean;
-  body?: Array<{
-    children?: Array<{
-      marks?: Array<string>;
-      text?: string;
-      _type: "span";
-      _key: string;
-    }>;
-    style?: "normal" | "h1" | "h2" | "h3" | "h4" | "blockquote";
-    listItem?: "bullet";
-    markDefs?: Array<{
-      href?: string;
-      _type: "link";
-      _key: string;
-    }>;
-    level?: number;
-    _type: "block";
-    _key: string;
-  } | {
-    asset?: {
-      _ref: string;
-      _type: "reference";
-      _weak?: boolean;
-      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
-    };
-    media?: unknown;
-    hotspot?: SanityImageHotspot;
-    crop?: SanityImageCrop;
-    alt?: string;
-    _type: "image";
-    _key: string;
-  }>;
+  body?: Array<
+    | {
+        children?: Array<{
+          marks?: Array<string>;
+          text?: string;
+          _type: 'span';
+          _key: string;
+        }>;
+        style?: 'normal' | 'h1' | 'h2' | 'h3' | 'h4' | 'blockquote';
+        listItem?: 'bullet';
+        markDefs?: Array<{
+          href?: string;
+          _type: 'link';
+          _key: string;
+        }>;
+        level?: number;
+        _type: 'block';
+        _key: string;
+      }
+    | {
+        asset?: {
+          _ref: string;
+          _type: 'reference';
+          _weak?: boolean;
+          [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
+        };
+        media?: unknown;
+        hotspot?: SanityImageHotspot;
+        crop?: SanityImageCrop;
+        alt?: string;
+        _type: 'image';
+        _key: string;
+      }
+  >;
 };
 
 export type Author = {
   _id: string;
-  _type: "author";
+  _type: 'author';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -411,38 +414,38 @@ export type Author = {
   image?: {
     asset?: {
       _ref: string;
-      _type: "reference";
+      _type: 'reference';
       _weak?: boolean;
-      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
     };
     media?: unknown;
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
-    _type: "image";
+    _type: 'image';
   };
   bio?: Array<{
     children?: Array<{
       marks?: Array<string>;
       text?: string;
-      _type: "span";
+      _type: 'span';
       _key: string;
     }>;
-    style?: "normal";
+    style?: 'normal';
     listItem?: never;
     markDefs?: Array<{
       href?: string;
-      _type: "link";
+      _type: 'link';
       _key: string;
     }>;
     level?: number;
-    _type: "block";
+    _type: 'block';
     _key: string;
   }>;
 };
 
 export type Banner = {
   _id: string;
-  _type: "banner";
+  _type: 'banner';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -453,20 +456,20 @@ export type Banner = {
   image?: {
     asset?: {
       _ref: string;
-      _type: "reference";
+      _type: 'reference';
       _weak?: boolean;
-      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
     };
     media?: unknown;
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
-    _type: "image";
+    _type: 'image';
   };
 };
 
 export type Order = {
   _id: string;
-  _type: "order";
+  _type: 'order';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -485,9 +488,9 @@ export type Order = {
   products?: Array<{
     product?: {
       _ref: string;
-      _type: "reference";
+      _type: 'reference';
       _weak?: boolean;
-      [internalGroqTypeReferenceTo]?: "product";
+      [internalGroqTypeReferenceTo]?: 'product';
     };
     quantity?: number;
     _key: string;
@@ -505,10 +508,21 @@ export type Order = {
     address?: string;
     name?: string;
   };
-  status?: "pending" | "address_confirmed" | "order_confirmed" | "packed" | "ready_for_delivery" | "out_for_delivery" | "delivered" | "completed" | "cancelled" | "rescheduled" | "failed_delivery";
+  status?:
+    | 'pending'
+    | 'address_confirmed'
+    | 'order_confirmed'
+    | 'packed'
+    | 'ready_for_delivery'
+    | 'out_for_delivery'
+    | 'delivered'
+    | 'completed'
+    | 'cancelled'
+    | 'rescheduled'
+    | 'failed_delivery';
   orderDate?: string;
-  paymentStatus?: "pending" | "paid" | "failed" | "cancelled";
-  paymentMethod?: "cash_on_delivery" | "stripe" | "card";
+  paymentStatus?: 'pending' | 'paid' | 'failed' | 'cancelled';
+  paymentMethod?: 'cash_on_delivery' | 'stripe' | 'card';
   addressConfirmedBy?: string;
   addressConfirmedAt?: string;
   orderConfirmedBy?: string;
@@ -537,7 +551,7 @@ export type Order = {
   cashSubmissionNotes?: string;
   assignedAccountsEmployeeId?: string;
   assignedAccountsEmployeeName?: string;
-  cashSubmissionStatus?: "not_submitted" | "pending" | "confirmed" | "rejected";
+  cashSubmissionStatus?: 'not_submitted' | 'pending' | 'confirmed' | 'rejected';
   cashSubmissionRejectionReason?: string;
   paymentReceivedBy?: string;
   paymentReceivedAt?: string;
@@ -550,7 +564,15 @@ export type Order = {
   statusHistory?: Array<{
     status?: string;
     changedBy?: string;
-    changedByRole?: "admin" | "callcenter" | "packer" | "warehouse" | "deliveryman" | "incharge" | "accounts" | "system";
+    changedByRole?:
+      | 'admin'
+      | 'callcenter'
+      | 'packer'
+      | 'warehouse'
+      | 'deliveryman'
+      | 'incharge'
+      | 'accounts'
+      | 'system';
     changedAt?: string;
     notes?: string;
     _key: string;
@@ -559,7 +581,7 @@ export type Order = {
 
 export type Product = {
   _id: string;
-  _type: "product";
+  _type: 'product';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -568,14 +590,14 @@ export type Product = {
   images?: Array<{
     asset?: {
       _ref: string;
-      _type: "reference";
+      _type: 'reference';
       _weak?: boolean;
-      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
     };
     media?: unknown;
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
-    _type: "image";
+    _type: 'image';
     _key: string;
   }>;
   description?: string;
@@ -583,20 +605,20 @@ export type Product = {
   discount?: number;
   categories?: Array<{
     _ref: string;
-    _type: "reference";
+    _type: 'reference';
     _weak?: boolean;
     _key: string;
-    [internalGroqTypeReferenceTo]?: "category";
+    [internalGroqTypeReferenceTo]?: 'category';
   }>;
   stock?: number;
   brand?: {
     _ref: string;
-    _type: "reference";
+    _type: 'reference';
     _weak?: boolean;
-    [internalGroqTypeReferenceTo]?: "brand";
+    [internalGroqTypeReferenceTo]?: 'brand';
   };
-  status?: "new" | "hot" | "sale";
-  variant?: "gadget" | "appliances" | "refrigerators" | "others";
+  status?: 'new' | 'hot' | 'sale';
+  variant?: 'gadget' | 'appliances' | 'refrigerators' | 'others';
   isFeatured?: boolean;
   averageRating?: number;
   totalReviews?: number;
@@ -611,7 +633,7 @@ export type Product = {
 
 export type Brand = {
   _id: string;
-  _type: "brand";
+  _type: 'brand';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -621,20 +643,20 @@ export type Brand = {
   image?: {
     asset?: {
       _ref: string;
-      _type: "reference";
+      _type: 'reference';
       _weak?: boolean;
-      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
     };
     media?: unknown;
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
-    _type: "image";
+    _type: 'image';
   };
 };
 
 export type Category = {
   _id: string;
-  _type: "category";
+  _type: 'category';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -646,51 +668,54 @@ export type Category = {
   image?: {
     asset?: {
       _ref: string;
-      _type: "reference";
+      _type: 'reference';
       _weak?: boolean;
-      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
     };
     media?: unknown;
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
-    _type: "image";
+    _type: 'image';
   };
 };
 
-export type BlockContent = Array<{
-  children?: Array<{
-    marks?: Array<string>;
-    text?: string;
-    _type: "span";
-    _key: string;
-  }>;
-  style?: "normal" | "h1" | "h2" | "h3" | "h4" | "blockquote";
-  listItem?: "bullet";
-  markDefs?: Array<{
-    href?: string;
-    _type: "link";
-    _key: string;
-  }>;
-  level?: number;
-  _type: "block";
-  _key: string;
-} | {
-  asset?: {
-    _ref: string;
-    _type: "reference";
-    _weak?: boolean;
-    [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
-  };
-  media?: unknown;
-  hotspot?: SanityImageHotspot;
-  crop?: SanityImageCrop;
-  alt?: string;
-  _type: "image";
-  _key: string;
-}>;
+export type BlockContent = Array<
+  | {
+      children?: Array<{
+        marks?: Array<string>;
+        text?: string;
+        _type: 'span';
+        _key: string;
+      }>;
+      style?: 'normal' | 'h1' | 'h2' | 'h3' | 'h4' | 'blockquote';
+      listItem?: 'bullet';
+      markDefs?: Array<{
+        href?: string;
+        _type: 'link';
+        _key: string;
+      }>;
+      level?: number;
+      _type: 'block';
+      _key: string;
+    }
+  | {
+      asset?: {
+        _ref: string;
+        _type: 'reference';
+        _weak?: boolean;
+        [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
+      };
+      media?: unknown;
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      alt?: string;
+      _type: 'image';
+      _key: string;
+    }
+>;
 
 export type SanityImagePaletteSwatch = {
-  _type: "sanity.imagePaletteSwatch";
+  _type: 'sanity.imagePaletteSwatch';
   background?: string;
   foreground?: string;
   population?: number;
@@ -698,7 +723,7 @@ export type SanityImagePaletteSwatch = {
 };
 
 export type SanityImagePalette = {
-  _type: "sanity.imagePalette";
+  _type: 'sanity.imagePalette';
   darkMuted?: SanityImagePaletteSwatch;
   lightVibrant?: SanityImagePaletteSwatch;
   darkVibrant?: SanityImagePaletteSwatch;
@@ -709,14 +734,14 @@ export type SanityImagePalette = {
 };
 
 export type SanityImageDimensions = {
-  _type: "sanity.imageDimensions";
+  _type: 'sanity.imageDimensions';
   height?: number;
   width?: number;
   aspectRatio?: number;
 };
 
 export type SanityImageHotspot = {
-  _type: "sanity.imageHotspot";
+  _type: 'sanity.imageHotspot';
   x?: number;
   y?: number;
   height?: number;
@@ -724,7 +749,7 @@ export type SanityImageHotspot = {
 };
 
 export type SanityImageCrop = {
-  _type: "sanity.imageCrop";
+  _type: 'sanity.imageCrop';
   top?: number;
   bottom?: number;
   left?: number;
@@ -733,7 +758,7 @@ export type SanityImageCrop = {
 
 export type SanityFileAsset = {
   _id: string;
-  _type: "sanity.fileAsset";
+  _type: 'sanity.fileAsset';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -755,7 +780,7 @@ export type SanityFileAsset = {
 
 export type SanityImageAsset = {
   _id: string;
-  _type: "sanity.imageAsset";
+  _type: 'sanity.imageAsset';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -777,7 +802,7 @@ export type SanityImageAsset = {
 };
 
 export type SanityImageMetadata = {
-  _type: "sanity.imageMetadata";
+  _type: 'sanity.imageMetadata';
   location?: Geopoint;
   dimensions?: SanityImageDimensions;
   palette?: SanityImagePalette;
@@ -788,33 +813,60 @@ export type SanityImageMetadata = {
 };
 
 export type Geopoint = {
-  _type: "geopoint";
+  _type: 'geopoint';
   lat?: number;
   lng?: number;
   alt?: number;
 };
 
 export type Slug = {
-  _type: "slug";
+  _type: 'slug';
   current?: string;
   source?: string;
 };
 
 export type SanityAssetSourceData = {
-  _type: "sanity.assetSourceData";
+  _type: 'sanity.assetSourceData';
   name?: string;
   id?: string;
   url?: string;
 };
 
-export type AllSanitySchemaTypes = Subscription | Review | UserAccessRequest | SentNotification | Contact | Address | User | Blogcategory | Blog | Author | Banner | Order | Product | Brand | Category | BlockContent | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageHotspot | SanityImageCrop | SanityFileAsset | SanityImageAsset | SanityImageMetadata | Geopoint | Slug | SanityAssetSourceData;
+export type AllSanitySchemaTypes =
+  | Subscription
+  | Review
+  | UserAccessRequest
+  | SentNotification
+  | Contact
+  | Address
+  | User
+  | Blogcategory
+  | Blog
+  | Author
+  | Banner
+  | Order
+  | Product
+  | Brand
+  | Category
+  | BlockContent
+  | SanityImagePaletteSwatch
+  | SanityImagePalette
+  | SanityImageDimensions
+  | SanityImageHotspot
+  | SanityImageCrop
+  | SanityFileAsset
+  | SanityImageAsset
+  | SanityImageMetadata
+  | Geopoint
+  | Slug
+  | SanityAssetSourceData;
 export declare const internalGroqTypeReferenceTo: unique symbol;
 // Source: ./app/(client)/(user)/success/page.tsx
 // Variable: query
 // Query: *[_type == 'order' && clerkUserId == $userId] | order(orderDate desc){  ...,products[]{    ...,product->  }}
 export type QueryResult = Array<{
   _id: string;
-  _type: "order";
+  _type: 'order';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -833,7 +885,7 @@ export type QueryResult = Array<{
   products: Array<{
     product: {
       _id: string;
-      _type: "product";
+      _type: 'product';
       _createdAt: string;
       _updatedAt: string;
       _rev: string;
@@ -842,14 +894,14 @@ export type QueryResult = Array<{
       images?: Array<{
         asset?: {
           _ref: string;
-          _type: "reference";
+          _type: 'reference';
           _weak?: boolean;
-          [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+          [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
         };
         media?: unknown;
         hotspot?: SanityImageHotspot;
         crop?: SanityImageCrop;
-        _type: "image";
+        _type: 'image';
         _key: string;
       }>;
       description?: string;
@@ -857,20 +909,20 @@ export type QueryResult = Array<{
       discount?: number;
       categories?: Array<{
         _ref: string;
-        _type: "reference";
+        _type: 'reference';
         _weak?: boolean;
         _key: string;
-        [internalGroqTypeReferenceTo]?: "category";
+        [internalGroqTypeReferenceTo]?: 'category';
       }>;
       stock?: number;
       brand?: {
         _ref: string;
-        _type: "reference";
+        _type: 'reference';
         _weak?: boolean;
-        [internalGroqTypeReferenceTo]?: "brand";
+        [internalGroqTypeReferenceTo]?: 'brand';
       };
-      status?: "hot" | "new" | "sale";
-      variant?: "appliances" | "gadget" | "others" | "refrigerators";
+      status?: 'hot' | 'new' | 'sale';
+      variant?: 'appliances' | 'gadget' | 'others' | 'refrigerators';
       isFeatured?: boolean;
       averageRating?: number;
       totalReviews?: number;
@@ -898,10 +950,21 @@ export type QueryResult = Array<{
     address?: string;
     name?: string;
   };
-  status?: "address_confirmed" | "cancelled" | "completed" | "delivered" | "failed_delivery" | "order_confirmed" | "out_for_delivery" | "packed" | "pending" | "ready_for_delivery" | "rescheduled";
+  status?:
+    | 'address_confirmed'
+    | 'cancelled'
+    | 'completed'
+    | 'delivered'
+    | 'failed_delivery'
+    | 'order_confirmed'
+    | 'out_for_delivery'
+    | 'packed'
+    | 'pending'
+    | 'ready_for_delivery'
+    | 'rescheduled';
   orderDate?: string;
-  paymentStatus?: "cancelled" | "failed" | "paid" | "pending";
-  paymentMethod?: "card" | "cash_on_delivery" | "stripe";
+  paymentStatus?: 'cancelled' | 'failed' | 'paid' | 'pending';
+  paymentMethod?: 'card' | 'cash_on_delivery' | 'stripe';
   addressConfirmedBy?: string;
   addressConfirmedAt?: string;
   orderConfirmedBy?: string;
@@ -930,7 +993,7 @@ export type QueryResult = Array<{
   cashSubmissionNotes?: string;
   assignedAccountsEmployeeId?: string;
   assignedAccountsEmployeeName?: string;
-  cashSubmissionStatus?: "confirmed" | "not_submitted" | "pending" | "rejected";
+  cashSubmissionStatus?: 'confirmed' | 'not_submitted' | 'pending' | 'rejected';
   cashSubmissionRejectionReason?: string;
   paymentReceivedBy?: string;
   paymentReceivedAt?: string;
@@ -943,7 +1006,15 @@ export type QueryResult = Array<{
   statusHistory?: Array<{
     status?: string;
     changedBy?: string;
-    changedByRole?: "accounts" | "admin" | "callcenter" | "deliveryman" | "incharge" | "packer" | "system" | "warehouse";
+    changedByRole?:
+      | 'accounts'
+      | 'admin'
+      | 'callcenter'
+      | 'deliveryman'
+      | 'incharge'
+      | 'packer'
+      | 'system'
+      | 'warehouse';
     changedAt?: string;
     notes?: string;
     _key: string;
@@ -955,7 +1026,7 @@ export type QueryResult = Array<{
 // Query: *[_type == 'product' && references(*[_type == "category" && slug.current == $categorySlug]._id)] | order(name asc)
 export type PRODUCT_BY_CATEGORY_QUERYResult = Array<{
   _id: string;
-  _type: "product";
+  _type: 'product';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -964,14 +1035,14 @@ export type PRODUCT_BY_CATEGORY_QUERYResult = Array<{
   images?: Array<{
     asset?: {
       _ref: string;
-      _type: "reference";
+      _type: 'reference';
       _weak?: boolean;
-      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
     };
     media?: unknown;
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
-    _type: "image";
+    _type: 'image';
     _key: string;
   }>;
   description?: string;
@@ -979,20 +1050,20 @@ export type PRODUCT_BY_CATEGORY_QUERYResult = Array<{
   discount?: number;
   categories?: Array<{
     _ref: string;
-    _type: "reference";
+    _type: 'reference';
     _weak?: boolean;
     _key: string;
-    [internalGroqTypeReferenceTo]?: "category";
+    [internalGroqTypeReferenceTo]?: 'category';
   }>;
   stock?: number;
   brand?: {
     _ref: string;
-    _type: "reference";
+    _type: 'reference';
     _weak?: boolean;
-    [internalGroqTypeReferenceTo]?: "brand";
+    [internalGroqTypeReferenceTo]?: 'brand';
   };
-  status?: "hot" | "new" | "sale";
-  variant?: "appliances" | "gadget" | "others" | "refrigerators";
+  status?: 'hot' | 'new' | 'sale';
+  variant?: 'appliances' | 'gadget' | 'others' | 'refrigerators';
   isFeatured?: boolean;
   averageRating?: number;
   totalReviews?: number;
@@ -1011,7 +1082,7 @@ export type SALE_QUERYResult = Array<never>;
 // Query: *[_type == 'order' && clerkUserId == $userId] | order(orderDate desc)[$start...$end]{    ...,    paymentStatus,    paymentMethod,    products[]{      ...,      product->{        _id,        name,        slug,        image,        images,        price,        currency      }    }  }
 export type MY_ORDERS_QUERYResult = Array<{
   _id: string;
-  _type: "order";
+  _type: 'order';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -1036,14 +1107,14 @@ export type MY_ORDERS_QUERYResult = Array<{
       images: Array<{
         asset?: {
           _ref: string;
-          _type: "reference";
+          _type: 'reference';
           _weak?: boolean;
-          [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+          [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
         };
         media?: unknown;
         hotspot?: SanityImageHotspot;
         crop?: SanityImageCrop;
-        _type: "image";
+        _type: 'image';
         _key: string;
       }> | null;
       price: number | null;
@@ -1065,10 +1136,21 @@ export type MY_ORDERS_QUERYResult = Array<{
     address?: string;
     name?: string;
   };
-  status?: "address_confirmed" | "cancelled" | "completed" | "delivered" | "failed_delivery" | "order_confirmed" | "out_for_delivery" | "packed" | "pending" | "ready_for_delivery" | "rescheduled";
+  status?:
+    | 'address_confirmed'
+    | 'cancelled'
+    | 'completed'
+    | 'delivered'
+    | 'failed_delivery'
+    | 'order_confirmed'
+    | 'out_for_delivery'
+    | 'packed'
+    | 'pending'
+    | 'ready_for_delivery'
+    | 'rescheduled';
   orderDate?: string;
-  paymentStatus: "cancelled" | "failed" | "paid" | "pending" | null;
-  paymentMethod: "card" | "cash_on_delivery" | "stripe" | null;
+  paymentStatus: 'cancelled' | 'failed' | 'paid' | 'pending' | null;
+  paymentMethod: 'card' | 'cash_on_delivery' | 'stripe' | null;
   addressConfirmedBy?: string;
   addressConfirmedAt?: string;
   orderConfirmedBy?: string;
@@ -1097,7 +1179,7 @@ export type MY_ORDERS_QUERYResult = Array<{
   cashSubmissionNotes?: string;
   assignedAccountsEmployeeId?: string;
   assignedAccountsEmployeeName?: string;
-  cashSubmissionStatus?: "confirmed" | "not_submitted" | "pending" | "rejected";
+  cashSubmissionStatus?: 'confirmed' | 'not_submitted' | 'pending' | 'rejected';
   cashSubmissionRejectionReason?: string;
   paymentReceivedBy?: string;
   paymentReceivedAt?: string;
@@ -1110,7 +1192,15 @@ export type MY_ORDERS_QUERYResult = Array<{
   statusHistory?: Array<{
     status?: string;
     changedBy?: string;
-    changedByRole?: "accounts" | "admin" | "callcenter" | "deliveryman" | "incharge" | "packer" | "system" | "warehouse";
+    changedByRole?:
+      | 'accounts'
+      | 'admin'
+      | 'callcenter'
+      | 'deliveryman'
+      | 'incharge'
+      | 'packer'
+      | 'system'
+      | 'warehouse';
     changedAt?: string;
     notes?: string;
     _key: string;
@@ -1125,7 +1215,7 @@ export type COUNT_QUERYResult = number;
 // Query: *[_type == 'banner'] | order(publishedAt desc)
 export type BANNER_QUERYResult = Array<{
   _id: string;
-  _type: "banner";
+  _type: 'banner';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -1136,21 +1226,21 @@ export type BANNER_QUERYResult = Array<{
   image?: {
     asset?: {
       _ref: string;
-      _type: "reference";
+      _type: 'reference';
       _weak?: boolean;
-      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
     };
     media?: unknown;
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
-    _type: "image";
+    _type: 'image';
   };
 }>;
 // Variable: FEATURED_CATEGORY_QUERY
 // Query: *[_type == 'category' && featured == true] | order(name desc)
 export type FEATURED_CATEGORY_QUERYResult = Array<{
   _id: string;
-  _type: "category";
+  _type: 'category';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -1162,21 +1252,21 @@ export type FEATURED_CATEGORY_QUERYResult = Array<{
   image?: {
     asset?: {
       _ref: string;
-      _type: "reference";
+      _type: 'reference';
       _weak?: boolean;
-      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
     };
     media?: unknown;
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
-    _type: "image";
+    _type: 'image';
   };
 }>;
 // Variable: ALL_PRODUCTS_QUERY
 // Query: *[_type=="product"] | order(name asc)
 export type ALL_PRODUCTS_QUERYResult = Array<{
   _id: string;
-  _type: "product";
+  _type: 'product';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -1185,14 +1275,14 @@ export type ALL_PRODUCTS_QUERYResult = Array<{
   images?: Array<{
     asset?: {
       _ref: string;
-      _type: "reference";
+      _type: 'reference';
       _weak?: boolean;
-      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
     };
     media?: unknown;
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
-    _type: "image";
+    _type: 'image';
     _key: string;
   }>;
   description?: string;
@@ -1200,20 +1290,20 @@ export type ALL_PRODUCTS_QUERYResult = Array<{
   discount?: number;
   categories?: Array<{
     _ref: string;
-    _type: "reference";
+    _type: 'reference';
     _weak?: boolean;
     _key: string;
-    [internalGroqTypeReferenceTo]?: "category";
+    [internalGroqTypeReferenceTo]?: 'category';
   }>;
   stock?: number;
   brand?: {
     _ref: string;
-    _type: "reference";
+    _type: 'reference';
     _weak?: boolean;
-    [internalGroqTypeReferenceTo]?: "brand";
+    [internalGroqTypeReferenceTo]?: 'brand';
   };
-  status?: "hot" | "new" | "sale";
-  variant?: "appliances" | "gadget" | "others" | "refrigerators";
+  status?: 'hot' | 'new' | 'sale';
+  variant?: 'appliances' | 'gadget' | 'others' | 'refrigerators';
   isFeatured?: boolean;
   averageRating?: number;
   totalReviews?: number;
@@ -1229,7 +1319,7 @@ export type ALL_PRODUCTS_QUERYResult = Array<{
 // Query: *[_type == 'product' && status == 'hot'] | order(name asc){  ...,"categories": categories[]->title}
 export type DEAL_PRODUCTSResult = Array<{
   _id: string;
-  _type: "product";
+  _type: 'product';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -1238,14 +1328,14 @@ export type DEAL_PRODUCTSResult = Array<{
   images?: Array<{
     asset?: {
       _ref: string;
-      _type: "reference";
+      _type: 'reference';
       _weak?: boolean;
-      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
     };
     media?: unknown;
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
-    _type: "image";
+    _type: 'image';
     _key: string;
   }>;
   description?: string;
@@ -1255,12 +1345,12 @@ export type DEAL_PRODUCTSResult = Array<{
   stock?: number;
   brand?: {
     _ref: string;
-    _type: "reference";
+    _type: 'reference';
     _weak?: boolean;
-    [internalGroqTypeReferenceTo]?: "brand";
+    [internalGroqTypeReferenceTo]?: 'brand';
   };
-  status?: "hot" | "new" | "sale";
-  variant?: "appliances" | "gadget" | "others" | "refrigerators";
+  status?: 'hot' | 'new' | 'sale';
+  variant?: 'appliances' | 'gadget' | 'others' | 'refrigerators';
   isFeatured?: boolean;
   averageRating?: number;
   totalReviews?: number;
@@ -1276,7 +1366,7 @@ export type DEAL_PRODUCTSResult = Array<{
 // Query: *[_type == 'product' && isFeatured == true] | order(name asc){  ...,"categories": categories[]->title}
 export type FEATURE_PRODUCTSResult = Array<{
   _id: string;
-  _type: "product";
+  _type: 'product';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -1285,14 +1375,14 @@ export type FEATURE_PRODUCTSResult = Array<{
   images?: Array<{
     asset?: {
       _ref: string;
-      _type: "reference";
+      _type: 'reference';
       _weak?: boolean;
-      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
     };
     media?: unknown;
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
-    _type: "image";
+    _type: 'image';
     _key: string;
   }>;
   description?: string;
@@ -1302,12 +1392,12 @@ export type FEATURE_PRODUCTSResult = Array<{
   stock?: number;
   brand?: {
     _ref: string;
-    _type: "reference";
+    _type: 'reference';
     _weak?: boolean;
-    [internalGroqTypeReferenceTo]?: "brand";
+    [internalGroqTypeReferenceTo]?: 'brand';
   };
-  status?: "hot" | "new" | "sale";
-  variant?: "appliances" | "gadget" | "others" | "refrigerators";
+  status?: 'hot' | 'new' | 'sale';
+  variant?: 'appliances' | 'gadget' | 'others' | 'refrigerators';
   isFeatured?: boolean;
   averageRating?: number;
   totalReviews?: number;
@@ -1323,7 +1413,7 @@ export type FEATURE_PRODUCTSResult = Array<{
 // Query: *[_type=='brand'] | order(name asc)
 export type BRANDS_QUERYResult = Array<{
   _id: string;
-  _type: "brand";
+  _type: 'brand';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -1333,21 +1423,21 @@ export type BRANDS_QUERYResult = Array<{
   image?: {
     asset?: {
       _ref: string;
-      _type: "reference";
+      _type: 'reference';
       _weak?: boolean;
-      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
     };
     media?: unknown;
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
-    _type: "image";
+    _type: 'image';
   };
 }>;
 // Variable: LATEST_BLOG_QUERY
 // Query: *[_type == 'blog' && isLatest == true]|order(name asc){    ...,    blogcategories[]->{    title  }  }
 export type LATEST_BLOG_QUERYResult = Array<{
   _id: string;
-  _type: "blog";
+  _type: 'blog';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -1355,64 +1445,67 @@ export type LATEST_BLOG_QUERYResult = Array<{
   slug?: Slug;
   author?: {
     _ref: string;
-    _type: "reference";
+    _type: 'reference';
     _weak?: boolean;
-    [internalGroqTypeReferenceTo]?: "author";
+    [internalGroqTypeReferenceTo]?: 'author';
   };
   mainImage?: {
     asset?: {
       _ref: string;
-      _type: "reference";
+      _type: 'reference';
       _weak?: boolean;
-      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
     };
     media?: unknown;
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
-    _type: "image";
+    _type: 'image';
   };
   blogcategories: Array<{
     title: string | null;
   }> | null;
   publishedAt?: string;
   isLatest?: boolean;
-  body?: Array<{
-    children?: Array<{
-      marks?: Array<string>;
-      text?: string;
-      _type: "span";
-      _key: string;
-    }>;
-    style?: "blockquote" | "h1" | "h2" | "h3" | "h4" | "normal";
-    listItem?: "bullet";
-    markDefs?: Array<{
-      href?: string;
-      _type: "link";
-      _key: string;
-    }>;
-    level?: number;
-    _type: "block";
-    _key: string;
-  } | {
-    asset?: {
-      _ref: string;
-      _type: "reference";
-      _weak?: boolean;
-      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
-    };
-    media?: unknown;
-    hotspot?: SanityImageHotspot;
-    crop?: SanityImageCrop;
-    alt?: string;
-    _type: "image";
-    _key: string;
-  }>;
+  body?: Array<
+    | {
+        children?: Array<{
+          marks?: Array<string>;
+          text?: string;
+          _type: 'span';
+          _key: string;
+        }>;
+        style?: 'blockquote' | 'h1' | 'h2' | 'h3' | 'h4' | 'normal';
+        listItem?: 'bullet';
+        markDefs?: Array<{
+          href?: string;
+          _type: 'link';
+          _key: string;
+        }>;
+        level?: number;
+        _type: 'block';
+        _key: string;
+      }
+    | {
+        asset?: {
+          _ref: string;
+          _type: 'reference';
+          _weak?: boolean;
+          [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
+        };
+        media?: unknown;
+        hotspot?: SanityImageHotspot;
+        crop?: SanityImageCrop;
+        alt?: string;
+        _type: 'image';
+        _key: string;
+      }
+  >;
 }>;
 // Variable: GET_ALL_BLOG
 // Query: *[_type == 'blog'] | order(publishedAt desc)[0...$quantity]{  ...,       blogcategories[]->{    title}    }
 export type GET_ALL_BLOGResult = Array<{
   _id: string;
-  _type: "blog";
+  _type: 'blog';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -1420,64 +1513,67 @@ export type GET_ALL_BLOGResult = Array<{
   slug?: Slug;
   author?: {
     _ref: string;
-    _type: "reference";
+    _type: 'reference';
     _weak?: boolean;
-    [internalGroqTypeReferenceTo]?: "author";
+    [internalGroqTypeReferenceTo]?: 'author';
   };
   mainImage?: {
     asset?: {
       _ref: string;
-      _type: "reference";
+      _type: 'reference';
       _weak?: boolean;
-      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
     };
     media?: unknown;
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
-    _type: "image";
+    _type: 'image';
   };
   blogcategories: Array<{
     title: string | null;
   }> | null;
   publishedAt?: string;
   isLatest?: boolean;
-  body?: Array<{
-    children?: Array<{
-      marks?: Array<string>;
-      text?: string;
-      _type: "span";
-      _key: string;
-    }>;
-    style?: "blockquote" | "h1" | "h2" | "h3" | "h4" | "normal";
-    listItem?: "bullet";
-    markDefs?: Array<{
-      href?: string;
-      _type: "link";
-      _key: string;
-    }>;
-    level?: number;
-    _type: "block";
-    _key: string;
-  } | {
-    asset?: {
-      _ref: string;
-      _type: "reference";
-      _weak?: boolean;
-      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
-    };
-    media?: unknown;
-    hotspot?: SanityImageHotspot;
-    crop?: SanityImageCrop;
-    alt?: string;
-    _type: "image";
-    _key: string;
-  }>;
+  body?: Array<
+    | {
+        children?: Array<{
+          marks?: Array<string>;
+          text?: string;
+          _type: 'span';
+          _key: string;
+        }>;
+        style?: 'blockquote' | 'h1' | 'h2' | 'h3' | 'h4' | 'normal';
+        listItem?: 'bullet';
+        markDefs?: Array<{
+          href?: string;
+          _type: 'link';
+          _key: string;
+        }>;
+        level?: number;
+        _type: 'block';
+        _key: string;
+      }
+    | {
+        asset?: {
+          _ref: string;
+          _type: 'reference';
+          _weak?: boolean;
+          [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
+        };
+        media?: unknown;
+        hotspot?: SanityImageHotspot;
+        crop?: SanityImageCrop;
+        alt?: string;
+        _type: 'image';
+        _key: string;
+      }
+  >;
 }>;
 // Variable: SINGLE_BLOG_QUERY
 // Query: *[_type == "blog" && slug.current == $slug][0]{  ...,     author->{    name,    image,  },  blogcategories[]->{    title,    "slug": slug.current,  },}
 export type SINGLE_BLOG_QUERYResult = {
   _id: string;
-  _type: "blog";
+  _type: 'blog';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -1488,27 +1584,27 @@ export type SINGLE_BLOG_QUERYResult = {
     image: {
       asset?: {
         _ref: string;
-        _type: "reference";
+        _type: 'reference';
         _weak?: boolean;
-        [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+        [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
       };
       media?: unknown;
       hotspot?: SanityImageHotspot;
       crop?: SanityImageCrop;
-      _type: "image";
+      _type: 'image';
     } | null;
   } | null;
   mainImage?: {
     asset?: {
       _ref: string;
-      _type: "reference";
+      _type: 'reference';
       _weak?: boolean;
-      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
     };
     media?: unknown;
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
-    _type: "image";
+    _type: 'image';
   };
   blogcategories: Array<{
     title: string | null;
@@ -1516,44 +1612,47 @@ export type SINGLE_BLOG_QUERYResult = {
   }> | null;
   publishedAt?: string;
   isLatest?: boolean;
-  body?: Array<{
-    children?: Array<{
-      marks?: Array<string>;
-      text?: string;
-      _type: "span";
-      _key: string;
-    }>;
-    style?: "blockquote" | "h1" | "h2" | "h3" | "h4" | "normal";
-    listItem?: "bullet";
-    markDefs?: Array<{
-      href?: string;
-      _type: "link";
-      _key: string;
-    }>;
-    level?: number;
-    _type: "block";
-    _key: string;
-  } | {
-    asset?: {
-      _ref: string;
-      _type: "reference";
-      _weak?: boolean;
-      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
-    };
-    media?: unknown;
-    hotspot?: SanityImageHotspot;
-    crop?: SanityImageCrop;
-    alt?: string;
-    _type: "image";
-    _key: string;
-  }>;
+  body?: Array<
+    | {
+        children?: Array<{
+          marks?: Array<string>;
+          text?: string;
+          _type: 'span';
+          _key: string;
+        }>;
+        style?: 'blockquote' | 'h1' | 'h2' | 'h3' | 'h4' | 'normal';
+        listItem?: 'bullet';
+        markDefs?: Array<{
+          href?: string;
+          _type: 'link';
+          _key: string;
+        }>;
+        level?: number;
+        _type: 'block';
+        _key: string;
+      }
+    | {
+        asset?: {
+          _ref: string;
+          _type: 'reference';
+          _weak?: boolean;
+          [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
+        };
+        media?: unknown;
+        hotspot?: SanityImageHotspot;
+        crop?: SanityImageCrop;
+        alt?: string;
+        _type: 'image';
+        _key: string;
+      }
+  >;
 } | null;
 // Variable: BLOG_CATEGORIES
 // Query: *[_type == "blog"]{     blogcategories[]->{    ...    }  }
 export type BLOG_CATEGORIESResult = Array<{
   blogcategories: Array<{
     _id: string;
-    _type: "blogcategory";
+    _type: 'blogcategory';
     _createdAt: string;
     _updatedAt: string;
     _rev: string;
@@ -1569,14 +1668,14 @@ export type OTHERS_BLOG_QUERYResult = Array<{
   mainImage: {
     asset?: {
       _ref: string;
-      _type: "reference";
+      _type: 'reference';
       _weak?: boolean;
-      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
     };
     media?: unknown;
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
-    _type: "image";
+    _type: 'image';
   } | null;
   slug: Slug | null;
   author: {
@@ -1584,14 +1683,14 @@ export type OTHERS_BLOG_QUERYResult = Array<{
     image: {
       asset?: {
         _ref: string;
-        _type: "reference";
+        _type: 'reference';
         _weak?: boolean;
-        [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+        [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
       };
       media?: unknown;
       hotspot?: SanityImageHotspot;
       crop?: SanityImageCrop;
-      _type: "image";
+      _type: 'image';
     } | null;
   } | null;
   categories: null;
@@ -1600,7 +1699,7 @@ export type OTHERS_BLOG_QUERYResult = Array<{
 // Query: *[_type=="address"] | order(publishedAt desc)
 export type ADDRESS_QUERYResult = Array<{
   _id: string;
-  _type: "address";
+  _type: 'address';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -1608,9 +1707,9 @@ export type ADDRESS_QUERYResult = Array<{
   email?: string;
   user?: {
     _ref: string;
-    _type: "reference";
+    _type: 'reference';
     _weak?: boolean;
-    [internalGroqTypeReferenceTo]?: "user";
+    [internalGroqTypeReferenceTo]?: 'user';
   };
   phone?: string;
   address?: string;
@@ -1621,7 +1720,7 @@ export type ADDRESS_QUERYResult = Array<{
   countryCode?: string;
   stateCode?: string;
   subArea?: string;
-  type?: "home" | "office" | "other";
+  type?: 'home' | 'office' | 'other';
   default?: boolean;
   createdAt?: string;
 }>;
@@ -1629,7 +1728,7 @@ export type ADDRESS_QUERYResult = Array<{
 // Query: *[_type == 'category'] | order(name asc) [0...$quantity]
 export type ALLCATEGORIES_QUERYResult = Array<{
   _id: string;
-  _type: "category";
+  _type: 'category';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -1641,14 +1740,14 @@ export type ALLCATEGORIES_QUERYResult = Array<{
   image?: {
     asset?: {
       _ref: string;
-      _type: "reference";
+      _type: 'reference';
       _weak?: boolean;
-      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
     };
     media?: unknown;
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
-    _type: "image";
+    _type: 'image';
   };
 }>;
 // Variable: ADMIN_CATEGORIES_QUERY
@@ -1664,7 +1763,7 @@ export type ADMIN_CATEGORIES_QUERYResult = Array<{
 // Query: *[_type == "product" && slug.current == $slug] | order(name asc) [0]{    ...,    "averageRating": math::avg(*[_type == "review" && product._ref == ^._id && status == "approved"].rating),    "totalReviews": count(*[_type == "review" && product._ref == ^._id && status == "approved"])  }
 export type PRODUCT_BY_SLUG_QUERYResult = {
   _id: string;
-  _type: "product";
+  _type: 'product';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -1673,14 +1772,14 @@ export type PRODUCT_BY_SLUG_QUERYResult = {
   images?: Array<{
     asset?: {
       _ref: string;
-      _type: "reference";
+      _type: 'reference';
       _weak?: boolean;
-      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
     };
     media?: unknown;
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
-    _type: "image";
+    _type: 'image';
     _key: string;
   }>;
   description?: string;
@@ -1688,20 +1787,20 @@ export type PRODUCT_BY_SLUG_QUERYResult = {
   discount?: number;
   categories?: Array<{
     _ref: string;
-    _type: "reference";
+    _type: 'reference';
     _weak?: boolean;
     _key: string;
-    [internalGroqTypeReferenceTo]?: "category";
+    [internalGroqTypeReferenceTo]?: 'category';
   }>;
   stock?: number;
   brand?: {
     _ref: string;
-    _type: "reference";
+    _type: 'reference';
     _weak?: boolean;
-    [internalGroqTypeReferenceTo]?: "brand";
+    [internalGroqTypeReferenceTo]?: 'brand';
   };
-  status?: "hot" | "new" | "sale";
-  variant?: "appliances" | "gadget" | "others" | "refrigerators";
+  status?: 'hot' | 'new' | 'sale';
+  variant?: 'appliances' | 'gadget' | 'others' | 'refrigerators';
   isFeatured?: boolean;
   averageRating: number | null;
   totalReviews: number;
@@ -1725,14 +1824,14 @@ export type RELATED_PRODUCTS_QUERYResult = Array<{
   images: Array<{
     asset?: {
       _ref: string;
-      _type: "reference";
+      _type: 'reference';
       _weak?: boolean;
-      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
     };
     media?: unknown;
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
-    _type: "image";
+    _type: 'image';
     _key: string;
   }> | null;
   categories: Array<{
@@ -1748,30 +1847,30 @@ export type BRAND_QUERYResult = Array<{
 }>;
 
 // Query TypeMap
-import "@sanity/client";
-declare module "@sanity/client" {
+import '@sanity/client';
+declare module '@sanity/client' {
   interface SanityQueries {
     "*[_type == 'order' && clerkUserId == $userId] | order(orderDate desc){\n  ...,products[]{\n    ...,product->\n  }\n}": QueryResult;
-    "*[_type == 'product' && references(*[_type == \"category\" && slug.current == $categorySlug]._id)] | order(name asc)": PRODUCT_BY_CATEGORY_QUERYResult;
+    '*[_type == \'product\' && references(*[_type == "category" && slug.current == $categorySlug]._id)] | order(name asc)': PRODUCT_BY_CATEGORY_QUERYResult;
     "*[_type == 'sale'] | order(name asc)": SALE_QUERYResult;
     "*[_type == 'order' && clerkUserId == $userId] | order(orderDate desc)[$start...$end]{\n    ...,\n    paymentStatus,\n    paymentMethod,\n    products[]{\n      ...,\n      product->{\n        _id,\n        name,\n        slug,\n        image,\n        images,\n        price,\n        currency\n      }\n    }\n  }": MY_ORDERS_QUERYResult;
     "count(*[_type == 'order' && clerkUserId == $userId])": COUNT_QUERYResult;
     "*[_type == 'banner'] | order(publishedAt desc)": BANNER_QUERYResult;
     "*[_type == 'category' && featured == true] | order(name desc)": FEATURED_CATEGORY_QUERYResult;
-    "*[_type==\"product\"] | order(name asc)": ALL_PRODUCTS_QUERYResult;
+    '*[_type=="product"] | order(name asc)': ALL_PRODUCTS_QUERYResult;
     "*[_type == 'product' && status == 'hot'] | order(name asc){\n  ...,\"categories\": categories[]->title\n}": DEAL_PRODUCTSResult;
-    "*[_type == 'product' && isFeatured == true] | order(name asc){\n  ...,\"categories\": categories[]->title\n}": FEATURE_PRODUCTSResult;
+    '*[_type == \'product\' && isFeatured == true] | order(name asc){\n  ...,"categories": categories[]->title\n}': FEATURE_PRODUCTSResult;
     "*[_type=='brand'] | order(name asc) ": BRANDS_QUERYResult;
     " *[_type == 'blog' && isLatest == true]|order(name asc){\n    ...,\n    blogcategories[]->{\n    title\n  }\n  }": LATEST_BLOG_QUERYResult;
     "*[_type == 'blog'] | order(publishedAt desc)[0...$quantity]{\n  ...,  \n     blogcategories[]->{\n    title\n}\n    }\n  ": GET_ALL_BLOGResult;
-    "*[_type == \"blog\" && slug.current == $slug][0]{\n  ..., \n    author->{\n    name,\n    image,\n  },\n  blogcategories[]->{\n    title,\n    \"slug\": slug.current,\n  },\n}": SINGLE_BLOG_QUERYResult;
-    "*[_type == \"blog\"]{\n     blogcategories[]->{\n    ...\n    }\n  }": BLOG_CATEGORIESResult;
-    "*[\n  _type == \"blog\"\n  && defined(slug.current)\n  && slug.current != $slug\n]|order(publishedAt desc)[0...$quantity]{\n...\n  publishedAt,\n  title,\n  mainImage,\n  slug,\n  author->{\n    name,\n    image,\n  },\n  categories[]->{\n    title,\n    \"slug\": slug.current,\n  }\n}": OTHERS_BLOG_QUERYResult;
-    "*[_type==\"address\"] | order(publishedAt desc)": ADDRESS_QUERYResult;
+    '*[_type == "blog" && slug.current == $slug][0]{\n  ..., \n    author->{\n    name,\n    image,\n  },\n  blogcategories[]->{\n    title,\n    "slug": slug.current,\n  },\n}': SINGLE_BLOG_QUERYResult;
+    '*[_type == "blog"]{\n     blogcategories[]->{\n    ...\n    }\n  }': BLOG_CATEGORIESResult;
+    '*[\n  _type == "blog"\n  && defined(slug.current)\n  && slug.current != $slug\n]|order(publishedAt desc)[0...$quantity]{\n...\n  publishedAt,\n  title,\n  mainImage,\n  slug,\n  author->{\n    name,\n    image,\n  },\n  categories[]->{\n    title,\n    "slug": slug.current,\n  }\n}': OTHERS_BLOG_QUERYResult;
+    '*[_type=="address"] | order(publishedAt desc)': ADDRESS_QUERYResult;
     "*[_type == 'category'] | order(name asc) [0...$quantity]": ALLCATEGORIES_QUERYResult;
     "*[_type == 'category'] | order(title asc) {\n    _id,\n    title,\n    slug,\n    description,\n    featured\n  }": ADMIN_CATEGORIES_QUERYResult;
-    "*[_type == \"product\" && slug.current == $slug] | order(name asc) [0]{\n    ...,\n    \"averageRating\": math::avg(*[_type == \"review\" && product._ref == ^._id && status == \"approved\"].rating),\n    \"totalReviews\": count(*[_type == \"review\" && product._ref == ^._id && status == \"approved\"])\n  }": PRODUCT_BY_SLUG_QUERYResult;
-    "*[_type == \"product\" && count((categories[]._ref)[@ in $categoryIds]) > 0 && slug.current != $currentSlug] | order(name asc) [0...$limit]{\n    _id,\n    name,\n    slug,\n    price,\n    discount,\n    stock,\n    images,\n    categories[]->{\n      _id,\n      title,\n      slug\n    }\n  }": RELATED_PRODUCTS_QUERYResult;
-    "*[_type == \"product\" && slug.current == $slug]{\n\"brandName\": brand->title\n}": BRAND_QUERYResult;
+    '*[_type == "product" && slug.current == $slug] | order(name asc) [0]{\n    ...,\n    "averageRating": math::avg(*[_type == "review" && product._ref == ^._id && status == "approved"].rating),\n    "totalReviews": count(*[_type == "review" && product._ref == ^._id && status == "approved"])\n  }': PRODUCT_BY_SLUG_QUERYResult;
+    '*[_type == "product" && count((categories[]._ref)[@ in $categoryIds]) > 0 && slug.current != $currentSlug] | order(name asc) [0...$limit]{\n    _id,\n    name,\n    slug,\n    price,\n    discount,\n    stock,\n    images,\n    categories[]->{\n      _id,\n      title,\n      slug\n    }\n  }': RELATED_PRODUCTS_QUERYResult;
+    '*[_type == "product" && slug.current == $slug]{\n"brandName": brand->title\n}': BRAND_QUERYResult;
   }
 }

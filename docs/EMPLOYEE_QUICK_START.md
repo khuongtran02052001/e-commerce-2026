@@ -44,14 +44,12 @@
 3. For each order:
 
    **Step 1: Confirm Address**
-
    - Review customer shipping address
    - Click "Confirm Address"
    - Add notes if needed (optional)
    - Click "Confirm"
 
    **Step 2: Confirm Order**
-
    - Verify order details and products
    - Click "Confirm Order"
    - Add notes if needed (optional)
@@ -75,7 +73,6 @@
 3. For each order:
 
    **Step 1: Pack the Order**
-
    - Gather all products from the order
    - Pack them securely
    - Click "Mark as Packed"
@@ -83,7 +80,6 @@
    - Click "Confirm"
 
    **Step 2: Assign Deliveryman**
-
    - Click "Assign Deliveryman"
    - Select available deliveryman from dropdown
    - Click "Confirm"
@@ -107,7 +103,6 @@
 4. Complete delivery:
 
    **For Cash on Delivery (COD) or Pending Payment:**
-
    - Click "Mark as Delivered"
    - **Important:** Enter cash collected amount
    - Add delivery notes (optional)
@@ -115,7 +110,6 @@
    - **Cash collection is mandatory** - cannot mark delivered without collecting payment
 
    **For Pre-Paid Orders:**
-
    - Click "Mark as Delivered"
    - Add delivery notes (optional)
    - Click "Confirm"
@@ -136,13 +130,11 @@
 As In-Charge, you have access to all features:
 
 1. **Order Management** (`/admin/orders`)
-
    - View all orders in the system
    - Perform any role's actions
    - Monitor entire workflow
 
 2. **Employee Management** (`/admin/employees`)
-
    - Manage all employees
    - Assign/remove roles
    - Suspend/activate employees

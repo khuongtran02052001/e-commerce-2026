@@ -1,15 +1,15 @@
-import { auth, clerkClient } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
-import { isUserAdmin } from "@/lib/adminUtils";
-import { getAdminCategories } from "@/sanity/queries";
-import AdminProducts from "@/components/admin/AdminProducts";
+import AdminProducts from '@/components/admin/AdminProducts';
+import { isUserAdmin } from '@/lib/adminUtils';
+import { getAdminCategories } from '@/sanity/queries';
+import { auth, clerkClient } from '@clerk/nextjs/server';
+import { redirect } from 'next/navigation';
 
 const AdminProductsPage = async () => {
   // Check authentication and admin access
   const { userId } = await auth();
 
   if (!userId) {
-    redirect("/sign-in");
+    redirect('/sign-in');
   }
 
   // Get current user details to check admin status
@@ -19,7 +19,7 @@ const AdminProductsPage = async () => {
 
   // Check if current user is admin
   if (!userEmail || !isUserAdmin(userEmail)) {
-    redirect("/");
+    redirect('/');
   }
 
   // Fetch categories server-side using the query function

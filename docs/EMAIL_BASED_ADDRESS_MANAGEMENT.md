@@ -57,13 +57,13 @@ const fetchAddresses = async () => {
 
   setAddressesLoading(true);
   try {
-    const response = await fetch("/api/user/addresses");
+    const response = await fetch('/api/user/addresses');
     if (response.ok) {
       const data = await response.json();
       setAddresses(data.addresses || []);
     }
   } catch (error) {
-    console.error("Error fetching addresses:", error);
+    console.error('Error fetching addresses:', error);
   } finally {
     setAddressesLoading(false);
   }

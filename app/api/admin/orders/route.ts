@@ -1,12 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth, clerkClient } from "@clerk/nextjs/server";
-import { isUserAdmin } from "@/lib/adminUtils";
-import { client } from "@/sanity/lib/client";
-import { writeClient } from "@/sanity/lib/client";
-import { revalidatePath } from "next/cache";
+import { isUserAdmin } from '@/lib/adminUtils';
+import { client, writeClient } from '@/sanity/lib/client';
+import { auth, clerkClient } from '@clerk/nextjs/server';
+import { revalidatePath } from 'next/cache';
+import { NextRequest, NextResponse } from 'next/server';
 
 // Disable Next.js caching for this route
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export async function GET(req: NextRequest) {
@@ -15,10 +14,7 @@ export async function GET(req: NextRequest) {
     const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json(
-        { error: "Unauthorized - Not logged in" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized - Not logged in' }, { status: 401 });
     }
 
     // Get current user details to check admin status
@@ -28,20 +24,17 @@ export async function GET(req: NextRequest) {
 
     // Check if current user is admin
     if (!userEmail || !isUserAdmin(userEmail)) {
-      return NextResponse.json(
-        { error: "Forbidden - Admin access required" },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
     }
 
     // Get query parameters
     const { searchParams } = new URL(req.url);
-    const limit = parseInt(searchParams.get("limit") || "10");
-    const offset = parseInt(searchParams.get("offset") || "0");
-    const status = searchParams.get("status") || "";
-    const paymentMethod = searchParams.get("paymentMethod") || "";
-    const sortBy = searchParams.get("sortBy") || "orderDate";
-    const sortOrder = searchParams.get("sortOrder") || "desc";
+    const limit = parseInt(searchParams.get('limit') || '10');
+    const offset = parseInt(searchParams.get('offset') || '0');
+    const status = searchParams.get('status') || '';
+    const paymentMethod = searchParams.get('paymentMethod') || '';
+    const sortBy = searchParams.get('sortBy') || 'orderDate';
+    const sortOrder = searchParams.get('sortOrder') || 'desc';
 
     // Build filter conditions
     const filterConditions = [];
@@ -55,9 +48,7 @@ export async function GET(req: NextRequest) {
     // Build GROQ query
     const query = `
       *[_type == "order"${
-        filterConditions.length > 0
-          ? ` && (${filterConditions.join(" && ")})`
-          : ""
+        filterConditions.length > 0 ? ` && (${filterConditions.join(' && ')})` : ''
       }] | order(${sortBy} ${sortOrder}) [${offset}...${offset + limit}] {
         _id,
         _createdAt,
@@ -94,20 +85,14 @@ export async function GET(req: NextRequest) {
     // Get count query
     const countQuery = `
       count(*[_type == "order"${
-        filterConditions.length > 0
-          ? ` && (${filterConditions.join(" && ")})`
-          : ""
+        filterConditions.length > 0 ? ` && (${filterConditions.join(' && ')})` : ''
       }])
     `;
 
     // Execute queries with perspective 'published' to avoid draft content
     const [orders, totalCount] = await Promise.all([
-      client.fetch(query, {}, { cache: "no-store", next: { revalidate: 0 } }),
-      client.fetch(
-        countQuery,
-        {},
-        { cache: "no-store", next: { revalidate: 0 } }
-      ),
+      client.fetch(query, {}, { cache: 'no-store', next: { revalidate: 0 } }),
+      client.fetch(countQuery, {}, { cache: 'no-store', next: { revalidate: 0 } }),
     ]);
 
     return NextResponse.json(
@@ -125,18 +110,15 @@ export async function GET(req: NextRequest) {
       },
       {
         headers: {
-          "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
-          Pragma: "no-cache",
-          Expires: "0",
+          'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+          Pragma: 'no-cache',
+          Expires: '0',
         },
-      }
+      },
     );
   } catch (error) {
-    console.error("❌ Error fetching orders:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    console.error('❌ Error fetching orders:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -147,10 +129,7 @@ export async function DELETE(req: NextRequest) {
     const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json(
-        { error: "Unauthorized - Not logged in" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized - Not logged in' }, { status: 401 });
     }
 
     // Get current user details to check admin status
@@ -160,20 +139,14 @@ export async function DELETE(req: NextRequest) {
 
     // Check if current user is admin
     if (!userEmail || !isUserAdmin(userEmail)) {
-      return NextResponse.json(
-        { error: "Forbidden - Admin access required" },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
     }
 
     const body = await req.json();
     const { orderIds } = body; // Array of order IDs to delete
 
     if (!orderIds || !Array.isArray(orderIds) || orderIds.length === 0) {
-      return NextResponse.json(
-        { error: "Order IDs array is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Order IDs array is required' }, { status: 400 });
     }
 
     // Delete orders from Sanity
@@ -187,7 +160,7 @@ export async function DELETE(req: NextRequest) {
         deleteResults.push({
           orderId: orderIdToDelete,
           success: false,
-          error: error instanceof Error ? error.message : "Unknown error",
+          error: error instanceof Error ? error.message : 'Unknown error',
         });
       }
     }
@@ -198,10 +171,10 @@ export async function DELETE(req: NextRequest) {
     // Revalidate admin orders page to clear cache
     if (successCount > 0) {
       try {
-        revalidatePath("/admin/orders", "page");
-        revalidatePath("/api/admin/orders", "page");
+        revalidatePath('/admin/orders', 'page');
+        revalidatePath('/api/admin/orders', 'page');
       } catch (revalidateError) {
-        console.error("Error revalidating paths:", revalidateError);
+        console.error('Error revalidating paths:', revalidateError);
       }
     }
 
@@ -209,23 +182,20 @@ export async function DELETE(req: NextRequest) {
       {
         success: true,
         message: `Successfully deleted ${successCount} order(s)${
-          failureCount > 0 ? `, failed to delete ${failureCount}` : ""
+          failureCount > 0 ? `, failed to delete ${failureCount}` : ''
         }`,
         results: deleteResults,
       },
       {
         headers: {
-          "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
-          Pragma: "no-cache",
-          Expires: "0",
+          'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+          Pragma: 'no-cache',
+          Expires: '0',
         },
-      }
+      },
     );
   } catch (error) {
-    console.error("Error deleting orders:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    console.error('Error deleting orders:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

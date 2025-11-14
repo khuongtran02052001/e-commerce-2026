@@ -1,5 +1,5 @@
-import Container from "@/components/Container";
-import Title from "@/components/Title";
+import Container from '@/components/Container';
+import Title from '@/components/Title';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -7,13 +7,13 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { getCategories } from "@/sanity/queries";
-import { Category } from "@/sanity.types";
-import { urlFor } from "@/sanity/lib/image";
-import Image from "next/image";
-import Link from "next/link";
-import { ArrowRight, Package, Tag } from "lucide-react";
+} from '@/components/ui/breadcrumb';
+import { Category } from '@/sanity.types';
+import { urlFor } from '@/sanity/lib/image';
+import { getCategories } from '@/sanity/queries';
+import { ArrowRight, Package, Tag } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
 
 const CategoryPage = async () => {
   const categories: Category[] = await getCategories();
@@ -43,8 +43,8 @@ const CategoryPage = async () => {
             Shop by Categories
           </Title>
           <p className="text-base lg:text-lg text-dark-text max-w-2xl mx-auto mb-6">
-            Discover our wide range of products organized by categories. Find
-            exactly what you&apos;re looking for with ease.
+            Discover our wide range of products organized by categories. Find exactly what
+            you&apos;re looking for with ease.
           </p>
 
           {/* View All Products Button */}
@@ -74,7 +74,7 @@ const CategoryPage = async () => {
                     {category.image ? (
                       <Image
                         src={urlFor(category.image).url()}
-                        alt={category.title || "Category"}
+                        alt={category.title || 'Category'}
                         fill
                         className="object-contain group-hover:scale-105 transition-transform duration-300"
                         sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 16vw"
@@ -92,9 +92,7 @@ const CategoryPage = async () => {
                     {category.featured && (
                       <div className="absolute top-1.5 left-1.5 bg-shop_orange text-white px-2 py-0.5 rounded-full text-xs font-medium flex items-center gap-1">
                         <Tag className="w-2 h-2" />
-                        <span className="hidden sm:inline text-xs">
-                          Featured
-                        </span>
+                        <span className="hidden sm:inline text-xs">Featured</span>
                       </div>
                     )}
 
@@ -118,7 +116,7 @@ const CategoryPage = async () => {
 
                     <div className="flex items-center justify-between text-xs text-light-text">
                       <span className="capitalize truncate text-xs">
-                        {category.slug?.current?.replace(/-/g, " ")}
+                        {category.slug?.current?.replace(/-/g, ' ')}
                       </span>
                       {category.range && (
                         <span className="bg-shop_light_pink/50 text-shop_dark_green px-1.5 py-0.5 rounded text-xs font-medium whitespace-nowrap ml-2">
@@ -141,8 +139,8 @@ const CategoryPage = async () => {
                   Explore Our Complete Product Range
                 </h3>
                 <p className="text-dark-text text-sm mb-4">
-                  Don&apos;t see what you&apos;re looking for? Browse our entire
-                  collection of products.
+                  Don&apos;t see what you&apos;re looking for? Browse our entire collection of
+                  products.
                 </p>
                 <Link
                   href="/shop"
@@ -163,8 +161,8 @@ const CategoryPage = async () => {
                 No Categories Available
               </h3>
               <p className="text-dark-text text-sm mb-6">
-                It looks like there are no categories set up yet. Check back
-                soon for our product categories!
+                It looks like there are no categories set up yet. Check back soon for our product
+                categories!
               </p>
               <Link
                 href="/shop"
@@ -185,8 +183,7 @@ const CategoryPage = async () => {
                 Can&apos;t Find What You&apos;re Looking For?
               </h3>
               <p className="text-dark-text mb-6 text-sm lg:text-base">
-                Browse all our products or use our search feature to find
-                specific items.
+                Browse all our products or use our search feature to find specific items.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Link

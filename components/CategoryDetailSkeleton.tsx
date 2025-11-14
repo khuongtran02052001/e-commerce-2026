@@ -1,5 +1,5 @@
-import Container from "@/components/Container";
-import { Skeleton } from "@/components/ui/skeleton";
+import Container from '@/components/Container';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const CategoryDetailSkeleton = () => {
   return (
@@ -143,10 +143,7 @@ const CategoryDetailSkeleton = () => {
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {Array.from({ length: 6 }).map((_, index) => (
-              <div
-                key={index}
-                className="bg-white rounded-lg shadow-sm border p-4 text-center"
-              >
+              <div key={index} className="bg-white rounded-lg shadow-sm border p-4 text-center">
                 <Skeleton className="h-12 w-12 rounded-lg mx-auto mb-3" />
                 <Skeleton className="h-4 w-20 mx-auto mb-1" />
                 <Skeleton className="h-3 w-12 mx-auto" />

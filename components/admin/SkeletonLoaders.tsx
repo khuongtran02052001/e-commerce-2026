@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import {
   Table,
   TableBody,
@@ -6,8 +6,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Skeleton } from "../ui/skeleton";
+} from '@/components/ui/table';
+import { Skeleton } from '../ui/skeleton';
 
 // Admin Layout Skeleton
 export const AdminLayoutSkeleton = () => (
@@ -234,10 +234,7 @@ export const AnalyticsSkeleton = () => (
       <CardContent>
         <div className="space-y-3">
           {[...Array(8)].map((_, i) => (
-            <div
-              key={i}
-              className="flex items-center justify-between p-3 border rounded-lg"
-            >
+            <div key={i} className="flex items-center justify-between p-3 border rounded-lg">
               <div className="flex items-center gap-3">
                 <Skeleton className="w-2 h-2 rounded-full" />
                 <Skeleton className="h-4 w-48" />
@@ -680,10 +677,7 @@ export const OrderDetailsSkeleton = () => (
       <CardContent>
         <div className="space-y-3">
           {[...Array(3)].map((_, i) => (
-            <div
-              key={i}
-              className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg border"
-            >
+            <div key={i} className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg border">
               <Skeleton className="w-16 h-16 rounded-md" />
               <div className="flex-1 space-y-2">
                 <Skeleton className="h-4 w-32" />

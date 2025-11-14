@@ -1,9 +1,8 @@
-"use server";
+'use server';
 
-import { auth } from "@clerk/nextjs/server";
-import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
-import { client } from "@/sanity/lib/client";
+import { client } from '@/sanity/lib/client';
+import { auth } from '@clerk/nextjs/server';
+import { revalidatePath } from 'next/cache';
 
 // Types for server actions
 interface CreateUserData {
@@ -42,13 +41,13 @@ export async function createOrUpdateUser(userData: CreateUserData) {
   try {
     const { userId } = await auth();
     if (!userId) {
-      throw new Error("User not authenticated");
+      throw new Error('User not authenticated');
     }
 
     // Check if user already exists
     const existingUser = await client.fetch(
       `*[_type == "user" && clerkUserId == $clerkUserId][0]`,
-      { clerkUserId: userData.clerkUserId }
+      { clerkUserId: userData.clerkUserId },
     );
 
     if (existingUser) {
@@ -69,7 +68,7 @@ export async function createOrUpdateUser(userData: CreateUserData) {
     } else {
       // Create new user
       const newUser = await client.create({
-        _type: "user",
+        _type: 'user',
         clerkUserId: userData.clerkUserId,
         email: userData.email,
         firstName: userData.firstName,
@@ -79,8 +78,8 @@ export async function createOrUpdateUser(userData: CreateUserData) {
           newsletter: false,
           emailNotifications: true,
           smsNotifications: false,
-          preferredCurrency: "USD",
-          preferredLanguage: "en",
+          preferredCurrency: 'USD',
+          preferredLanguage: 'en',
         },
         cart: [],
         wishlist: [],
@@ -97,8 +96,8 @@ export async function createOrUpdateUser(userData: CreateUserData) {
       return newUser._id;
     }
   } catch (error) {
-    console.error("Error creating/updating user:", error);
-    throw new Error("Failed to create or update user");
+    console.error('Error creating/updating user:', error);
+    throw new Error('Failed to create or update user');
   }
 }
 
@@ -107,17 +106,16 @@ export async function addToCart(data: AddToCartData) {
   try {
     const { userId } = await auth();
     if (!userId) {
-      throw new Error("User not authenticated");
+      throw new Error('User not authenticated');
     }
 
     // Get user document
-    const user = await client.fetch(
-      `*[_type == "user" && clerkUserId == $clerkUserId][0]`,
-      { clerkUserId: userId }
-    );
+    const user = await client.fetch(`*[_type == "user" && clerkUserId == $clerkUserId][0]`, {
+      clerkUserId: userId,
+    });
 
     if (!user) {
-      throw new Error("User not found");
+      throw new Error('User not found');
     }
 
     // Check if item already exists in cart
@@ -125,17 +123,15 @@ export async function addToCart(data: AddToCartData) {
       (item: any) =>
         item.product._ref === data.productId &&
         item.size === data.size &&
-        item.color === data.color
+        item.color === data.color,
     );
 
     if (existingCartItem) {
       // Update existing item quantity
       const updatedCart = user.cart.map((item: any) =>
-        item.product._ref === data.productId &&
-        item.size === data.size &&
-        item.color === data.color
+        item.product._ref === data.productId && item.size === data.size && item.color === data.color
           ? { ...item, quantity: item.quantity + data.quantity }
-          : item
+          : item,
       );
 
       await client
@@ -149,7 +145,7 @@ export async function addToCart(data: AddToCartData) {
       // Add new item to cart
       const newCartItem = {
         product: {
-          _type: "reference",
+          _type: 'reference',
           _ref: data.productId,
         },
         quantity: data.quantity,
@@ -161,16 +157,16 @@ export async function addToCart(data: AddToCartData) {
       await client
         .patch(user._id)
         .setIfMissing({ cart: [] })
-        .append("cart", [newCartItem])
+        .append('cart', [newCartItem])
         .set({ updatedAt: new Date().toISOString() })
         .commit();
     }
 
-    revalidatePath("/cart");
+    revalidatePath('/cart');
     return { success: true };
   } catch (error) {
-    console.error("Error adding to cart:", error);
-    throw new Error("Failed to add item to cart");
+    console.error('Error adding to cart:', error);
+    throw new Error('Failed to add item to cart');
   }
 }
 
@@ -178,24 +174,21 @@ export async function updateCartItem(data: UpdateCartItemData) {
   try {
     const { userId } = await auth();
     if (!userId) {
-      throw new Error("User not authenticated");
+      throw new Error('User not authenticated');
     }
 
-    const user = await client.fetch(
-      `*[_type == "user" && clerkUserId == $clerkUserId][0]`,
-      { clerkUserId: userId }
-    );
+    const user = await client.fetch(`*[_type == "user" && clerkUserId == $clerkUserId][0]`, {
+      clerkUserId: userId,
+    });
 
     if (!user) {
-      throw new Error("User not found");
+      throw new Error('User not found');
     }
 
     const updatedCart = user.cart.map((item: any) =>
-      item.product._ref === data.productId &&
-      item.size === data.size &&
-      item.color === data.color
+      item.product._ref === data.productId && item.size === data.size && item.color === data.color
         ? { ...item, quantity: data.quantity }
-        : item
+        : item,
     );
 
     await client
@@ -206,41 +199,32 @@ export async function updateCartItem(data: UpdateCartItemData) {
       })
       .commit();
 
-    revalidatePath("/cart");
+    revalidatePath('/cart');
     return { success: true };
   } catch (error) {
-    console.error("Error updating cart item:", error);
-    throw new Error("Failed to update cart item");
+    console.error('Error updating cart item:', error);
+    throw new Error('Failed to update cart item');
   }
 }
 
-export async function removeFromCart(
-  productId: string,
-  size?: string,
-  color?: string
-) {
+export async function removeFromCart(productId: string, size?: string, color?: string) {
   try {
     const { userId } = await auth();
     if (!userId) {
-      throw new Error("User not authenticated");
+      throw new Error('User not authenticated');
     }
 
-    const user = await client.fetch(
-      `*[_type == "user" && clerkUserId == $clerkUserId][0]`,
-      { clerkUserId: userId }
-    );
+    const user = await client.fetch(`*[_type == "user" && clerkUserId == $clerkUserId][0]`, {
+      clerkUserId: userId,
+    });
 
     if (!user) {
-      throw new Error("User not found");
+      throw new Error('User not found');
     }
 
     const updatedCart = user.cart.filter(
       (item: any) =>
-        !(
-          item.product._ref === productId &&
-          item.size === size &&
-          item.color === color
-        )
+        !(item.product._ref === productId && item.size === size && item.color === color),
     );
 
     await client
@@ -251,11 +235,11 @@ export async function removeFromCart(
       })
       .commit();
 
-    revalidatePath("/cart");
+    revalidatePath('/cart');
     return { success: true };
   } catch (error) {
-    console.error("Error removing from cart:", error);
-    throw new Error("Failed to remove item from cart");
+    console.error('Error removing from cart:', error);
+    throw new Error('Failed to remove item from cart');
   }
 }
 
@@ -263,16 +247,15 @@ export async function clearCart() {
   try {
     const { userId } = await auth();
     if (!userId) {
-      throw new Error("User not authenticated");
+      throw new Error('User not authenticated');
     }
 
-    const user = await client.fetch(
-      `*[_type == "user" && clerkUserId == $clerkUserId][0]`,
-      { clerkUserId: userId }
-    );
+    const user = await client.fetch(`*[_type == "user" && clerkUserId == $clerkUserId][0]`, {
+      clerkUserId: userId,
+    });
 
     if (!user) {
-      throw new Error("User not found");
+      throw new Error('User not found');
     }
 
     await client
@@ -283,11 +266,11 @@ export async function clearCart() {
       })
       .commit();
 
-    revalidatePath("/cart");
+    revalidatePath('/cart');
     return { success: true };
   } catch (error) {
-    console.error("Error clearing cart:", error);
-    throw new Error("Failed to clear cart");
+    console.error('Error clearing cart:', error);
+    throw new Error('Failed to clear cart');
   }
 }
 
@@ -296,37 +279,34 @@ export async function addToWishlist(productId: string) {
   try {
     const { userId } = await auth();
     if (!userId) {
-      throw new Error("User not authenticated");
+      throw new Error('User not authenticated');
     }
 
-    const user = await client.fetch(
-      `*[_type == "user" && clerkUserId == $clerkUserId][0]`,
-      { clerkUserId: userId }
-    );
+    const user = await client.fetch(`*[_type == "user" && clerkUserId == $clerkUserId][0]`, {
+      clerkUserId: userId,
+    });
 
     if (!user) {
-      throw new Error("User not found");
+      throw new Error('User not found');
     }
 
     // Check if product is already in wishlist
-    const isInWishlist = user.wishlist?.some(
-      (item: any) => item._ref === productId
-    );
+    const isInWishlist = user.wishlist?.some((item: any) => item._ref === productId);
 
     if (!isInWishlist) {
       await client
         .patch(user._id)
         .setIfMissing({ wishlist: [] })
-        .append("wishlist", [{ _type: "reference", _ref: productId }])
+        .append('wishlist', [{ _type: 'reference', _ref: productId }])
         .set({ updatedAt: new Date().toISOString() })
         .commit();
     }
 
-    revalidatePath("/wishlist");
+    revalidatePath('/wishlist');
     return { success: true };
   } catch (error) {
-    console.error("Error adding to wishlist:", error);
-    throw new Error("Failed to add item to wishlist");
+    console.error('Error adding to wishlist:', error);
+    throw new Error('Failed to add item to wishlist');
   }
 }
 
@@ -334,20 +314,18 @@ export async function removeFromWishlist(productId: string) {
   try {
     const { userId } = await auth();
     if (!userId) {
-      throw new Error("User not authenticated");
+      throw new Error('User not authenticated');
     }
 
-    const user = await client.fetch(
-      `*[_type == "user" && clerkUserId == $clerkUserId][0]`,
-      { clerkUserId: userId }
-    );
+    const user = await client.fetch(`*[_type == "user" && clerkUserId == $clerkUserId][0]`, {
+      clerkUserId: userId,
+    });
 
     if (!user) {
-      throw new Error("User not found");
+      throw new Error('User not found');
     }
 
-    const updatedWishlist =
-      user.wishlist?.filter((item: any) => item._ref !== productId) || [];
+    const updatedWishlist = user.wishlist?.filter((item: any) => item._ref !== productId) || [];
 
     await client
       .patch(user._id)
@@ -357,11 +335,11 @@ export async function removeFromWishlist(productId: string) {
       })
       .commit();
 
-    revalidatePath("/wishlist");
+    revalidatePath('/wishlist');
     return { success: true };
   } catch (error) {
-    console.error("Error removing from wishlist:", error);
-    throw new Error("Failed to remove item from wishlist");
+    console.error('Error removing from wishlist:', error);
+    throw new Error('Failed to remove item from wishlist');
   }
 }
 
@@ -370,24 +348,22 @@ export async function createAddress(addressData: CreateAddressData) {
   try {
     const { userId } = await auth();
     if (!userId) {
-      throw new Error("User not authenticated");
+      throw new Error('User not authenticated');
     }
 
-    const user = await client.fetch(
-      `*[_type == "user" && clerkUserId == $clerkUserId][0]`,
-      { clerkUserId: userId }
-    );
+    const user = await client.fetch(`*[_type == "user" && clerkUserId == $clerkUserId][0]`, {
+      clerkUserId: userId,
+    });
 
     if (!user) {
-      throw new Error("User not found");
+      throw new Error('User not found');
     }
 
     // If this is set as default, unset all other default addresses
     if (addressData.isDefault) {
-      const userAddresses = await client.fetch(
-        `*[_type == "address" && user._ref == $userId]`,
-        { userId: user._id }
-      );
+      const userAddresses = await client.fetch(`*[_type == "address" && user._ref == $userId]`, {
+        userId: user._id,
+      });
 
       for (const address of userAddresses) {
         await client.patch(address._id).set({ default: false }).commit();
@@ -396,7 +372,7 @@ export async function createAddress(addressData: CreateAddressData) {
 
     // Create new address
     const newAddress = await client.create({
-      _type: "address",
+      _type: 'address',
       name: addressData.name,
       email: user.email,
       address: addressData.address,
@@ -405,7 +381,7 @@ export async function createAddress(addressData: CreateAddressData) {
       zip: addressData.zip,
       default: addressData.isDefault || false,
       user: {
-        _type: "reference",
+        _type: 'reference',
         _ref: user._id,
       },
       createdAt: new Date().toISOString(),
@@ -415,39 +391,35 @@ export async function createAddress(addressData: CreateAddressData) {
     await client
       .patch(user._id)
       .setIfMissing({ addresses: [] })
-      .append("addresses", [{ _type: "reference", _ref: newAddress._id }])
+      .append('addresses', [{ _type: 'reference', _ref: newAddress._id }])
       .set({ updatedAt: new Date().toISOString() })
       .commit();
 
-    revalidatePath("/cart");
+    revalidatePath('/cart');
     return { success: true, addressId: newAddress._id };
   } catch (error) {
-    console.error("Error creating address:", error);
-    throw new Error("Failed to create address");
+    console.error('Error creating address:', error);
+    throw new Error('Failed to create address');
   }
 }
 
-export async function updateAddress(
-  addressId: string,
-  addressData: CreateAddressData
-) {
+export async function updateAddress(addressId: string, addressData: CreateAddressData) {
   try {
     const { userId } = await auth();
     if (!userId) {
-      throw new Error("User not authenticated");
+      throw new Error('User not authenticated');
     }
 
     // If this is set as default, unset all other default addresses
     if (addressData.isDefault) {
-      const user = await client.fetch(
-        `*[_type == "user" && clerkUserId == $clerkUserId][0]`,
-        { clerkUserId: userId }
-      );
+      const user = await client.fetch(`*[_type == "user" && clerkUserId == $clerkUserId][0]`, {
+        clerkUserId: userId,
+      });
 
       if (user) {
         const userAddresses = await client.fetch(
           `*[_type == "address" && user._ref == $userId && _id != $addressId]`,
-          { userId: user._id, addressId }
+          { userId: user._id, addressId },
         );
 
         for (const address of userAddresses) {
@@ -468,11 +440,11 @@ export async function updateAddress(
       })
       .commit();
 
-    revalidatePath("/cart");
+    revalidatePath('/cart');
     return { success: true };
   } catch (error) {
-    console.error("Error updating address:", error);
-    throw new Error("Failed to update address");
+    console.error('Error updating address:', error);
+    throw new Error('Failed to update address');
   }
 }
 
@@ -480,21 +452,19 @@ export async function deleteAddress(addressId: string) {
   try {
     const { userId } = await auth();
     if (!userId) {
-      throw new Error("User not authenticated");
+      throw new Error('User not authenticated');
     }
 
-    const user = await client.fetch(
-      `*[_type == "user" && clerkUserId == $clerkUserId][0]`,
-      { clerkUserId: userId }
-    );
+    const user = await client.fetch(`*[_type == "user" && clerkUserId == $clerkUserId][0]`, {
+      clerkUserId: userId,
+    });
 
     if (!user) {
-      throw new Error("User not found");
+      throw new Error('User not found');
     }
 
     // Remove address reference from user
-    const updatedAddresses =
-      user.addresses?.filter((addr: any) => addr._ref !== addressId) || [];
+    const updatedAddresses = user.addresses?.filter((addr: any) => addr._ref !== addressId) || [];
 
     await client
       .patch(user._id)
@@ -507,10 +477,10 @@ export async function deleteAddress(addressId: string) {
     // Delete the address document
     await client.delete(addressId);
 
-    revalidatePath("/cart");
+    revalidatePath('/cart');
     return { success: true };
   } catch (error) {
-    console.error("Error deleting address:", error);
-    throw new Error("Failed to delete address");
+    console.error('Error deleting address:', error);
+    throw new Error('Failed to delete address');
   }
 }

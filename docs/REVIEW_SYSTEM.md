@@ -91,21 +91,18 @@ Added to `productType.ts`:
 #### User Actions:
 
 1. **`submitReview(data)`**
-
    - Validates user authentication
    - Checks for duplicate reviews
    - Detects verified purchase status
    - Creates review with "pending" status
 
 2. **`getProductReviews(productId)`**
-
    - Fetches all approved reviews for a product
    - Calculates rating statistics
    - Updates product with latest ratings
    - Returns reviews with user details
 
 3. **`markReviewHelpful(reviewId)`**
-
    - Toggles helpful status for a review
    - Prevents duplicate helpful marks
    - Updates helpful count
@@ -119,13 +116,11 @@ Added to `productType.ts`:
 #### Admin Actions:
 
 1. **`approveReview(reviewId, adminEmail)`**
-
    - Changes review status to "approved"
    - Records approval timestamp and admin
    - Triggers rating recalculation
 
 2. **`rejectReview(reviewId, adminNotes)`**
-
    - Changes review status to "rejected"
    - Stores optional admin notes
    - Review won't appear on product pages
@@ -185,14 +180,12 @@ Added to `productType.ts`:
 ### For End Users
 
 1. **Viewing Reviews**:
-
    - Go to any product page
    - Scroll to the "Customer Reviews" section
    - See average rating, total reviews, and distribution
    - Read individual reviews
 
 2. **Writing a Review**:
-
    - Must be logged in
    - Click "Write a Review" button
    - Sidebar opens from the right side of the screen
@@ -213,12 +206,10 @@ Added to `productType.ts`:
 ### For Administrators
 
 1. **Access Admin Panel**:
-
    - Navigate to admin dashboard
    - Find "Reviews" or "Pending Reviews" section
 
 2. **Review Management**:
-
    - See all pending reviews
    - Click "Preview" to see how review will appear
    - Click "Approve" to publish the review
@@ -271,13 +262,11 @@ Review now visible on product page
 ## Performance Optimizations
 
 1. **Component Memoization**:
-
    - All components use React.memo
    - Callbacks wrapped in useCallback
    - State updates minimized
 
 2. **Data Caching**:
-
    - Product ratings cached in product document
    - Reduces need for real-time calculations
    - Ratings recalculated only on approval
@@ -290,19 +279,16 @@ Review now visible on product page
 ## Security Considerations
 
 1. **Authentication**:
-
    - All actions require valid authentication
    - User identity verified via Clerk
    - Sanity user lookup for permissions
 
 2. **Authorization**:
-
    - Only review authors or admins can modify reviews
    - Regular users can't approve/reject reviews
    - Admin actions logged with email
 
 3. **Validation**:
-
    - Server-side validation for all inputs
    - Character limits enforced
    - Rating bounds checked
@@ -317,29 +303,24 @@ Review now visible on product page
 Potential improvements to consider:
 
 1. **Reply System**:
-
    - Allow sellers to respond to reviews
    - Threaded conversations
 
 2. **Image Uploads**:
-
    - Let users add photos to reviews
    - Image moderation in admin panel
 
 3. **Review Filtering**:
-
    - Filter by rating
    - Sort by most helpful/recent
    - Search within reviews
 
 4. **Email Notifications**:
-
    - Notify users when review is approved
    - Alert admins of new pending reviews
    - Remind users to review purchased products
 
 5. **Review Incentives**:
-
    - Reward points for reviews
    - Gamification badges
    - Featured reviewer status
@@ -355,7 +336,6 @@ To view and manage reviews in Sanity Studio:
 
 1. Reviews appear as a new document type
 2. Custom orderings available:
-
    - By date (newest/oldest)
    - By rating (highest/lowest)
    - By helpful count
@@ -411,12 +391,10 @@ To view and manage reviews in Sanity Studio:
 Regular maintenance tasks:
 
 1. **Weekly**:
-
    - Review pending reviews
    - Check for spam/inappropriate content
 
 2. **Monthly**:
-
    - Analyze review patterns
    - Update rejection criteria if needed
    - Review admin notes for trends

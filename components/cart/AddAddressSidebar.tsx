@@ -1,9 +1,8 @@
-"use client";
+'use client';
 
-import React, { useState, useTransition } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Sheet,
   SheetContent,
@@ -11,9 +10,10 @@ import {
   SheetFooter,
   SheetHeader,
   SheetTitle,
-} from "@/components/ui/sheet";
-import { MapPin, Loader2 } from "lucide-react";
-import { toast } from "sonner";
+} from '@/components/ui/sheet';
+import { Loader2, MapPin } from 'lucide-react';
+import React, { useState, useTransition } from 'react';
+import { toast } from 'sonner';
 
 interface AddAddressSidebarProps {
   userEmail: string;
@@ -32,54 +32,48 @@ export function AddAddressSidebar({
 }: AddAddressSidebarProps) {
   const [isPending, startTransition] = useTransition();
   const [formData, setFormData] = useState({
-    name: "",
-    address: "",
-    city: "",
-    state: "",
-    zip: "",
-    phone: "",
+    name: '',
+    address: '',
+    city: '',
+    state: '',
+    zip: '',
+    phone: '',
     isDefault: isFirstAddress, // First address is default by default
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (
-      !formData.name ||
-      !formData.address ||
-      !formData.city ||
-      !formData.state ||
-      !formData.zip
-    ) {
-      toast.error("Please fill in all required fields");
+    if (!formData.name || !formData.address || !formData.city || !formData.state || !formData.zip) {
+      toast.error('Please fill in all required fields');
       return;
     }
 
     startTransition(async () => {
       try {
         // Use API route instead of server action for better error handling
-        const response = await fetch("/api/user/addresses", {
-          method: "POST",
+        const response = await fetch('/api/user/addresses', {
+          method: 'POST',
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
           body: JSON.stringify(formData),
         });
 
         if (!response.ok) {
           const errorData = await response.json();
-          throw new Error(errorData.error || "Failed to create address");
+          throw new Error(errorData.error || 'Failed to create address');
         }
 
         await response.json();
-        toast.success("Address saved successfully!");
+        toast.success('Address saved successfully!');
         setFormData({
-          name: "",
-          address: "",
-          city: "",
-          state: "",
-          zip: "",
-          phone: "",
+          name: '',
+          address: '',
+          city: '',
+          state: '',
+          zip: '',
+          phone: '',
           isDefault: false,
         });
         onClose();
@@ -92,10 +86,8 @@ export function AddAddressSidebar({
           window.location.reload();
         }
       } catch (error) {
-        toast.error(
-          error instanceof Error ? error.message : "Failed to add address"
-        );
-        console.error("Address creation error:", error);
+        toast.error(error instanceof Error ? error.message : 'Failed to add address');
+        console.error('Address creation error:', error);
       }
     });
   };
@@ -116,11 +108,9 @@ export function AddAddressSidebar({
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2">
             <MapPin className="w-5 h-5" />
-            {isFirstAddress ? "Add Your First Address" : "Add New Address"}
+            {isFirstAddress ? 'Add Your First Address' : 'Add New Address'}
           </SheetTitle>
-          <SheetDescription>
-            Add a shipping address to {userEmail}
-          </SheetDescription>
+          <SheetDescription>Add a shipping address to {userEmail}</SheetDescription>
         </SheetHeader>
 
         <form onSubmit={handleSubmit} className="flex flex-col h-full px-3">
@@ -133,7 +123,7 @@ export function AddAddressSidebar({
                 id="name"
                 placeholder="e.g., Home, Work, Office"
                 value={formData.name}
-                onChange={(e) => handleInputChange("name", e.target.value)}
+                onChange={(e) => handleInputChange('name', e.target.value)}
                 disabled={isPending}
                 className="w-full"
               />
@@ -148,7 +138,7 @@ export function AddAddressSidebar({
                 type="tel"
                 placeholder="(555) 123-4567"
                 value={formData.phone}
-                onChange={(e) => handleInputChange("phone", e.target.value)}
+                onChange={(e) => handleInputChange('phone', e.target.value)}
                 disabled={isPending}
                 className="w-full"
               />
@@ -162,7 +152,7 @@ export function AddAddressSidebar({
                 id="address"
                 placeholder="123 Main Street, Apt 4B"
                 value={formData.address}
-                onChange={(e) => handleInputChange("address", e.target.value)}
+                onChange={(e) => handleInputChange('address', e.target.value)}
                 disabled={isPending}
                 className="w-full"
               />
@@ -177,7 +167,7 @@ export function AddAddressSidebar({
                   id="city"
                   placeholder="New York"
                   value={formData.city}
-                  onChange={(e) => handleInputChange("city", e.target.value)}
+                  onChange={(e) => handleInputChange('city', e.target.value)}
                   disabled={isPending}
                   className="w-full"
                 />
@@ -191,9 +181,7 @@ export function AddAddressSidebar({
                   placeholder="NY"
                   maxLength={2}
                   value={formData.state}
-                  onChange={(e) =>
-                    handleInputChange("state", e.target.value.toUpperCase())
-                  }
+                  onChange={(e) => handleInputChange('state', e.target.value.toUpperCase())}
                   disabled={isPending}
                   className="w-full"
                 />
@@ -208,7 +196,7 @@ export function AddAddressSidebar({
                 id="zip"
                 placeholder="12345"
                 value={formData.zip}
-                onChange={(e) => handleInputChange("zip", e.target.value)}
+                onChange={(e) => handleInputChange('zip', e.target.value)}
                 disabled={isPending}
                 className="w-full"
               />
@@ -219,16 +207,12 @@ export function AddAddressSidebar({
                 type="checkbox"
                 id="isDefault"
                 checked={formData.isDefault}
-                onChange={(e) =>
-                  handleInputChange("isDefault", e.target.checked)
-                }
+                onChange={(e) => handleInputChange('isDefault', e.target.checked)}
                 disabled={isPending || isFirstAddress}
                 className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
               />
               <Label htmlFor="isDefault" className="text-sm">
-                {isFirstAddress
-                  ? "This will be your default address"
-                  : "Set as default address"}
+                {isFirstAddress ? 'This will be your default address' : 'Set as default address'}
               </Label>
             </div>
           </div>
@@ -251,7 +235,7 @@ export function AddAddressSidebar({
                     Adding...
                   </>
                 ) : (
-                  "Add Address"
+                  'Add Address'
                 )}
               </Button>
             </div>

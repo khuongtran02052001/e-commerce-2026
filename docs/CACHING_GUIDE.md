@@ -60,16 +60,16 @@ We use semantic cache tags for organized invalidation:
 ```typescript
 export const CACHE_TAGS = {
   // Product-related
-  PRODUCTS: "products",
+  PRODUCTS: 'products',
   PRODUCT: (id: string) => `product-${id}`,
   PRODUCT_REVIEWS: (productId: string) => `product-reviews-${productId}`,
 
   // Category-related
-  CATEGORIES: "categories",
+  CATEGORIES: 'categories',
   CATEGORY: (slug: string) => `category-${slug}`,
 
   // Brand-related
-  BRANDS: "brands",
+  BRANDS: 'brands',
   BRAND: (slug: string) => `brand-${slug}`,
 
   // User-related
@@ -78,10 +78,10 @@ export const CACHE_TAGS = {
   USER_CART: (userId: string) => `user-cart-${userId}`,
 
   // Static content
-  HOMEPAGE: "homepage",
-  NAVIGATION: "navigation",
-  FEATURED: "featured",
-  DEALS: "deals",
+  HOMEPAGE: 'homepage',
+  NAVIGATION: 'navigation',
+  FEATURED: 'featured',
+  DEALS: 'deals',
 } as const;
 ```
 
@@ -108,36 +108,30 @@ Smart cache invalidation functions:
 
 ```typescript
 // Invalidate product and related caches
-export async function invalidateProduct(
-  productId: string,
-  productSlug?: string
-) {
+export async function invalidateProduct(productId: string, productSlug?: string) {
   if (productSlug) {
-    revalidatePath(`/product/${productSlug}`, "page");
+    revalidatePath(`/product/${productSlug}`, 'page');
   }
-  revalidatePath("/shop", "page");
-  revalidatePath("/", "layout");
+  revalidatePath('/shop', 'page');
+  revalidatePath('/', 'layout');
 }
 
 // Invalidate product reviews (triggers on review submission)
-export async function invalidateProductReviews(
-  productId: string,
-  productSlug?: string
-) {
+export async function invalidateProductReviews(productId: string, productSlug?: string) {
   if (productSlug) {
-    revalidatePath(`/product/${productSlug}`, "page");
+    revalidatePath(`/product/${productSlug}`, 'page');
   }
-  revalidatePath("/shop", "page");
+  revalidatePath('/shop', 'page');
 }
 
 // Invalidate order caches (triggers on status change)
 export async function invalidateOrder(orderId: string, userId?: string) {
-  revalidatePath("/user/orders", "page");
+  revalidatePath('/user/orders', 'page');
   if (userId) {
-    revalidatePath("/user", "layout");
+    revalidatePath('/user', 'layout');
   }
-  revalidatePath("/admin", "layout");
-  revalidatePath("/employee", "layout");
+  revalidatePath('/admin', 'layout');
+  revalidatePath('/employee', 'layout');
 }
 ```
 
@@ -154,12 +148,12 @@ const getAllBrands = unstable_cache(
       const { data } = await sanityFetch({ query: BRANDS_QUERY });
       return data ?? [];
     } catch (error) {
-      console.log("Error fetching all brands:", error);
+      console.log('Error fetching all brands:', error);
       return [];
     }
   },
-  ["all-brands"],
-  { revalidate: 3600, tags: ["brands"] }
+  ['all-brands'],
+  { revalidate: 3600, tags: ['brands'] },
 );
 ```
 
@@ -175,12 +169,12 @@ const getProductBySlug = unstable_cache(
       });
       return product?.data || null;
     } catch (error) {
-      console.error("Error fetching product by slug:", error);
+      console.error('Error fetching product by slug:', error);
       return null;
     }
   },
-  ["product-by-slug"],
-  { revalidate: 1800, tags: ["products"] }
+  ['product-by-slug'],
+  { revalidate: 1800, tags: ['products'] },
 );
 ```
 
@@ -193,12 +187,12 @@ const getFeaturedProducts = unstable_cache(
       const { data } = await sanityFetch({ query: FEATURE_PRODUCTS });
       return data ?? [];
     } catch (error) {
-      console.log("Error fetching featured products:", error);
+      console.log('Error fetching featured products:', error);
       return [];
     }
   },
-  ["featured-products"],
-  { revalidate: 600, tags: ["products", "featured", "homepage"] }
+  ['featured-products'],
+  { revalidate: 600, tags: ['products', 'featured', 'homepage'] },
 );
 ```
 
@@ -207,13 +201,13 @@ const getFeaturedProducts = unstable_cache(
 #### Review Submission (`actions/reviewActions.ts`)
 
 ```typescript
-import { invalidateProductReviews } from "@/lib/cache";
+import { invalidateProductReviews } from '@/lib/cache';
 
 export async function submitReview(data: SubmitReviewData) {
   // ... review creation logic ...
 
   const review = await client.create({
-    _type: "review",
+    _type: 'review',
     // ... review data ...
   });
 
@@ -227,20 +221,20 @@ export async function submitReview(data: SubmitReviewData) {
 #### Order Status Updates (`actions/orderEmployeeActions.ts`)
 
 ```typescript
-import { invalidateOrder } from "@/lib/cache";
+import { invalidateOrder } from '@/lib/cache';
 
 export async function markAsPacked(orderId: string, notes?: string) {
   // ... order update logic ...
 
   await backendClient
     .patch(orderId)
-    .set({ status: "packed", packedAt: new Date().toISOString() })
+    .set({ status: 'packed', packedAt: new Date().toISOString() })
     .commit();
 
   // Invalidate caches for instant updates
   await invalidateOrder(orderId, order.clerkUserId);
 
-  return { success: true, message: "Order marked as packed" };
+  return { success: true, message: 'Order marked as packed' };
 }
 
 export async function markAsDelivered(orderId: string, notes?: string) {
@@ -248,13 +242,13 @@ export async function markAsDelivered(orderId: string, notes?: string) {
 
   await backendClient
     .patch(orderId)
-    .set({ status: "delivered", deliveredAt: new Date().toISOString() })
+    .set({ status: 'delivered', deliveredAt: new Date().toISOString() })
     .commit();
 
   // Invalidate caches for instant updates
   await invalidateOrder(orderId, order.clerkUserId);
 
-  return { success: true, message: "Order delivered successfully" };
+  return { success: true, message: 'Order delivered successfully' };
 }
 ```
 
@@ -605,7 +599,7 @@ const revalidateTime = isHighTraffic ? 300 : 1800;
 Deploy to Vercel Edge Network for global cache distribution:
 
 ```typescript
-export const runtime = "edge";
+export const runtime = 'edge';
 export const revalidate = 600;
 ```
 

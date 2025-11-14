@@ -1,8 +1,8 @@
-import { currentUser } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
-import { getMyOrders } from "@/sanity/helpers";
-import Title from "@/components/Title";
-import OrdersClient from "@/components/OrdersClient";
+import OrdersClient from '@/components/OrdersClient';
+import Title from '@/components/Title';
+import { getMyOrders } from '@/sanity/helpers';
+import { currentUser } from '@clerk/nextjs/server';
+import { redirect } from 'next/navigation';
 
 interface OrdersPageProps {
   searchParams: Promise<{
@@ -14,16 +14,15 @@ async function UserOrdersPage({ searchParams }: OrdersPageProps) {
   const user = await currentUser();
 
   if (!user) {
-    redirect("/sign-in");
+    redirect('/sign-in');
   }
 
   const { page } = await searchParams;
-  const currentPage = parseInt(page || "1", 10);
+  const currentPage = parseInt(page || '1', 10);
   const ordersPerPage = 20;
 
   const orderData = await getMyOrders(user.id, currentPage, ordersPerPage);
-  const { orders, totalCount, totalPages, hasNextPage, hasPrevPage } =
-    orderData;
+  const { orders, totalCount, totalPages, hasNextPage, hasPrevPage } = orderData;
 
   return (
     <div className="space-y-6">

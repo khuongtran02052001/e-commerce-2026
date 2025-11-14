@@ -1,12 +1,12 @@
-import HomeCategories from "@/components/HomeCategories";
-import LatestBlog from "@/components/LatestBlog";
-import HomeBanner from "@/components/HomeBanner";
-import ProductGrid from "@/components/ProductGrid";
-import ShopByBrands from "@/components/ShopByBrands";
-import ShopFeatures from "@/components/ShopFeatures";
+import HomeBanner from '@/components/HomeBanner';
+import HomeCategories from '@/components/HomeCategories';
+import LatestBlog from '@/components/LatestBlog';
+import ProductGrid from '@/components/ProductGrid';
+import ShopByBrands from '@/components/ShopByBrands';
+import ShopFeatures from '@/components/ShopFeatures';
 // import { getCategories } from "@/sanity/queries";
-import { generateOrganizationSchema, generateWebsiteSchema } from "@/lib/seo";
-import { mockCategories } from "@/mock-data";
+import { generateOrganizationSchema, generateWebsiteSchema } from '@/lib/seo';
+import { mockCategories } from '@/mock-data';
 
 export default async function Home() {
   // const categories = await mockCategories(8);

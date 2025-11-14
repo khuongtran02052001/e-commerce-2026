@@ -50,7 +50,6 @@ Successfully implemented a comprehensive user profile system with address manage
 ### API Endpoints
 
 1. **`/api/user/addresses`**
-
    - POST: Create address
    - PUT: Update address
    - DELETE: Remove address

@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth, clerkClient } from "@clerk/nextjs/server";
-import { isUserAdmin } from "@/lib/adminUtils";
-import { client } from "@/sanity/lib/client";
+import { isUserAdmin } from '@/lib/adminUtils';
+import { client } from '@/sanity/lib/client';
+import { auth, clerkClient } from '@clerk/nextjs/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 interface OrderProduct {
   name: string;
@@ -55,10 +55,7 @@ export async function GET(req: NextRequest) {
     const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json(
-        { error: "Unauthorized - Not logged in" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized - Not logged in' }, { status: 401 });
     }
 
     // Get current user details to check admin status
@@ -68,28 +65,25 @@ export async function GET(req: NextRequest) {
 
     // Check if current user is admin
     if (!userEmail || !isUserAdmin(userEmail)) {
-      return NextResponse.json(
-        { error: "Forbidden - Admin access required" },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
     }
 
     const { searchParams } = new URL(req.url);
-    const period = searchParams.get("period") || "30d"; // days
-    const type = searchParams.get("type") || "overview";
+    const period = searchParams.get('period') || '30d'; // days
+    const type = searchParams.get('type') || 'overview';
 
     // Calculate date ranges
     const currentDate = new Date();
     const startDate = new Date();
     let periodDays = 30;
 
-    if (period === "7d") {
+    if (period === '7d') {
       periodDays = 7;
-    } else if (period === "30d") {
+    } else if (period === '30d') {
       periodDays = 30;
-    } else if (period === "90d") {
+    } else if (period === '90d') {
       periodDays = 90;
-    } else if (period === "365d") {
+    } else if (period === '365d') {
       periodDays = 365;
     }
 
@@ -99,7 +93,7 @@ export async function GET(req: NextRequest) {
     const prevStartDate = new Date();
     prevStartDate.setDate(startDate.getDate() - periodDays);
 
-    if (type === "overview") {
+    if (type === 'overview') {
       // Overview analytics
       const [
         currentPeriodOrders,
@@ -128,7 +122,7 @@ export async function GET(req: NextRequest) {
           {
             startDate: startDate.toISOString(),
             currentDate: currentDate.toISOString(),
-          }
+          },
         ),
 
         // Previous period orders for comparison
@@ -141,7 +135,7 @@ export async function GET(req: NextRequest) {
           {
             prevStartDate: prevStartDate.toISOString(),
             startDate: startDate.toISOString(),
-          }
+          },
         ),
 
         // Total products
@@ -152,7 +146,7 @@ export async function GET(req: NextRequest) {
           try {
             return await clerk.users.getCount();
           } catch (error) {
-            console.error("Error fetching users count:", error);
+            console.error('Error fetching users count:', error);
             return 0;
           }
         })(),
@@ -167,7 +161,7 @@ export async function GET(req: NextRequest) {
           status,
           orderDate
         }`,
-          { startDate: startDate.toISOString() }
+          { startDate: startDate.toISOString() },
         ),
 
         // Orders by status
@@ -175,7 +169,7 @@ export async function GET(req: NextRequest) {
           `*[_type == "order" && dateTime(orderDate) >= dateTime($startDate)] {
           status
         }`,
-          { startDate: startDate.toISOString() }
+          { startDate: startDate.toISOString() },
         ),
 
         // Top products analysis
@@ -187,26 +181,18 @@ export async function GET(req: NextRequest) {
             price
           }
         }`,
-          { startDate: startDate.toISOString() }
+          { startDate: startDate.toISOString() },
         ),
       ]);
 
       // Calculate current period stats
       const currentRevenue = currentPeriodOrders
-        .filter((order: OrderWithStatus) => order.status === "delivered")
-        .reduce(
-          (sum: number, order: OrderWithStatus) =>
-            sum + (order.totalPrice || 0),
-          0
-        );
+        .filter((order: OrderWithStatus) => order.status === 'delivered')
+        .reduce((sum: number, order: OrderWithStatus) => sum + (order.totalPrice || 0), 0);
 
       const previousRevenue = previousPeriodOrders
-        .filter((order: OrderWithStatus) => order.status === "delivered")
-        .reduce(
-          (sum: number, order: OrderWithStatus) =>
-            sum + (order.totalPrice || 0),
-          0
-        );
+        .filter((order: OrderWithStatus) => order.status === 'delivered')
+        .reduce((sum: number, order: OrderWithStatus) => sum + (order.totalPrice || 0), 0);
 
       // Calculate percentage changes
       const calculateChange = (current: number, previous: number) => {
@@ -221,20 +207,16 @@ export async function GET(req: NextRequest) {
       });
 
       // Process top products
-      const productSales: Record<
-        string,
-        { name: string; sales: number; revenue: number }
-      > = {};
+      const productSales: Record<string, { name: string; sales: number; revenue: number }> = {};
 
       topProducts.forEach((order: OrderWithStatus) => {
         order.products?.forEach((product: OrderProduct) => {
-          const key = product.name || "Unknown Product";
+          const key = product.name || 'Unknown Product';
           if (!productSales[key]) {
             productSales[key] = { name: key, sales: 0, revenue: 0 };
           }
           productSales[key].sales += product.quantity || 0;
-          productSales[key].revenue +=
-            (product.price || 0) * (product.quantity || 0);
+          productSales[key].revenue += (product.price || 0) * (product.quantity || 0);
         });
       });
 
@@ -243,34 +225,27 @@ export async function GET(req: NextRequest) {
         .slice(0, 5);
 
       // Create recent activity
-      const recentActivity = recentOrders
-        .slice(0, 8)
-        .map((order: RecentOrder) => ({
-          action: `Order ${order.orderNumber} ${order.status}`,
-          time: new Date(order.orderDate).toLocaleDateString(),
-          value: `$${order.totalPrice?.toLocaleString() || 0}`,
-        }));
+      const recentActivity = recentOrders.slice(0, 8).map((order: RecentOrder) => ({
+        action: `Order ${order.orderNumber} ${order.status}`,
+        time: new Date(order.orderDate).toLocaleDateString(),
+        value: `$${order.totalPrice?.toLocaleString() || 0}`,
+      }));
 
       // Return analytics data in the format expected by the component
       const result = {
         revenue: {
           total: currentRevenue,
-          change: Number(
-            calculateChange(currentRevenue, previousRevenue).toFixed(1)
-          ),
+          change: Number(calculateChange(currentRevenue, previousRevenue).toFixed(1)),
           trend: [], // Could add daily revenue data here
         },
         orders: {
           total: currentPeriodOrders.length,
           change: Number(
-            calculateChange(
-              currentPeriodOrders.length,
-              previousPeriodOrders.length
-            ).toFixed(1)
+            calculateChange(currentPeriodOrders.length, previousPeriodOrders.length).toFixed(1),
           ),
-          pending: statusCounts["pending"] || 0,
-          completed: statusCounts["delivered"] || 0,
-          cancelled: statusCounts["cancelled"] || 0,
+          pending: statusCounts['pending'] || 0,
+          completed: statusCounts['delivered'] || 0,
+          cancelled: statusCounts['cancelled'] || 0,
         },
         customers: {
           total: totalUsers,
@@ -289,14 +264,14 @@ export async function GET(req: NextRequest) {
       };
 
       return NextResponse.json(result);
-    } else if (type === "sales") {
+    } else if (type === 'sales') {
       // Sales analytics - simplified for now
       return NextResponse.json({
         salesByCategory: [],
         salesByBrand: [],
         monthlySales: [],
       });
-    } else if (type === "customers") {
+    } else if (type === 'customers') {
       // Customer analytics - simplified for now
       return NextResponse.json({
         topCustomers: [],
@@ -304,15 +279,9 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    return NextResponse.json(
-      { error: "Invalid analytics type" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: 'Invalid analytics type' }, { status: 400 });
   } catch (error) {
-    console.error("Error fetching analytics:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    console.error('Error fetching analytics:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

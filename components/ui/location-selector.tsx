@@ -1,16 +1,5 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -18,9 +7,19 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Country, State, City } from "country-state-city";
-import { ChevronRight, MapPin, Globe } from "lucide-react";
+} from '@/components/ui/breadcrumb';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { City, Country, State } from 'country-state-city';
+import { Globe, MapPin } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface LocationData {
   country: string;
@@ -38,18 +37,10 @@ interface LocationSelectorProps {
   className?: string;
 }
 
-export default function LocationSelector({
-  value,
-  onChange,
-  className,
-}: LocationSelectorProps) {
+export default function LocationSelector({ value, onChange, className }: LocationSelectorProps) {
   const [countries] = useState(() => Country.getAllCountries());
-  const [states, setStates] = useState<
-    ReturnType<typeof State.getStatesOfCountry>
-  >([]);
-  const [cities, setCities] = useState<
-    ReturnType<typeof City.getCitiesOfState>
-  >([]);
+  const [states, setStates] = useState<ReturnType<typeof State.getStatesOfCountry>>([]);
+  const [cities, setCities] = useState<ReturnType<typeof City.getCitiesOfState>>([]);
   const [loadingStates, setLoadingStates] = useState(false);
   const [loadingCities, setLoadingCities] = useState(false);
 
@@ -61,7 +52,7 @@ export default function LocationSelector({
         const countryStates = State.getStatesOfCountry(value.countryCode);
         setStates(countryStates);
       } catch (error) {
-        console.error("Error loading states:", error);
+        console.error('Error loading states:', error);
         setStates([]);
       } finally {
         setLoadingStates(false);
@@ -76,13 +67,10 @@ export default function LocationSelector({
     if (value.countryCode && value.stateCode) {
       setLoadingCities(true);
       try {
-        const stateCities = City.getCitiesOfState(
-          value.countryCode,
-          value.stateCode
-        );
+        const stateCities = City.getCitiesOfState(value.countryCode, value.stateCode);
         setCities(stateCities);
       } catch (error) {
-        console.error("Error loading cities:", error);
+        console.error('Error loading cities:', error);
         setCities([]);
       } finally {
         setLoadingCities(false);
@@ -98,10 +86,10 @@ export default function LocationSelector({
       onChange({
         country: country.name,
         countryCode: country.isoCode,
-        state: "",
-        stateCode: "",
-        city: "",
-        subArea: "",
+        state: '',
+        stateCode: '',
+        city: '',
+        subArea: '',
         zipCode: value.zipCode,
       });
     }
@@ -114,8 +102,8 @@ export default function LocationSelector({
         ...value,
         state: state.name,
         stateCode: state.isoCode,
-        city: "",
-        subArea: "",
+        city: '',
+        subArea: '',
       });
     }
   };
@@ -124,7 +112,7 @@ export default function LocationSelector({
     onChange({
       ...value,
       city: cityName,
-      subArea: "",
+      subArea: '',
     });
   };
 
@@ -144,12 +132,12 @@ export default function LocationSelector({
 
   const resetToCountry = () => {
     onChange({
-      country: "",
-      countryCode: "",
-      state: "",
-      stateCode: "",
-      city: "",
-      subArea: "",
+      country: '',
+      countryCode: '',
+      state: '',
+      stateCode: '',
+      city: '',
+      subArea: '',
       zipCode: value.zipCode,
     });
   };
@@ -157,18 +145,18 @@ export default function LocationSelector({
   const resetToState = () => {
     onChange({
       ...value,
-      state: "",
-      stateCode: "",
-      city: "",
-      subArea: "",
+      state: '',
+      stateCode: '',
+      city: '',
+      subArea: '',
     });
   };
 
   const resetToCity = () => {
     onChange({
       ...value,
-      city: "",
-      subArea: "",
+      city: '',
+      subArea: '',
     });
   };
 
@@ -178,9 +166,7 @@ export default function LocationSelector({
       <div className="bg-gray-50 rounded-lg p-4 border">
         <div className="flex items-center space-x-2 mb-3">
           <MapPin className="h-4 w-4 text-blue-600" />
-          <span className="text-sm font-medium text-gray-700">
-            Location Selection
-          </span>
+          <span className="text-sm font-medium text-gray-700">Location Selection</span>
         </div>
 
         <Breadcrumb>
@@ -282,7 +268,7 @@ export default function LocationSelector({
       {value.countryCode && (
         <div>
           <Label htmlFor="state" className="text-sm font-medium">
-            {value.country === "United States" ? "State" : "State/Province"} *
+            {value.country === 'United States' ? 'State' : 'State/Province'} *
           </Label>
           <Select
             value={value.stateCode}
@@ -293,14 +279,10 @@ export default function LocationSelector({
               <SelectValue
                 placeholder={
                   loadingStates
-                    ? "Loading states..."
+                    ? 'Loading states...'
                     : states.length === 0
-                    ? "No states available"
-                    : `Select a ${
-                        value.country === "United States"
-                          ? "state"
-                          : "state/province"
-                      }`
+                      ? 'No states available'
+                      : `Select a ${value.country === 'United States' ? 'state' : 'state/province'}`
                 }
               />
             </SelectTrigger>
@@ -330,10 +312,10 @@ export default function LocationSelector({
               <SelectValue
                 placeholder={
                   loadingCities
-                    ? "Loading cities..."
+                    ? 'Loading cities...'
                     : cities.length === 0
-                    ? "No cities available or enter manually below"
-                    : "Select a city"
+                      ? 'No cities available or enter manually below'
+                      : 'Select a city'
                 }
               />
             </SelectTrigger>
@@ -369,7 +351,7 @@ export default function LocationSelector({
           <Input
             id="subarea"
             placeholder="Enter area, district, or neighborhood"
-            value={value.subArea || ""}
+            value={value.subArea || ''}
             onChange={(e) => handleSubAreaChange(e.target.value)}
             className="mt-1"
           />
@@ -380,14 +362,14 @@ export default function LocationSelector({
       {value.country && (
         <div>
           <Label htmlFor="zipcode" className="text-sm font-medium">
-            {value.country === "United States" ? "ZIP Code" : "Postal Code"} *
+            {value.country === 'United States' ? 'ZIP Code' : 'Postal Code'} *
           </Label>
           <Input
             id="zipcode"
             placeholder={
-              value.country === "United States"
-                ? "Enter ZIP code (e.g., 12345)"
-                : "Enter postal code"
+              value.country === 'United States'
+                ? 'Enter ZIP code (e.g., 12345)'
+                : 'Enter postal code'
             }
             value={value.zipCode}
             onChange={(e) => handleZipChange(e.target.value)}

@@ -62,13 +62,13 @@ const contextValue = useMemo(
     settings,
     actions,
   }),
-  [user, settings, actions]
+  [user, settings, actions],
 );
 
 // Filtering/sorting large arrays
 const filteredProducts = useMemo(
   () => products.filter((p) => p.category === selectedCategory),
-  [products, selectedCategory]
+  [products, selectedCategory],
 );
 ```
 
@@ -108,7 +108,7 @@ useEffect(() => {
 ```tsx
 // Functions not passed as props or used in dependencies
 const handleClick = useCallback(() => {
-  console.log("clicked"); // This function is only used in this component
+  console.log('clicked'); // This function is only used in this component
 }, []);
 
 // Functions that need to change every render anyway
@@ -135,11 +135,11 @@ useEffect(() => {
 // Event listeners with proper cleanup
 useEffect(() => {
   const handleKeydown = (e: KeyboardEvent) => {
-    if (e.key === "Escape") setModalOpen(false);
+    if (e.key === 'Escape') setModalOpen(false);
   };
 
-  document.addEventListener("keydown", handleKeydown);
-  return () => document.removeEventListener("keydown", handleKeydown);
+  document.addEventListener('keydown', handleKeydown);
+  return () => document.removeEventListener('keydown', handleKeydown);
 }, []);
 
 // Timers with cleanup
@@ -204,8 +204,7 @@ useEffect(() => {
 useEffect(() => {
   // This runs every render - PERFORMANCE ISSUE
   const filteredData = data.filter(
-    (item) =>
-      item.name.includes(searchQuery) && item.category === selectedCategory
+    (item) => item.name.includes(searchQuery) && item.category === selectedCategory,
   );
   setFilteredData(filteredData);
 }, [data, searchQuery, selectedCategory]); // Should use useMemo instead
@@ -303,13 +302,13 @@ useEffect(() => {
 ```tsx
 // Memoizing everything "just in case"
 const Component = memo(() => {
-  const value = useMemo(() => "static string", []); // Unnecessary
-  const handler = useCallback(() => console.log("hi"), []); // Not passed as prop
+  const value = useMemo(() => 'static string', []); // Unnecessary
+  const handler = useCallback(() => console.log('hi'), []); // Not passed as prop
   return <div>{value}</div>;
 });
 
 // Breaking memo with object props
-<MemoComponent config={{ theme: "dark" }} />; // New object every render
+<MemoComponent config={{ theme: 'dark' }} />; // New object every render
 
 // Incorrect dependencies
 const value = useMemo(() => expensiveCalc(a, b), [a]); // Missing 'b' dependency
@@ -320,13 +319,13 @@ const value = useMemo(() => expensiveCalc(a, b), [a]); // Missing 'b' dependency
 ```tsx
 // Only memoize when beneficial
 const Component = memo(() => {
-  const value = "static string"; // Just use the value directly
-  const handler = () => console.log("hi"); // Simple function, no memo needed
+  const value = 'static string'; // Just use the value directly
+  const handler = () => console.log('hi'); // Simple function, no memo needed
   return <div>{value}</div>;
 });
 
 // Stable object references
-const config = useMemo(() => ({ theme: "dark" }), []);
+const config = useMemo(() => ({ theme: 'dark' }), []);
 <MemoComponent config={config} />;
 
 // Correct dependencies
