@@ -1,4 +1,4 @@
-import { client } from '@/sanity/lib/client';
+import { client } from '@/lib/axiosClient';
 import { currentUser } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
 

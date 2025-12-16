@@ -1,7 +1,8 @@
 import PremiumFloatingButton from '@/components/PremiumFloatingButton';
 import { UserDataProvider } from '@/contexts/UserDataContext';
-import { ClerkProvider } from '@clerk/nextjs';
+import { auth } from '@/lib/auth';
 import type { Metadata } from 'next';
+import { SessionProvider } from 'next-auth/react';
 import localFont from 'next/font/local';
 import Head from 'next/head';
 import Script from 'next/script';
@@ -101,9 +102,10 @@ export const metadata: Metadata = {
 };
 
 const RootLayout = async ({ children }: { children: ReactNode }) => {
-  const GADSENSE_CLIENT_ID = 'ca-pub-6542623777003381'; // Define it once
+  const GADSENSE_CLIENT_ID = ''; // Define it once
+  const session = await auth();
   return (
-    <ClerkProvider>
+    <SessionProvider session={session}>
       <html lang="en">
         <Head>
           <meta name="google-adsense-account" content={GADSENSE_CLIENT_ID} />
@@ -136,7 +138,7 @@ const RootLayout = async ({ children }: { children: ReactNode }) => {
           />
         </body>
       </html>
-    </ClerkProvider>
+    </SessionProvider>
   );
 };
 

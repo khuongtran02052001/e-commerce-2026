@@ -2,14 +2,14 @@
 
 import { Button } from '@/components/ui/button';
 import { useOrderPlacement } from '@/hooks/useOrderPlacement';
-import { trackCheckoutStarted } from '@/lib/analytics';
+// import { trackCheckoutStarted } from '@/lib/analytics';
 import { PAYMENT_METHODS } from '@/lib/orderStatus';
 import useCartStore, { CartItem } from '@/store';
-import { useUser } from '@clerk/nextjs';
 import { CreditCard, Package } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
+import { useUserData } from '@/contexts/UserDataContext';
 import { OrderPlacementOverlay } from './OrderPlacementSkeleton';
 
 interface Address {
@@ -30,10 +30,10 @@ interface CheckoutButtonProps {
 }
 
 export function CheckoutButton({ cart, selectedAddress }: CheckoutButtonProps) {
-  const { user } = useUser();
+  const { currentUser: user } = useUserData();
   const { resetCart, setOrderPlacementState } = useCartStore();
   const { placeOrder, isPlacingOrder, orderStep } = useOrderPlacement({
-    user: user ? { emailAddresses: user.emailAddresses } : null,
+    user: user ? { emailAddresses: [{ emailAddress: 'Test' }, { emailAddress: 'Email' }] } : null,
   });
   const [actionType, setActionType] = useState<'checkout' | 'order' | null>(null);
 
@@ -58,11 +58,11 @@ export function CheckoutButton({ cart, selectedAddress }: CheckoutButtonProps) {
       (sum, item) => sum + (item.product.price || 0) * item.quantity,
       0,
     );
-    trackCheckoutStarted({
-      userId: user?.id,
-      cartValue,
-      itemCount: cart.length,
-    });
+    // trackCheckoutStarted({
+    //   userId: user?.id,
+    //   cartValue,
+    //   itemCount: cart.length,
+    // });
 
     // Redirect with loading effect
     const addressParam = encodeURIComponent(JSON.stringify(selectedAddress));

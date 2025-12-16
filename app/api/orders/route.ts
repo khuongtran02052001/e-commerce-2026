@@ -1,7 +1,7 @@
 import { sendOrderStatusNotification } from '@/lib/notificationService';
 import { ORDER_STATUSES, PAYMENT_METHODS, PAYMENT_STATUSES } from '@/lib/orderStatus';
 import { getMyOrders } from '@/sanity/helpers';
-import { writeClient } from '@/sanity/lib/client';
+import { writeClient } from '@/lib/axiosClient';
 import { auth, currentUser } from '@clerk/nextjs/server';
 import crypto from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';

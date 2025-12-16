@@ -2,14 +2,14 @@
 
 export const contactConfig = {
   company: {
-    name: process.env.NEXT_PUBLIC_COMPANY_NAME || 'ShopCart',
-    email: process.env.NEXT_PUBLIC_COMPANY_EMAIL || 'support@shopcart.com',
+    name: process.env.NEXT_PUBLIC_COMPANY_NAME || 'Shop',
+    email: process.env.NEXT_PUBLIC_COMPANY_EMAIL || 'support@Shop.com',
     phone: process.env.NEXT_PUBLIC_COMPANY_PHONE || '+1 (555) 123-4567',
-    address: process.env.NEXT_PUBLIC_COMPANY_ADDRESS || '123 Shopping Street, Commerce District',
+    address: process.env.NEXT_PUBLIC_COMPANY_ADDRESS || 'Sài Gòn, Việt Nam',
     city: process.env.NEXT_PUBLIC_COMPANY_CITY || 'New York, NY 10001, USA',
     description:
       process.env.NEXT_PUBLIC_COMPANY_DESCRIPTION ||
-      'Discover amazing products at ShopCart, your trusted online shopping destination for quality items and exceptional customer service.',
+      'Discover amazing products at Shop, your trusted online shopping destination for quality items and exceptional customer service.',
   },
   businessHours: {
     weekday:
@@ -18,8 +18,8 @@ export const contactConfig = {
       process.env.NEXT_PUBLIC_COMPANY_BUSINESS_HOURS_WEEKEND || 'Saturday - Sunday: 10AM - 4PM EST',
   },
   emails: {
-    support: process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'support@shopcart.com',
-    sales: process.env.NEXT_PUBLIC_SALES_EMAIL || 'sales@shopcart.com',
+    support: process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'support@Shop.com',
+    sales: process.env.NEXT_PUBLIC_SALES_EMAIL || 'sales@Shop.com',
   },
   responseTime: {
     standard: process.env.NEXT_PUBLIC_CONTACT_RESPONSE_TIME || 'We reply within 24 hours',
@@ -32,17 +32,9 @@ export const contactConfig = {
     linkedin: process.env.NEXT_PUBLIC_LINKEDIN_URL || '#',
   },
   legal: {
-    copyright: process.env.NEXT_PUBLIC_COPYRIGHT_TEXT || '© 2024 ShopCart. All rights reserved.',
-    privacyPolicy: process.env.NEXT_PUBLIC_PRIVACY_POLICY_URL || '/privacy',
-    terms: process.env.NEXT_PUBLIC_TERMS_URL || '/terms',
-  },
-  support: {
-    helpCenter: '/help',
-    faq: '/faqs',
-    trackOrder: '/track-order',
-    returns: '/returns',
-    shipping: '/shipping',
-    sizeGuide: '/size-guide',
+    copyright: process.env.NEXT_PUBLIC_COPYRIGHT_TEXT || '© 2024 Shop. All rights reserved.',
+    privacyPolicy: process.env.NEXT_PUBLIC_PRIVACY_POLICY_URL || '#',
+    terms: process.env.NEXT_PUBLIC_TERMS_URL || '#',
   },
 };
 

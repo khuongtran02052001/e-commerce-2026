@@ -1,4 +1,4 @@
-import { client, writeClient } from '@/sanity/lib/client';
+import { client, writeClient } from '@/lib/axiosClient';
 import { auth } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
 

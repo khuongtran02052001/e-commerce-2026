@@ -1,5 +1,5 @@
 import { backendClient } from '@/sanity/lib/backendClient';
-import { writeClient } from '@/sanity/lib/client';
+import { writeClient } from '@/lib/axiosClient';
 import { currentUser } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 

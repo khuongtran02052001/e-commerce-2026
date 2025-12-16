@@ -5,7 +5,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getProductReviewsAPI, markReviewHelpfulAPI } from '@/lib/reviewAPI';
-import { useAuth } from '@clerk/nextjs';
+
+import { useUserData } from '@/contexts/UserDataContext';
 import { StarIcon, ThumbsUp } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
@@ -38,7 +39,7 @@ interface ProductReviewsProps {
 }
 
 const ProductReviews = React.memo(({ productId, productName }: ProductReviewsProps) => {
-  const { isSignedIn } = useAuth();
+  const { currentUser: user } = useUserData();
   const [reviews, setReviews] = useState<Review[]>([]);
   const [averageRating, setAverageRating] = useState(0);
   const [totalReviews, setTotalReviews] = useState(0);
@@ -74,7 +75,7 @@ const ProductReviews = React.memo(({ productId, productName }: ProductReviewsPro
   }, [productId]);
 
   const checkCanReview = useCallback(async () => {
-    if (!isSignedIn) {
+    if (!user) {
       setCanReview(false);
       return;
     }
@@ -87,7 +88,7 @@ const ProductReviews = React.memo(({ productId, productName }: ProductReviewsPro
     } catch (error) {
       console.error('Error checking review eligibility:', error);
     }
-  }, [productId, isSignedIn]);
+  }, [productId, user]);
 
   useEffect(() => {
     loadReviews();
@@ -96,7 +97,7 @@ const ProductReviews = React.memo(({ productId, productName }: ProductReviewsPro
 
   const handleMarkHelpful = useCallback(
     async (reviewId: string) => {
-      if (!isSignedIn) {
+      if (!user) {
         toast.error('Please sign in to mark reviews as helpful');
         return;
       }
@@ -114,7 +115,7 @@ const ProductReviews = React.memo(({ productId, productName }: ProductReviewsPro
         toast.error('Failed to update review');
       }
     },
-    [isSignedIn, loadReviews],
+    [user, loadReviews],
   );
 
   const displayedReviews = showAll ? reviews : reviews.slice(0, 3);
@@ -128,12 +129,12 @@ const ProductReviews = React.memo(({ productId, productName }: ProductReviewsPro
   ];
 
   const handleOpenReviewSidebar = useCallback(() => {
-    if (!isSignedIn) {
+    if (!user) {
       toast.error('Please sign in to write a review');
       return;
     }
     setIsReviewSidebarOpen(true);
-  }, [isSignedIn]);
+  }, [user]);
 
   const handleCloseReviewSidebar = useCallback(() => {
     setIsReviewSidebarOpen(false);
@@ -191,7 +192,7 @@ const ProductReviews = React.memo(({ productId, productName }: ProductReviewsPro
                   ? 'No reviews yet'
                   : `Based on ${totalReviews} ${totalReviews === 1 ? 'review' : 'reviews'}`}
               </p>
-              {isSignedIn ? (
+              {user ? (
                 canReview ? (
                   <Button
                     onClick={handleOpenReviewSidebar}
@@ -296,7 +297,7 @@ const ProductReviews = React.memo(({ productId, productName }: ProductReviewsPro
                         <button
                           onClick={() => handleMarkHelpful(review._id)}
                           className="flex items-center gap-1 hover:text-shop_light_green transition-colors disabled:opacity-50"
-                          disabled={!isSignedIn}
+                          disabled={!user}
                         >
                           <ThumbsUp size={14} />
                           Helpful ({review.helpful})
@@ -312,7 +313,7 @@ const ProductReviews = React.memo(({ productId, productName }: ProductReviewsPro
               <p className="text-gray-500 mb-4">
                 No reviews yet. Be the first to review this product!
               </p>
-              {isSignedIn && canReview && (
+              {user && canReview && (
                 <Button
                   onClick={handleOpenReviewSidebar}
                   className="bg-shop_dark_green hover:bg-shop_light_green text-white"

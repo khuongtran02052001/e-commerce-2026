@@ -13,13 +13,13 @@ export default async function Home() {
   const categories = mockCategories;
 
   // Generate structured data
-  const organizationSchema = generateOrganizationSchema();
-  const websiteSchema = generateWebsiteSchema();
+  // const organizationSchema = generateOrganizationSchema();
+  // const websiteSchema = generateWebsiteSchema();
 
   return (
     <div>
       {/* JSON-LD Structured Data */}
-      <script
+      {/* <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(organizationSchema),
@@ -30,7 +30,7 @@ export default async function Home() {
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(websiteSchema),
         }}
-      />
+      /> */}
 
       <HomeBanner />
       <div className="py-10">

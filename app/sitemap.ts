@@ -1,4 +1,4 @@
-import { client } from '@/sanity/lib/client';
+import { client } from '@/lib/axiosClient';
 import { MetadataRoute } from 'next';
 
 const BASE_URL = 'https://shopcartpro.reactbd.org';

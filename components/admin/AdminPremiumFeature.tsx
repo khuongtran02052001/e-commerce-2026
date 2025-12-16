@@ -14,7 +14,7 @@ export default function AdminPremiumFeature({
   description = 'This premium feature is only available in the paid version of ShopCart Pro.',
 }: AdminPremiumFeatureProps) {
   const upgradeUrl =
-    process.env.NEXT_PUBLIC_PAID_VERION || 'https://www.buymeacoffee.com/noor_Mohammad';
+    process.env.NEXT_PUBLIC_PAID_VERION || '#';
 
   const premiumFeatures = [
     'Advanced Analytics Dashboard',

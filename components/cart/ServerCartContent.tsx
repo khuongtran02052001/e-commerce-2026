@@ -52,7 +52,6 @@ interface ServerCartContentProps {
 
 export function ServerCartContent({
   userEmail,
-
   userAddresses,
   userOrders,
   onAddressesRefresh,
@@ -160,7 +159,7 @@ export function ServerCartContent({
       {/* Cart Items */}
       <div className="lg:col-span-2 space-y-4">
         {cart.map((item) => (
-          <div key={item.product._id} className="border rounded-lg p-4">
+          <div key={item.product.id} className="border rounded-lg p-4">
             <div className="flex gap-4">
               {/* Product Image */}
               <div className="relative w-24 h-24 flex-shrink-0">
@@ -180,28 +179,18 @@ export function ServerCartContent({
               <div className="flex-1">
                 <div className="flex justify-between">
                   <div>
-                    <Link href={`/product/${item.product.slug?.current}`}>
+                    <Link href={`/product/${item.product.slug}`}>
                       <h3 className="font-semibold hover:text-primary transition-colors">
                         {item.product.name}
                       </h3>
                     </Link>
                     {item.product.categories && (
                       <div className="flex gap-2 mt-1">
-                        {item.product.categories?.slice(0, 2).map(
-                          (
-                            category: {
-                              _ref?: string;
-                              _type?: string;
-                              name?: string;
-                              title?: string;
-                            },
-                            idx: number,
-                          ) => (
-                            <Badge key={idx} variant="secondary" className="text-xs">
-                              {category?.name || category?.title || 'Category'}
-                            </Badge>
-                          ),
-                        )}
+                        {item.product.categories?.slice(0, 2).map((ct, idx: number) => (
+                          <Badge key={idx} variant="secondary" className="text-xs">
+                            {ct || 'Category'}
+                          </Badge>
+                        ))}
                       </div>
                     )}
                   </div>

@@ -1,5 +1,5 @@
 import stripe from '@/lib/stripe';
-import { writeClient } from '@/sanity/lib/client';
+import { writeClient } from '@/lib/axiosClient';
 import { currentUser } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
 

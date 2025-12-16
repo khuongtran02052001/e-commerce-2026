@@ -1,392 +1,166 @@
-// import { unstable_cache } from "next/cache";
-// import { sanityFetch } from "../lib/live";
-// import {
-//   ADDRESS_QUERY,
-//   ALL_PRODUCTS_QUERY,
-//   ALLCATEGORIES_QUERY,
-//   ADMIN_CATEGORIES_QUERY,
-//   BANNER_QUERY,
-//   BLOG_CATEGORIES,
-//   BRAND_QUERY,
-//   BRANDS_QUERY,
-//   DEAL_PRODUCTS,
-//   FEATURE_PRODUCTS,
-//   FEATURED_CATEGORY_QUERY,
-//   GET_ALL_BLOG,
-//   LATEST_BLOG_QUERY,
-//   OTHERS_BLOG_QUERY,
-//   PRODUCT_BY_SLUG_QUERY,
-//   RELATED_PRODUCTS_QUERY,
-//   SINGLE_BLOG_QUERY,
-// } from "./query";
-// import { getOrderById } from "./userQueries";
+import axiosClient from '@/lib/axiosClient';
+import { unstable_cache } from 'next/cache';
 
-// // ============================================================================
-// // CACHED DATA FETCHERS - Next.js 16 Caching Revolution
-// // ============================================================================
+/**
+ * Helper wrapper for axios get
+ */
+async function fetchApi<T>(url: string, params: any = {}): Promise<T | null> {
+  try {
+    const { data } = await axiosClient.get(url, { params });
+    return data ?? null;
+  } catch (error) {
+    console.error(`API ERROR (${url}):`, error);
+    return null;
+  }
+}
 
-// // ============================================================================
-// // CACHED DATA FETCHERS - Next.js 16 Caching Revolution
-// // ============================================================================
+/* ============================================================
+    BANNERS (Cached 5 min)
+============================================================ */
+export const getBanner = unstable_cache(async () => await fetchApi('/banners'), ['banner'], {
+  revalidate: 300,
+});
 
-// /**
-//  * Get banner data - cached for 5 minutes
-//  * Banners change infrequently, safe to cache
-//  */
-// const getBanner = unstable_cache(
-//   async () => {
-//     try {
-//       const { data } = await sanityFetch({ query: BANNER_QUERY });
-//       return data ?? [];
-//     } catch (error) {
-//       console.error("Error fetching sale banner:", error);
-//       return [];
-//     }
-//   },
-//   ["banner"],
-//   { revalidate: 300, tags: ["homepage", "banners"] }
-// );
+/* ============================================================
+    FEATURED CATEGORIES (Cached 15 min)
+============================================================ */
+export const getFeaturedCategory = unstable_cache(
+  async (quantity: number) => await fetchApi('/categories/featured', { quantity }),
+  ['featured-categories'],
+  { revalidate: 900 },
+);
 
-// /**
-//  * Get featured categories - cached for 15 minutes
-//  * Featured categories are relatively static
-//  */
-// const getFeaturedCategory = unstable_cache(
-//   async (quantity: number) => {
-//     try {
-//       const { data } = await sanityFetch({
-//         query: FEATURED_CATEGORY_QUERY,
-//         params: { quantity },
-//       });
-//       return data ?? [];
-//     } catch (error) {
-//       console.error("Error fetching featured category:", error);
-//       return [];
-//     }
-//   },
-//   ["featured-categories"],
-//   { revalidate: 900, tags: ["categories", "featured", "homepage"] }
-// );
+/* ============================================================
+    ALL PRODUCTS (Cached 10 min)
+============================================================ */
+export const getAllProducts = unstable_cache(
+  async () => await fetchApi('/products'),
+  ['all-products'],
+  { revalidate: 600 },
+);
 
-// /**
-//  * Get all products - cached for 10 minutes
-//  * Product list updates moderately often
-//  */
-// const getAllProducts = unstable_cache(
-//   async () => {
-//     try {
-//       const { data } = await sanityFetch({ query: ALL_PRODUCTS_QUERY });
-//       return data ?? [];
-//     } catch (error) {
-//       console.log("Error fetching all products:", error);
-//       return [];
-//     }
-//   },
-//   ["all-products"],
-//   { revalidate: 600, tags: ["products"] }
-// );
+/* ============================================================
+    DEAL PRODUCTS (Cached 5 min)
+============================================================ */
+export const getDealProducts = unstable_cache(
+  async () => await fetchApi('/products/deals'),
+  ['deal-products'],
+  { revalidate: 300 },
+);
 
-// /**
-//  * Get deal products - cached for 5 minutes
-//  * Deals may change frequently
-//  */
-// const getDealProducts = unstable_cache(
-//   async () => {
-//     try {
-//       const { data } = await sanityFetch({ query: DEAL_PRODUCTS });
-//       return data ?? [];
-//     } catch (error) {
-//       console.log("Error fetching deal products:", error);
-//       return [];
-//     }
-//   },
-//   ["deal-products"],
-//   { revalidate: 300, tags: ["products", "deals", "homepage"] }
-// );
+/* ============================================================
+    FEATURED PRODUCTS (Cached 10 min)
+============================================================ */
+export const getFeaturedProducts = unstable_cache(
+  async () => await fetchApi('/products/featured'),
+  ['featured-products'],
+  { revalidate: 600 },
+);
 
-// /**
-//  * Get featured products - cached for 10 minutes
-//  * Featured products are manually curated
-//  */
-// const getFeaturedProducts = unstable_cache(
-//   async () => {
-//     try {
-//       const { data } = await sanityFetch({ query: FEATURE_PRODUCTS });
-//       return data ?? [];
-//     } catch (error) {
-//       console.log("Error fetching featured products:", error);
-//       return [];
-//     }
-//   },
-//   ["featured-products"],
-//   { revalidate: 600, tags: ["products", "featured", "homepage"] }
-// );
+/* ============================================================
+    ALL BRANDS (Cached 1 hour)
+============================================================ */
+export const getAllBrands = unstable_cache(async () => await fetchApi('/brands'), ['all-brands'], {
+  revalidate: 3600,
+});
 
-// /**
-//  * Get all brands - cached for 1 hour
-//  * Brand list rarely changes
-//  */
-// const getAllBrands = unstable_cache(
-//   async () => {
-//     try {
-//       const { data } = await sanityFetch({ query: BRANDS_QUERY });
-//       return data ?? [];
-//     } catch (error) {
-//       console.log("Error fetching all brands:", error);
-//       return [];
-//     }
-//   },
-//   ["all-brands"],
-//   { revalidate: 3600, tags: ["brands"] }
-// );
+/* ============================================================
+    LATEST BLOGS (Cached 5 min)
+============================================================ */
+export const getLatestBlogs = unstable_cache(
+  async () => await fetchApi('/blogs/latest'),
+  ['latest-blogs'],
+  { revalidate: 300 },
+);
 
-// /**
-//  * Get latest blogs - cached for 5 minutes
-//  * Blog content updates regularly
-//  */
-// const getLatestBlogs = unstable_cache(
-//   async () => {
-//     try {
-//       const { data } = await sanityFetch({ query: LATEST_BLOG_QUERY });
-//       return data ?? [];
-//     } catch (error) {
-//       console.log("Error fetching latest blogs:", error);
-//       return [];
-//     }
-//   },
-//   ["latest-blogs"],
-//   { revalidate: 300, tags: ["blogs", "homepage"] }
-// );
+/* ============================================================
+    ALL BLOGS (Cached 10 min)
+============================================================ */
+export const getAllBlogs = unstable_cache(
+  async (quantity: number) => await fetchApi('/blogs', { quantity }),
+  ['all-blogs'],
+  { revalidate: 600 },
+);
 
-// /**
-//  * Get all blogs with limit - cached for 10 minutes
-//  */
-// const getAllBlogs = unstable_cache(
-//   async (quantity: number) => {
-//     try {
-//       const { data } = await sanityFetch({
-//         query: GET_ALL_BLOG,
-//         params: { quantity },
-//       });
-//       return data ?? [];
-//     } catch (error) {
-//       console.log("Error fetching all blogs:", error);
-//       return [];
-//     }
-//   },
-//   ["all-blogs"],
-//   { revalidate: 600, tags: ["blogs"] }
-// );
+/* ============================================================
+    SINGLE BLOG (Cached 30 min)
+============================================================ */
+export const getSingleBlog = unstable_cache(
+  async (slug: string) => await fetchApi(`/blogs/${slug}`),
+  ['single-blog'],
+  { revalidate: 1800 },
+);
 
-// /**
-//  * Get single blog by slug - cached for 30 minutes
-//  * Individual blog posts don't change often
-//  */
-// const getSingleBlog = unstable_cache(
-//   async (slug: string) => {
-//     try {
-//       const { data } = await sanityFetch({
-//         query: SINGLE_BLOG_QUERY,
-//         params: { slug },
-//       });
-//       return data ?? [];
-//     } catch (error) {
-//       console.log("Error fetching blog:", error);
-//       return [];
-//     }
-//   },
-//   ["single-blog"],
-//   { revalidate: 1800, tags: ["blogs"] }
-// );
+/* ============================================================
+    BLOG CATEGORIES (Cached 1 hour)
+============================================================ */
+export const getBlogCategories = unstable_cache(
+  async () => await fetchApi('/blog-categories'),
+  ['blog-categories'],
+  { revalidate: 3600 },
+);
 
-// /**
-//  * Get blog categories - cached for 1 hour
-//  * Blog categories rarely change
-//  */
-// const getBlogCategories = unstable_cache(
-//   async () => {
-//     try {
-//       const { data } = await sanityFetch({
-//         query: BLOG_CATEGORIES,
-//       });
-//       return data ?? [];
-//     } catch (error) {
-//       console.log("Error fetching blog categories:", error);
-//       return [];
-//     }
-//   },
-//   ["blog-categories"],
-//   { revalidate: 3600, tags: ["blogs"] }
-// );
+/* ============================================================
+    OTHER BLOGS (Cached 10 min)
+============================================================ */
+export const getOthersBlog = unstable_cache(
+  async (slug: string, quantity: number) => await fetchApi('/blogs/others', { slug, quantity }),
+  ['others-blog'],
+  { revalidate: 600 },
+);
 
-// /**
-//  * Get other blogs (excluding current) - cached for 10 minutes
-//  */
-// const getOthersBlog = unstable_cache(
-//   async (slug: string, quantity: number) => {
-//     try {
-//       const { data } = await sanityFetch({
-//         query: OTHERS_BLOG_QUERY,
-//         params: { slug, quantity },
-//       });
-//       return data ?? [];
-//     } catch (error) {
-//       console.log("Error fetching other blogs:", error);
-//       return [];
-//     }
-//   },
-//   ["others-blog"],
-//   { revalidate: 600, tags: ["blogs"] }
-// );
+/* ============================================================
+    ADDRESSES (No Cache — User Data)
+============================================================ */
+export const getAddresses = async (userId: string) => await fetchApi(`/users/${userId}/addresses`);
 
-// /**
-//  * Get addresses - not cached (user-specific data)
-//  */
-// const getAddresses = async () => {
-//   try {
-//     const { data } = await sanityFetch({
-//       query: ADDRESS_QUERY,
-//     });
-//     return data ?? [];
-//   } catch (error) {
-//     console.log("Error fetching address:", error);
-//     return [];
-//   }
-// };
+/* ============================================================
+    CATEGORIES WITH PRODUCT COUNT (Cached 15 min)
+============================================================ */
+export const getCategories = unstable_cache(
+  async (quantity?: number) => await fetchApi('/categories', { quantity }),
+  ['categories-list'],
+  { revalidate: 900 },
+);
 
-// /**
-//  * Get categories - cached for 15 minutes
-//  * Category structure is relatively static
-//  */
-// const getCategories = unstable_cache(
-//   async (quantity?: number) => {
-//     try {
-//       const query = quantity
-//         ? `*[_type == 'category'] | order(name asc) [0...$quantity] {
-//             ...,
-//             "productCount": count(*[_type == "product" && references(^._id)])
-//           }`
-//         : `*[_type == 'category'] | order(name asc) {
-//             ...,
-//             "productCount": count(*[_type == "product" && references(^._id)])
-//           }`;
+/* ============================================================
+    ADMIN CATEGORIES (No Cache)
+============================================================ */
+export const getAdminCategories = async () => await fetchApi('/admin/categories');
 
-//       const { data } = await sanityFetch({
-//         query,
-//         params: quantity ? { quantity } : {},
-//       });
+/* ============================================================
+    PRODUCT BY SLUG (Cached 30 min)
+============================================================ */
+export const getProductBySlug = unstable_cache(
+  async (slug: string) => await fetchApi(`/products/${slug}`),
+  ['product-by-slug'],
+  { revalidate: 1800 },
+);
 
-//       return data ?? [];
-//     } catch (error) {
-//       console.log("Error fetching categories with product count:", error);
-//       return [];
-//     }
-//   },
-//   ["categories-list"],
-//   { revalidate: 900, tags: ["categories", "navigation"] }
-// );
+/* ============================================================
+    BRAND BY SLUG (Cached 30 min)
+============================================================ */
+export const getBrand = unstable_cache(
+  async (slug: string) => await fetchApi(`/brands/${slug}`),
+  ['brand-by-slug'],
+  { revalidate: 1800 },
+);
 
-// /**
-//  * Get admin categories - not cached (admin data needs to be fresh)
-//  */
-// const getAdminCategories = async () => {
-//   try {
-//     const { data } = await sanityFetch({ query: ADMIN_CATEGORIES_QUERY });
-//     return data ?? [];
-//   } catch (error) {
-//     console.error("Error fetching admin categories:", error);
-//     return [];
-//   }
-// };
+/* ============================================================
+    RELATED PRODUCTS (Cached 15 min)
+============================================================ */
+export const getRelatedProducts = unstable_cache(
+  async (categoryIds: string[], currentSlug: string, limit: number = 4) =>
+    await fetchApi('/products/related', {
+      categoryIds: JSON.stringify(categoryIds),
+      currentSlug,
+      limit,
+    }),
+  ['related-products'],
+  { revalidate: 900 },
+);
 
-// /**
-//  * Get product by slug - cached for 30 minutes
-//  * Product details don't change frequently
-//  */
-// const getProductBySlug = unstable_cache(
-//   async (slug: string) => {
-//     try {
-//       const product = await sanityFetch({
-//         query: PRODUCT_BY_SLUG_QUERY,
-//         params: {
-//           slug,
-//         },
-//       });
-//       return product?.data || null;
-//     } catch (error) {
-//       console.error("Error fetching product by slug:", error);
-//       return null;
-//     }
-//   },
-//   ["product-by-slug"],
-//   { revalidate: 1800, tags: ["products", "reviews"] }
-// );
-
-// /**
-//  * Get brand by slug - cached for 30 minutes
-//  * Brand info rarely changes
-//  */
-// const getBrand = unstable_cache(
-//   async (slug: string) => {
-//     try {
-//       const product = await sanityFetch({
-//         query: BRAND_QUERY,
-//         params: {
-//           slug,
-//         },
-//       });
-//       return product?.data || null;
-//     } catch (error) {
-//       console.error("Error fetching brand by slug:", error);
-//       return null;
-//     }
-//   },
-//   ["brand-by-slug"],
-//   { revalidate: 1800, tags: ["brands"] }
-// );
-
-// /**
-//  * Get related products - cached for 15 minutes
-//  * Related products are dynamic but can be cached briefly
-//  */
-// const getRelatedProducts = unstable_cache(
-//   async (categoryIds: string[], currentSlug: string, limit: number = 4) => {
-//     try {
-//       const { data } = await sanityFetch({
-//         query: RELATED_PRODUCTS_QUERY,
-//         params: {
-//           categoryIds,
-//           currentSlug,
-//           limit,
-//         },
-//       });
-//       return data ?? [];
-//     } catch (error) {
-//       console.error("Error fetching related products:", error);
-//       return [];
-//     }
-//   },
-//   ["related-products"],
-//   { revalidate: 900, tags: ["products"] }
-// );
-
-// export {
-//   getBanner,
-//   getFeaturedCategory,
-//   getAllProducts,
-//   getDealProducts,
-//   getFeaturedProducts,
-//   getAllBrands,
-//   getLatestBlogs,
-//   getSingleBlog,
-//   getAllBlogs,
-//   getBlogCategories,
-//   getOthersBlog,
-//   getAddresses,
-//   getCategories,
-//   getAdminCategories,
-//   getProductBySlug,
-//   getBrand,
-//   getRelatedProducts,
-//   getOrderById,
-// };
+/* ============================================================
+    SINGLE ORDER (UNCACHED - from userQueries)
+============================================================ */
+export const getOrderById = async (orderId: string) => await fetchApi(`/orders/${orderId}`);

@@ -2,20 +2,20 @@
 
 import QuantityButtons from '@/components/QuantityButtons';
 import { Button } from '@/components/ui/button';
-import { Product } from '@/sanity.types';
+import { IProductMock } from '@/mock-data';
 import useCartStore from '@/store';
 import { Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface CartItemControlsProps {
-  product: Product;
+  product: IProductMock;
 }
 
 export function CartItemControls({ product }: CartItemControlsProps) {
   const { deleteCartProduct } = useCartStore();
 
   const handleRemove = () => {
-    deleteCartProduct(product._id);
+    deleteCartProduct(product.id);
     toast.success('Item removed from cart');
   };
 

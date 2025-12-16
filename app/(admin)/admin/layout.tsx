@@ -20,11 +20,11 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
   const isAdmin = useIsAdmin(user?.primaryEmailAddress?.emailAddress);
 
   // Redirect non-admin users
-  useEffect(() => {
-    if (isLoaded && !isAdmin) {
-      router.push('/admin/access-denied');
-    }
-  }, [isLoaded, isAdmin, router]);
+  // useEffect(() => {
+  //   if (isLoaded && !isAdmin) {
+  //     router.push('/admin/access-denied');
+  //   }
+  // }, [isLoaded, isAdmin, router]);
 
   // Show loading while checking authentication
   if (!isLoaded) {
@@ -38,9 +38,9 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
   }
 
   // If not admin, don't render anything (redirect will happen)
-  if (!isAdmin) {
-    return null;
-  }
+  // if (!isAdmin) {
+  //   return null;
+  // }
 
   return (
     <div className="min-h-screen">

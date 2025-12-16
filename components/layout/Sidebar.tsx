@@ -1,7 +1,9 @@
+'use client';
+
 import { categoriesData } from '@/constants';
+import { useUserData } from '@/contexts/UserDataContext';
 import { useOutsideClick } from '@/hooks';
 import useStore from '@/store';
-import { ClerkLoaded, SignedIn } from '@clerk/nextjs';
 import {
   BookOpen,
   Flame,
@@ -36,7 +38,9 @@ const Sidebar: FC<SidebarProps> = ({ isOpen, onClose }) => {
   const sidebarRef = useOutsideClick<HTMLDivElement>(onClose);
   const { items, favoriteProduct } = useStore();
 
-  // Enhanced menu sections with icons
+  const { currentUser: user } = useUserData();
+  const isSignedIn = !!user; // replaces ClerkSignedIn
+
   const userMenuItems = [
     { title: 'My Account', href: '/account', icon: User },
     { title: 'My Orders', href: '/orders', icon: Package },
@@ -89,14 +93,15 @@ const Sidebar: FC<SidebarProps> = ({ isOpen, onClose }) => {
             Quick Access
           </h3>
           <div className="grid grid-cols-3 gap-3">
-            {/* Shopping Cart */}
+            {/* Cart */}
             <Link
               onClick={onClose}
               href="/cart"
-              className="flex flex-col items-center gap-2 p-3 rounded-lg bg-shop_dark_green/30 hover:bg-shop_dark_green/50 transition-colors duration-200 text-center relative"
+              className="flex flex-col items-center gap-2 p-3 rounded-lg bg-shop_dark_green/30 hover:bg-shop_dark_green/50 transition-colors text-center relative"
             >
               <ShoppingCart size={20} className="text-shop_light_green" />
               <span className="text-xs font-medium text-zinc-300">Cart</span>
+
               {items?.length > 0 && (
                 <span className="absolute -top-1 -right-1 bg-shop_btn_dark_green text-white h-4 w-4 rounded-full text-xs font-semibold flex items-center justify-center">
                   {items.length}
@@ -108,10 +113,11 @@ const Sidebar: FC<SidebarProps> = ({ isOpen, onClose }) => {
             <Link
               onClick={onClose}
               href="/wishlist"
-              className="flex flex-col items-center gap-2 p-3 rounded-lg bg-shop_dark_green/30 hover:bg-shop_dark_green/50 transition-colors duration-200 text-center relative"
+              className="flex flex-col items-center gap-2 p-3 rounded-lg bg-shop_dark_green/30 hover:bg-shop_dark_green/50 transition-colors text-center relative"
             >
               <Heart size={20} className="text-pink-400" />
               <span className="text-xs font-medium text-zinc-300">Wishlist</span>
+
               {favoriteProduct?.length > 0 && (
                 <span className="absolute -top-1 -right-1 bg-pink-500 text-white h-4 w-4 rounded-full text-xs font-semibold flex items-center justify-center">
                   {favoriteProduct.length}
@@ -119,23 +125,21 @@ const Sidebar: FC<SidebarProps> = ({ isOpen, onClose }) => {
               )}
             </Link>
 
-            {/* Orders */}
-            <ClerkLoaded>
-              <SignedIn>
-                <Link
-                  onClick={onClose}
-                  href="/user/orders"
-                  className="flex flex-col items-center gap-2 p-3 rounded-lg bg-shop_dark_green/30 hover:bg-shop_dark_green/50 transition-colors duration-200 text-center"
-                >
-                  <Logs size={20} className="text-blue-400" />
-                  <span className="text-xs font-medium text-zinc-300">Orders</span>
-                </Link>
-              </SignedIn>
-            </ClerkLoaded>
+            {/* Orders (ClerkSignedIn → NextAuth SignedIn) */}
+            {isSignedIn && (
+              <Link
+                onClick={onClose}
+                href="/user/orders"
+                className="flex flex-col items-center gap-2 p-3 rounded-lg bg-shop_dark_green/30 hover:bg-shop_dark_green/50 transition-colors text-center"
+              >
+                <Logs size={20} className="text-blue-400" />
+                <span className="text-xs font-medium text-zinc-300">Orders</span>
+              </Link>
+            )}
           </div>
         </div>
 
-        {/* User Section */}
+        {/* My Account */}
         <div className="space-y-3">
           <h3 className="text-sm font-semibold text-shop_light_green uppercase tracking-wider">
             My Account
@@ -162,9 +166,9 @@ const Sidebar: FC<SidebarProps> = ({ isOpen, onClose }) => {
           </div>
         </div>
 
-        {/* Main Navigation */}
+        {/* Main navigation */}
         <div className="space-y-3">
-          <h3 className="text-sm font-semibold text-shop_light_green uppercase tracking-wider">
+          <h3 className="text-sm font-semibold text-shop_light_light_green uppercase tracking-wider">
             Navigation
           </h3>
           <div className="flex flex-col gap-2">
@@ -189,7 +193,7 @@ const Sidebar: FC<SidebarProps> = ({ isOpen, onClose }) => {
           </div>
         </div>
 
-        {/* Categories Section */}
+        {/* Categories */}
         <div className="space-y-3">
           <h3 className="text-sm font-semibold text-shop_light_green uppercase tracking-wider">
             Popular Categories
@@ -200,7 +204,7 @@ const Sidebar: FC<SidebarProps> = ({ isOpen, onClose }) => {
                 onClick={onClose}
                 key={item.title}
                 href={`/category/${item.href}`}
-                className="text-xs font-medium text-zinc-400 hover:text-shop_light_green transition-colors duration-200 py-1.5 px-2 rounded hover:bg-shop_dark_green/20 capitalize"
+                className="text-xs font-medium text-zinc-400 hover:text-shop_light_green transition-colors py-1.5 px-2 rounded hover:bg-shop_dark_green/20 capitalize"
               >
                 {item.title}
               </Link>
@@ -208,7 +212,7 @@ const Sidebar: FC<SidebarProps> = ({ isOpen, onClose }) => {
             <Link
               onClick={onClose}
               href="/category"
-              className="text-xs font-semibold text-shop_orange hover:text-shop_light_orange transition-colors duration-200 py-1.5 px-2 rounded hover:bg-shop_dark_green/20 mt-1"
+              className="text-xs font-semibold text-shop_orange hover:text-shop_light_orange transition-colors py-1.5 px-2 rounded hover:bg-shop_dark_green/20 mt-1"
             >
               View All Categories →
             </Link>
@@ -224,15 +228,16 @@ const Sidebar: FC<SidebarProps> = ({ isOpen, onClose }) => {
             <Link
               onClick={onClose}
               href="/deal"
-              className="flex flex-col items-center gap-1 p-3 rounded-lg bg-shop_dark_green/30 hover:bg-shop_dark_green/50 transition-colors duration-200 text-center"
+              className="flex flex-col items-center gap-1 p-3 rounded-lg bg-shop_dark_green/30 hover:bg-shop_dark_green/50 transition-colors text-center"
             >
               <Flame size={20} className="text-shop_orange" />
               <span className="text-xs font-medium text-zinc-300">Hot Deals</span>
             </Link>
+
             <Link
               onClick={onClose}
               href="/wishlist"
-              className="flex flex-col items-center gap-1 p-3 rounded-lg bg-shop_dark_green/30 hover:bg-shop_dark_green/50 transition-colors duration-200 text-center"
+              className="flex flex-col items-center gap-1 p-3 rounded-lg bg-shop_dark_green/30 hover:bg-shop_dark_green/50 transition-colors text-center"
             >
               <Heart size={20} className="text-shop_light_green" />
               <span className="text-xs font-medium text-zinc-300">Wishlist</span>
@@ -240,7 +245,7 @@ const Sidebar: FC<SidebarProps> = ({ isOpen, onClose }) => {
           </div>
         </div>
 
-        {/* Support Section */}
+        {/* Support */}
         <div className="space-y-3">
           <h3 className="text-sm font-semibold text-shop_light_green uppercase tracking-wider">
             Support
@@ -270,7 +275,7 @@ const Sidebar: FC<SidebarProps> = ({ isOpen, onClose }) => {
         {/* Divider */}
         <div className="border-t border-shop_dark_green my-2"></div>
 
-        {/* Promotional Banner */}
+        {/* Promo */}
         <div className="bg-gradient-to-r from-shop_dark_green to-shop_btn_dark_green rounded-lg p-4 text-center">
           <h4 className="text-sm font-bold text-shop_light_green mb-1">Special Offer!</h4>
           <p className="text-xs text-zinc-300 mb-2">Get 20% off on your first order</p>
@@ -283,7 +288,7 @@ const Sidebar: FC<SidebarProps> = ({ isOpen, onClose }) => {
           </Link>
         </div>
 
-        {/* Social Media */}
+        {/* Social */}
         <div className="mt-4">
           <h3 className="text-sm font-semibold text-shop_light_green uppercase tracking-wider mb-3">
             Follow Us

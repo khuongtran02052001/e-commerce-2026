@@ -1,9 +1,11 @@
 'use client';
 
-import { useUser } from '@clerk/nextjs';
+import { User } from 'next-auth';
+import { useSession } from 'next-auth/react';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
 interface UserData {
+  currentUser: User | null;
   ordersCount: number;
   isEmployee: boolean;
   unreadNotifications: number;
@@ -17,14 +19,17 @@ interface UserDataContextType extends UserData {
 
 const UserDataContext = createContext<UserDataContextType | undefined>(undefined);
 
-// Cache for user data to prevent unnecessary API calls
-let cachedData: UserData | null = null;
+let cachedData: Omit<UserData, 'isLoading'> | null = null;
 let cacheTimestamp = 0;
-const CACHE_DURATION = 30000; // 30 seconds
+const CACHE_DURATION = 30000;
 
 export function UserDataProvider({ children }: { children: React.ReactNode }) {
-  const { user, isLoaded } = useUser();
+  const { data: session, status } = useSession();
+  const sessionUser = session?.user;
+  const isSessionLoaded = status !== 'loading';
+
   const [userData, setUserData] = useState<UserData>({
+    currentUser: null,
     ordersCount: 0,
     isEmployee: false,
     unreadNotifications: 0,
@@ -32,68 +37,57 @@ export function UserDataProvider({ children }: { children: React.ReactNode }) {
     isLoading: false,
   });
 
-  const fetchUserData = useCallback(
+  const loadUserStats = useCallback(
     async (forceRefresh = false) => {
-      if (!user || !isLoaded) return;
+      if (!sessionUser || !isSessionLoaded) return;
 
-      // Use cached data if available and not expired
       const now = Date.now();
       if (!forceRefresh && cachedData && now - cacheTimestamp < CACHE_DURATION) {
-        setUserData(cachedData);
+        setUserData((prev) => ({ ...prev, ...cachedData }));
         return;
       }
 
       setUserData((prev) => ({ ...prev, isLoading: true }));
 
       try {
-        // Fetch all user data in a single optimized API call
         const response = await fetch('/api/user/combined-data', {
-          headers: { 'Content-Type': 'application/json' },
           cache: 'no-store',
         });
 
-        if (response.ok) {
-          const data = await response.json();
+        const data = await response.json();
 
-          const newUserData = {
-            ordersCount: data.ordersCount || 0,
-            isEmployee: data.isEmployee || false,
-            unreadNotifications: data.unreadNotifications || 0,
-            walletBalance: data.walletBalance || 0,
-            isLoading: false,
-          };
+        const newUserData: Omit<UserData, 'isLoading'> = {
+          currentUser: sessionUser,
+          ordersCount: data.ordersCount ?? 0,
+          isEmployee: data.isEmployee ?? false,
+          unreadNotifications: data.unreadNotifications ?? 0,
+          walletBalance: data.walletBalance ?? 0,
+        };
 
-          // Update cache
-          cachedData = newUserData;
-          cacheTimestamp = now;
+        cachedData = newUserData;
+        cacheTimestamp = now;
 
-          setUserData(newUserData);
-        } else {
-          setUserData((prev) => ({ ...prev, isLoading: false }));
-        }
-      } catch (error) {
-        console.error('Error fetching user data:', error);
+        setUserData((prev) => ({ ...prev, ...newUserData, isLoading: false }));
+      } catch (e) {
+        console.error('Failed to load user stats:', e);
         setUserData((prev) => ({ ...prev, isLoading: false }));
       }
     },
-    [user, isLoaded],
+    [sessionUser, isSessionLoaded],
   );
 
   useEffect(() => {
-    if (isLoaded && user) {
-      fetchUserData();
+    if (isSessionLoaded && sessionUser) {
+      setUserData((prev) => ({ ...prev, currentUser: sessionUser }));
+      loadUserStats();
     }
-  }, [user, isLoaded, fetchUserData]);
-
-  const refreshUserData = useCallback(async () => {
-    await fetchUserData(true);
-  }, [fetchUserData]);
+  }, [isSessionLoaded, sessionUser, loadUserStats]);
 
   return (
     <UserDataContext.Provider
       value={{
         ...userData,
-        refreshUserData,
+        refreshUserData: () => loadUserStats(true),
       }}
     >
       {children}
@@ -102,9 +96,7 @@ export function UserDataProvider({ children }: { children: React.ReactNode }) {
 }
 
 export function useUserData() {
-  const context = useContext(UserDataContext);
-  if (context === undefined) {
-    throw new Error('useUserData must be used within a UserDataProvider');
-  }
-  return context;
+  const ctx = useContext(UserDataContext);
+  if (!ctx) throw new Error('useUserData must be used within UserDataProvider');
+  return ctx;
 }

@@ -1,6 +1,6 @@
 'use server';
 
-import { client } from '@/sanity/lib/client';
+import { client } from '@/lib/axiosClient';
 import { auth } from '@clerk/nextjs/server';
 import { revalidatePath } from 'next/cache';
 

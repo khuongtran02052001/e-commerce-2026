@@ -12,7 +12,7 @@ export const safeApiCall = async (url: string, options?: RequestInit) => {
       },
     });
 
-    // Check if response is ok
+    // Check if response is ok  
     if (!response.ok) {
       // Try to get error details from response body
       let errorDetails = '';

@@ -1,6 +1,6 @@
 'use server';
 
-import { client, writeClient } from '@/sanity/lib/client';
+import { client, writeClient } from '@/lib/axiosClient';
 
 interface SubscriptionData {
   email: string;

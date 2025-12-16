@@ -1,5 +1,5 @@
 import { isUserAdmin } from '@/lib/adminUtils';
-import { client } from '@/sanity/lib/client';
+import { client } from '@/lib/axiosClient';
 import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 

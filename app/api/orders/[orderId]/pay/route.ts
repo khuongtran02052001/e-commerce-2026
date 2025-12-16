@@ -1,5 +1,5 @@
 import { ORDER_STATUSES, PAYMENT_STATUSES } from '@/lib/orderStatus';
-import { client } from '@/sanity/lib/client';
+import { client } from '@/lib/axiosClient';
 import { urlFor } from '@/sanity/lib/image';
 import { auth, currentUser } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';

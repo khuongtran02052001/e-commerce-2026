@@ -1,64 +1,75 @@
-import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
+import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
+import { auth } from './lib/auth';
 
-const isProtectedRoute = createRouteMatcher([
-  '/user(.*)',
-  '/cart(.*)',
-  '/wishlist(.*)',
-  '/success(.*)',
-  '/checkout(.*)',
-  '/settings(.*)',
-  '/admin(.*)',
-]);
+const protectedRoutes = [
+  '/user',
+  '/cart',
+  '/wishlist',
+  '/success',
+  '/checkout',
+  '/settings',
+  '/admin',
+];
 
-const isAdminRoute = createRouteMatcher(['/admin(.*)']);
+const adminRoutes = ['/admin'];
 
-// Helper function to check if user is admin
-const isUserAdmin = (userEmail: string | null | undefined): boolean => {
-  if (!userEmail) return false;
+function isRoute(req: NextRequest, patterns: string[]) {
+  const pathname = req.nextUrl.pathname;
+  return patterns.some((p) => pathname.startsWith(p));
+}
 
-  const adminEmailsEnv = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
-  if (!adminEmailsEnv) return false;
+function isUserAdmin(email?: string | null) {
+  if (!email) return false;
 
-  try {
-    const adminEmails = adminEmailsEnv
-      .replace(/[\[\]]/g, '') // Remove brackets if present
-      .split(',')
-      .map((email) => email.trim().toLowerCase())
-      .filter((email) => email.length > 0);
+  const env = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+  if (!env) return false;
 
-    return adminEmails.includes(userEmail.toLowerCase());
-  } catch (error) {
-    console.error('Error parsing admin emails:', error);
-    return false;
+  const adminEmails = env
+    .replace(/[\[\]]/g, '')
+    .split(',')
+    .map((i) => i.trim().toLowerCase());
+
+  return adminEmails.includes(email.toLowerCase());
+}
+
+export default async function middleware(req: NextRequest) {
+  const url = req.nextUrl.clone();
+  const pathname = url.pathname;
+
+  // Same as Clerk's `await auth.protect()`
+  const session = await auth();
+
+  // 1️⃣ PROTECTED ROUTES (same as Clerk)
+  if (isRoute(req, protectedRoutes)) {
+    if (!session?.user) {
+      url.pathname = '/login';
+      return NextResponse.redirect(url);
+    }
   }
-};
 
-export default clerkMiddleware(async (auth, req) => {
-  if (isProtectedRoute(req)) {
-    await auth.protect();
-  }
-
-  // Additional check for admin routes
-  if (isAdminRoute(req)) {
-    const { userId } = await auth();
-
-    if (!userId) {
-      return NextResponse.redirect(new URL('/sign-in', req.url));
+  // 2️⃣ ADMIN ROUTES — must login + must be admin
+  if (isRoute(req, adminRoutes)) {
+    // Clerk: if (!userId) redirect
+    if (!session?.user) {
+      url.pathname = '/login';
+      return NextResponse.redirect(url);
     }
 
-    // Get user's email from Clerk
-    // Note: In middleware, we can't easily access the full user object
-    // The client-side check in the admin page component will handle the detailed verification
-    // This middleware primarily ensures authentication is required for admin routes
+    // Clerk FE admin email check → NextAuth middleware does it directly
+    const email = session.user.email;
+    if (!isUserAdmin(email)) {
+      url.pathname = '/403';
+      return NextResponse.redirect(url);
+    }
   }
-});
+
+  return NextResponse.next();
+}
 
 export const config = {
   matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
     '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
-    // Always run for API routes
     '/(api|trpc)(.*)',
   ],
 };

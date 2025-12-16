@@ -1,39 +1,39 @@
-import { defineQuery } from 'next-sanity';
-import { writeClient } from '../lib/client';
-import { sanityFetch } from '../lib/live';
+import axiosClient from '@/lib/axiosClient';
+
+/* ============================================================
+   1. Get products by category slug
+============================================================ */
 
 export const getProductsByCategory = async (categorySlug: string) => {
-  const PRODUCT_BY_CATEGORY_QUERY = defineQuery(
-    `*[_type == 'product' && references(*[_type == "category" && slug.current == $categorySlug]._id)] | order(name asc)`,
-  );
   try {
-    const products = await sanityFetch({
-      query: PRODUCT_BY_CATEGORY_QUERY,
-      params: {
-        categorySlug,
-      },
+    const data = await axiosClient.get('/products/by-category', {
+      params: { slug: categorySlug },
     });
-    return products?.data || [];
+    return data.data || [];
   } catch (error) {
     console.error('Error fetching products by category:', error);
     return [];
   }
 };
+
+/* ============================================================
+   2. Get sale products
+============================================================ */
 
 export const getSale = async () => {
-  const SALE_QUERY = defineQuery(`*[_type == 'sale'] | order(name asc)`);
   try {
-    const products = await sanityFetch({
-      query: SALE_QUERY,
-    });
-    return products?.data || [];
+    const data = await axiosClient.get('/products/sale');
+    return data.data || [];
   } catch (error) {
-    console.error('Error fetching products by category:', error);
+    console.error('Error fetching sale products:', error);
     return [];
   }
 };
 
-// Contact message functions
+/* ============================================================
+   3. Save contact message
+============================================================ */
+
 export const saveContactMessage = async (contactData: {
   name: string;
   email: string;
@@ -43,8 +43,7 @@ export const saveContactMessage = async (contactData: {
   userAgent?: string;
 }) => {
   try {
-    const doc = {
-      _type: 'contact',
+    const payload = {
       name: contactData.name,
       email: contactData.email,
       subject: contactData.subject,
@@ -56,69 +55,40 @@ export const saveContactMessage = async (contactData: {
       userAgent: contactData.userAgent || '',
     };
 
-    const result = await writeClient.create(doc);
-    return { success: true, data: result };
+    const res = await axiosClient.post('/contact', payload);
+
+    return { success: true, data: res.data };
   } catch (error) {
     console.error('Error saving contact message:', error);
     return { success: false, error: 'Failed to save contact message' };
   }
 };
+
+/* ============================================================
+   4. Get orders with pagination
+============================================================ */
+
 export const getMyOrders = async (userId: string, page: number = 1, limit: number = 5) => {
   if (!userId) {
     throw new Error('User ID is required');
   }
 
-  const offset = (page - 1) * limit;
-
-  // Query for paginated orders
-  const MY_ORDERS_QUERY =
-    defineQuery(`*[_type == 'order' && clerkUserId == $userId] | order(orderDate desc)[$start...$end]{
-    ...,
-    paymentStatus,
-    paymentMethod,
-    products[]{
-      ...,
-      product->{
-        _id,
-        name,
-        slug,
-        image,
-        images,
-        price,
-        currency
-      }
-    }
-  }`);
-
-  // Query for total count
-  const COUNT_QUERY = defineQuery(`count(*[_type == 'order' && clerkUserId == $userId])`);
-
   try {
-    const [orders, totalCount] = await Promise.all([
-      sanityFetch({
-        query: MY_ORDERS_QUERY,
-        params: {
-          userId,
-          start: offset,
-          end: offset + limit - 1,
-        },
-      }),
-      sanityFetch({
-        query: COUNT_QUERY,
-        params: { userId },
-      }),
-    ]);
+    const res = await axiosClient.get(`/orders/user/${userId}`, {
+      params: { page, limit },
+    });
 
     return {
-      orders: orders?.data || [],
-      totalCount: totalCount?.data || 0,
-      totalPages: Math.ceil((totalCount?.data || 0) / limit),
-      currentPage: page,
-      hasNextPage: page < Math.ceil((totalCount?.data || 0) / limit),
-      hasPrevPage: page > 1,
+      orders: res.data.orders || [],
+      totalCount: res.data.totalCount || 0,
+      totalPages: res.data.totalPages || 0,
+      currentPage: res.data.currentPage || page,
+      hasNextPage: res.data.hasNextPage || false,
+      hasPrevPage: res.data.hasPrevPage || false,
     };
   } catch (error) {
     console.error('Error fetching orders:', error);
+
     return {
       orders: [],
       totalCount: 0,

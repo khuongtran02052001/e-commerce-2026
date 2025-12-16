@@ -368,7 +368,7 @@ export const markNotificationAsRead = async (clerkUserId: string, notificationId
       return notification;
     });
 
-    const { writeClient } = await import('../lib/client');
+    const { writeClient } = await import('../../lib/axiosClient');
 
     await writeClient.patch(user.data._id).set({ notifications: updatedNotifications }).commit();
 
@@ -394,7 +394,7 @@ export const deleteUserNotification = async (clerkUserId: string, notificationId
       (notification: any) => notification.id !== notificationId,
     );
 
-    const { writeClient } = await import('../lib/client');
+    const { writeClient } = await import('../../lib/axiosClient');
 
     await writeClient.patch(user.data._id).set({ notifications: updatedNotifications }).commit();
 

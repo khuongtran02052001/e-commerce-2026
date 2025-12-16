@@ -1,7 +1,7 @@
 'use client';
 
-import { trackCartView } from '@/lib/analytics';
-import { useUser } from '@clerk/nextjs';
+import { useUserData } from '@/contexts/UserDataContext';
+// import { trackCartView } from '@/lib/analytics';
 import { useCallback, useEffect, useState } from 'react';
 import { CartSkeleton } from './CartSkeleton';
 import { ServerCartContent } from './ServerCartContent';
@@ -35,7 +35,7 @@ interface UserData {
 }
 
 export function ClientCartContent() {
-  const { user, isLoaded } = useUser();
+  const { isLoading: isLoaded, currentUser: user } = useUserData();
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -43,7 +43,7 @@ export function ClientCartContent() {
   const fetchUserData = useCallback(async () => {
     if (!isLoaded || !user) return;
 
-    const userEmail = user.emailAddresses[0]?.emailAddress;
+    const userEmail = user.email;
     if (!userEmail) {
       setError('Email not found. Please contact support.');
       setLoading(false);
@@ -72,7 +72,7 @@ export function ClientCartContent() {
   const refreshAddresses = async () => {
     if (!user) return;
 
-    const userEmail = user.emailAddresses[0]?.emailAddress;
+    const userEmail = user.email;
     if (!userEmail) return;
 
     try {
@@ -94,9 +94,9 @@ export function ClientCartContent() {
   useEffect(() => {
     fetchUserData();
     // Track cart view
-    if (user) {
-      trackCartView(user.id);
-    }
+    // if (user) {
+    //   trackCartView(user.id);
+    // }
   }, [user, fetchUserData]);
 
   if (!isLoaded || loading) {
@@ -119,7 +119,7 @@ export function ClientCartContent() {
     );
   }
 
-  const userEmail = user.emailAddresses[0]?.emailAddress || '';
+  const userEmail = user.email!;
 
   return (
     <ServerCartContent

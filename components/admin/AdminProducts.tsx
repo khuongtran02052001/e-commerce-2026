@@ -111,9 +111,9 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ initialCategories = [] })
   );
 
   // Effects
-  useEffect(() => {
-    fetchProducts(currentPage);
-  }, [fetchProducts, currentPage]);
+  // useEffect(() => {
+  //   fetchProducts(currentPage);
+  // }, [fetchProducts, currentPage]);
 
   // Reset page when filters change
   useEffect(() => {

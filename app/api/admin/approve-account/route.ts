@@ -1,5 +1,5 @@
 import { backendClient } from '@/sanity/lib/backendClient';
-import { client } from '@/sanity/lib/client';
+import { client } from '@/lib/axiosClient';
 import { auth } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
     } catch (backendError) {
       console.log('backendClient failed, trying with writeClient...', backendError);
       // Import writeClient locally to avoid import issues
-      const { writeClient } = await import('@/sanity/lib/client');
+      const { writeClient } = await import('@/lib/axiosClient');
       const result = await writeClient.patch(userId).set(updateData).commit();
       console.log('Successfully updated user with writeClient:', userId, result);
     }

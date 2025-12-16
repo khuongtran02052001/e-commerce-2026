@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MY_ORDERS_QUERYResult } from '@/sanity.types';
-import { client } from '@/sanity/lib/client';
+import { client } from '@/lib/axiosClient';
 import { useUser } from '@clerk/nextjs';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';

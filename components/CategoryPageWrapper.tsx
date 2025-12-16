@@ -1,7 +1,6 @@
 'use client';
 
 import { Category, Product } from '@/sanity.types';
-import { client } from '@/sanity/lib/client';
 import { urlFor } from '@/sanity/lib/image';
 import { ArrowLeft, ArrowRight, Filter, Grid3X3, Package, Tag, TrendingUp } from 'lucide-react';
 import Image from 'next/image';

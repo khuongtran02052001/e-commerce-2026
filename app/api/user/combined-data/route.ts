@@ -1,55 +1,36 @@
-import { client } from '@/sanity/lib/client';
-import { auth } from '@clerk/nextjs/server';
+import { auth } from '@/lib/auth';
+import axiosClient from '@/lib/axiosClient';
 import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-/**
- * Combined API endpoint to fetch all user data in a single request
- * Optimized for Next.js 16 and React 19
- */
 export async function GET() {
   try {
-    const { userId } = await auth();
+    const session = await auth();
 
-    if (!userId) {
+    if (!session?.user?.email) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Fetch all data in parallel
-    const [user, orders, notifications] = await Promise.all([
-      // Get user data including employee status
-      client.fetch(
-        `*[_type == "user" && clerkUserId == $userId][0]{
-          _id,
-          email,
-          role,
-          isEmployee,
-          walletBalance
-        }`,
-        { userId },
-      ),
-      // Get orders count
-      client.fetch(`count(*[_type == "order" && userId == $userId])`, {
-        userId,
-      }),
-      // Get unread notifications count
-      client.fetch(
-        `*[_type == "notification" && userId == $userId && !read] | order(_createdAt desc)[0...20]{
-          _id,
-          read
-        }`,
-        { userId },
-      ),
+    const userId = session.user.id;
+
+    const [userRes, notificationsRes] = await Promise.all([
+      axiosClient.get(`/users`, { params: { userId } }),
+      // axiosClient.get(`/orders/count`, { params: { email } }),
+      axiosClient.get(`/notifications/unread`, { params: { userId, limit: 20 } }),
     ]);
 
+    const user = userRes.data?.user || null;
+    // const ordersCount = ordersRes.data?.count || 0;
+    const unreadNotifications = notificationsRes.data?.count || 0;
+    console.log(userRes, notificationsRes);
     return NextResponse.json(
       {
-        user: user || null,
-        ordersCount: orders || 0,
+        user,
+        // ordersCount,
         isEmployee: user?.isEmployee || false,
-        unreadNotifications: notifications?.length || 0,
+        unreadNotifications,
         walletBalance: user?.walletBalance || 0,
       },
       {
@@ -61,8 +42,9 @@ export async function GET() {
         },
       },
     );
-  } catch (error) {
-    console.error('Error fetching combined user data:', error);
+  } catch (error: any) {
+    console.error('Error fetching combined user data:', error?.response?.data || error);
+
     return NextResponse.json(
       {
         user: null,

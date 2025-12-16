@@ -1,5 +1,5 @@
 import { backendClient } from '@/sanity/lib/backendClient';
-import { client } from '@/sanity/lib/client';
+import { client } from '@/lib/axiosClient';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
