@@ -38,8 +38,7 @@ const Sidebar: FC<SidebarProps> = ({ isOpen, onClose }) => {
   const sidebarRef = useOutsideClick<HTMLDivElement>(onClose);
   const { items, favoriteProduct } = useStore();
 
-  const { currentUser: user } = useUserData();
-  const isSignedIn = !!user; // replaces ClerkSignedIn
+  const { authReady } = useUserData();
 
   const userMenuItems = [
     { title: 'My Account', href: '/account', icon: User },
@@ -126,7 +125,7 @@ const Sidebar: FC<SidebarProps> = ({ isOpen, onClose }) => {
             </Link>
 
             {/* Orders (ClerkSignedIn → NextAuth SignedIn) */}
-            {isSignedIn && (
+            {!!authReady && (
               <Link
                 onClick={onClose}
                 href="/user/orders"

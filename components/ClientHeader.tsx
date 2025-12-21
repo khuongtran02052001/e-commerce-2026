@@ -2,9 +2,11 @@
 
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 import { useUserData } from '@/contexts/UserDataContext';
+import { UserCircle } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import CartIcon from './cart/CartIcon';
 import Logo from './common/Logo';
 import Container from './Container';
@@ -12,24 +14,35 @@ import FavoriteButton from './FavoriteButton';
 import HeaderMenu from './layout/HeaderMenu';
 import MobileMenu from './layout/MobileMenu';
 import NotificationBell from './NotificationBell';
-import UserDropdown from './UserDropdown';
+
+const UserDropdown = dynamic(() => import('./UserDropdown'), {
+  ssr: false,
+  loading: () => (
+    <button className="flex items-center gap-2 py-1 px-2 rounded-lg hover:bg-shop_light_bg group border border-shop_dark_green/20 hover:border-shop_dark_green hoverEffect">
+      <div className="relative">
+        <UserCircle className="w-8 h-8 text-gray-500 group-hover:text-shop_light_green transition-colors" />
+
+        <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white shadow-sm"></div>
+      </div>
+
+      <div className="hidden lg:flex flex-col items-start">
+        <span className="text-sm font-medium text-gray-800 group-hover:text-shop_light_green transition-colors">
+          Username
+        </span>
+      </div>
+    </button>
+  ),
+});
 
 const ClientHeader = () => {
-  const { currentUser: user } = useUserData();
-  const isSignedIn = !!user;
+  const { authReady } = useUserData();
 
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
   // Handle redirect after login
   useEffect(() => {
-    if (isSignedIn && isMounted && typeof window !== 'undefined') {
+    if (typeof window !== 'undefined') {
       const redirectTo = searchParams.get('redirectTo');
       if (redirectTo) {
         const clean = decodeURIComponent(redirectTo);
@@ -37,16 +50,16 @@ const ClientHeader = () => {
         router.replace(window.location.pathname);
       }
     }
-  }, [isSignedIn, searchParams, router, isMounted]);
+  }, [searchParams, router]);
 
   const getSignInUrl = () => {
-    if (!isMounted || typeof window === 'undefined') return '/login';
+    if (typeof window === 'undefined') return '/login';
     const path = window.location.pathname + window.location.search;
     return `/login?redirectTo=${encodeURIComponent(path)}`;
   };
 
   const getSignUpUrl = () => {
-    if (!isMounted || typeof window === 'undefined') return '/register';
+    if (typeof window === 'undefined') return '/register';
     const path = window.location.pathname + window.location.search;
     return `/register?redirectTo=${encodeURIComponent(path)}`;
   };
@@ -75,10 +88,10 @@ const ClientHeader = () => {
               <NotificationBell />
 
               {/* Signed In */}
-              {isSignedIn && <UserDropdown />}
+              <UserDropdown />
 
               {/* Signed Out */}
-              {!isSignedIn && (
+              {!authReady && (
                 <div className="flex items-center gap-3">
                   <Link
                     href={getSignInUrl()}
@@ -102,7 +115,7 @@ const ClientHeader = () => {
               <FavoriteButton />
               <NotificationBell />
 
-              {isSignedIn ? (
+              {authReady ? (
                 <UserDropdown />
               ) : (
                 <div className="flex items-center gap-2">
@@ -124,7 +137,7 @@ const ClientHeader = () => {
 
             {/* Mobile */}
             <div className="flex md:hidden items-center gap-1">
-              {isSignedIn ? (
+              {authReady ? (
                 <UserDropdown />
               ) : (
                 <div className="flex items-center gap-1">

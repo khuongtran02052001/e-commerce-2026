@@ -21,7 +21,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           const res = await axiosClient.post('/auth/google-login', {
             googleIdToken: account.id_token,
           });
-
           // gắn tạm vào account để jwt callback lấy
           (account as any).beAccessToken = res.data.accessToken;
         } catch (e) {
@@ -40,7 +39,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
 
     async session({ session, token }) {
-      session.beAccessToken = token.beAccessToken as string;
+      session.accessToken = token.beAccessToken as string;
       return session;
     },
   },

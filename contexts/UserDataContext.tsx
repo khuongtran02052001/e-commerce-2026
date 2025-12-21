@@ -2,7 +2,7 @@
 
 import { User } from 'next-auth';
 import { useSession } from 'next-auth/react';
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 
 interface UserData {
   currentUser: User | null;
@@ -10,25 +10,28 @@ interface UserData {
   isEmployee: boolean;
   unreadNotifications: number;
   walletBalance: number;
-  isLoading: boolean;
 }
 
 interface UserDataContextType extends UserData {
+  authReady: boolean;
+  isLoading: boolean;
   refreshUserData: () => Promise<void>;
 }
 
 const UserDataContext = createContext<UserDataContextType | undefined>(undefined);
 
-let cachedData: Omit<UserData, 'isLoading'> | null = null;
-let cacheTimestamp = 0;
-const CACHE_DURATION = 30000;
-
 export function UserDataProvider({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession();
-  const sessionUser = session?.user;
-  const isSessionLoaded = status !== 'loading';
 
-  const [userData, setUserData] = useState<UserData>({
+  const authReady = status !== 'loading';
+  const sessionUser = session?.user ?? null;
+
+  const cacheRef = useRef<{
+    data: Omit<UserData, 'currentUser'>;
+    timestamp: number;
+  } | null>(null);
+
+  const [state, setState] = useState<UserData & { isLoading: boolean }>({
     currentUser: null,
     ordersCount: 0,
     isEmployee: false,
@@ -38,55 +41,70 @@ export function UserDataProvider({ children }: { children: React.ReactNode }) {
   });
 
   const loadUserStats = useCallback(
-    async (forceRefresh = false) => {
-      if (!sessionUser || !isSessionLoaded) return;
+    async (force = false) => {
+      if (!sessionUser) return;
 
       const now = Date.now();
-      if (!forceRefresh && cachedData && now - cacheTimestamp < CACHE_DURATION) {
-        setUserData((prev) => ({ ...prev, ...cachedData }));
+      if (!force && cacheRef.current && now - cacheRef.current.timestamp < 30_000) {
+        setState((prev) => ({
+          ...prev,
+          ...cacheRef.current!.data,
+        }));
         return;
       }
 
-      setUserData((prev) => ({ ...prev, isLoading: true }));
+      setState((prev) => ({ ...prev, isLoading: true }));
 
       try {
-        const response = await fetch('/api/user/combined-data', {
+        const res = await fetch('/api/user/combined-data', {
           cache: 'no-store',
         });
+        const data = await res.json();
 
-        const data = await response.json();
-
-        const newUserData: Omit<UserData, 'isLoading'> = {
-          currentUser: sessionUser,
+        const normalized = {
           ordersCount: data.ordersCount ?? 0,
           isEmployee: data.isEmployee ?? false,
           unreadNotifications: data.unreadNotifications ?? 0,
           walletBalance: data.walletBalance ?? 0,
         };
 
-        cachedData = newUserData;
-        cacheTimestamp = now;
+        cacheRef.current = {
+          data: normalized,
+          timestamp: now,
+        };
 
-        setUserData((prev) => ({ ...prev, ...newUserData, isLoading: false }));
-      } catch (e) {
-        console.error('Failed to load user stats:', e);
-        setUserData((prev) => ({ ...prev, isLoading: false }));
+        setState((prev) => ({
+          ...prev,
+          ...normalized,
+          isLoading: false,
+        }));
+      } catch (err) {
+        console.error('Failed to load user stats', err);
+        setState((prev) => ({ ...prev, isLoading: false }));
       }
     },
-    [sessionUser, isSessionLoaded],
+    [sessionUser],
   );
 
+  // Khi auth READY → set user
   useEffect(() => {
-    if (isSessionLoaded && sessionUser) {
-      setUserData((prev) => ({ ...prev, currentUser: sessionUser }));
+    if (!authReady) return;
+
+    setState((prev) => ({
+      ...prev,
+      currentUser: sessionUser,
+    }));
+
+    if (sessionUser) {
       loadUserStats();
     }
-  }, [isSessionLoaded, sessionUser, loadUserStats]);
+  }, [authReady, sessionUser, loadUserStats]);
 
   return (
     <UserDataContext.Provider
       value={{
-        ...userData,
+        ...state,
+        authReady,
         refreshUserData: () => loadUserStats(true),
       }}
     >

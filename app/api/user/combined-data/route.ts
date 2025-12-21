@@ -15,16 +15,14 @@ export async function GET() {
 
     const userId = session.user.id;
 
-    const [userRes, notificationsRes] = await Promise.all([
-      axiosClient.get(`/users`, { params: { userId } }),
-      // axiosClient.get(`/orders/count`, { params: { email } }),
-      axiosClient.get(`/notifications/unread`, { params: { userId, limit: 20 } }),
-    ]);
+    const userRes = await axiosClient.get(`/auth/me`);
+    // axiosClient.get(`/orders/count`, { params: { email } }),
+    // axiosClient.get(`/notifications/unread`, { params: { userId, limit: 20 } }),
 
-    const user = userRes.data?.user || null;
+    const user = userRes.data || null;
     // const ordersCount = ordersRes.data?.count || 0;
-    const unreadNotifications = notificationsRes.data?.count || 0;
-    console.log(userRes, notificationsRes);
+    const unreadNotifications = 0;
+    console.log(user);
     return NextResponse.json(
       {
         user,

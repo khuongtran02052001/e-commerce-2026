@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getSession } from 'next-auth/react';
+import { auth } from './auth';
 
 const axiosClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080', // ví dụ: https://api.myapp.com
@@ -13,7 +13,8 @@ const axiosClient = axios.create({
 axiosClient.interceptors.request.use(
   async (config) => {
     // Lấy token từ localStorage (hoặc cookie tuỳ bạn)
-    const session = await getSession();
+    const session = await auth();
+
     if (session?.accessToken) {
       config.headers.Authorization = `Bearer ${session.accessToken}`;
     }

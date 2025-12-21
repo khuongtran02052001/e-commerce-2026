@@ -1,7 +1,7 @@
 import { categoriesData } from '@/constants';
+import { useUserData } from '@/contexts/UserDataContext';
 import { useOutsideClick } from '@/hooks';
 import useStore from '@/store';
-import { ClerkLoaded, SignedIn } from '@clerk/nextjs';
 import {
   BookOpen,
   Flame,
@@ -35,7 +35,8 @@ const Sidebar: FC<SidebarProps> = ({ isOpen, onClose }) => {
   const pathname = usePathname();
   const sidebarRef = useOutsideClick<HTMLDivElement>(onClose);
   const { items, favoriteProduct } = useStore();
-
+  const { authReady, currentUser } = useUserData();
+  
   // Enhanced menu sections with icons
   const userMenuItems = [
     { title: 'My Account', href: '/account', icon: User },
@@ -120,18 +121,16 @@ const Sidebar: FC<SidebarProps> = ({ isOpen, onClose }) => {
             </Link>
 
             {/* Orders */}
-            <ClerkLoaded>
-              <SignedIn>
-                <Link
-                  onClick={onClose}
-                  href="/user/orders"
-                  className="flex flex-col items-center gap-2 p-3 rounded-lg bg-shop_dark_green/30 hover:bg-shop_dark_green/50 transition-colors duration-200 text-center"
-                >
-                  <Logs size={20} className="text-blue-400" />
-                  <span className="text-xs font-medium text-zinc-300">Orders</span>
-                </Link>
-              </SignedIn>
-            </ClerkLoaded>
+            {authReady && currentUser && (
+              <Link
+                onClick={onClose}
+                href="/user/orders"
+                className="flex flex-col items-center gap-2 p-3 rounded-lg bg-shop_dark_green/30 hover:bg-shop_dark_green/50 transition-colors duration-200 text-center"
+              >
+                <Logs size={20} className="text-blue-400" />
+                <span className="text-xs font-medium text-zinc-300">Orders</span>
+              </Link>
+            )}
           </div>
         </div>
 

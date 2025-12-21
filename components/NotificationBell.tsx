@@ -5,12 +5,7 @@ import { Bell } from 'lucide-react';
 import Link from 'next/link';
 
 export default function NotificationBell() {
-  const { currentUser: session } = useUserData();
-  const isSignedIn = !!session;
-
   const { unreadNotifications } = useUserData();
-
-  if (!isSignedIn) return null;
 
   const displayCount = unreadNotifications > 9 ? '9+' : unreadNotifications;
 

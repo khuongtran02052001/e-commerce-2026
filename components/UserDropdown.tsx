@@ -26,14 +26,11 @@ const UserDropdown = () => {
   const {
     currentUser: user,
     ordersCount,
-    isEmployee,
     walletBalance,
     isLoading: isLoadingOrders,
   } = useUserData();
 
   const isAdmin = useIsAdmin(user?.email);
-
-  if (!user) return null;
 
   const handleSignOut = async () => {
     await doLogout();
@@ -47,11 +44,11 @@ const UserDropdown = () => {
       <PopoverTrigger asChild>
         <button className="flex items-center gap-2 py-1 px-2 rounded-lg hover:bg-shop_light_bg group border border-shop_dark_green/20 hover:border-shop_dark_green hoverEffect">
           <div className="relative">
-            {user.image ? (
+            {user?.image ? (
               <img
                 src={user.image}
                 alt={user.name || 'User'}
-                className="w-8 h-8 rounded-full object-cover border-2 border-shop_light_green/20 group-hover:border-shop_light_green/40 transition-colors"
+                className="w-8 h-8 rounded-full object-cover"
               />
             ) : (
               <UserCircle className="w-8 h-8 text-gray-500 group-hover:text-shop_light_green transition-colors" />
@@ -62,7 +59,7 @@ const UserDropdown = () => {
 
           <div className="hidden lg:flex flex-col items-start">
             <span className="text-sm font-medium text-gray-800 group-hover:text-shop_light_green transition-colors">
-              {user.name || 'User'}
+              {user?.name || 'User'}
             </span>
           </div>
         </button>
@@ -72,18 +69,18 @@ const UserDropdown = () => {
         {/* Header */}
         <div className="p-4 border-b border-gray-100">
           <div className="flex items-center gap-3">
-            {user.image ? (
+            {user?.image ? (
               <img
-                src={user.image}
-                alt={user.name || 'User'}
+                src={user?.image}
+                alt={user?.name || 'User'}
                 className="w-12 h-12 rounded-full object-cover"
               />
             ) : (
               <UserCircle className="w-12 h-12 text-gray-500" />
             )}
             <div>
-              <h3 className="font-semibold text-gray-800">{user.name || 'User'}</h3>
-              <p className="text-sm text-gray-500">{user.email}</p>
+              <h3 className="font-semibold text-gray-800">{user?.name || 'User'}</h3>
+              <p className="text-sm text-gray-500">{user?.email}</p>
             </div>
           </div>
         </div>
