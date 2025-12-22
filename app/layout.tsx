@@ -106,7 +106,7 @@ const RootLayout = async ({ children }: { children: ReactNode }) => {
   const session = await auth();
   return (
     <SessionProvider session={session}>
-      <html lang="en">
+      <html lang="en" suppressHydrationWarning>
         <Head>
           <meta name="google-adsense-account" content={GADSENSE_CLIENT_ID} />
         </Head>

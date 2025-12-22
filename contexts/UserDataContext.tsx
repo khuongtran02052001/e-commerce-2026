@@ -16,6 +16,7 @@ interface UserDataContextType extends UserData {
   authReady: boolean;
   isLoading: boolean;
   refreshUserData: () => Promise<void>;
+  doLogoutLocal: () => void;
 }
 
 const UserDataContext = createContext<UserDataContextType | undefined>(undefined);
@@ -86,7 +87,15 @@ export function UserDataProvider({ children }: { children: React.ReactNode }) {
     [sessionUser],
   );
 
-  // Khi auth READY → set user
+  const doLogoutLocal = async () =>
+    setState({
+      currentUser: null,
+      ordersCount: 0,
+      isEmployee: false,
+      unreadNotifications: 0,
+      walletBalance: 0,
+      isLoading: false,
+    });
   useEffect(() => {
     if (!authReady) return;
 
@@ -105,6 +114,7 @@ export function UserDataProvider({ children }: { children: React.ReactNode }) {
       value={{
         ...state,
         authReady,
+        doLogoutLocal,
         refreshUserData: () => loadUserStats(true),
       }}
     >

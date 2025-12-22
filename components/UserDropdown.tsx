@@ -28,12 +28,14 @@ const UserDropdown = () => {
     ordersCount,
     walletBalance,
     isLoading: isLoadingOrders,
+    doLogoutLocal,
   } = useUserData();
 
   const isAdmin = useIsAdmin(user?.email);
 
   const handleSignOut = async () => {
     await doLogout();
+    doLogoutLocal();
     setOpen(false);
   };
 
@@ -47,7 +49,7 @@ const UserDropdown = () => {
             {user?.image ? (
               <img
                 src={user.image}
-                alt={user.name || 'User'}
+                alt={user.name || 'Username'}
                 className="w-8 h-8 rounded-full object-cover"
               />
             ) : (
@@ -59,7 +61,7 @@ const UserDropdown = () => {
 
           <div className="hidden lg:flex flex-col items-start">
             <span className="text-sm font-medium text-gray-800 group-hover:text-shop_light_green transition-colors">
-              {user?.name || 'User'}
+              {user?.name || 'Username'}
             </span>
           </div>
         </button>
@@ -79,7 +81,7 @@ const UserDropdown = () => {
               <UserCircle className="w-12 h-12 text-gray-500" />
             )}
             <div>
-              <h3 className="font-semibold text-gray-800">{user?.name || 'User'}</h3>
+              <h3 className="font-semibold text-gray-800">{user?.name || 'Username'}</h3>
               <p className="text-sm text-gray-500">{user?.email}</p>
             </div>
           </div>

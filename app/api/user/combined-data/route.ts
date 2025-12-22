@@ -1,5 +1,6 @@
 import { auth } from '@/lib/auth';
 import axiosClient from '@/lib/axiosClient';
+import { User } from '@/types/common-type';
 import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -13,22 +14,15 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const userId = session.user.id;
-
-    const userRes = await axiosClient.get(`/auth/me`);
-    // axiosClient.get(`/orders/count`, { params: { email } }),
-    // axiosClient.get(`/notifications/unread`, { params: { userId, limit: 20 } }),
+    const userRes = await axiosClient.get<User>(`/auth/me`);
 
     const user = userRes.data || null;
-    // const ordersCount = ordersRes.data?.count || 0;
-    const unreadNotifications = 0;
-    console.log(user);
     return NextResponse.json(
       {
         user,
-        // ordersCount,
+        ordersCount: user.orders.length || 0,
         isEmployee: user?.isEmployee || false,
-        unreadNotifications,
+        unreadNotifications: user.notifications.length || 0,
         walletBalance: user?.walletBalance || 0,
       },
       {
