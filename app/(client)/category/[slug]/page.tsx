@@ -15,7 +15,7 @@ import {
   generateItemListSchema,
 } from '@/lib/seo';
 import { Category, Product } from '@/sanity.types';
-import { client } from '@/lib/axiosClient';
+import { client } from '@/lib/axios/axiosPrivate';
 import { urlFor } from '@/sanity/lib/image';
 import { getCategories } from '@/sanity/queries';
 import { ArrowLeft, ArrowRight, Filter, Grid3X3, Package, Tag, TrendingUp } from 'lucide-react';

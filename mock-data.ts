@@ -32,7 +32,7 @@ export interface IProductMock {
   createdAt: string;
 }
 
-export interface ICategoryMock {
+export interface ICategory {
   id: string;
   title: string;
   slug: string;
@@ -75,7 +75,7 @@ export interface IBlogMock {
   body: string;
 }
 
-export const mockCategories: ICategoryMock[] = [
+export const mockCategories: ICategory[] = [
   {
     id: 'cat-001',
     title: 'Smartphones',

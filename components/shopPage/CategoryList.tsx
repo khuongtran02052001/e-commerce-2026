@@ -1,11 +1,11 @@
 import { Dispatch, SetStateAction } from 'react';
 import Title from '../Title';
 
-import { ICategoryMock } from '@/mock-data';
+import { ICategory } from '@/mock-data';
 import { Label } from '../ui/label';
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
 interface Props {
-  categories: ICategoryMock[];
+  categories: ICategory[];
   selectedCategory?: string | null;
   setSelectedCategory: Dispatch<SetStateAction<string | null>>;
 }

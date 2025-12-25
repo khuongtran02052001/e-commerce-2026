@@ -4,18 +4,15 @@ import LatestBlog from '@/components/LatestBlog';
 import ProductGrid from '@/components/ProductGrid';
 import ShopByBrands from '@/components/ShopByBrands';
 import ShopFeatures from '@/components/ShopFeatures';
-// import { getCategories } from "@/sanity/queries";
-import { generateOrganizationSchema, generateWebsiteSchema } from '@/lib/seo';
-import { mockCategories } from '@/mock-data';
+import { getAllCategories } from '@/repository/categoryApi';
+import { getAllProducts } from '@/sanity/queries';
 
 export default async function Home() {
-  // const categories = await mockCategories(8);
-  const categories = mockCategories;
-
+  const categories = await getAllCategories();
+  const productsHydrat = await getAllProducts();
   // Generate structured data
   // const organizationSchema = generateOrganizationSchema();
   // const websiteSchema = generateWebsiteSchema();
-
   return (
     <div>
       {/* JSON-LD Structured Data */}
@@ -34,8 +31,8 @@ export default async function Home() {
 
       <HomeBanner />
       <div className="py-10">
-        <ProductGrid />
-        <HomeCategories categories={categories} />
+        <ProductGrid data={productsHydrat!} />
+        <HomeCategories categories={categories.data} />
         <ShopFeatures />
         <ShopByBrands />
         <LatestBlog />

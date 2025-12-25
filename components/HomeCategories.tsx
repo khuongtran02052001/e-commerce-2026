@@ -1,11 +1,11 @@
-import { ICategoryMock } from '@/mock-data';
+import { ICategory } from '@/mock-data';
 import Image from 'next/image';
 import Link from 'next/link';
 import Container from './Container';
 import Title from './Title';
 
 interface Props {
-  categories: ICategoryMock[];
+  categories: ICategory[];
 }
 
 const HomeCategories = ({ categories }: Props) => {

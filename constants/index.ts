@@ -7,10 +7,13 @@ export const headerData = [
 ];
 
 export const productType = [
-  { title: 'Gadget', value: 'gadget' },
-  { title: 'Appliances', value: 'appliances' },
-  { title: 'Refrigerators', value: 'refrigerators' },
-  { title: 'Others', value: 'others' },
+  { title: 'New', value: 'NEW' },
+  { title: 'Hot', value: 'HOT' },
+  { title: 'Sale', value: 'SALE' },
+  { title: 'Featured', value: 'FEATURED' },
+  { title: 'Out of Stock', value: 'OUT_OF_STOCK' },
+  { title: 'Discontinued', value: 'DISCONTINUED' },
+  { title: 'Preorder', value: 'PREORDER' },
 ];
 
 export const quickLinksData = [

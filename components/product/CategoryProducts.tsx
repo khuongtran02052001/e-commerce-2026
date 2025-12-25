@@ -1,6 +1,6 @@
 'use client';
 import { Category, Product } from '@/sanity.types';
-import { client } from '@/lib/axiosClient';
+import { client } from '@/lib/axios/axiosPrivate';
 import { Grid3X3 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useRouter } from 'next/navigation';

@@ -19,7 +19,8 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { Slider } from '@/components/ui/slider';
 import { productType } from '@/constants';
-import { IProductMock, mockProducts } from '@/mock-data';
+import { axiosPublic } from '@/lib/axios/axiosPublic';
+import { IProductMock } from '@/mock-data';
 import { Eye, Filter, Grid3X3, LayoutGrid, List, SortAsc } from 'lucide-react';
 import Container from './Container';
 import HomeTabbar from './HomeTabbar';
@@ -29,11 +30,11 @@ import { ProductGridSkeleton } from './ProductSkeletons';
 type ViewMode = 'grid-2' | 'grid-3' | 'grid-4' | 'grid-5' | 'list';
 type SortOption = 'name-asc' | 'name-desc' | 'price-asc' | 'price-desc' | 'newest';
 
-const ProductGrid = () => {
-  const [products, setProducts] = useState<IProductMock[]>(mockProducts);
-  const [filteredProducts, setFilteredProducts] = useState<IProductMock[]>([]);
+const ProductGrid: React.FC<{ data: IProductMock[] }> = (props) => {
+  const [products, setProducts] = useState<IProductMock[]>(props.data);
+  const [filteredProducts, setFilteredProducts] = useState<IProductMock[]>(props.data);
   const [loading, setLoading] = useState(false);
-  const [selectedTab, setSelectedTab] = useState(productType[0]?.title || '');
+  const [selectedTab, setSelectedTab] = useState(productType[0]?.value || '');
   const [viewMode, setViewMode] = useState<ViewMode>('grid-5');
   const [sortBy, setSortBy] = useState<SortOption>('name-asc');
   const [showFilters, setShowFilters] = useState(false);
@@ -42,43 +43,44 @@ const ProductGrid = () => {
   const [stockStatus, setStockStatus] = useState<string>('all');
   const [rating, setRating] = useState<string>('all');
 
-  const query = `*[_type == "product" && variant == $variant] | order(${getSortQuery(sortBy)}){
-  ...,"categories": categories[]->title
-}`;
-  const params = { variant: selectedTab.toLowerCase() };
-
-  function getSortQuery(sort: SortOption): string {
+  function getSortParams(sort: SortOption) {
     switch (sort) {
       case 'name-asc':
-        return 'name asc';
+        return { sort: 'name', order: 'asc' };
       case 'name-desc':
-        return 'name desc';
+        return { sort: 'name', order: 'desc' };
       case 'price-asc':
-        return 'price asc';
+        return { sort: 'price', order: 'asc' };
       case 'price-desc':
-        return 'price desc';
+        return { sort: 'price', order: 'desc' };
       case 'newest':
-        return '_createdAt desc';
+        return { sort: 'createdAt', order: 'desc' };
       default:
-        return 'name asc';
+        return { sort: 'name', order: 'asc' };
     }
   }
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     setLoading(true);
-  //     try {
-  //       const response = await client.fetch(query, params);
-  //       setProducts(await response);
-  //       setFilteredProducts(await response);
-  //     } catch (error) {
-  //       console.log("Product fetching Error", error);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-  //   fetchData();
-  // }, [selectedTab, sortBy]);
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+
+      const { sort, order } = getSortParams(sortBy);
+      try {
+        const res = await axiosPublic.get<IProductMock[]>(
+          `/products?variant=${selectedTab}&sort=${sort}&order=${order}`,
+        );
+        console.log(res);
+        setProducts(res);
+        setFilteredProducts(res);
+      } catch (error) {
+        console.error('Product fetching error', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [selectedTab, sortBy]);
 
   // Apply filters to products
   const applyFilters = () => {
