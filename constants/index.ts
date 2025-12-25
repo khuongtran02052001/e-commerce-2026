@@ -11,7 +11,6 @@ export const productType = [
   { title: 'Hot', value: 'HOT' },
   { title: 'Sale', value: 'SALE' },
   { title: 'Featured', value: 'FEATURED' },
-  { title: 'Out of Stock', value: 'OUT_OF_STOCK' },
   { title: 'Discontinued', value: 'DISCONTINUED' },
   { title: 'Preorder', value: 'PREORDER' },
 ];

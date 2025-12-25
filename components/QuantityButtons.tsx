@@ -4,10 +4,10 @@ import { toast } from 'sonner';
 import { twMerge } from 'tailwind-merge';
 import { Button } from './ui/button';
 // import { trackAddToCart, trackRemoveFromCart } from "@/lib/analytics";
-import { IProductMock } from '@/mock-data';
+import { IProduct } from '@/mock-data';
 
 interface Props {
-  product: IProductMock;
+  product: IProduct;
   className?: string;
   borderStyle?: string;
 }

@@ -2,13 +2,13 @@
 
 import QuantityButtons from '@/components/QuantityButtons';
 import { Button } from '@/components/ui/button';
-import { IProductMock } from '@/mock-data';
+import { IProduct } from '@/mock-data';
 import useCartStore from '@/store';
 import { Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface CartItemControlsProps {
-  product: IProductMock;
+  product: IProduct;
 }
 
 export function CartItemControls({ product }: CartItemControlsProps) {

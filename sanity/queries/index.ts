@@ -1,4 +1,4 @@
-import { IProductMock } from '@/mock-data';
+import { IProduct } from '@/mock-data';
 import { unstable_cache } from 'next/cache';
 
 /**
@@ -58,7 +58,7 @@ export const getFeaturedCategory = unstable_cache(
 ============================================================ */
 export const getAllProducts = unstable_cache(
   async () => {
-    const res = await fetchApi<IProductMock[]>('/products');
+    const res = await fetchApi<IProduct[]>('/products');
     return res.data;
   },
   ['all-products'],

@@ -20,7 +20,7 @@ import { Separator } from '@/components/ui/separator';
 import { Slider } from '@/components/ui/slider';
 import { productType } from '@/constants';
 import { axiosPublic } from '@/lib/axios/axiosPublic';
-import { IProductMock } from '@/mock-data';
+import { IProduct } from '@/mock-data';
 import { Eye, Filter, Grid3X3, LayoutGrid, List, SortAsc } from 'lucide-react';
 import Container from './Container';
 import HomeTabbar from './HomeTabbar';
@@ -30,9 +30,9 @@ import { ProductGridSkeleton } from './ProductSkeletons';
 type ViewMode = 'grid-2' | 'grid-3' | 'grid-4' | 'grid-5' | 'list';
 type SortOption = 'name-asc' | 'name-desc' | 'price-asc' | 'price-desc' | 'newest';
 
-const ProductGrid: React.FC<{ data: IProductMock[] }> = (props) => {
-  const [products, setProducts] = useState<IProductMock[]>(props.data);
-  const [filteredProducts, setFilteredProducts] = useState<IProductMock[]>(props.data);
+const ProductGrid: React.FC<{ data: IProduct[] }> = (props) => {
+  const [products, setProducts] = useState<IProduct[]>(props.data);
+  const [filteredProducts, setFilteredProducts] = useState<IProduct[]>(props.data);
   const [loading, setLoading] = useState(false);
   const [selectedTab, setSelectedTab] = useState(productType[0]?.value || '');
   const [viewMode, setViewMode] = useState<ViewMode>('grid-5');
@@ -63,13 +63,11 @@ const ProductGrid: React.FC<{ data: IProductMock[] }> = (props) => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-
       const { sort, order } = getSortParams(sortBy);
       try {
-        const res = await axiosPublic.get<IProductMock[]>(
+        const res = await axiosPublic.get<IProduct[]>(
           `/products?variant=${selectedTab}&sort=${sort}&order=${order}`,
         );
-        console.log(res);
         setProducts(res);
         setFilteredProducts(res);
       } catch (error) {
@@ -85,7 +83,6 @@ const ProductGrid: React.FC<{ data: IProductMock[] }> = (props) => {
   // Apply filters to products
   const applyFilters = () => {
     let filtered = [...products];
-
     // Filter by price range
     if (priceRange[0] > 0 || priceRange[1] < 1000) {
       filtered = filtered.filter((product) => {
@@ -100,7 +97,7 @@ const ProductGrid: React.FC<{ data: IProductMock[] }> = (props) => {
       filtered = filtered.filter((product) => {
         if (stockStatus === 'in-stock') {
           return (product.stock || 0) > 0;
-        } else if (stockStatus === 'out-of-stock') {
+        } else if (stockStatus === 'OUT_OF_STOCK') {
           return (product.stock || 0) === 0;
         }
         return true;
@@ -109,18 +106,21 @@ const ProductGrid: React.FC<{ data: IProductMock[] }> = (props) => {
 
     // Filter by status (using status as a proxy for "rating/quality")
     if (rating !== 'all') {
+      const ratingMap: Record<string, string[]> = {
+        '5': ['HOT', 'FEATURED'],
+        '4': ['HOT', 'NEW', 'FEATURED'],
+        '3': ['HOT', 'NEW', 'SALE', 'FEATURED', 'PREORDER'],
+      };
+
+      const allowedStatuses = ratingMap[rating] || [];
+
       filtered = filtered.filter((product) => {
-        if (rating === '5') {
-          return product.status === 'hot'; // Hot products = 5 stars
-        } else if (rating === '4') {
-          return product.status === 'hot' || product.status === 'new'; // Hot or New = 4+ stars
-        } else if (rating === '3') {
-          return product.status === 'hot' || product.status === 'new' || product.status === 'sale'; // All products = 3+ stars
-        }
-        return true;
+        const status = product.status || '';
+        if (status === 'DISCONTINUED' || status === 'OUT_OF_STOCK') return false;
+        if (!allowedStatuses.length) return true;
+        return allowedStatuses.includes(status);
       });
     }
-
     setFilteredProducts(filtered);
   };
 
@@ -169,7 +169,6 @@ const ProductGrid: React.FC<{ data: IProductMock[] }> = (props) => {
       {icon}
     </Button>
   );
-
   return (
     <Container className="flex flex-col lg:px-0 mt-16 lg:mt-24">
       {/* Header Section */}
@@ -346,7 +345,7 @@ const ProductGrid: React.FC<{ data: IProductMock[] }> = (props) => {
                               In Stock
                             </span>
                           </SelectItem>
-                          <SelectItem value="out-of-stock">
+                          <SelectItem value="OUT_OF_STOCK">
                             <span className="flex items-center gap-2">
                               <div className="w-2 h-2 bg-red-500 rounded-full"></div>
                               Out of Stock

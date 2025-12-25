@@ -1,6 +1,6 @@
 'use client';
 // import { client } from "@/sanity/lib/client";
-import { IBrandMock, ICategory, IProductMock, mockProducts } from '@/mock-data';
+import { IBrandMock, ICategory, IProduct, mockProducts } from '@/mock-data';
 import { Filter, X } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
@@ -20,7 +20,7 @@ interface Props {
 const Shop = ({ categories, brands }: Props) => {
   const searchParams = useSearchParams();
   const brandParams = searchParams?.get('brand');
-  const [products, setProducts] = useState<IProductMock[]>(mockProducts ?? []);
+  const [products, setProducts] = useState<IProduct[]>(mockProducts ?? []);
   const [loading, setLoading] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedBrand, setSelectedBrand] = useState<string | null>(brandParams || null);

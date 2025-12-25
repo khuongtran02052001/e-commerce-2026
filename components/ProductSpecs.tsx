@@ -2,11 +2,11 @@
 
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { IProductMock } from '@/mock-data';
+import { IProduct } from '@/mock-data';
 import { Award, Package, Shield, Truck } from 'lucide-react';
 
 interface ProductSpecsProps {
-  product: IProductMock;
+  product: IProduct;
 }
 
 const ProductSpecs = ({ product }: ProductSpecsProps) => {

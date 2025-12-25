@@ -1,6 +1,6 @@
 'use client';
 import BreadcrumbLink from '@/components/BreadcrumbLink';
-import { IProductMock } from '@/mock-data';
+import { IProduct } from '@/mock-data';
 import useCartStore from '@/store';
 import isArray from 'js-isarray';
 import _ from 'lodash';
@@ -14,10 +14,10 @@ const FavoriteButton = ({
   product,
 }: {
   showProduct?: boolean;
-  product?: IProductMock;
+  product?: IProduct;
 }) => {
   const { favoriteProduct, addToFavorite } = useCartStore();
-  const [existingProduct, setExistingProduct] = useState<IProductMock | null>(null);
+  const [existingProduct, setExistingProduct] = useState<IProduct | null>(null);
 
   useEffect(() => {
     const availableItem = _.find(favoriteProduct, (item) => item?.id === product?.id);

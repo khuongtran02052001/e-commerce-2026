@@ -8,10 +8,10 @@ import PriceFormatter from './PriceFormatter';
 import QuantityButtons from './QuantityButtons';
 import { Button } from './ui/button';
 // import { trackAddToCart } from "@/lib/analytics";
-import { IProductMock } from '@/mock-data';
+import { IProduct } from '@/mock-data';
 
 interface Props {
-  product: IProductMock;
+  product: IProduct;
   className?: string;
 }
 

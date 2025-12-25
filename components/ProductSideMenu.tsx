@@ -1,15 +1,15 @@
 'use client';
 import { cn } from '@/lib/utils';
-import { IProductMock } from '@/mock-data';
+import { IProduct } from '@/mock-data';
 import useCartStore from '@/store';
 import _ from 'lodash';
 import { Heart } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
-const ProductSideMenu = ({ product, className }: { product: IProductMock; className?: string }) => {
+const ProductSideMenu = ({ product, className }: { product: IProduct; className?: string }) => {
   const { favoriteProduct, addToFavorite } = useCartStore();
-  const [existingProduct, setExistingProduct] = useState<IProductMock | null>(null);
+  const [existingProduct, setExistingProduct] = useState<IProduct | null>(null);
 
   useEffect(() => {
     const availableItem = _.find(favoriteProduct, (item) => item?.id === product?.id);

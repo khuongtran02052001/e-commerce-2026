@@ -1,4 +1,4 @@
-import { IProductMock } from '@/mock-data';
+import { IProduct } from '@/mock-data';
 import { StarIcon } from '@sanity/icons';
 import { Flame } from 'lucide-react';
 import Link from 'next/link';
@@ -8,7 +8,7 @@ import PriceView from './PriceView';
 import ProductSideMenu from './ProductSideMenu';
 import Title from './Title';
 
-const ProductCard = memo(({ product }: { product: IProductMock }) => {
+const ProductCard = memo(({ product }: { product: IProduct }) => {
   return (
     <div className="text-sm border rounded-md border-dark-blue/20 group bg-white">
       <div className="relative group overflow-hidden bg-shop_light_bg">

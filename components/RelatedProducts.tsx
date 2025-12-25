@@ -1,7 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { IProductMock } from '@/mock-data';
+import { IProduct } from '@/mock-data';
 import { urlFor } from '@/sanity/lib/image';
 import { StarIcon } from 'lucide-react';
 import Image from 'next/image';
@@ -11,8 +11,8 @@ import AddToCartButton from './AddToCartButton';
 import FavoriteButton from './FavoriteButton';
 
 interface RelatedProductsProps {
-  currentProduct: IProductMock;
-  relatedProducts: IProductMock[];
+  currentProduct: IProduct;
+  relatedProducts: IProduct[];
 }
 
 const RelatedProducts = memo(({ relatedProducts }: RelatedProductsProps) => {
@@ -31,7 +31,7 @@ const RelatedProducts = memo(({ relatedProducts }: RelatedProductsProps) => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {relatedProducts.map((product: IProductMock) => {
+        {relatedProducts.map((product: IProduct) => {
           const imageUrl = product?.images?.[0] ? urlFor(product.images[0]).url() : null;
           const originalPrice =
             product?.discount && product?.price

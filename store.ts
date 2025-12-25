@@ -1,17 +1,17 @@
 import _ from 'lodash';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { IProductMock } from './mock-data';
+import { IProduct } from './mock-data';
 
 export interface CartItem {
-  product: IProductMock;
+  product: IProduct;
   quantity: number;
 }
 
 interface StoreState {
   items: CartItem[];
-  addItem: (product: IProductMock) => void;
-  addMultipleItems: (products: Array<{ product: IProductMock; quantity: number }>) => void;
+  addItem: (product: IProduct) => void;
+  addMultipleItems: (products: Array<{ product: IProduct; quantity: number }>) => void;
   removeItem: (productId: string) => void;
   deleteCartProduct: (productId: string) => void;
   resetCart: () => void;
@@ -21,8 +21,8 @@ interface StoreState {
   getItemCount: (productId: string) => number;
   getGroupedItems: () => CartItem[];
   // favorite
-  favoriteProduct: IProductMock[];
-  addToFavorite: (product: IProductMock) => Promise<void>;
+  favoriteProduct: IProduct[];
+  addToFavorite: (product: IProduct) => Promise<void>;
   removeFromFavorite: (productId: string) => void;
   resetFavorite: () => void;
   // order placement state
@@ -134,7 +134,7 @@ const useCartStore = create<StoreState>()(
         return item ? item.quantity : 0;
       },
       getGroupedItems: () => get().items,
-      addToFavorite: (product: IProductMock) => {
+      addToFavorite: (product: IProduct) => {
         return new Promise<void>((resolve) => {
           set((state: StoreState) => {
             const isFavorite = _.some(state.favoriteProduct, (item) => item.id === product.id);

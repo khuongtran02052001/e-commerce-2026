@@ -1,8 +1,8 @@
-import { IBrandMock, IProductMock } from '@/mock-data';
+import { IBrandMock, IProduct } from '@/mock-data';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
 
 interface ProductCharacteristicsProps {
-  product: IProductMock;
+  product: IProduct;
   brand: IBrandMock[] | null;
 }
 

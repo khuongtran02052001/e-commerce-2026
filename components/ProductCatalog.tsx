@@ -1,6 +1,6 @@
 'use client';
 
-import { IBrandMock, ICategory, IProductMock } from '@/mock-data';
+import { IBrandMock, ICategory, IProduct } from '@/mock-data';
 import { ChevronDown, Grid3X3, LayoutGrid, Search, SlidersHorizontal, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useMemo, useState } from 'react';
@@ -16,7 +16,7 @@ import { Separator } from './ui/separator';
 import { Slider } from './ui/slider';
 
 interface Props {
-  initialProducts: IProductMock[];
+  initialProducts: IProduct[];
   categories: ICategory[];
   brands: IBrandMock[];
 }
@@ -24,7 +24,7 @@ interface Props {
 type SortOption = 'name-asc' | 'name-desc' | 'price-low' | 'price-high' | 'newest' | 'popular';
 
 const ProductCatalog = ({ initialProducts, categories, brands }: Props) => {
-  const [products] = useState<IProductMock[]>(initialProducts);
+  const [products] = useState<IProduct[]>(initialProducts);
   const [loading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);

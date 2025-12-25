@@ -20,7 +20,7 @@ import {
 } from '@/components/ProductClientWrapper';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
-import { IBrandMock, IProductMock } from '@/mock-data';
+import { IBrandMock, IProduct } from '@/mock-data';
 import { CornerDownLeft, RefreshCw, Shield, StarIcon, Truck } from 'lucide-react';
 import { FaRegQuestionCircle } from 'react-icons/fa';
 import { FiShare2 } from 'react-icons/fi';
@@ -29,8 +29,8 @@ import { TbTruckDelivery } from 'react-icons/tb';
 import RelatedProducts from './RelatedProducts';
 
 interface ProductContentProps {
-  product: IProductMock;
-  relatedProducts: IProductMock[];
+  product: IProduct;
+  relatedProducts: IProduct[];
   brand: IBrandMock[] | null;
 }
 

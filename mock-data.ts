@@ -12,7 +12,7 @@ export interface IRatingDistributionMock {
   oneStar?: number;
 }
 
-export interface IProductMock {
+export interface IProduct {
   id: string;
   name: string;
   slug: string;
@@ -23,7 +23,7 @@ export interface IProductMock {
   categories?: string[];
   stock?: number;
   brand?: string;
-  status?: 'new' | 'hot' | 'sale';
+  status?: 'NEW' | 'HOT' | 'SALE' | 'FEATURED' | 'OUT_OF_STOCK' | 'DISCONTINUED' | 'PREORDER';
   variant?: 'gadget' | 'appliances' | 'refrigerators' | 'others';
   isFeatured?: boolean;
   averageRating?: number;
@@ -231,170 +231,5 @@ export const mockBrands: IBrandMock[] = [
     description:
       'Xiaomi focuses on smart hardware connected by an IoT platform with smartphones at its core.',
     imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/2/29/Xiaomi_logo.svg',
-  },
-];
-
-export const mockProducts: IProductMock[] = [
-  {
-    id: 'prod-001',
-    name: 'iPhone 16 Pro',
-    slug: 'iphone-16-pro',
-    images: [
-      {
-        id: 'img-001',
-        url: 'https://images.unsplash.com/photo-1512499617640-c2f999098e95',
-        alt: 'iPhone 16 Pro Front',
-      },
-      {
-        id: 'img-002',
-        url: 'https://images.unsplash.com/photo-1606813902779-0c1b3f6b3e5b',
-        alt: 'iPhone 16 Pro Side',
-      },
-    ],
-    description: "Apple's latest iPhone 16 Pro with A18 Bionic chip and advanced AI camera system.",
-    price: 1299,
-    discount: 5,
-    categories: ['smartphones'],
-    stock: 45,
-    brand: 'apple',
-    status: 'hot',
-    variant: 'gadget',
-    isFeatured: true,
-    averageRating: 4.8,
-    totalReviews: 312,
-    ratingDistribution: {
-      fiveStars: 260,
-      fourStars: 40,
-      threeStars: 10,
-      twoStars: 2,
-      oneStar: 0,
-    },
-    createdAt: '',
-  },
-  {
-    id: 'prod-002',
-    name: 'Samsung Galaxy Z Fold 7',
-    slug: 'samsung-galaxy-z-fold-7',
-    images: [
-      {
-        id: 'img-003',
-        url: 'https://images.unsplash.com/photo-1580910051071-b8c67e34c282',
-        alt: 'Samsung Galaxy Z Fold 7',
-      },
-    ],
-    description:
-      'Next-gen foldable smartphone with 7.6-inch AMOLED display and improved durability.',
-    price: 1899,
-    discount: 10,
-    categories: ['smartphones'],
-    stock: 30,
-    brand: 'samsung',
-    status: 'new',
-    variant: 'gadget',
-    isFeatured: true,
-    averageRating: 4.6,
-    totalReviews: 214,
-    ratingDistribution: {
-      fiveStars: 150,
-      fourStars: 50,
-      threeStars: 10,
-      twoStars: 3,
-      oneStar: 1,
-    },
-    createdAt: '',
-  },
-  {
-    id: 'prod-003',
-    name: 'Sony WH-1000XM6 Headphones',
-    slug: 'sony-wh-1000xm6',
-    images: [
-      {
-        id: 'img-004',
-        url: 'https://images.unsplash.com/photo-1585386959984-a41552231693',
-        alt: 'Sony WH-1000XM6',
-      },
-    ],
-    description:
-      'Noise-cancelling wireless headphones with 40 hours of playback and immersive sound.',
-    price: 499,
-    discount: 15,
-    categories: ['gaming-accessories'],
-    stock: 80,
-    brand: 'sony',
-    status: 'sale',
-    variant: 'others',
-    isFeatured: false,
-    averageRating: 4.9,
-    totalReviews: 580,
-    ratingDistribution: {
-      fiveStars: 500,
-      fourStars: 60,
-      threeStars: 15,
-      twoStars: 3,
-      oneStar: 2,
-    },
-    createdAt: '',
-  },
-  {
-    id: 'prod-004',
-    name: 'LG InstaView Refrigerator',
-    slug: 'lg-instaview-refrigerator',
-    images: [
-      {
-        id: 'img-005',
-        url: 'https://images.unsplash.com/photo-1616627988597-2563c1cc7466',
-        alt: 'LG Refrigerator',
-      },
-    ],
-    description: 'Energy-efficient refrigerator with smart glass panel and Wi-Fi connectivity.',
-    price: 2199,
-    discount: 8,
-    categories: ['refrigerators', 'home-appliances'],
-    stock: 20,
-    brand: 'lg',
-    status: 'hot',
-    variant: 'refrigerators',
-    isFeatured: true,
-    averageRating: 4.7,
-    totalReviews: 123,
-    ratingDistribution: {
-      fiveStars: 90,
-      fourStars: 25,
-      threeStars: 6,
-      twoStars: 1,
-      oneStar: 1,
-    },
-    createdAt: '',
-  },
-  {
-    id: 'prod-005',
-    name: 'Xiaomi Air Purifier 6 Pro',
-    slug: 'xiaomi-air-purifier-6-pro',
-    images: [
-      {
-        id: 'img-006',
-        url: 'https://images.unsplash.com/photo-1606811843854-6d38e1b21f8c',
-        alt: 'Xiaomi Air Purifier',
-      },
-    ],
-    description: 'High-performance air purifier with smart home integration and quiet operation.',
-    price: 399,
-    discount: 12,
-    categories: ['home-appliances'],
-    stock: 50,
-    brand: 'xiaomi',
-    status: 'new',
-    variant: 'appliances',
-    isFeatured: false,
-    averageRating: 4.5,
-    totalReviews: 76,
-    ratingDistribution: {
-      fiveStars: 55,
-      fourStars: 15,
-      threeStars: 4,
-      twoStars: 1,
-      oneStar: 1,
-    },
-    createdAt: '',
   },
 ];
