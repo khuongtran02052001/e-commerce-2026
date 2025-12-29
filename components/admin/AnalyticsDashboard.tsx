@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { formatCurrency } from '@/lib/formatCurrency';
 import { Award, DollarSign, Package, RefreshCw, ShoppingCart, TrendingUp } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 
@@ -58,13 +59,6 @@ const AnalyticsDashboard: React.FC = () => {
   useEffect(() => {
     fetchAnalytics(timeframe);
   }, [timeframe]);
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(amount);
-  };
 
   return (
     <div className="space-y-6">

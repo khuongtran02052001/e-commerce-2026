@@ -145,7 +145,11 @@ const OrdersComponent = ({ orders }: { orders: MY_ORDERS_QUERYResult }) => {
                     {renderProductImages(order.products || [])}
                   </TableCell>
                   <TableCell className="font-medium text-sm">
-                    <PriceFormatter amount={order?.totalPrice} className="text-black font-medium" />
+                    <PriceFormatter
+                      showDecimals
+                      amount={order?.totalPrice}
+                      className="text-black font-medium"
+                    />
                   </TableCell>
                   <TableCell>
                     {order?.status && (

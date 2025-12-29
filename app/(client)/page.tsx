@@ -32,7 +32,7 @@ export default async function Home() {
       <HomeBanner />
       <div className="py-10">
         <ProductGrid data={productsHydrat!} />
-        <HomeCategories categories={categories.data} />
+        <HomeCategories categories={categories} />
         <ShopFeatures />
         <ShopByBrands />
         <LatestBlog />

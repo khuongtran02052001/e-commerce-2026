@@ -10,7 +10,7 @@ const HomeTabbar = ({ selectedTab, onTabSelect }: Props) => {
   return (
     <div className="flex items-center flex-wrap gap-5 justify-between">
       <div className="flex items-center gap-1.5 text-sm font-semibold">
-        <div className="flex items-center gap-1.5 md:gap-3">
+        <div className="flex items-center gap-1.5 md:gap-3 flex-wrap">
           {productType?.map((item) => (
             <button
               onClick={() => onTabSelect(item?.value)}

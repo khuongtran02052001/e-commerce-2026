@@ -4,6 +4,7 @@ import { doLogout } from '@/app/action';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useUserData } from '@/contexts/UserDataContext';
 import { useIsAdmin } from '@/lib/adminUtils';
+import { formatCompactUSD, formatCurrency } from '@/lib/formatCurrency';
 import {
   Briefcase,
   Crown,
@@ -18,7 +19,7 @@ import {
   Wallet,
 } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const UserDropdown = () => {
   const [open, setOpen] = useState(false);
@@ -40,23 +41,28 @@ const UserDropdown = () => {
   };
 
   const handleLinkClick = () => setOpen(false);
-
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <button className="flex items-center gap-2 py-1 px-2 rounded-lg hover:bg-shop_light_bg group border border-shop_dark_green/20 hover:border-shop_dark_green hoverEffect">
           <div className="relative">
-            {user?.image ? (
+            {mounted && user?.image ? (
               <img
                 src={user.image}
                 alt={user.name || 'Username'}
                 className="w-8 h-8 rounded-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.src = '/images/avatar-placeholder.png';
+                }}
               />
             ) : (
               <UserCircle className="w-8 h-8 text-gray-500 group-hover:text-shop_light_green transition-colors" />
             )}
 
-            <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white shadow-sm"></div>
+            <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white shadow-sm" />
           </div>
 
           <div className="hidden lg:flex flex-col items-start">
@@ -97,9 +103,12 @@ const UserDropdown = () => {
                   <Wallet className="w-4 h-4 text-shop_dark_green" />
                   <span className="text-sm font-medium text-gray-700">Wallet Balance</span>
                 </div>
-                <span className="text-lg font-bold text-shop_dark_green">
-                  ${walletBalance.toFixed(2)}
-                </span>
+                <p
+                  title={formatCurrency(walletBalance)}
+                  className="text-lg font-bold text-shop_dark_green"
+                >
+                  {formatCompactUSD(walletBalance)}
+                </p>
               </div>
             </div>
           )}

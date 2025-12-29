@@ -15,12 +15,21 @@ const ProductCard = memo(({ product }: { product: IProduct }) => {
         {product?.images && (
           <Link href={`/product/${product?.slug}`}>
             <img
-              src={product.images[0].url}
-              className={`w-full h-64 object-contain overflow-hidden transition-transform bg-shop_light_bg duration-500 
-                ${product?.stock !== 0 ? 'group-hover:scale-105' : 'opacity-50'}`}
-              alt="productImage"
+              src={product.images?.[0]?.url || '/images/placeholder.webp'}
+              onError={(e) => {
+                e.currentTarget.src = '/images/placeholder.webp';
+              }}
+              className={`
+    w-full h-64
+    object-cover
+    bg-shop_light_bg
+    transition-transform duration-500
+    ${product.stock !== 0 ? 'group-hover:scale-105' : 'opacity-50'}
+  `}
+              alt={product.name}
               loading="lazy"
             />
+
             {/* <Image
               src={urlFor(product.images[0]).url()}
               alt="productImage"
@@ -33,14 +42,14 @@ const ProductCard = memo(({ product }: { product: IProduct }) => {
           </Link>
         )}
         <ProductSideMenu product={product} />
-        {product?.status === 'sale' ? (
+        {product?.status === 'SALE' ? (
           <p className="absolute top-2 left-2 z-10 text-xs border border-dark-color/50 px-2 rounded-full group-hover:border-light-green hover:text-shop_dark_green hoverEffect">
             Sale!
           </p>
         ) : (
           <Link
             href={'/deal'}
-            className="absolute top-2 left-2 z-10 border border-shop_orange/50 p-1 rounded-full group-hover:border-shop_orange hover:text-shop_dark_green hoverEffect"
+            className=" absolute top-2 left-2 z-10 border border-shop_orange/50 p-1 rounded-full group-hover:border-shop_orange hover:text-shop_dark_green hoverEffect"
           >
             <Flame
               size={18}

@@ -483,11 +483,16 @@ const OrderDetailsPage: React.FC<OrderDetailsPageProps> = ({ order }) => {
                         )}
                         <div className="flex items-center gap-4 mt-2">
                           <span className="text-sm text-gray-600">Qty: {item.quantity}</span>
-                          <PriceFormatter amount={item.product.price} className="font-medium" />
+                          <PriceFormatter
+                            showDecimals
+                            amount={item.product.price}
+                            className="font-medium"
+                          />
                         </div>
                       </div>
                       <div className="text-right">
                         <PriceFormatter
+                          showDecimals
                           amount={item.product.price * item.quantity}
                           className="font-medium text-lg"
                         />

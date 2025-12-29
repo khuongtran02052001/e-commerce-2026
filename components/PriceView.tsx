@@ -21,6 +21,7 @@ const PriceView = ({ price, discount, className }: Props) => {
       <div className="flex items-center gap-2">
         {/* Current/Payable Price (discounted price) */}
         <PriceFormatter
+          compact
           amount={currentPrice}
           className={cn('text-shop_dark_green font-semibold', className)}
         />
@@ -29,6 +30,7 @@ const PriceView = ({ price, discount, className }: Props) => {
         {discount && discountAmount > 0 && (
           <div className="flex items-center gap-1">
             <PriceFormatter
+              compact
               amount={grossPrice}
               className={twMerge('line-through text-xs font-normal text-zinc-500', className)}
             />

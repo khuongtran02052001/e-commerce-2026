@@ -1,162 +1,46 @@
 'use client';
 
-import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect } from 'react';
-
 import { useUserData } from '@/contexts/UserDataContext';
-import { UserCircle } from 'lucide-react';
-import dynamic from 'next/dynamic';
-import CartIcon from './cart/CartIcon';
-import Logo from './common/Logo';
+import { useEffect, useState } from 'react';
+import AuthActions from './AuthAction';
 import Container from './Container';
-import FavoriteButton from './FavoriteButton';
+import Logo from './common/Logo';
 import HeaderMenu from './layout/HeaderMenu';
 import MobileMenu from './layout/MobileMenu';
-import NotificationBell from './NotificationBell';
-
-const UserDropdown = dynamic(() => import('./UserDropdown'), {
-  ssr: false,
-  loading: () => (
-    <button className="flex items-center gap-2 py-1 px-2 rounded-lg hover:bg-shop_light_bg group border border-shop_dark_green/20 hover:border-shop_dark_green hoverEffect">
-      <div className="relative">
-        <UserCircle className="w-8 h-8 text-gray-500 group-hover:text-shop_light_green transition-colors" />
-
-        <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white shadow-sm"></div>
-      </div>
-
-      <div className="hidden lg:flex flex-col items-start">
-        <span className="text-sm font-medium text-gray-800 group-hover:text-shop_light_green transition-colors">
-          Username
-        </span>
-      </div>
-    </button>
-  ),
-});
 
 const ClientHeader = () => {
-  const { authReady } = useUserData();
+  const { authReady, isAuthenticated } = useUserData();
 
-  const router = useRouter();
-  const searchParams = useSearchParams();
+  const [signInUrl, setSignInUrl] = useState('/login');
+  const [signUpUrl, setSignUpUrl] = useState('/register');
 
-  // Handle redirect after login
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const redirectTo = searchParams.get('redirectTo');
-      if (redirectTo) {
-        const clean = decodeURIComponent(redirectTo);
-        router.push(clean);
-        router.replace(window.location.pathname);
-      }
-    }
-  }, [searchParams, router]);
-
-  const getSignInUrl = () => {
-    if (typeof window === 'undefined') return '/login';
     const path = window.location.pathname + window.location.search;
-    return `/login?redirectTo=${encodeURIComponent(path)}`;
-  };
+    setSignInUrl(`/login?redirectTo=${encodeURIComponent(path)}`);
+    setSignUpUrl(`/register?redirectTo=${encodeURIComponent(path)}`);
+  }, []);
 
-  const getSignUpUrl = () => {
-    if (typeof window === 'undefined') return '/register';
-    const path = window.location.pathname + window.location.search;
-    return `/register?redirectTo=${encodeURIComponent(path)}`;
-  };
+  if (!authReady) return null;
 
   return (
-    <header className="sticky top-0 z-40 py-2 sm:py-3 lg:py-4 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm">
-      <Container className="h-full">
-        <div className="flex items-center h-full min-h-[3rem] sm:min-h-[3.5rem] lg:min-h-[4rem]">
-          {/* Mobile menu + Logo */}
-          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+    <header className="sticky top-0 z-40 py-2 bg-white/95 backdrop-blur-md border-b">
+      <Container>
+        <div className="flex items-center">
+          <div className="flex items-center gap-2">
             <MobileMenu />
             <Logo />
           </div>
 
-          {/* Desktop Menu */}
-          <div className="hidden lg:flex items-center justify-center flex-1 mx-8">
+          <div className="hidden lg:flex flex-1 justify-center mx-8">
             <HeaderMenu />
           </div>
 
-          {/* Right section */}
-          <div className="flex items-center gap-2 sm:gap-3 lg:gap-4 ml-auto">
-            {/* Desktop actions */}
-            <div className="hidden lg:flex items-center gap-4">
-              <CartIcon />
-              <FavoriteButton />
-              <NotificationBell />
-
-              {/* Signed In */}
-              <UserDropdown />
-
-              {/* Signed Out */}
-              {!authReady && (
-                <div className="flex items-center gap-3">
-                  <Link
-                    href={getSignInUrl()}
-                    className="bg-transparent border border-shop_btn_dark_green hover:bg-shop_btn_dark_green text-shop_btn_dark_green hover:text-white px-2 py-1.5 rounded text-xs font-semibold hoverEffect"
-                  >
-                    Sign In
-                  </Link>
-                  <Link
-                    href={getSignUpUrl()}
-                    className="bg-shop_btn_dark_green border border-shop_btn_dark_green hover:bg-transparent text-white hover:text-shop_btn_dark_green px-2 py-1.5 rounded text-xs font-semibold hoverEffect"
-                  >
-                    Sign Up
-                  </Link>
-                </div>
-              )}
-            </div>
-
-            {/* Tablet */}
-            <div className="hidden md:flex lg:hidden items-center gap-2">
-              <CartIcon />
-              <FavoriteButton />
-              <NotificationBell />
-
-              {authReady ? (
-                <UserDropdown />
-              ) : (
-                <div className="flex items-center gap-2">
-                  <Link
-                    href={getSignInUrl()}
-                    className="text-sm font-semibold hover:text-shop_light_green hoverEffect px-2 py-1 transition-colors duration-200"
-                  >
-                    Sign In
-                  </Link>
-                  <Link
-                    href={getSignUpUrl()}
-                    className="bg-shop_dark_green hover:bg-shop_light_green text-white px-3 py-1.5 rounded-md text-sm font-semibold transition-all duration-200"
-                  >
-                    Sign Up
-                  </Link>
-                </div>
-              )}
-            </div>
-
-            {/* Mobile */}
-            <div className="flex md:hidden items-center gap-1">
-              {authReady ? (
-                <UserDropdown />
-              ) : (
-                <div className="flex items-center gap-1">
-                  <Link
-                    href={getSignInUrl()}
-                    className="bg-transparent border border-shop_btn_dark_green hover:bg-shop_btn_dark_green text-shop_btn_dark_green  hover:text-white px-2 py-1.5 rounded text-xs font-semibold hoverEffect"
-                  >
-                    Sign In
-                  </Link>
-                  <Link
-                    href={getSignUpUrl()}
-                    className="bg-shop_btn_dark_green border border-shop_btn_dark_green hover:bg-transparent text-white hover:text-shop_btn_dark_green px-2 py-1.5 rounded text-xs font-semibold hoverEffect"
-                  >
-                    Sign Up
-                  </Link>
-                </div>
-              )}
-            </div>
-          </div>
+          <AuthActions
+            authReady={authReady}
+            isAuthenticated={isAuthenticated}
+            signInUrl={signInUrl}
+            signUpUrl={signUpUrl}
+          />
         </div>
       </Container>
     </header>

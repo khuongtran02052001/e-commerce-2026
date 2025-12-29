@@ -117,7 +117,7 @@ const Loading = () => {
           </motion.div>
 
           {/* Progress Bar */}
-          <div className="w-64 h-2 bg-gray-200 rounded-full overflow-hidden">
+          <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
             <motion.div
               className="h-full bg-gradient-to-r from-shop_light_green to-shop_orange rounded-full"
               initial={{ width: '0%' }}

@@ -1,15 +1,14 @@
+import { getLatestBlogs } from '@/repository/blogApi';
 import Container from './Container';
 import Title from './Title';
 // import { getLatestBlogs } from "@/sanity/queries";
-import { mockBlogs } from '@/mock-data';
 import dayjs from 'dayjs';
 import { Calendar } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
 const LatestBlog = async () => {
-  // const blogs = await getLatestBlogs();
-  const blogs = mockBlogs;
+  const blogs = await getLatestBlogs();
 
   return (
     <Container className="mt-16 lg:mt-24">
@@ -79,7 +78,7 @@ const LatestBlog = async () => {
                     key={index}
                     className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-shop_light_pink text-shop_dark_green border border-shop_light_green/30"
                   >
-                    {item?.name}
+                    {item?.title}
                   </span>
                 ))}
               </div>

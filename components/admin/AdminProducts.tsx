@@ -27,6 +27,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { formatCurrency } from '@/lib/formatCurrency';
 import { ADMIN_CATEGORIES_QUERYResult } from '@/sanity.types';
 import { urlFor } from '@/sanity/lib/image';
 import {
@@ -80,14 +81,6 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ initialCategories = [] })
       setCurrentPage(0);
     }
   }, [debouncedSearchTerm, searchTerm]);
-
-  // Utility functions
-  const formatCurrency = (amount: number): string => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(amount);
-  };
 
   // Fetch products
   const fetchProducts = useCallback(

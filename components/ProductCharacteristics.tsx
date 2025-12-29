@@ -1,9 +1,9 @@
-import { IBrandMock, IProduct } from '@/mock-data';
+import { IBrand, IProduct } from '@/mock-data';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
 
 interface ProductCharacteristicsProps {
   product: IProduct;
-  brand: IBrandMock[] | null;
+  brand: IBrand[] | null;
 }
 
 const ProductCharacteristics = ({ product, brand }: ProductCharacteristicsProps) => {

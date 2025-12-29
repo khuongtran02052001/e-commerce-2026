@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/sheet';
 import { Textarea } from '@/components/ui/textarea';
 import { trackOrderDetails, trackOrderFullfillment } from '@/lib/analytics';
+import { formatCurrency } from '@/lib/formatCurrency';
 import { showToast } from '@/lib/toast';
 import { Calendar, DollarSign, Package, Save, Truck, User, X } from 'lucide-react';
 import React, { useState } from 'react';
@@ -76,13 +77,6 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
       });
     }
   }, [order]);
-
-  const formatCurrency = (amount: number): string => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(amount);
-  };
 
   const formatDate = (dateString: string): string => {
     if (!dateString) return 'Not set';

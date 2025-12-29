@@ -1,9 +1,8 @@
-import Container from './Container';
-// import { getAllBrands } from "@/sanity/queries";
-import { mockBrands } from '@/mock-data';
+import { getAllBrands } from '@/sanity/queries';
 import { GitCompareArrows, Headset, ShieldCheck, Truck } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import Container from './Container';
 import Title from './Title';
 
 const extraData = [
@@ -30,8 +29,7 @@ const extraData = [
 ];
 
 const ShopByBrands = async () => {
-  // const brands = await getAllBrands();
-  const brands = mockBrands;
+  const brands = await getAllBrands();
 
   return (
     <Container className="mt-16 lg:mt-24">

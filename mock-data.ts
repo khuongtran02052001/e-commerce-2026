@@ -42,7 +42,7 @@ export interface ICategory {
   imageUrl?: string;
 }
 
-export interface IBrandMock {
+export interface IBrand {
   id: string;
   title: string;
   slug: string;
@@ -52,7 +52,7 @@ export interface IBrandMock {
 
 export interface IBlogCategoryMock {
   id: string;
-  name: string;
+  title: string;
   slug: string;
 }
 
@@ -139,9 +139,9 @@ export const mockAuthors: IAuthorMock[] = [
 ];
 
 export const mockBlogCategories: IBlogCategoryMock[] = [
-  { id: 'bcat-001', name: 'Tech News', slug: 'tech-news' },
-  { id: 'bcat-002', name: 'Tutorials', slug: 'tutorials' },
-  { id: 'bcat-003', name: 'Product Reviews', slug: 'product-reviews' },
+  { id: 'bcat-001', title: 'Tech News', slug: 'tech-news' },
+  { id: 'bcat-002', title: 'Tutorials', slug: 'tutorials' },
+  { id: 'bcat-003', title: 'Product Reviews', slug: 'product-reviews' },
 ];
 
 export const mockBlogs: IBlogMock[] = [
@@ -192,7 +192,7 @@ export const mockBlogs: IBlogMock[] = [
   },
 ];
 
-export const mockBrands: IBrandMock[] = [
+export const mockBrands: IBrand[] = [
   {
     id: 'brand-001',
     title: 'Apple',

@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -24,6 +24,8 @@
   --color-light-text: #ababab;
   --color-light-green: #93d991;
   --color-product-bg: #f1f3f8;
+  --color-shop_light_blue: #a8b8f5;
+  --color-shop_dark_blue: #43749f;
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
 
@@ -211,7 +213,7 @@
 }
 @layer utilities {
   :root {
-    --font-poppins: 'Poppins', sans-serif;
+    --font-poppins: "Poppins", sans-serif;
   }
   body {
     font-family: var(--font-poppins);
@@ -490,7 +492,7 @@
   --sonner-toast-width: 356px;
 }
 
-[data-sonner-toaster][data-theme='light'] {
+[data-sonner-toaster][data-theme="light"] {
   --sonner-loading-bar: #3b9c3c;
   --sonner-success: #3b9c3c;
   --sonner-success-bg: #f0f9f0;
@@ -506,25 +508,25 @@
   --sonner-info-border: #a5b4fc;
 }
 
-[data-sonner-toast][data-type='success'] {
+[data-sonner-toast][data-type="success"] {
   background: var(--sonner-success-bg);
   border: 1px solid var(--sonner-success-border);
   color: var(--color-shop_dark_green);
 }
 
-[data-sonner-toast][data-type='error'] {
+[data-sonner-toast][data-type="error"] {
   background: var(--sonner-error-bg);
   border: 1px solid var(--sonner-error-border);
   color: var(--color-dark-red);
 }
 
-[data-sonner-toast][data-type='warning'] {
+[data-sonner-toast][data-type="warning"] {
   background: var(--sonner-warning-bg);
   border: 1px solid var(--sonner-warning-border);
   color: var(--color-shop_orange);
 }
 
-[data-sonner-toast][data-type='info'] {
+[data-sonner-toast][data-type="info"] {
   background: var(--sonner-info-bg);
   border: 1px solid var(--sonner-info-border);
   color: var(--color-light-blue);

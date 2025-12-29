@@ -104,6 +104,7 @@ const OrderDetailsDialog: FC<OrderDetailsDialogProps> = ({ order, isOpen, onClos
                 <TableCell>{product?.quantity}</TableCell>
                 <TableCell>
                   <PriceFormatter
+                    showDecimals
                     amount={product?.product?.price as number}
                     className="text-black font-medium"
                   />
@@ -118,13 +119,18 @@ const OrderDetailsDialog: FC<OrderDetailsDialogProps> = ({ order, isOpen, onClos
             {order?.amountDiscount !== 0 && (
               <div className="w-full flex items-center justify-between">
                 <strong>Discount: </strong>
-                <PriceFormatter amount={order?.amountDiscount} className="text-black font-bold" />
+                <PriceFormatter
+                  showDecimals
+                  amount={order?.amountDiscount}
+                  className="text-black font-bold"
+                />
               </div>
             )}
             {order?.amountDiscount !== 0 && (
               <div className="w-full flex items-center justify-between">
                 <strong>Subtotal: </strong>
                 <PriceFormatter
+                  showDecimals
                   amount={(order?.totalPrice as number) + (order?.amountDiscount as number)}
                   className="text-black font-bold"
                 />
@@ -132,7 +138,11 @@ const OrderDetailsDialog: FC<OrderDetailsDialogProps> = ({ order, isOpen, onClos
             )}
             <div className="w-full flex items-center justify-between">
               <strong>Total: </strong>
-              <PriceFormatter amount={order?.totalPrice} className="text-black font-bold" />
+              <PriceFormatter
+                showDecimals
+                amount={order?.totalPrice}
+                className="text-black font-bold"
+              />
             </div>
           </div>
         </div>

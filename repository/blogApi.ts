@@ -1,6 +1,8 @@
+import { axiosPublic } from '@/lib/axios/axiosPublic';
 import axiosClient from '@/lib/axiosClient';
+import { IBlogMock } from '@/mock-data';
 
-export const getLatestBlogs = () => axiosClient.get('/blogs/latest');
+export const getLatestBlogs = () => axiosPublic.get<IBlogMock[]>('/blogs/latest?limit=4');
 
 export const getBlogs = (quantity?: number) => {
   return axiosClient.get('/blogs', { params: { quantity } });

@@ -1,6 +1,6 @@
 'use client';
 // import { client } from "@/sanity/lib/client";
-import { IBrandMock, ICategory, IProduct, mockProducts } from '@/mock-data';
+import { IBrand, ICategory, IProduct, mockProducts } from '@/mock-data';
 import { Filter, X } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
@@ -14,7 +14,7 @@ import PriceList from './PriceList';
 
 interface Props {
   categories: ICategory[];
-  brands: IBrandMock[];
+  brands: IBrand[];
 }
 
 const Shop = ({ categories, brands }: Props) => {

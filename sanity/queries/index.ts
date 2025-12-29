@@ -1,4 +1,4 @@
-import { IProduct } from '@/mock-data';
+import { IBrand, IProduct } from '@/mock-data';
 import { unstable_cache } from 'next/cache';
 
 /**
@@ -94,7 +94,7 @@ export const getFeaturedProducts = unstable_cache(
 ============================================================ */
 export const getAllBrands = unstable_cache(
   async () => {
-    const res = await fetchApi('/brands');
+    const res = await fetchApi<IBrand[]>('/brands');
     return res.data;
   },
   ['all-brands'],

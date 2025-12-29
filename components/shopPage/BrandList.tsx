@@ -1,10 +1,10 @@
-import { IBrandMock } from '@/mock-data';
+import { IBrand } from '@/mock-data';
 import { Dispatch, SetStateAction } from 'react';
 import Title from '../Title';
 import { Label } from '../ui/label';
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
 interface Props {
-  brands: IBrandMock[];
+  brands: IBrand[];
   selectedBrand?: string | null;
   setSelectedBrand: Dispatch<SetStateAction<string | null>>;
 }

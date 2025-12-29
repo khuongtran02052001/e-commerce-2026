@@ -1,6 +1,6 @@
 'use client';
 
-import { IBrandMock, ICategory, IProduct } from '@/mock-data';
+import { IBrand, ICategory, IProduct } from '@/mock-data';
 import { ChevronDown, Grid3X3, LayoutGrid, Search, SlidersHorizontal, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useMemo, useState } from 'react';
@@ -18,7 +18,7 @@ import { Slider } from './ui/slider';
 interface Props {
   initialProducts: IProduct[];
   categories: ICategory[];
-  brands: IBrandMock[];
+  brands: IBrand[];
 }
 
 type SortOption = 'name-asc' | 'name-desc' | 'price-low' | 'price-high' | 'newest' | 'popular';

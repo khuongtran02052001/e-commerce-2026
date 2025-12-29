@@ -94,7 +94,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
             </div>
             <div className="flex justify-between items-center">
               <span className="text-sm text-gray-600">Total Amount</span>
-              <PriceFormatter amount={orderTotal} className="font-semibold text-lg" />
+              <PriceFormatter showDecimals amount={orderTotal} className="font-semibold text-lg" />
             </div>
           </div>
 

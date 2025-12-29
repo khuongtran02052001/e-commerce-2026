@@ -15,6 +15,7 @@ interface UserData {
 interface UserDataContextType extends UserData {
   authReady: boolean;
   isLoading: boolean;
+  isAuthenticated: boolean;
   refreshUserData: () => Promise<void>;
   doLogoutLocal: () => void;
 }
@@ -25,6 +26,8 @@ export function UserDataProvider({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession();
 
   const authReady = status !== 'loading';
+  const isAuthenticated = status === 'authenticated' && !!session?.user;
+
   const sessionUser = session?.user ?? null;
 
   const cacheRef = useRef<{
@@ -87,7 +90,8 @@ export function UserDataProvider({ children }: { children: React.ReactNode }) {
     [sessionUser],
   );
 
-  const doLogoutLocal = async () =>
+  const doLogoutLocal = async () => {
+    cacheRef.current = null;
     setState({
       currentUser: null,
       ordersCount: 0,
@@ -96,6 +100,7 @@ export function UserDataProvider({ children }: { children: React.ReactNode }) {
       walletBalance: 0,
       isLoading: false,
     });
+  };
   useEffect(() => {
     if (!authReady) return;
 
@@ -114,6 +119,7 @@ export function UserDataProvider({ children }: { children: React.ReactNode }) {
       value={{
         ...state,
         authReady,
+        isAuthenticated,
         doLogoutLocal,
         refreshUserData: () => loadUserStats(true),
       }}
