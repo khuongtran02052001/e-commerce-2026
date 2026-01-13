@@ -15,7 +15,7 @@ const ProductCharacteristics = ({ product, brand }: ProductCharacteristicsProps)
           <p className="flex items-center justify-between">
             Brand:{' '}
             {brand && brand.length > 0 && (
-              <span className="font-semibold tracking-wide">{brand[0]?.title}</span>
+              <span className="font-semibold tracking-wide">{brand[0]?.name}</span>
             )}
           </p>
           <p className="flex items-center justify-between">

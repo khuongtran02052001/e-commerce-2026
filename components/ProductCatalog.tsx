@@ -222,7 +222,7 @@ const ProductCatalog = ({ initialProducts, categories, brands }: Props) => {
               const brand = brands.find((b) => b.id === brandId);
               return brand ? (
                 <Badge key={brandId} variant="secondary" className="gap-1">
-                  {brand.title}
+                  {brand.name}
                   <X className="w-3 h-3 cursor-pointer" onClick={() => toggleBrand(brandId)} />
                 </Badge>
               ) : null;
@@ -316,7 +316,7 @@ const ProductCatalog = ({ initialProducts, categories, brands }: Props) => {
                           onCheckedChange={() => toggleBrand(brand.id)}
                         />
                         <label htmlFor={brand.id} className="text-sm flex-1 cursor-pointer">
-                          {brand.title}
+                          {brand.name}
                         </label>
                       </div>
                     ))}

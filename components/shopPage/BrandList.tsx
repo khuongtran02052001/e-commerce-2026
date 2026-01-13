@@ -39,7 +39,7 @@ const BrandList = ({ brands, selectedBrand, setSelectedBrand }: Props) => {
                   : 'text-gray-700 group-hover:text-gray-900'
               }`}
             >
-              {brand?.title}
+              {brand?.name}
             </Label>
           </div>
         ))}

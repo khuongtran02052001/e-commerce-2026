@@ -8,7 +8,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 const LatestBlog = async () => {
-  const blogs = await getLatestBlogs();
+  const blogsResult = await getLatestBlogs();
+  const blogs = blogsResult.data;
 
   return (
     <Container className="mt-16 lg:mt-24">

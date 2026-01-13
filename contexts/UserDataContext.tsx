@@ -47,7 +47,6 @@ export function UserDataProvider({ children }: { children: React.ReactNode }) {
   const loadUserStats = useCallback(
     async (force = false) => {
       if (!sessionUser) return;
-
       const now = Date.now();
       if (!force && cacheRef.current && now - cacheRef.current.timestamp < 30_000) {
         setState((prev) => ({

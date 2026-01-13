@@ -76,7 +76,7 @@ const ProductContent = ({ product, relatedProducts, brand }: ProductContentProps
                 <Badge className="bg-shop_light_green/10 text-shop_dark_green hover:bg-shop_light_green/20 w-fit">
                   {brand && brand.length > 0 && (
                     <span className="font-semibold tracking-wide">
-                      {brand[0]?.title || 'Brand'}
+                      {brand[0]?.name || 'Brand'}
                     </span>
                   )}
                 </Badge>

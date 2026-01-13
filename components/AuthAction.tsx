@@ -1,9 +1,9 @@
+import { signIn } from 'next-auth/react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import CartIcon from './cart/CartIcon';
 import FavoriteButton from './FavoriteButton';
 import NotificationBell from './NotificationBell';
-import { signIn } from 'next-auth/react';
 
 const UserDropdown = dynamic(() => import('./UserDropdown'), {
   ssr: false,

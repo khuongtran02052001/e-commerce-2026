@@ -1,17 +1,18 @@
 import { axiosPublic } from '@/lib/axios/axiosPublic';
 import axiosClient from '@/lib/axiosClient';
-import { ICategory } from '@/mock-data';
+import type { ICategory } from '@/mock-data';
+import type { PaginatedResult } from '@/types/common-type';
 
 export const getFeaturedCategories = () => {
-  return axiosClient.get('/categories/featured');
+  return axiosClient.get<PaginatedResult<ICategory>>('/categories/featured');
 };
 
 export const getAllCategories = (quantity?: number) => {
-  return axiosPublic.get<ICategory[]>('/categories', {
+  return axiosPublic.get<PaginatedResult<ICategory>>('/categories', {
     params: { quantity },
   });
 };
 
 export const getAdminCategories = () => {
-  return axiosClient.get('/admin/categories');
+  return axiosClient.get<PaginatedResult<ICategory>>('/admin/categories');
 };

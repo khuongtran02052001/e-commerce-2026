@@ -44,7 +44,7 @@ export interface ICategory {
 
 export interface IBrand {
   id: string;
-  title: string;
+  name: string;
   slug: string;
   description?: string;
   imageUrl?: string;
@@ -195,7 +195,7 @@ export const mockBlogs: IBlogMock[] = [
 export const mockBrands: IBrand[] = [
   {
     id: 'brand-001',
-    title: 'Apple',
+    name: 'Apple',
     slug: 'apple',
     description:
       'Apple designs innovative hardware, software, and services — known for the iPhone, iPad, and Mac.',
@@ -203,7 +203,7 @@ export const mockBrands: IBrand[] = [
   },
   {
     id: 'brand-002',
-    title: 'Samsung',
+    name: 'Samsung',
     slug: 'samsung',
     description:
       'Samsung is a global leader in technology, opening new possibilities for people everywhere.',
@@ -211,7 +211,7 @@ export const mockBrands: IBrand[] = [
   },
   {
     id: 'brand-003',
-    title: 'Sony',
+    name: 'Sony',
     slug: 'sony',
     description:
       'Sony creates products for entertainment, gaming, and professional technologies with premium design.',
@@ -219,14 +219,14 @@ export const mockBrands: IBrand[] = [
   },
   {
     id: 'brand-004',
-    title: 'LG',
+    name: 'LG',
     slug: 'lg',
     description: 'LG Electronics delivers home appliances and mobile devices that make life good.',
     imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/6/6f/LG_logo_%282015%29.svg',
   },
   {
     id: 'brand-005',
-    title: 'Xiaomi',
+    name: 'Xiaomi',
     slug: 'xiaomi',
     description:
       'Xiaomi focuses on smart hardware connected by an IoT platform with smartphones at its core.',

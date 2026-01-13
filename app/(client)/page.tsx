@@ -8,8 +8,10 @@ import { getAllCategories } from '@/repository/categoryApi';
 import { getAllProducts } from '@/sanity/queries';
 
 export default async function Home() {
-  const categories = await getAllCategories();
+  const categoriesResult = await getAllCategories();
+  const categories = categoriesResult.data;
   const productsHydrat = await getAllProducts();
+  console.log(categories)
   // Generate structured data
   // const organizationSchema = generateOrganizationSchema();
   // const websiteSchema = generateWebsiteSchema();

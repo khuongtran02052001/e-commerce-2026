@@ -81,7 +81,7 @@ const ShopByBrands = async () => {
                 <div className="relative w-full h-full flex items-center justify-center">
                   <Image
                     src={brand?.imageUrl}
-                    alt={`${brand?.title || 'Brand'} logo`}
+                    alt={`${brand?.name || 'Brand'} logo`}
                     width={120}
                     height={80}
                     className="max-w-full max-h-full object-contain group-hover:scale-110 hoverEffect filter group-hover:brightness-110"

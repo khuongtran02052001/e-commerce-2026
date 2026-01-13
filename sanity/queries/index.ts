@@ -1,4 +1,4 @@
-import { IBrand, IProduct } from '@/mock-data';
+import { IBrand, ICategory, IProduct } from '@/mock-data';
 import { unstable_cache } from 'next/cache';
 
 /**
@@ -174,7 +174,7 @@ export const getAddresses = async (userId: string) => {
 ============================================================ */
 export const getCategories = unstable_cache(
   async (quantity?: number) => {
-    const res = await fetchApi('/categories', { quantity });
+    const res = await fetchApi<ICategory[]>('/categories', { quantity });
     return res.data;
   },
   ['categories-list'],

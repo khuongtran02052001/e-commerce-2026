@@ -21,6 +21,7 @@ import { Slider } from '@/components/ui/slider';
 import { productType } from '@/constants';
 import { axiosPublic } from '@/lib/axios/axiosPublic';
 import { IProduct } from '@/mock-data';
+import type { PaginatedResult } from '@/types/common-type';
 import { Eye, Filter, Grid3X3, LayoutGrid, List, SortAsc } from 'lucide-react';
 import Container from './Container';
 import HomeTabbar from './HomeTabbar';
@@ -65,11 +66,11 @@ const ProductGrid: React.FC<{ data: IProduct[] }> = (props) => {
       setLoading(true);
       const { sort, order } = getSortParams(sortBy);
       try {
-        const res = await axiosPublic.get<IProduct[]>(
+        const res = await axiosPublic.get<PaginatedResult<IProduct>>(
           `/products?variant=${selectedTab}&sort=${sort}&order=${order}`,
         );
-        setProducts(res);
-        setFilteredProducts(res);
+        setProducts(res.data);
+        setFilteredProducts(res.data);
       } catch (error) {
         console.error('Product fetching error', error);
       } finally {

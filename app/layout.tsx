@@ -29,7 +29,7 @@ const opensans = localFont({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://shopcartpro.reactbd.org'),
+  metadataBase: new URL('https://yourHttps'),
   title: {
     template: '%s | ShopCart - Premium Online Shopping',
     default: 'ShopCart - Your Trusted Online Shopping Destination',
@@ -59,7 +59,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://shopcartpro.reactbd.org',
+    url: 'https://yourHttps',
     siteName: 'ShopCart',
     title: 'ShopCart - Your Trusted Online Shopping Destination',
     description:
@@ -97,7 +97,7 @@ export const metadata: Metadata = {
     // Add other verification codes as needed
   },
   alternates: {
-    canonical: 'https://shopcartpro.reactbd.org',
+    canonical: 'https://yourHttps',
   },
 };
 
@@ -131,11 +131,11 @@ const RootLayout = async ({ children }: { children: ReactNode }) => {
             }}
           />
 
-          <Script
+          {/* <Script
             async
             src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${GADSENSE_CLIENT_ID}`}
             strategy="beforeInteractive"
-          />
+          /> */}
         </body>
       </html>
     </SessionProvider>
