@@ -1,11 +1,11 @@
-import Container from "@/components/Container";
-import DynamicBreadcrumb from "@/components/DynamicBreadcrumb";
-import { ShoppingBag } from "lucide-react";
-import { CheckoutContent } from "@/components/checkout/CheckoutContent";
-import { notFound } from "next/navigation";
-import { getOrderById } from "@/sanity/queries";
-import { currentUser } from "@clerk/nextjs/server";
-import { OrderCheckoutContent } from "@/components/checkout/OrderCheckoutContent";
+import { CheckoutContent } from '@/components/checkout/CheckoutContent';
+import { OrderCheckoutContent } from '@/components/checkout/OrderCheckoutContent';
+import Container from '@/components/Container';
+import DynamicBreadcrumb from '@/components/DynamicBreadcrumb';
+import { getOrderById } from '@/data/server';
+import { auth } from '@/lib/auth';
+import { ShoppingBag } from 'lucide-react';
+import { notFound } from 'next/navigation';
 
 interface Props {
   searchParams: Promise<{
@@ -15,16 +15,16 @@ interface Props {
 
 export default async function CheckoutPage({ searchParams }: Props) {
   const { orderId } = await searchParams;
-  const user = await currentUser();
 
-  // If there's an orderId, this is a payment for an existing order
   if (orderId) {
-    if (!user) {
+    const session = await auth();
+    const userId = session?.user?.id;
+    if (!userId) {
       notFound();
     }
 
     const order = await getOrderById(orderId);
-    if (!order || order.clerkUserId !== user.id) {
+    if (!order || order.userId !== userId) {
       notFound();
     }
 
@@ -33,9 +33,9 @@ export default async function CheckoutPage({ searchParams }: Props) {
         {/* Breadcrumb with custom items for payment flow */}
         <DynamicBreadcrumb
           customItems={[
-            { label: "Home", href: "/" },
-            { label: "Orders", href: "/orders" },
-            { label: "Payment" },
+            { label: 'Home', href: '/' },
+            { label: 'Orders', href: '/orders' },
+            { label: 'Payment' },
           ]}
           className="mb-6"
         />
@@ -47,7 +47,7 @@ export default async function CheckoutPage({ searchParams }: Props) {
         </div>
 
         {/* Order Checkout Content */}
-        <OrderCheckoutContent order={order} />
+        <OrderCheckoutContent order={order as any} />
       </Container>
     );
   }
@@ -58,10 +58,10 @@ export default async function CheckoutPage({ searchParams }: Props) {
       {/* Breadcrumb with parent context showing "Home > Dashboard > Cart > Checkout" */}
       <DynamicBreadcrumb
         customItems={[
-          { label: "Home", href: "/" },
-          { label: "Dashboard", href: "/user" },
-          { label: "Cart", href: "/cart" },
-          { label: "Checkout" },
+          { label: 'Home', href: '/' },
+          { label: 'Dashboard', href: '/user' },
+          { label: 'Cart', href: '/cart' },
+          { label: 'Checkout' },
         ]}
         className="mb-6"
       />

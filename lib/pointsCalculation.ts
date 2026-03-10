@@ -5,8 +5,8 @@ export interface PointsCalculation {
 }
 
 export function calculateRewardPoints(orderTotal: number): number {
-  const threshold = parseFloat(process.env.REWARD_POINTS_THRESHOLD || "3000");
-  const basePoints = parseInt(process.env.REWARD_POINTS_AMOUNT || "5");
+  const threshold = parseFloat(process.env.REWARD_POINTS_THRESHOLD || '3000');
+  const basePoints = parseInt(process.env.REWARD_POINTS_AMOUNT || '5');
 
   if (orderTotal < threshold) {
     return 0;
@@ -28,10 +28,8 @@ export function calculateRewardPoints(orderTotal: number): number {
 }
 
 export function calculateLoyaltyPoints(completedOrders: number): number {
-  const orderThreshold = parseInt(
-    process.env.LOYALTY_POINTS_ORDER_THRESHOLD || "5"
-  );
-  const pointsAmount = parseInt(process.env.LOYALTY_POINTS_AMOUNT || "100");
+  const orderThreshold = parseInt(process.env.LOYALTY_POINTS_ORDER_THRESHOLD || '5');
+  const pointsAmount = parseInt(process.env.LOYALTY_POINTS_AMOUNT || '100');
 
   // Calculate how many loyalty point milestones have been reached
   const milestones = Math.floor(completedOrders / orderThreshold);
@@ -42,7 +40,7 @@ export function calculatePointsUpdate(
   orderTotal: number,
   currentCompletedOrders: number,
   currentRewardPoints: number = 0,
-  currentLoyaltyPoints: number = 0
+  currentLoyaltyPoints: number = 0,
 ): PointsCalculation {
   const newRewardPoints = calculateRewardPoints(orderTotal);
   const newCompletedOrders = currentCompletedOrders + 1;
@@ -52,15 +50,13 @@ export function calculatePointsUpdate(
   const messages: string[] = [];
 
   if (newRewardPoints > 0) {
-    const threshold = process.env.REWARD_POINTS_THRESHOLD || "3000";
-    messages.push(
-      `Earned ${newRewardPoints} reward points for order over $${threshold}!`
-    );
+    const threshold = process.env.REWARD_POINTS_THRESHOLD || '3000';
+    messages.push(`Earned ${newRewardPoints} reward points for order over $${threshold}!`);
   }
 
   if (loyaltyPointsEarned > 0) {
     messages.push(
-      `Earned ${loyaltyPointsEarned} loyalty points for completing ${newCompletedOrders} orders!`
+      `Earned ${loyaltyPointsEarned} loyalty points for completing ${newCompletedOrders} orders!`,
     );
   }
 

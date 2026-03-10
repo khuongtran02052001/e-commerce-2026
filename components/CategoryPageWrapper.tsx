@@ -1,76 +1,50 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { Category, Product } from "@/sanity.types";
-import { client } from "@/sanity/lib/client";
-import { urlFor } from "@/sanity/lib/image";
-import Image from "next/image";
-import Link from "next/link";
-import {
-  ArrowLeft,
-  ArrowRight,
-  Package,
-  Tag,
-  Grid3X3,
-  Filter,
-  TrendingUp,
-} from "lucide-react";
-import Title from "./Title";
-import CategoryProducts from "./product/CategoryProducts";
-import CategoryDetailSkeleton from "./CategoryDetailSkeleton";
+import { fetchService } from '@/lib/restClient';
+import type { ICategory, IProduct } from '@/mock-data';
+import { ArrowLeft, ArrowRight, Filter, Grid3X3, Package, Tag, TrendingUp } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import CategoryDetailSkeleton from './CategoryDetailSkeleton';
+import Title from './Title';
+import CategoryProducts from './product/CategoryProducts';
 
 interface Props {
   slug: string;
 }
 
 const CategoryPageWrapper = ({ slug }: Props) => {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [currentCategory, setCurrentCategory] = useState<Category | null>(null);
+  const [categories, setCategories] = useState<ICategory[]>([]);
+  const [currentCategory, setCurrentCategory] = useState<ICategory | null>(null);
   const [categoryLoading, setCategoryLoading] = useState(true);
-  const [categoriesLoaded, setCategoriesLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<IProduct[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setCategoryLoading(true);
-        // Fetch categories directly using Sanity client
-        const categoriesQuery = `*[_type == "category"] {
-          _id,
-          title,
-          slug,
-          description,
-          image,
-          featured,
-          range
-        }`;
-        const fetchedCategories = await client.fetch(categoriesQuery);
-        setCategories(fetchedCategories);
+        const [categoriesRes, productsRes] = await Promise.all([
+          fetchService('/categories'),
+          fetchService(`/products?category=${encodeURIComponent(slug)}`),
+        ]);
 
-        // Find current category
-        const current = fetchedCategories.find(
-          (cat: Category) => cat.slug?.current === slug
-        );
+        const categoriesPayload = await categoriesRes.json().catch(() => null);
+        const categoriesList: ICategory[] =
+          categoriesPayload?.data ?? categoriesPayload?.categories ?? categoriesPayload ?? [];
+        setCategories(categoriesList);
+
+        const current = categoriesList.find((cat) => cat.slug === slug);
         setCurrentCategory(current || null);
 
-        // Fetch products for the current category
-        const productsQuery = `
-          *[_type == "product" && references(*[_type == "category" && slug.current == $slug]._id)] {
-            ...,
-            brand->{
-              _id,
-              title
-            }
-          }
-        `;
-        const fetchedProducts: Product[] = await client.fetch(productsQuery, {
-          slug,
-        });
-        setProducts(fetchedProducts);
+        const productsPayload = await productsRes.json().catch(() => null);
+        const productsList: IProduct[] =
+          productsPayload?.data ?? productsPayload?.products ?? productsPayload ?? [];
+        setProducts(productsList);
       } catch (err) {
-        console.error("Error fetching categories:", err);
-        setError("Failed to load category data");
+        console.error('Error fetching categories:', err);
+        setError('Failed to load category data');
       } finally {
         setCategoryLoading(false);
       }
@@ -89,9 +63,7 @@ const CategoryPageWrapper = ({ slug }: Props) => {
     return (
       <div className="flex flex-col items-center justify-center py-20 bg-white rounded-lg">
         <Package className="w-16 h-16 text-gray-400 mb-4" />
-        <h3 className="text-xl font-semibold text-gray-800 mb-2">
-          Error Loading Category
-        </h3>
+        <h3 className="text-xl font-semibold text-gray-800 mb-2">Error Loading Category</h3>
         <p className="text-gray-600 mb-4">{error}</p>
         <Link
           href="/category"
@@ -105,9 +77,7 @@ const CategoryPageWrapper = ({ slug }: Props) => {
   }
 
   const categoryTitle = currentCategory?.title || slug;
-  const relatedCategories = categories
-    .filter((cat) => cat.slug?.current !== slug)
-    .slice(0, 6);
+  const relatedCategories = categories.filter((cat) => cat.slug !== slug).slice(0, 6);
 
   return (
     <>
@@ -118,10 +88,10 @@ const CategoryPageWrapper = ({ slug }: Props) => {
           <div className="flex-1">
             <div className="flex items-start gap-4 mb-4">
               {/* Category Image */}
-              {currentCategory?.image && (
+              {currentCategory?.imageUrl && (
                 <div className="flex-shrink-0 w-16 h-16 lg:w-20 lg:h-20 bg-gradient-to-br from-shop_light_pink to-shop_light_bg rounded-xl overflow-hidden">
                   <Image
-                    src={urlFor(currentCategory.image).url()}
+                    src={currentCategory.imageUrl}
                     alt={categoryTitle}
                     width={80}
                     height={80}
@@ -200,11 +170,7 @@ const CategoryPageWrapper = ({ slug }: Props) => {
       </div>
 
       {/* Main Content */}
-      <CategoryProducts
-        categories={categories}
-        slug={slug}
-        initialProducts={products}
-      />
+      <CategoryProducts categories={categories} slug={slug} initialProducts={products} />
 
       {/* Related Categories Section */}
       {relatedCategories.length > 0 && (
@@ -225,16 +191,16 @@ const CategoryPageWrapper = ({ slug }: Props) => {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {relatedCategories.map((category) => (
               <Link
-                key={category._id}
-                href={`/category/${category.slug?.current}`}
+                key={category.id}
+                href={`/category/${category.slug}`}
                 className="group bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border border-gray-100 hover:border-shop_light_green p-4 text-center"
               >
                 {/* Category Image */}
                 <div className="w-12 h-12 mx-auto mb-3 bg-gradient-to-br from-shop_light_pink to-shop_light_bg rounded-lg flex items-center justify-center">
-                  {category.image ? (
+                  {category.imageUrl ? (
                     <Image
-                      src={urlFor(category.image).url()}
-                      alt={category.title || "Category"}
+                      src={category.imageUrl}
+                      alt={category.title || 'Category'}
                       width={32}
                       height={32}
                       className="w-8 h-8 object-contain"
@@ -261,8 +227,8 @@ const CategoryPageWrapper = ({ slug }: Props) => {
             Discover More Amazing Products
           </h3>
           <p className="text-dark-text mb-6 text-sm lg:text-base">
-            Can&apos;t find what you&apos;re looking for in {categoryTitle}?
-            Explore our complete collection of products across all categories.
+            Can&apos;t find what you&apos;re looking for in {categoryTitle}? Explore our complete
+            collection of products across all categories.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link

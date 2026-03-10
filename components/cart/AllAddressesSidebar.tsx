@@ -1,21 +1,20 @@
-"use client";
+'use client';
 
-import React from "react";
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from "@/components/ui/sheet";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { MapPin, Check } from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area";
+} from '@/components/ui/sheet';
+import { Check, MapPin } from 'lucide-react';
 
 interface Address {
-  _id: string;
+  id: string;
   name: string;
   email: string;
   address: string;
@@ -56,68 +55,59 @@ export function AllAddressesSidebar({
           </SheetTitle>
           <SheetDescription>
             Choose from {addresses.length} saved address
-            {addresses.length !== 1 ? "es" : ""}
+            {addresses.length !== 1 ? 'es' : ''}
           </SheetDescription>
         </SheetHeader>
 
         <ScrollArea className="h-[calc(100vh-180px)] mt-6 p-5">
           <RadioGroup
-            value={selectedAddress?._id || ""}
+            value={selectedAddress?.id || ''}
             onValueChange={(value) => {
-              const address = addresses.find((addr) => addr._id === value);
+              const address = addresses.find((addr) => addr.id === value);
               if (address) handleSelectAddress(address);
             }}
             className="space-y-4"
           >
             {addresses.map((address) => (
               <div
-                key={address._id}
+                key={address.id}
                 className={`
                   relative border rounded-lg p-4 cursor-pointer transition-all
                   ${
-                    selectedAddress?._id === address._id
-                      ? "border-primary bg-primary/5 shadow-sm"
-                      : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                    selectedAddress?.id === address.id
+                      ? 'border-primary bg-primary/5 shadow-sm'
+                      : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                   }
                 `}
                 onClick={() => handleSelectAddress(address)}
               >
                 <div className="flex items-start gap-3">
                   <RadioGroupItem
-                    value={address._id}
-                    id={`address-${address._id}`}
+                    value={address.id}
+                    id={`address-${address.id}`}
                     className="mt-1"
                   />
-                  <Label
-                    htmlFor={`address-${address._id}`}
-                    className="flex-1 cursor-pointer"
-                  >
+                  <Label htmlFor={`address-${address.id}`} className="flex-1 cursor-pointer">
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <div className="font-semibold text-base">
-                          {address.name}
-                        </div>
+                        <div className="font-semibold text-base">{address.name}</div>
                         <div className="flex items-center gap-2">
                           {address.default && (
                             <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full font-medium">
                               Default
                             </span>
                           )}
-                          {selectedAddress?._id === address._id && (
+                          {selectedAddress?.id === address.id && (
                             <Check className="w-5 h-5 text-primary" />
                           )}
                         </div>
                       </div>
-                      <div className="text-sm text-gray-600">
-                        {address.address}
-                      </div>
+                      <div className="text-sm text-gray-600">{address.address}</div>
                       <div className="text-sm text-gray-600">
                         {address.city}, {address.state} {address.zip}
                       </div>
                       {address.email && (
-                        <div className="text-xs text-gray-500">
-                          {address.email}
-                        </div>
+                        <div className="text-xs text-gray-500">{address.email}</div>
                       )}
                     </div>
                   </Label>

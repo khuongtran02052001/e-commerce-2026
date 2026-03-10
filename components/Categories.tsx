@@ -1,7 +1,7 @@
-import { Category } from "@/sanity.types";
-import CategorySelector from "./ui/category-selector";
+import type { ICategory } from '@/mock-data';
+import CategorySelector from './ui/category-selector';
 interface Props {
-  categories: Category[];
+  categories: ICategory[];
 }
 
 const Categories = ({ categories }: Props) => {

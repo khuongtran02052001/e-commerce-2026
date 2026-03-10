@@ -1,93 +1,53 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import {
-  CreditCard,
-  Truck,
-  MapPin,
-  Package,
-  ArrowLeft,
-  Loader2,
-} from "lucide-react";
-import PriceFormatter from "@/components/PriceFormatter";
-import Image from "next/image";
-import { urlFor } from "@/sanity/lib/image";
-import { toast } from "sonner";
-import { PAYMENT_METHODS, PaymentMethod } from "@/lib/orderStatus";
-import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
-
-interface OrderProduct {
-  product: {
-    _id: string;
-    name: string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    images?: any[];
-    price: number;
-    currency: string;
-  };
-  quantity: number;
-}
-
-interface Order {
-  _id: string;
-  orderNumber: string;
-  customerName: string;
-  email: string;
-  products: OrderProduct[];
-  subtotal: number;
-  tax: number;
-  shipping: number;
-  totalPrice: number;
-  currency: string;
-  address: {
-    name: string;
-    address: string;
-    city: string;
-    state: string;
-    zip: string;
-  };
-  status: string;
-  paymentStatus: string;
-  orderDate: string;
-}
+import PriceFormatter from '@/components/PriceFormatter';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Separator } from '@/components/ui/separator';
+import { PAYMENT_METHODS, PaymentMethod } from '@/lib/orderStatus';
+import { fetchService } from '@/lib/restClient';
+import type { Order, OrderProduct } from '@/types/domain/order';
+import { getOrderImageUrl } from '@/types/domain/order';
+import { ArrowLeft, CreditCard, Loader2, MapPin, Package, Truck } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
 interface OrderCheckoutContentProps {
   order: Order;
 }
 
 export function OrderCheckoutContent({ order }: OrderCheckoutContentProps) {
-  const [selectedPaymentMethod, setSelectedPaymentMethod] =
-    useState<PaymentMethod>(PAYMENT_METHODS.STRIPE);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod>(
+    PAYMENT_METHODS.STRIPE,
+  );
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handlePayNow = async () => {
     setIsProcessing(true);
 
     try {
-      const response = await fetch(`/api/orders/${order._id}/pay`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const orderId = order.id;
+      const response = await fetchService(`/orders/${orderId}/pay`, { method: 'POST' });
 
       const data = await response.json();
 
-      if (response.ok && data.success && data.url) {
+      const checkoutUrl = data.url || data.checkoutUrl;
+      if (response.ok && data.success && checkoutUrl) {
         // Redirect to Stripe checkout
-        window.location.href = data.url;
+        window.location.href = checkoutUrl;
+      } else if (response.ok && data.success) {
+        toast.success(data.message || 'Payment processed successfully');
       } else {
-        toast.error(data.error || "Failed to create payment session");
+        toast.error(data.error || 'Failed to create payment session');
       }
     } catch (error) {
-      console.error("Payment error:", error);
-      toast.error("Failed to initiate payment");
+      console.error('Payment error:', error);
+      toast.error('Failed to initiate payment');
     } finally {
       setIsProcessing(false);
     }
@@ -99,14 +59,14 @@ export function OrderCheckoutContent({ order }: OrderCheckoutContentProps) {
     try {
       // Here you could implement COD logic if needed
       // For now, just show a message
-      toast.success("Order confirmed with Cash on Delivery payment method");
+      toast.success('Order confirmed with Cash on Delivery payment method');
 
       setTimeout(() => {
-        window.location.href = `/user/orders/${order._id}`;
+        window.location.href = `/user/orders/${order.id}`;
       }, 1500);
     } catch (error) {
-      console.error("COD payment error:", error);
-      toast.error("Failed to process COD payment");
+      console.error('COD payment error:', error);
+      toast.error('Failed to process COD payment');
     } finally {
       setIsProcessing(false);
     }
@@ -139,7 +99,7 @@ export function OrderCheckoutContent({ order }: OrderCheckoutContentProps) {
               <div>
                 <p className="text-muted-foreground">Order Date</p>
                 <p className="font-medium">
-                  {new Date(order.orderDate).toLocaleDateString()}
+                  {new Date(order.orderDate || order.createdAt).toLocaleDateString()}
                 </p>
               </div>
             </div>
@@ -156,10 +116,11 @@ export function OrderCheckoutContent({ order }: OrderCheckoutContentProps) {
           </CardHeader>
           <CardContent>
             <div className="space-y-1">
-              <p className="font-medium">{order.address.name}</p>
-              <p className="text-muted-foreground">{order.address.address}</p>
+              <p className="font-medium">{order.address?.name || order.addressName}</p>
+              <p className="text-muted-foreground">{order.address?.address || order.addressLine}</p>
               <p className="text-muted-foreground">
-                {order.address.city}, {order.address.state} {order.address.zip}
+                {order.address?.city || order.city}, {order.address?.state || order.state}{' '}
+                {order.address?.zip || order.zip}
               </p>
             </div>
           </CardContent>
@@ -176,17 +137,11 @@ export function OrderCheckoutContent({ order }: OrderCheckoutContentProps) {
           <CardContent>
             <RadioGroup
               value={selectedPaymentMethod}
-              onValueChange={(value) =>
-                setSelectedPaymentMethod(value as PaymentMethod)
-              }
+              onValueChange={(value) => setSelectedPaymentMethod(value as PaymentMethod)}
               className="space-y-3"
             >
               <div className="flex items-start space-x-3 p-3 border rounded-lg">
-                <RadioGroupItem
-                  value={PAYMENT_METHODS.STRIPE}
-                  id="stripe"
-                  className="mt-1"
-                />
+                <RadioGroupItem value={PAYMENT_METHODS.STRIPE} id="stripe" className="mt-1" />
                 <div className="flex-1">
                   <Label htmlFor="stripe" className="cursor-pointer">
                     <div className="flex items-center gap-2 font-medium">
@@ -225,42 +180,42 @@ export function OrderCheckoutContent({ order }: OrderCheckoutContentProps) {
         {/* Order Items */}
         <Card>
           <CardHeader>
-            <CardTitle>Order Items ({order.products.length})</CardTitle>
+            <CardTitle>Order Items ({order.products?.length ?? 0})</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {order.products.map((item, index) => (
-              <div key={index} className="flex gap-3 p-3 border rounded-lg">
-                <div className="w-16 h-16 flex-shrink-0">
-                  <Image
-                    src={
-                      item.product.images?.[0]
-                        ? urlFor(item.product.images[0]).url()
-                        : "/placeholder.jpg"
-                    }
-                    alt={item.product.name || "Product"}
-                    width={64}
-                    height={64}
-                    className="w-full h-full object-cover rounded"
-                  />
-                </div>
-                <div className="flex-1">
-                  <h4 className="font-medium">{item.product.name}</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Qty: {item.quantity}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="font-medium">
-                    <PriceFormatter
-                      amount={item.product.price * item.quantity}
+            {order.products?.map((item: OrderProduct, index: number) => {
+              const productName = item.product?.name || item.name || 'Product';
+              const productPrice = item.price ?? item.product?.price ?? 0;
+              const imageUrl = getOrderImageUrl(item);
+              return (
+                <div
+                  key={item.id || item.productId || index}
+                  className="flex gap-3 p-3 border rounded-lg"
+                >
+                  <div className="w-16 h-16 flex-shrink-0">
+                    <Image
+                      src={imageUrl || '/placeholder.jpg'}
+                      alt={productName}
+                      width={64}
+                      height={64}
+                      className="w-full h-full object-cover rounded"
                     />
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    <PriceFormatter amount={item.product.price} /> each
-                  </p>
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-medium">{productName}</h4>
+                    <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-medium">
+                      <PriceFormatter amount={productPrice * item.quantity} />
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      <PriceFormatter amount={productPrice} /> each
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </CardContent>
         </Card>
       </div>
@@ -273,20 +228,20 @@ export function OrderCheckoutContent({ order }: OrderCheckoutContentProps) {
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex justify-between">
-              <span>Subtotal ({order.products.length} items)</span>
-              <PriceFormatter amount={order.subtotal} />
+              <span>Subtotal ({order.products?.length ?? 0} items)</span>
+              <PriceFormatter amount={order.subtotal ?? 0} />
             </div>
             <div className="flex justify-between">
               <span>Shipping</span>
               {order.shipping === 0 ? (
                 <span className="text-green-600 font-medium">Free</span>
               ) : (
-                <PriceFormatter amount={order.shipping} />
+                <PriceFormatter amount={order.shipping ?? 0} />
               )}
             </div>
             <div className="flex justify-between">
               <span>Tax</span>
-              <PriceFormatter amount={order.tax} />
+              <PriceFormatter amount={order.tax ?? 0} />
             </div>
             <Separator />
             <div className="flex justify-between text-lg font-bold">
@@ -298,9 +253,7 @@ export function OrderCheckoutContent({ order }: OrderCheckoutContentProps) {
 
         <Button
           onClick={
-            selectedPaymentMethod === PAYMENT_METHODS.STRIPE
-              ? handlePayNow
-              : handleCODPayment
+            selectedPaymentMethod === PAYMENT_METHODS.STRIPE ? handlePayNow : handleCODPayment
           }
           disabled={isProcessing}
           className="w-full h-12 text-lg font-semibold"

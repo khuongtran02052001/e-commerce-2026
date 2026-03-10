@@ -1,29 +1,21 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
+import { getCurrentEmployee, getEmployeesByRole } from '@/actions/employeeActions';
 import {
-  getOrdersForEmployee,
+  assignDeliveryman,
   confirmAddress,
   confirmOrder,
-  markAsPacked,
-  assignDeliveryman,
+  getOrderWorkflow,
+  getOrdersForEmployee,
+  markFailedDelivery,
   markAsDelivered,
+  markAsPacked,
   receivePaymentFromDeliveryman,
-} from "@/actions/orderEmployeeActions";
-import {
-  getCurrentEmployee,
-  getEmployeesByRole,
-} from "@/actions/employeeActions";
-import {
-  Employee,
-  OrderWithTracking,
-  getRoleDisplayName,
-} from "@/types/employee";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+  rescheduleDelivery,
+  startDelivery,
+} from '@/actions/orderEmployeeActions';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -31,26 +23,83 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { toast } from "sonner";
+} from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Employee, OrderWithTracking, getRoleDisplayName } from '@/types/domain/employee';
 import {
   CheckCircle,
-  Package,
-  Truck,
-  DollarSign,
   Clock,
+  DollarSign,
   MapPin,
-  User,
-  Phone,
+  Package,
   RefreshCw,
-} from "lucide-react";
+  Truck,
+  User,
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
+
+const normalizeStatus = (value?: string) => String(value || '').trim().toLowerCase();
+
+const WORKFLOW_STAGE_INDEX: Record<string, number> = {
+  pending: 0,
+  address_confirmed: 1,
+  order_confirmed: 2,
+  packed: 3,
+  ready_for_delivery: 4,
+  out_for_delivery: 5,
+  delivered: 6,
+  completed: 7,
+};
+
+const requiresCashCollection = (order: OrderWithTracking) => {
+  const paymentMethod = normalizeStatus(order.paymentMethod);
+  const paymentStatus = normalizeStatus(order.paymentStatus);
+  return paymentMethod === 'cod' && (paymentStatus === 'pending' || paymentStatus === 'unpaid');
+};
+
+const getOrderWorkflowFlags = (order: OrderWithTracking) => {
+  const tracking = order.tracking || {};
+  const status = normalizeStatus(order.status);
+  const stage = WORKFLOW_STAGE_INDEX[status] ?? -1;
+
+  const hasAddressConfirmed = Boolean(tracking.addressConfirmedBy) || stage >= 1;
+  const hasOrderConfirmed = Boolean(tracking.orderConfirmedBy) || stage >= 2;
+  const hasPacked = Boolean(tracking.packedBy) || stage >= 3;
+  const hasAssignedDeliveryman = Boolean(tracking.assignedDeliverymanId) || stage >= 4;
+  const hasStartedDelivery =
+    Boolean(tracking.dispatchedBy || tracking.dispatchedAt) ||
+    stage >= 5 ||
+    status === 'failed_delivery' ||
+    status === 'rescheduled';
+  const hasDelivered = Boolean(tracking.deliveredBy) || stage >= 6;
+  const hasPaymentReceived =
+    Boolean(tracking.paymentReceivedBy) || normalizeStatus(order.paymentStatus) === 'paid' || stage >= 7;
+
+  const isTerminal = ['cancelled', 'refunded', 'failed'].includes(status);
+
+  return {
+    status,
+    hasAddressConfirmed,
+    hasOrderConfirmed,
+    hasPacked,
+    hasAssignedDeliveryman,
+    hasStartedDelivery,
+    hasDelivered,
+    hasPaymentReceived,
+    isTerminal,
+  };
+};
 
 export default function EmployeeOrderManagement() {
   const [employee, setEmployee] = useState<Employee | null>(null);
@@ -58,14 +107,16 @@ export default function EmployeeOrderManagement() {
   const [deliverymen, setDeliverymen] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
-  const [selectedOrder, setSelectedOrder] = useState<OrderWithTracking | null>(
-    null
-  );
+  const [selectedOrder, setSelectedOrder] = useState<OrderWithTracking | null>(null);
   const [showActionDialog, setShowActionDialog] = useState(false);
-  const [actionType, setActionType] = useState<string>("");
-  const [actionNotes, setActionNotes] = useState("");
+  const [actionType, setActionType] = useState<string>('');
+  const [actionNotes, setActionNotes] = useState('');
   const [cashAmount, setCashAmount] = useState<number>(0);
-  const [selectedDeliveryman, setSelectedDeliveryman] = useState<string>("");
+  const [selectedDeliveryman, setSelectedDeliveryman] = useState<string>('');
+  const [workflowLogsByOrder, setWorkflowLogsByOrder] = useState<Record<string, any[]>>({});
+  const [openWorkflowOrderId, setOpenWorkflowOrderId] = useState<string | null>(null);
+  const [loadingWorkflowOrderId, setLoadingWorkflowOrderId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'orders' | 'workflow'>('orders');
 
   useEffect(() => {
     loadData();
@@ -77,15 +128,15 @@ export default function EmployeeOrderManagement() {
       const [currentEmp, ordersData, deliverymenData] = await Promise.all([
         getCurrentEmployee(),
         getOrdersForEmployee(),
-        getEmployeesByRole("deliveryman"),
+        getEmployeesByRole('deliveryman'),
       ]);
 
       setEmployee(currentEmp);
       setOrders(ordersData);
       setDeliverymen(deliverymenData);
     } catch (error) {
-      console.error("Error loading data:", error);
-      toast.error("Failed to load data");
+      console.error('Error loading data:', error);
+      toast.error('Failed to load data');
     } finally {
       setLoading(false);
     }
@@ -93,58 +144,66 @@ export default function EmployeeOrderManagement() {
 
   const handleAction = async () => {
     if (!selectedOrder) return;
+    const needCashCollection = requiresCashCollection(selectedOrder);
 
     setActionLoading(true);
     try {
       let result;
 
       switch (actionType) {
-        case "confirmAddress":
-          result = await confirmAddress(selectedOrder._id, actionNotes);
+        case 'confirmAddress':
+          result = await confirmAddress(selectedOrder.id, actionNotes);
           break;
-        case "confirmOrder":
-          result = await confirmOrder(selectedOrder._id, actionNotes);
+        case 'confirmOrder':
+          result = await confirmOrder(selectedOrder.id, actionNotes);
           break;
-        case "markPacked":
-          result = await markAsPacked(selectedOrder._id, actionNotes);
+        case 'markPacked':
+          result = await markAsPacked(selectedOrder.id, actionNotes);
           break;
-        case "assignDeliveryman":
+        case 'assignDeliveryman':
           if (!selectedDeliveryman) {
-            toast.error("Please select a deliveryman");
+            toast.error('Please select a deliveryman');
             return;
           }
-          result = await assignDeliveryman(
-            selectedOrder._id,
-            selectedDeliveryman
+          result = await assignDeliveryman(selectedOrder.id, selectedDeliveryman);
+          break;
+        case 'startDelivery':
+          result = await startDelivery(selectedOrder.id, actionNotes);
+          break;
+        case 'markDelivered':
+          result = await markAsDelivered(
+            selectedOrder.id,
+            needCashCollection ? cashAmount : undefined,
+            actionNotes,
           );
           break;
-        case "markDelivered":
-          result = await markAsDelivered(selectedOrder._id, actionNotes);
+        case 'rescheduleDelivery':
+          result = await rescheduleDelivery(selectedOrder.id, actionNotes);
           break;
-        case "receivePayment":
-          result = await receivePaymentFromDeliveryman(
-            selectedOrder._id,
-            actionNotes
-          );
+        case 'failedDelivery':
+          result = await markFailedDelivery(selectedOrder.id, actionNotes);
+          break;
+        case 'receivePayment':
+          result = await receivePaymentFromDeliveryman(selectedOrder.id, actionNotes);
           break;
         default:
-          toast.error("Invalid action");
+          toast.error('Invalid action');
           return;
       }
 
       if (result.success) {
         toast.success(result.message);
         setShowActionDialog(false);
-        setActionNotes("");
+        setActionNotes('');
         setCashAmount(0);
-        setSelectedDeliveryman("");
+        setSelectedDeliveryman('');
         loadData();
       } else {
         toast.error(result.message);
       }
     } catch (error) {
-      console.error("Error performing action:", error);
-      toast.error("Failed to perform action");
+      console.error('Error performing action:', error);
+      toast.error('Failed to perform action');
     } finally {
       setActionLoading(false);
     }
@@ -157,46 +216,91 @@ export default function EmployeeOrderManagement() {
     setShowActionDialog(true);
   };
 
-  const canPerformAction = (
-    order: OrderWithTracking,
-    action: string
-  ): boolean => {
+  const toggleWorkflow = async (orderId: string) => {
+    if (openWorkflowOrderId === orderId) {
+      setOpenWorkflowOrderId(null);
+      return;
+    }
+
+    setOpenWorkflowOrderId(orderId);
+    if (workflowLogsByOrder[orderId]) return;
+
+    setLoadingWorkflowOrderId(orderId);
+    try {
+      const logs = await getOrderWorkflow(orderId);
+      setWorkflowLogsByOrder((prev) => ({ ...prev, [orderId]: logs || [] }));
+    } catch (error) {
+      console.error('Failed to load workflow logs:', error);
+      toast.error('Failed to load workflow logs');
+    } finally {
+      setLoadingWorkflowOrderId(null);
+    }
+  };
+
+  const canPerformAction = (order: OrderWithTracking, action: string): boolean => {
     if (!employee) return false;
+    const flags = getOrderWorkflowFlags(order);
 
     switch (action) {
-      case "confirmAddress":
+      case 'confirmAddress':
+        return employee.role === 'callcenter' && !flags.hasAddressConfirmed && !flags.isTerminal;
+      case 'confirmOrder':
         return (
-          employee.role === "callcenter" && !order.tracking?.addressConfirmedBy
+          (employee.role === 'callcenter' || employee.role === 'incharge') &&
+          flags.hasAddressConfirmed &&
+          !flags.hasOrderConfirmed &&
+          !flags.isTerminal
         );
-      case "confirmOrder":
+      case 'markPacked':
         return (
-          (employee.role === "callcenter" || employee.role === "incharge") &&
-          !!order.tracking?.addressConfirmedBy &&
-          !order.tracking?.orderConfirmedBy
+          (employee.role === 'packer' || employee.role === 'incharge') &&
+          flags.hasOrderConfirmed &&
+          !flags.hasPacked &&
+          !flags.isTerminal
         );
-      case "markPacked":
+      case 'assignDeliveryman':
         return (
-          (employee.role === "packer" || employee.role === "incharge") &&
-          !!order.tracking?.orderConfirmedBy &&
-          !order.tracking?.packedBy
+          (employee.role === 'packer' || employee.role === 'incharge') &&
+          flags.hasPacked &&
+          !flags.hasAssignedDeliveryman &&
+          !flags.isTerminal
         );
-      case "assignDeliveryman":
+      case 'markDelivered':
         return (
-          (employee.role === "packer" || employee.role === "incharge") &&
-          !!order.tracking?.packedBy &&
-          !order.tracking?.assignedDeliverymanId
+          (employee.role === 'deliveryman' || employee.role === 'incharge') &&
+          flags.hasAssignedDeliveryman &&
+          !flags.hasDelivered &&
+          !flags.isTerminal
         );
-      case "markDelivered":
+      case 'startDelivery':
         return (
-          (employee.role === "deliveryman" || employee.role === "incharge") &&
-          !!order.tracking?.assignedDeliverymanId &&
-          !order.tracking?.deliveredBy
+          (employee.role === 'deliveryman' || employee.role === 'incharge') &&
+          flags.hasAssignedDeliveryman &&
+          !flags.hasStartedDelivery &&
+          !flags.hasDelivered &&
+          !flags.isTerminal
         );
-      case "receivePayment":
+      case 'rescheduleDelivery':
         return (
-          (employee.role === "accounts" || employee.role === "incharge") &&
-          !!order.tracking?.cashCollected &&
-          !order.tracking?.paymentReceivedBy
+          (employee.role === 'deliveryman' || employee.role === 'incharge') &&
+          flags.hasAssignedDeliveryman &&
+          !flags.hasDelivered &&
+          !flags.isTerminal
+        );
+      case 'failedDelivery':
+        return (
+          (employee.role === 'deliveryman' || employee.role === 'incharge') &&
+          flags.hasAssignedDeliveryman &&
+          !flags.hasDelivered &&
+          !flags.isTerminal
+        );
+      case 'receivePayment':
+        return (
+          (employee.role === 'accounts' || employee.role === 'incharge') &&
+          flags.hasDelivered &&
+          (Boolean(order.tracking?.cashCollected) || requiresCashCollection(order)) &&
+          !flags.hasPaymentReceived &&
+          !flags.isTerminal
         );
       default:
         return false;
@@ -204,15 +308,51 @@ export default function EmployeeOrderManagement() {
   };
 
   const getOrderProgress = (order: OrderWithTracking): number => {
+    const flags = getOrderWorkflowFlags(order);
     let progress = 0;
-    if (order.tracking?.addressConfirmedBy) progress += 16.67;
-    if (order.tracking?.orderConfirmedBy) progress += 16.67;
-    if (order.tracking?.packedBy) progress += 16.67;
-    if (order.tracking?.assignedDeliverymanId) progress += 16.67;
-    if (order.tracking?.deliveredBy) progress += 16.67;
-    if (order.tracking?.paymentReceivedBy) progress += 16.65;
+    if (flags.hasAddressConfirmed) progress += 16.67;
+    if (flags.hasOrderConfirmed) progress += 16.67;
+    if (flags.hasPacked) progress += 16.67;
+    if (flags.hasAssignedDeliveryman) progress += 16.67;
+    if (flags.hasDelivered) progress += 16.67;
+    if (flags.hasPaymentReceived) progress += 16.65;
     return progress;
   };
+
+  const getPendingActionCount = (currentRole: Employee['role']) =>
+    orders.filter((order) => {
+      if (currentRole === 'callcenter') {
+        return canPerformAction(order, 'confirmAddress') || canPerformAction(order, 'confirmOrder');
+      }
+      if (currentRole === 'packer') {
+        return canPerformAction(order, 'markPacked') || canPerformAction(order, 'assignDeliveryman');
+      }
+      if (currentRole === 'deliveryman') {
+        return (
+          canPerformAction(order, 'startDelivery') ||
+          canPerformAction(order, 'markDelivered') ||
+          canPerformAction(order, 'rescheduleDelivery') ||
+          canPerformAction(order, 'failedDelivery')
+        );
+      }
+      if (currentRole === 'accounts') {
+        return canPerformAction(order, 'receivePayment');
+      }
+      if (currentRole === 'incharge') {
+        return (
+          canPerformAction(order, 'confirmAddress') ||
+          canPerformAction(order, 'confirmOrder') ||
+          canPerformAction(order, 'markPacked') ||
+          canPerformAction(order, 'assignDeliveryman') ||
+          canPerformAction(order, 'startDelivery') ||
+          canPerformAction(order, 'markDelivered') ||
+          canPerformAction(order, 'rescheduleDelivery') ||
+          canPerformAction(order, 'failedDelivery') ||
+          canPerformAction(order, 'receivePayment')
+        );
+      }
+      return false;
+    }).length;
 
   if (loading) {
     return (
@@ -229,12 +369,8 @@ export default function EmployeeOrderManagement() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <p className="text-xl text-gray-600">
-            You are not assigned as an employee
-          </p>
-          <p className="text-sm text-gray-500 mt-2">
-            Please contact your administrator
-          </p>
+          <p className="text-xl text-gray-600">You are not assigned as an employee</p>
+          <p className="text-sm text-gray-500 mt-2">Please contact your administrator</p>
         </div>
       </div>
     );
@@ -247,10 +383,7 @@ export default function EmployeeOrderManagement() {
         <div>
           <h1 className="text-3xl font-bold mb-2">Order Management</h1>
           <p className="text-gray-600">
-            Role:{" "}
-            <span className="font-semibold">
-              {getRoleDisplayName(employee.role)}
-            </span>
+            Role: <span className="font-semibold">{getRoleDisplayName(employee.role)}</span>
           </p>
         </div>
         <Button onClick={loadData} className="flex items-center gap-2">
@@ -274,24 +407,7 @@ export default function EmployeeOrderManagement() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Pending Action</p>
-              <p className="text-2xl font-bold">
-                {
-                  orders.filter((o) => {
-                    if (employee.role === "callcenter")
-                      return !o.tracking?.orderConfirmedBy;
-                    if (employee.role === "packer")
-                      return (
-                        !o.tracking?.packedBy && o.tracking?.orderConfirmedBy
-                      );
-                    if (employee.role === "deliveryman")
-                      return (
-                        !o.tracking?.deliveredBy &&
-                        o.tracking?.assignedDeliverymanId
-                      );
-                    return false;
-                  }).length
-                }
-              </p>
+              <p className="text-2xl font-bold">{getPendingActionCount(employee.role)}</p>
             </div>
             <Clock className="h-8 w-8 text-yellow-500" />
           </div>
@@ -311,225 +427,353 @@ export default function EmployeeOrderManagement() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Your Performance</p>
-              <p className="text-2xl font-bold">
-                {employee.performance?.ordersProcessed || 0}
-              </p>
+              <p className="text-2xl font-bold">{employee.performance?.ordersProcessed || 0}</p>
             </div>
             <User className="h-8 w-8 text-purple-500" />
           </div>
         </div>
       </div>
 
-      {/* Orders List */}
-      <div className="space-y-4">
-        {orders.length === 0 ? (
-          <div className="bg-white p-8 rounded-lg shadow text-center">
-            <p className="text-gray-500">No orders to display</p>
-          </div>
-        ) : (
-          orders.map((order) => (
-            <div
-              key={order._id}
-              className="bg-white rounded-lg shadow overflow-hidden"
-            >
-              <div className="p-4 sm:p-6">
-                {/* Order Header */}
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
-                  <div>
-                    <h3 className="text-lg font-semibold">
-                      Order #{order.orderNumber.slice(0, 8)}...
-                    </h3>
-                    <p className="text-sm text-gray-600">
-                      {order.customerName}
-                    </p>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    <Badge
-                      variant={
-                        order.status === "delivered" ? "default" : "secondary"
-                      }
-                    >
-                      {order.status}
-                    </Badge>
-                    <Badge
-                      variant={
-                        order.paymentStatus === "paid"
-                          ? "default"
-                          : "destructive"
-                      }
-                    >
-                      {order.paymentStatus}
-                    </Badge>
-                  </div>
-                </div>
+      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'orders' | 'workflow')}>
+        <TabsList className="mb-6">
+          <TabsTrigger value="orders">Orders</TabsTrigger>
+          <TabsTrigger value="workflow">Workflow Logs</TabsTrigger>
+        </TabsList>
 
-                {/* Progress Bar */}
-                <div className="mb-4">
-                  <div className="flex justify-between text-xs text-gray-600 mb-2">
-                    <span>Progress</span>
-                    <span>{Math.round(getOrderProgress(order))}%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div
-                      className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${getOrderProgress(order)}%` }}
-                    />
-                  </div>
-                </div>
+        <TabsContent value="orders">
+          <div className="space-y-4">
+            {orders.length === 0 ? (
+              <div className="bg-white p-8 rounded-lg shadow text-center">
+                <p className="text-gray-500">No orders to display</p>
+              </div>
+            ) : (
+              orders.map((order) => (
+                <div key={order.id} className="bg-white rounded-lg shadow overflow-hidden">
+                  <div className="p-4 sm:p-6">
+                    {/* Order Header */}
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+                      <div>
+                        <h3 className="text-lg font-semibold">
+                          Order #{order.orderNumber.slice(0, 8)}...
+                        </h3>
+                        <p className="text-sm text-gray-600">{order.customerName}</p>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        <Badge variant={order.status === 'delivered' ? 'default' : 'secondary'}>
+                          {order.status}
+                        </Badge>
+                        <Badge variant={order.paymentStatus === 'paid' ? 'default' : 'destructive'}>
+                          {order.paymentStatus}
+                        </Badge>
+                      </div>
+                    </div>
 
-                {/* Order Details Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                  <div>
-                    <p className="text-sm text-gray-600 flex items-center gap-2">
-                      <DollarSign className="h-4 w-4" />
-                      <span className="font-semibold">Amount:</span> $
-                      {order.totalPrice}
-                    </p>
-                    <p className="text-sm text-gray-600 flex items-center gap-2">
-                      <MapPin className="h-4 w-4" />
-                      <span className="font-semibold">City:</span>{" "}
-                      {order.address.city}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600 flex items-center gap-2">
-                      <Package className="h-4 w-4" />
-                      <span className="font-semibold">Items:</span>{" "}
-                      {order.products.length}
-                    </p>
-                    <p className="text-sm text-gray-600 flex items-center gap-2">
-                      <Clock className="h-4 w-4" />
-                      <span className="font-semibold">Date:</span>{" "}
-                      {new Date(order.orderDate).toLocaleDateString()}
-                    </p>
-                  </div>
-                </div>
+                    {/* Progress Bar */}
+                    <div className="mb-4">
+                      <div className="flex justify-between text-xs text-gray-600 mb-2">
+                        <span>Progress</span>
+                        <span>{Math.round(getOrderProgress(order))}%</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div
+                          className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                          style={{ width: `${getOrderProgress(order)}%` }}
+                        />
+                      </div>
+                    </div>
 
-                {/* Tracking Info */}
-                {order.tracking && (
-                  <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                    <h4 className="font-semibold mb-2 text-sm">
-                      Tracking Information
-                    </h4>
-                    <div className="space-y-1 text-xs">
-                      {order.tracking.addressConfirmedBy && (
-                        <p className="text-gray-600">
-                          ✓ Address confirmed by{" "}
-                          {order.tracking.addressConfirmedBy}
+                    {/* Order Details Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <p className="text-sm text-gray-600 flex items-center gap-2">
+                          <DollarSign className="h-4 w-4" />
+                          <span className="font-semibold">Amount:</span> ${order.totalPrice}
                         </p>
+                        <p className="text-sm text-gray-600 flex items-center gap-2">
+                          <MapPin className="h-4 w-4" />
+                          <span className="font-semibold">City:</span> {order.address.city}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600 flex items-center gap-2">
+                          <Package className="h-4 w-4" />
+                          <span className="font-semibold">Items:</span> {order.products.length}
+                        </p>
+                        <p className="text-sm text-gray-600 flex items-center gap-2">
+                          <Clock className="h-4 w-4" />
+                          <span className="font-semibold">Date:</span>{' '}
+                          {new Date(order.orderDate).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Tracking Info */}
+                    {order.tracking && (
+                      <div className="bg-gray-50 rounded-lg p-4 mb-4">
+                        <h4 className="font-semibold mb-2 text-sm">Tracking Information</h4>
+                        <div className="space-y-1 text-xs">
+                          {order.tracking.addressConfirmedBy && (
+                            <p className="text-gray-600">
+                              ✓ Address confirmed by {order.tracking.addressConfirmedBy}
+                            </p>
+                          )}
+                          {order.tracking.orderConfirmedBy && (
+                            <p className="text-gray-600">
+                              ✓ Order confirmed by {order.tracking.orderConfirmedBy}
+                            </p>
+                          )}
+                          {order.tracking.packedBy && (
+                            <p className="text-gray-600">✓ Packed by {order.tracking.packedBy}</p>
+                          )}
+                          {order.tracking.assignedDeliverymanName && (
+                            <p className="text-gray-600">
+                              ✓ Assigned to {order.tracking.assignedDeliverymanName}
+                            </p>
+                          )}
+                          {order.tracking.deliveredBy && (
+                            <p className="text-gray-600">
+                              ✓ Delivered by {order.tracking.deliveredBy}
+                            </p>
+                          )}
+                          {order.tracking.paymentReceivedBy && (
+                            <p className="text-gray-600">
+                              ✓ Payment received by {order.tracking.paymentReceivedBy}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Action Buttons */}
+                    <div className="flex flex-wrap gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => toggleWorkflow(order.id)}
+                        className="flex items-center gap-2"
+                      >
+                        {openWorkflowOrderId === order.id ? 'Hide Workflow' : 'View Workflow'}
+                      </Button>
+                      {canPerformAction(order, 'confirmAddress') && (
+                        <Button
+                          size="sm"
+                          onClick={() => openActionDialog(order, 'confirmAddress')}
+                          className="flex items-center gap-2"
+                        >
+                          <MapPin className="h-4 w-4" />
+                          Confirm Address
+                        </Button>
                       )}
-                      {order.tracking.orderConfirmedBy && (
-                        <p className="text-gray-600">
-                          ✓ Order confirmed by {order.tracking.orderConfirmedBy}
-                        </p>
+                      {canPerformAction(order, 'confirmOrder') && (
+                        <Button
+                          size="sm"
+                          onClick={() => openActionDialog(order, 'confirmOrder')}
+                          className="flex items-center gap-2"
+                        >
+                          <CheckCircle className="h-4 w-4" />
+                          Confirm Order
+                        </Button>
                       )}
-                      {order.tracking.packedBy && (
-                        <p className="text-gray-600">
-                          ✓ Packed by {order.tracking.packedBy}
-                        </p>
+                      {canPerformAction(order, 'markPacked') && (
+                        <Button
+                          size="sm"
+                          onClick={() => openActionDialog(order, 'markPacked')}
+                          className="flex items-center gap-2"
+                        >
+                          <Package className="h-4 w-4" />
+                          Mark as Packed
+                        </Button>
                       )}
-                      {order.tracking.assignedDeliverymanName && (
-                        <p className="text-gray-600">
-                          ✓ Assigned to {order.tracking.assignedDeliverymanName}
-                        </p>
+                      {canPerformAction(order, 'assignDeliveryman') && (
+                        <Button
+                          size="sm"
+                          onClick={() => openActionDialog(order, 'assignDeliveryman')}
+                          className="flex items-center gap-2"
+                        >
+                          <Truck className="h-4 w-4" />
+                          Assign Deliveryman
+                        </Button>
                       )}
-                      {order.tracking.deliveredBy && (
-                        <p className="text-gray-600">
-                          ✓ Delivered by {order.tracking.deliveredBy}
-                        </p>
+                      {canPerformAction(order, 'markDelivered') && (
+                        <Button
+                          size="sm"
+                          onClick={() => openActionDialog(order, 'markDelivered')}
+                          className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
+                        >
+                          <CheckCircle className="h-4 w-4" />
+                          Mark as Delivered
+                        </Button>
                       )}
-                      {order.tracking.paymentReceivedBy && (
-                        <p className="text-gray-600">
-                          ✓ Payment received by{" "}
-                          {order.tracking.paymentReceivedBy}
-                        </p>
+                      {canPerformAction(order, 'startDelivery') && (
+                        <Button
+                          size="sm"
+                          onClick={() => openActionDialog(order, 'startDelivery')}
+                          className="flex items-center gap-2 bg-sky-600 hover:bg-sky-700"
+                        >
+                          <Truck className="h-4 w-4" />
+                          Start Delivery
+                        </Button>
+                      )}
+                      {canPerformAction(order, 'rescheduleDelivery') && (
+                        <Button
+                          size="sm"
+                          onClick={() => openActionDialog(order, 'rescheduleDelivery')}
+                          className="flex items-center gap-2 bg-amber-600 hover:bg-amber-700"
+                        >
+                          <Clock className="h-4 w-4" />
+                          Reschedule
+                        </Button>
+                      )}
+                      {canPerformAction(order, 'failedDelivery') && (
+                        <Button
+                          size="sm"
+                          onClick={() => openActionDialog(order, 'failedDelivery')}
+                          className="flex items-center gap-2 bg-red-600 hover:bg-red-700"
+                        >
+                          <Clock className="h-4 w-4" />
+                          Mark Failed
+                        </Button>
+                      )}
+                      {canPerformAction(order, 'receivePayment') && (
+                        <Button
+                          size="sm"
+                          onClick={() => openActionDialog(order, 'receivePayment')}
+                          className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700"
+                        >
+                          <DollarSign className="h-4 w-4" />
+                          Receive Payment
+                        </Button>
                       )}
                     </div>
-                  </div>
-                )}
 
-                {/* Action Buttons */}
-                <div className="flex flex-wrap gap-2">
-                  {canPerformAction(order, "confirmAddress") && (
-                    <Button
-                      size="sm"
-                      onClick={() => openActionDialog(order, "confirmAddress")}
-                      className="flex items-center gap-2"
-                    >
-                      <MapPin className="h-4 w-4" />
-                      Confirm Address
+                    {openWorkflowOrderId === order.id && (
+                      <div className="mt-4 border rounded-lg p-4 bg-gray-50">
+                        <h5 className="text-sm font-semibold mb-3">Workflow Logs</h5>
+                        {loadingWorkflowOrderId === order.id ? (
+                          <p className="text-sm text-gray-500">Loading workflow logs...</p>
+                        ) : (workflowLogsByOrder[order.id] || []).length === 0 ? (
+                          <p className="text-sm text-gray-500">No workflow logs yet.</p>
+                        ) : (
+                          <div className="space-y-2">
+                            {(workflowLogsByOrder[order.id] || []).map((log, index) => {
+                              const action = log?.action || log?.status || 'Action';
+                              const role = log?.role || log?.changedByRole || 'system';
+                              const actor =
+                                log?.employeeName ||
+                                log?.performedBy ||
+                                log?.changedBy ||
+                                log?.userEmail ||
+                                'Unknown';
+                              const note = log?.notes || log?.note || '';
+                              const cashAmount = log?.cashAmount;
+                              const at = log?.createdAt || log?.timestamp || log?.changedAt;
+                              return (
+                                <div
+                                  key={`${order.id}-wf-${index}`}
+                                  className="text-xs bg-white border rounded p-2"
+                                >
+                                  <div className="flex flex-wrap items-center justify-between gap-2">
+                                    <span className="font-semibold text-gray-800">
+                                      {String(action)}
+                                    </span>
+                                    <span className="text-gray-500">
+                                      {at ? new Date(at).toLocaleString() : '-'}
+                                    </span>
+                                  </div>
+                                  <div className="mt-1 text-gray-600">
+                                    Role: <span className="font-medium">{String(role)}</span> | By:{' '}
+                                    <span className="font-medium">{String(actor)}</span>
+                                  </div>
+                                  {typeof cashAmount === 'number' && (
+                                    <div className="mt-1 text-gray-600">
+                                      Cash: <span className="font-medium">${cashAmount}</span>
+                                    </div>
+                                  )}
+                                  {note ? (
+                                    <div className="mt-1 text-gray-600">Note: {String(note)}</div>
+                                  ) : null}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="workflow">
+          <div className="space-y-4">
+            {orders.length === 0 ? (
+              <div className="bg-white p-8 rounded-lg shadow text-center">
+                <p className="text-gray-500">No orders to display</p>
+              </div>
+            ) : (
+              orders.map((order) => (
+                <div key={`${order.id}-workflow-tab`} className="bg-white rounded-lg shadow p-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div>
+                      <p className="font-semibold">Order #{order.orderNumber.slice(0, 8)}...</p>
+                      <p className="text-sm text-gray-600">{order.customerName}</p>
+                    </div>
+                    <Button variant="outline" size="sm" onClick={() => toggleWorkflow(order.id)}>
+                      Load Logs
                     </Button>
-                  )}
-                  {canPerformAction(order, "confirmOrder") && (
-                    <Button
-                      size="sm"
-                      onClick={() => openActionDialog(order, "confirmOrder")}
-                      className="flex items-center gap-2"
-                    >
-                      <CheckCircle className="h-4 w-4" />
-                      Confirm Order
-                    </Button>
-                  )}
-                  {canPerformAction(order, "markPacked") && (
-                    <Button
-                      size="sm"
-                      onClick={() => openActionDialog(order, "markPacked")}
-                      className="flex items-center gap-2"
-                    >
-                      <Package className="h-4 w-4" />
-                      Mark as Packed
-                    </Button>
-                  )}
-                  {canPerformAction(order, "assignDeliveryman") && (
-                    <Button
-                      size="sm"
-                      onClick={() =>
-                        openActionDialog(order, "assignDeliveryman")
-                      }
-                      className="flex items-center gap-2"
-                    >
-                      <Truck className="h-4 w-4" />
-                      Assign Deliveryman
-                    </Button>
-                  )}
-                  {canPerformAction(order, "markDelivered") && (
-                    <Button
-                      size="sm"
-                      onClick={() => openActionDialog(order, "markDelivered")}
-                      className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
-                    >
-                      <CheckCircle className="h-4 w-4" />
-                      Mark as Delivered
-                    </Button>
-                  )}
-                  {canPerformAction(order, "receivePayment") && (
-                    <Button
-                      size="sm"
-                      onClick={() => openActionDialog(order, "receivePayment")}
-                      className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700"
-                    >
-                      <DollarSign className="h-4 w-4" />
-                      Receive Payment
-                    </Button>
+                  </div>
+
+                  {openWorkflowOrderId === order.id && (
+                    <div className="mt-3 border rounded-md p-3 bg-gray-50">
+                      {loadingWorkflowOrderId === order.id ? (
+                        <p className="text-sm text-gray-500">Loading workflow logs...</p>
+                      ) : (workflowLogsByOrder[order.id] || []).length === 0 ? (
+                        <p className="text-sm text-gray-500">No workflow logs yet.</p>
+                      ) : (
+                        <div className="space-y-2">
+                          {(workflowLogsByOrder[order.id] || []).map((log, index) => (
+                            <div key={`${order.id}-wf-tab-${index}`} className="bg-white border rounded p-2 text-xs">
+                              <p className="font-medium text-gray-800">
+                                {String(log?.action || log?.status || 'Action')}
+                              </p>
+                              <p className="text-gray-600">
+                                {String(log?.performedBy || log?.changedBy || log?.userEmail || 'Unknown')} -{' '}
+                                {String(log?.role || log?.changedByRole || 'system')}
+                              </p>
+                              <p className="text-gray-500">
+                                {log?.createdAt || log?.timestamp || log?.changedAt
+                                  ? new Date(log?.createdAt || log?.timestamp || log?.changedAt).toLocaleString()
+                                  : '-'}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   )}
                 </div>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
+              ))
+            )}
+          </div>
+        </TabsContent>
+      </Tabs>
 
       {/* Action Dialog */}
       <Dialog open={showActionDialog} onOpenChange={setShowActionDialog}>
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>
-              {actionType === "confirmAddress" && "Confirm Address"}
-              {actionType === "confirmOrder" && "Confirm Order"}
-              {actionType === "markPacked" && "Mark as Packed"}
-              {actionType === "assignDeliveryman" && "Assign Deliveryman"}
-              {actionType === "markDelivered" && "Mark as Delivered"}
-              {actionType === "receivePayment" && "Receive Payment"}
+              {actionType === 'confirmAddress' && 'Confirm Address'}
+              {actionType === 'confirmOrder' && 'Confirm Order'}
+              {actionType === 'markPacked' && 'Mark as Packed'}
+              {actionType === 'assignDeliveryman' && 'Assign Deliveryman'}
+              {actionType === 'startDelivery' && 'Start Delivery'}
+              {actionType === 'markDelivered' && 'Mark as Delivered'}
+              {actionType === 'rescheduleDelivery' && 'Reschedule Delivery'}
+              {actionType === 'failedDelivery' && 'Mark Delivery as Failed'}
+              {actionType === 'receivePayment' && 'Receive Payment'}
             </DialogTitle>
             <DialogDescription>
               Order #{selectedOrder?.orderNumber.slice(0, 8)}...
@@ -537,42 +781,48 @@ export default function EmployeeOrderManagement() {
           </DialogHeader>
 
           <div className="space-y-4">
-            {actionType === "assignDeliveryman" && (
+            {actionType === 'assignDeliveryman' && (
               <div>
                 <Label htmlFor="deliveryman">Select Deliveryman</Label>
-                <Select
-                  value={selectedDeliveryman}
-                  onValueChange={setSelectedDeliveryman}
-                >
+                <Select value={selectedDeliveryman} onValueChange={setSelectedDeliveryman}>
                   <SelectTrigger id="deliveryman">
                     <SelectValue placeholder="Choose deliveryman" />
                   </SelectTrigger>
                   <SelectContent>
-                    {deliverymen.map((dm) => (
-                      <SelectItem key={dm._id} value={dm._id}>
-                        {dm.firstName} {dm.lastName}
-                      </SelectItem>
-                    ))}
+                    {deliverymen.map((dm) => {
+                      const deliverymanId = dm.id || dm.id;
+                      if (!deliverymanId) return null;
+                      return (
+                        <SelectItem key={deliverymanId} value={deliverymanId}>
+                          {dm.firstName} {dm.lastName}
+                        </SelectItem>
+                      );
+                    })}
                   </SelectContent>
                 </Select>
               </div>
             )}
 
-            {actionType === "markDelivered" && (
-              <div>
-                <Label htmlFor="cashAmount">Cash Collected Amount</Label>
-                <Input
-                  id="cashAmount"
-                  type="number"
-                  value={cashAmount}
-                  onChange={(e) => setCashAmount(Number(e.target.value))}
-                  placeholder="Enter amount"
-                />
-                <p className="text-sm text-gray-500 mt-1">
-                  Order total: ${selectedOrder?.totalPrice}
-                </p>
-              </div>
-            )}
+            {actionType === 'markDelivered' &&
+              (() => {
+                if (!selectedOrder || !requiresCashCollection(selectedOrder)) return null;
+
+                return (
+                  <div>
+                    <Label htmlFor="cashAmount">Cash Collected Amount</Label>
+                    <Input
+                      id="cashAmount"
+                      type="number"
+                      value={cashAmount}
+                      onChange={(e) => setCashAmount(Number(e.target.value))}
+                      placeholder="Enter amount"
+                    />
+                    <p className="text-sm text-gray-500 mt-1">
+                      Order total: ${selectedOrder?.totalPrice}
+                    </p>
+                  </div>
+                );
+              })()}
 
             <div>
               <Label htmlFor="notes">Notes (Optional)</Label>
@@ -587,14 +837,11 @@ export default function EmployeeOrderManagement() {
           </div>
 
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setShowActionDialog(false)}
-            >
+            <Button variant="outline" onClick={() => setShowActionDialog(false)}>
               Cancel
             </Button>
             <Button onClick={handleAction} disabled={actionLoading}>
-              {actionLoading ? "Processing..." : "Confirm"}
+              {actionLoading ? 'Processing...' : 'Confirm'}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -1,25 +1,12 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { getCurrentEmployee, getAllEmployees } from "@/actions/employeeActions";
-import { getOrdersForEmployee } from "@/actions/orderEmployeeActions";
-import {
-  Employee,
-  OrderWithTracking,
-  getRoleDisplayName,
-} from "@/types/employee";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import {
-  DollarSign,
-  Package,
-  TrendingUp,
-  Users,
-  CheckCircle,
-  Clock,
-  Truck,
-  AlertCircle,
-} from "lucide-react";
+import { getAllEmployees, getCurrentEmployee } from '@/actions/employeeActions';
+import { getOrdersForEmployee } from '@/actions/orderEmployeeActions';
+import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
+import { Employee, OrderWithTracking, getRoleDisplayName } from '@/types/domain/employee';
+import { AlertCircle, Clock, DollarSign, Package, TrendingUp } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 export default function EmployeeAnalyticsDashboard() {
   const [employee, setEmployee] = useState<Employee | null>(null);
@@ -44,7 +31,7 @@ export default function EmployeeAnalyticsDashboard() {
       setAllEmployees(employeesData);
       setOrders(ordersData);
     } catch (error) {
-      console.error("Error loading analytics data:", error);
+      console.error('Error loading analytics data:', error);
     } finally {
       setLoading(false);
     }
@@ -52,7 +39,7 @@ export default function EmployeeAnalyticsDashboard() {
 
   // Calculate statistics
   const totalRevenue = orders
-    .filter((o) => o.paymentStatus === "paid")
+    .filter((o) => o.paymentStatus === 'paid')
     .reduce((sum, o) => sum + o.totalPrice, 0);
 
   const cashCollected = orders
@@ -74,10 +61,7 @@ export default function EmployeeAnalyticsDashboard() {
     );
   }
 
-  if (
-    !employee ||
-    (employee.role !== "incharge" && employee.role !== "accounts")
-  ) {
+  if (!employee || (employee.role !== 'incharge' && employee.role !== 'accounts')) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -96,10 +80,7 @@ export default function EmployeeAnalyticsDashboard() {
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Analytics Dashboard</h1>
         <p className="text-gray-600">
-          Role:{" "}
-          <span className="font-semibold">
-            {getRoleDisplayName(employee.role)}
-          </span>
+          Role: <span className="font-semibold">{getRoleDisplayName(employee.role)}</span>
         </p>
       </div>
 
@@ -138,9 +119,7 @@ export default function EmployeeAnalyticsDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Pending Collection</p>
-              <p className="text-2xl font-bold text-orange-600">
-                ${cashPending.toFixed(2)}
-              </p>
+              <p className="text-2xl font-bold text-orange-600">${cashPending.toFixed(2)}</p>
             </div>
             <Clock className="h-12 w-12 text-orange-500" />
           </div>
@@ -178,7 +157,7 @@ export default function EmployeeAnalyticsDashboard() {
             </thead>
             <tbody className="divide-y divide-gray-200">
               {allEmployees.map((emp) => (
-                <tr key={emp._id} className="hover:bg-gray-50">
+                <tr key={emp.id} className="hover:bg-gray-50">
                   <td className="px-4 py-3 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">
                       {emp.firstName} {emp.lastName}
@@ -203,11 +182,11 @@ export default function EmployeeAnalyticsDashboard() {
                   <td className="px-4 py-3 whitespace-nowrap">
                     <Badge
                       variant={
-                        emp.status === "active"
-                          ? "default"
-                          : emp.status === "suspended"
-                          ? "destructive"
-                          : "secondary"
+                        emp.status === 'active'
+                          ? 'default'
+                          : emp.status === 'suspended'
+                            ? 'destructive'
+                            : 'secondary'
                       }
                     >
                       {emp.status}

@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import React, { useState, useTransition } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
+import { useState, useTransition } from 'react';
 
-import { Trash2 } from "lucide-react";
-import { removeFromCart, updateCartItem } from "@/actions/userActions";
-import { toast } from "sonner";
+import { removeFromCart, updateCartItem } from '@/actions/userActions';
+import { Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface CartItemActionsProps {
   productId: string;
@@ -38,9 +38,9 @@ export function CartItemActions({
           size,
           color,
         });
-        toast.success("Moved to cart successfully!");
+        toast.success('Moved to cart successfully!');
       } catch {
-        console.error("Error moving to cart");
+        console.error('Error moving to cart');
       }
     });
   };
@@ -49,9 +49,9 @@ export function CartItemActions({
     startTransition(async () => {
       try {
         await removeFromCart(productId, size, color);
-        toast.success("Item removed from cart");
+        toast.success('Item removed from cart');
       } catch {
-        toast.error("Failed to remove item");
+        toast.error('Failed to remove item');
       }
     });
   };
@@ -68,15 +68,11 @@ export function CartItemActions({
         >
           -
         </Button>
-        <span className="px-3 py-1 text-sm font-medium min-w-[40px] text-center">
-          {quantity}
-        </span>
+        <span className="px-3 py-1 text-sm font-medium min-w-[40px] text-center">{quantity}</span>
         <Button
           variant="ghost"
           size="sm"
-          onClick={() =>
-            handleQuantityChange(Math.min(maxQuantity, quantity + 1))
-          }
+          onClick={() => handleQuantityChange(Math.min(maxQuantity, quantity + 1))}
           disabled={isPending || !inStock || quantity >= maxQuantity}
           className="h-8 w-8 p-0"
         >

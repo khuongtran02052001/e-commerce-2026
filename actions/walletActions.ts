@@ -1,439 +1,236 @@
-// "use server";
+'use server';
 
-// import { auth } from "@clerk/nextjs/server";
-// import { backendClient } from "@/sanity/lib/backendClient";
-// import { v4 as uuidv4 } from "uuid";
+import { auth } from '@/lib/auth';
+import { fetchServiceJsonServer } from '@/lib/restClient';
+import { v4 as uuid } from 'uuid';
 
-// // Types
-// interface WalletTransaction {
-//   id: string;
-//   type: "credit_refund" | "credit_manual" | "debit_order" | "debit_withdrawal";
-//   amount: number;
-//   balanceBefore: number;
-//   balanceAfter: number;
-//   description: string;
-//   orderId?: string;
-//   withdrawalRequestId?: string;
-//   processedBy?: string;
-//   createdAt: string;
-//   status: "completed" | "pending" | "failed" | "cancelled";
-// }
+interface WalletUser {
+  walletBalance?: number;
+  walletTransactions?: unknown[];
+}
 
-// interface WithdrawalRequest {
-//   id: string;
-//   amount: number;
-//   method: "bank" | "paypal" | "stripe" | "check";
-//   bankDetails?: {
-//     accountHolderName: string;
-//     bankName: string;
-//     accountNumber: string;
-//     routingNumber?: string;
-//     swiftCode?: string;
-//   };
-//   paypalEmail?: string;
-//   status:
-//     | "pending"
-//     | "approved"
-//     | "processing"
-//     | "completed"
-//     | "rejected"
-//     | "cancelled";
-//   requestedAt: string;
-//   processedAt?: string;
-//   processedBy?: string;
-//   rejectionReason?: string;
-//   notes?: string;
-//   transactionId?: string;
-// }
+/* ============================================================
+   GET USER WALLET BALANCE
+============================================================ */
+export async function getUserWalletBalance() {
+  try {
+    const session = await auth();
+    const email = session?.user?.email;
 
-// /**
-//  * Get user's wallet balance
-//  */
-// export async function getUserWalletBalance(): Promise<{
-//   success: boolean;
-//   balance?: number;
-//   message?: string;
-// }> {
-//   try {
-//     const { userId } = await auth();
-//     if (!userId) {
-//       return { success: false, message: "Unauthorized" };
-//     }
+    if (!email) return { success: false, message: 'Unauthorized' };
 
-//     const user = await backendClient.fetch(
-//       `*[_type == "user" && clerkUserId == $clerkUserId][0]{ walletBalance }`,
-//       { clerkUserId: userId }
-//     );
+    const user = await fetchServiceJsonServer<WalletUser>(`/users/by-email/${email}`, {
+      accessToken: session?.accessToken,
+    });
 
-//     if (!user) {
-//       return { success: false, message: "User not found" };
-//     }
+    return { success: true, balance: user.walletBalance ?? 0 };
+  } catch (err) {
+    console.error('getUserWalletBalance error:', err);
+    return { success: false, message: 'Failed to load wallet' };
+  }
+}
 
-//     return {
-//       success: true,
-//       balance: user.walletBalance || 0,
-//     };
-//   } catch (error) {
-//     console.error("Error getting wallet balance:", error);
-//     return { success: false, message: "Failed to fetch wallet balance" };
-//   }
-// }
+/* ============================================================
+   GET WALLET TRANSACTION HISTORY
+============================================================ */
+export async function getWalletTransactions() {
+  try {
+    const session = await auth();
+    const email = session?.user?.email;
 
-// /**
-//  * Get user's wallet transaction history
-//  */
-// export async function getWalletTransactions(): Promise<{
-//   success: boolean;
-//   transactions?: WalletTransaction[];
-//   message?: string;
-// }> {
-//   try {
-//     const { userId } = await auth();
-//     if (!userId) {
-//       return { success: false, message: "Unauthorized" };
-//     }
+    if (!email) return { success: false, message: 'Unauthorized' };
 
-//     const user = await backendClient.fetch(
-//       `*[_type == "user" && clerkUserId == $clerkUserId][0]{ walletTransactions }`,
-//       { clerkUserId: userId }
-//     );
+    const res = await fetchServiceJsonServer<unknown[]>(`/wallet/transactions/${email}`, {
+      accessToken: session?.accessToken,
+    });
 
-//     if (!user) {
-//       return { success: false, message: "User not found" };
-//     }
+    return { success: true, transactions: res ?? [] };
+  } catch (err) {
+    console.error('getWalletTransactions error:', err);
+    return { success: false, message: 'Failed to load wallet history' };
+  }
+}
 
-//     return {
-//       success: true,
-//       transactions: user.walletTransactions || [],
-//     };
-//   } catch (error) {
-//     console.error("Error getting wallet transactions:", error);
-//     return { success: false, message: "Failed to fetch transactions" };
-//   }
-// }
+/* ============================================================
+   ADD CREDIT TO WALLET  (refund order)
+============================================================ */
+export async function addWalletCredit(
+  userEmail: string,
+  amount: number,
+  description: string,
+  orderId?: string,
+  processedBy?: string,
+) {
+  try {
+    const user = await fetchServiceJsonServer<WalletUser>(`/users/by-email/${userEmail}`);
 
-// /**
-//  * Add credit to user wallet (used for refunds)
-//  * This is called when an order is cancelled
-//  */
-// export async function addWalletCredit(
-//   userId: string,
-//   amount: number,
-//   description: string,
-//   orderId?: string,
-//   processedBy?: string
-// ): Promise<{ success: boolean; message: string; newBalance?: number }> {
-//   try {
-//     // Get user's current balance
-//     const user = await backendClient.fetch(
-//       `*[_type == "user" && clerkUserId == $userId][0]{ 
-//         _id, 
-//         walletBalance, 
-//         walletTransactions 
-//       }`,
-//       { userId }
-//     );
+    if (!user) return { success: false, message: 'User not found' };
 
-//     if (!user) {
-//       return { success: false, message: "User not found" };
-//     }
+    const currentBalance = user.walletBalance ?? 0;
+    const newBalance = currentBalance + amount;
 
-//     const currentBalance = user.walletBalance || 0;
-//     const newBalance = currentBalance + amount;
+    const transaction = {
+      id: uuid(),
+      type: 'credit_refund',
+      amount,
+      balanceBefore: currentBalance,
+      balanceAfter: newBalance,
+      description,
+      orderId,
+      processedBy,
+      createdAt: new Date().toISOString(),
+      status: 'completed',
+    };
 
-//     // Create transaction record
-//     const transaction: WalletTransaction = {
-//       id: uuidv4(),
-//       type: "credit_refund",
-//       amount,
-//       balanceBefore: currentBalance,
-//       balanceAfter: newBalance,
-//       description,
-//       orderId,
-//       processedBy,
-//       createdAt: new Date().toISOString(),
-//       status: "completed",
-//     };
+    await fetchServiceJsonServer(`/wallet/update/${userEmail}`, {
+      method: 'PUT',
+      body: JSON.stringify({
+        walletBalance: newBalance,
+        walletTransactions: [transaction, ...(user.walletTransactions ?? [])],
+      }),
+    });
 
-//     // Update user with new balance and transaction
-//     await backendClient
-//       .patch(user._id)
-//       .set({
-//         walletBalance: newBalance,
-//         walletTransactions: [transaction, ...(user.walletTransactions || [])],
-//       })
-//       .commit();
+    return { success: true, message: 'Credit added', newBalance };
+  } catch (err) {
+    console.error('addWalletCredit error:', err);
+    return { success: false, message: 'Failed to add credit' };
+  }
+}
 
-//     return {
-//       success: true,
-//       message: "Credit added successfully",
-//       newBalance,
-//     };
-//   } catch (error) {
-//     console.error("Error adding wallet credit:", error);
-//     return {
-//       success: false,
-//       message: "Failed to add credit to wallet",
-//     };
-//   }
-// }
+/* ============================================================
+   DEDUCT WALLET BALANCE  (checkout)
+============================================================ */
+export async function deductWalletBalance(amount: number, orderId: string) {
+  try {
+    const session = await auth();
+    const email = session?.user?.email;
 
-// /**
-//  * Deduct amount from wallet (used during checkout)
-//  */
-// export async function deductWalletBalance(
-//   amount: number,
-//   orderId: string
-// ): Promise<{ success: boolean; message: string; newBalance?: number }> {
-//   try {
-//     const { userId } = await auth();
-//     if (!userId) {
-//       return { success: false, message: "Unauthorized" };
-//     }
+    if (!email) return { success: false, message: 'Unauthorized' };
 
-//     const user = await backendClient.fetch(
-//       `*[_type == "user" && clerkUserId == $userId][0]{ 
-//         _id, 
-//         walletBalance, 
-//         walletTransactions 
-//       }`,
-//       { userId }
-//     );
+    const user = await fetchServiceJsonServer<WalletUser>(`/users/by-email/${email}`, {
+      accessToken: session?.accessToken,
+    });
 
-//     if (!user) {
-//       return { success: false, message: "User not found" };
-//     }
+    const currentBalance = user.walletBalance ?? 0;
+    if (currentBalance < amount) return { success: false, message: 'Insufficient wallet balance' };
 
-//     const currentBalance = user.walletBalance || 0;
+    const newBalance = currentBalance - amount;
 
-//     if (currentBalance < amount) {
-//       return {
-//         success: false,
-//         message: "Insufficient wallet balance",
-//       };
-//     }
+    const transaction = {
+      id: uuid(),
+      type: 'debit_order',
+      amount,
+      balanceBefore: currentBalance,
+      balanceAfter: newBalance,
+      description: `Payment for order #${orderId}`,
+      orderId,
+      createdAt: new Date().toISOString(),
+      status: 'completed',
+    };
 
-//     const newBalance = currentBalance - amount;
+    await fetchServiceJsonServer(`/wallet/update/${email}`, {
+      method: 'PUT',
+      body: JSON.stringify({
+        walletBalance: newBalance,
+        walletTransactions: [transaction, ...(user.walletTransactions ?? [])],
+      }),
+      accessToken: session?.accessToken,
+    });
 
-//     // Create transaction record
-//     const transaction: WalletTransaction = {
-//       id: uuidv4(),
-//       type: "debit_order",
-//       amount,
-//       balanceBefore: currentBalance,
-//       balanceAfter: newBalance,
-//       description: `Payment for order #${orderId}`,
-//       orderId,
-//       createdAt: new Date().toISOString(),
-//       status: "completed",
-//     };
+    return { success: true, newBalance, message: 'Deducted successfully' };
+  } catch (err) {
+    console.error('deductWalletBalance error:', err);
+    return { success: false, message: 'Failed to deduct' };
+  }
+}
 
-//     // Update user
-//     await backendClient
-//       .patch(user._id)
-//       .set({
-//         walletBalance: newBalance,
-//         walletTransactions: [transaction, ...(user.walletTransactions || [])],
-//       })
-//       .commit();
+/* ============================================================
+   USER: REQUEST WITHDRAWAL
+============================================================ */
+export async function requestWithdrawal(data: {
+  amount: number;
+  method: 'bank' | 'paypal' | 'stripe' | 'check';
+  bankDetails?: any;
+  paypalEmail?: string;
+}) {
+  try {
+    const session = await auth();
+    const email = session?.user?.email;
+    if (!email) return { success: false, message: 'Unauthorized' };
 
-//     return {
-//       success: true,
-//       message: "Payment deducted from wallet",
-//       newBalance,
-//     };
-//   } catch (error) {
-//     console.error("Error deducting wallet balance:", error);
-//     return {
-//       success: false,
-//       message: "Failed to deduct from wallet",
-//     };
-//   }
-// }
+    if (data.amount < 10) return { success: false, message: 'Minimum withdrawal is $10' };
 
-// /**
-//  * Request withdrawal from wallet
-//  */
-// export async function requestWithdrawal(data: {
-//   amount: number;
-//   method: "bank" | "paypal" | "stripe" | "check";
-//   bankDetails?: {
-//     accountHolderName: string;
-//     bankName: string;
-//     accountNumber: string;
-//     routingNumber?: string;
-//     swiftCode?: string;
-//   };
-//   paypalEmail?: string;
-// }): Promise<{ success: boolean; message: string; requestId?: string }> {
-//   try {
-//     const { userId } = await auth();
-//     if (!userId) {
-//       return { success: false, message: "Unauthorized" };
-//     }
+    const user = await fetchServiceJsonServer<WalletUser>(`/users/by-email/${email}`, {
+      accessToken: session?.accessToken,
+    });
 
-//     // Validate amount
-//     if (data.amount <= 0) {
-//       return { success: false, message: "Invalid amount" };
-//     }
+    const currentBalance = user.walletBalance ?? 0;
+    if (currentBalance < data.amount)
+      return {
+        success: false,
+        message: `Insufficient balance: $${currentBalance.toFixed(2)}`,
+      };
 
-//     // Minimum withdrawal amount
-//     if (data.amount < 10) {
-//       return { success: false, message: "Minimum withdrawal amount is $10" };
-//     }
+    const newRequest = {
+      id: uuid(),
+      amount: data.amount,
+      method: data.method,
+      bankDetails: data.bankDetails,
+      paypalEmail: data.paypalEmail,
+      status: 'pending',
+      requestedAt: new Date().toISOString(),
+    };
 
-//     const user = await backendClient.fetch(
-//       `*[_type == "user" && clerkUserId == $userId][0]{ 
-//         _id, 
-//         walletBalance, 
-//         withdrawalRequests 
-//       }`,
-//       { userId }
-//     );
+    await fetchServiceJsonServer(`/wallet/withdrawal/${email}`, {
+      method: 'POST',
+      body: JSON.stringify(newRequest),
+      accessToken: session?.accessToken,
+    });
 
-//     if (!user) {
-//       return { success: false, message: "User not found" };
-//     }
+    return { success: true, requestId: newRequest.id };
+  } catch (err) {
+    console.error('requestWithdrawal error:', err);
+    return { success: false, message: 'Failed to request withdrawal' };
+  }
+}
 
-//     const currentBalance = user.walletBalance || 0;
+/* ============================================================
+   USER: GET WITHDRAWAL REQUESTS
+============================================================ */
+export async function getWithdrawalRequests() {
+  try {
+    const session = await auth();
+    const email = session?.user?.email;
+    if (!email) return { success: false, message: 'Unauthorized' };
 
-//     if (currentBalance < data.amount) {
-//       return {
-//         success: false,
-//         message: `Insufficient balance. Available: $${currentBalance.toFixed(
-//           2
-//         )}`,
-//       };
-//     }
+    const res = await fetchServiceJsonServer(`/wallet/withdrawal/${email}`, {
+      accessToken: session?.accessToken,
+    });
+    return { success: true, requests: res ?? [] };
+  } catch (err) {
+    console.error('getWithdrawalRequests error:', err);
+    return { success: false, message: 'Failed to load withdrawals' };
+  }
+}
 
-//     // Create withdrawal request
-//     const withdrawalRequest: WithdrawalRequest = {
-//       id: uuidv4(),
-//       amount: data.amount,
-//       method: data.method,
-//       bankDetails: data.bankDetails,
-//       paypalEmail: data.paypalEmail,
-//       status: "pending",
-//       requestedAt: new Date().toISOString(),
-//     };
+/* ============================================================
+   USER: CANCEL WITHDRAWAL REQUEST
+============================================================ */
+export async function cancelWithdrawalRequest(requestId: string) {
+  try {
+    const session = await auth();
+    const email = session?.user?.email;
+    if (!email) return { success: false, message: 'Unauthorized' };
 
-//     // Add withdrawal request
-//     await backendClient
-//       .patch(user._id)
-//       .set({
-//         withdrawalRequests: [
-//           withdrawalRequest,
-//           ...(user.withdrawalRequests || []),
-//         ],
-//       })
-//       .commit();
+    await fetchServiceJsonServer(`/wallet/withdrawal/cancel/${email}`, {
+      method: 'PUT',
+      body: JSON.stringify({ requestId }),
+      accessToken: session?.accessToken,
+    });
 
-//     return {
-//       success: true,
-//       message:
-//         "Withdrawal request submitted successfully. It will be processed within 3-5 business days.",
-//       requestId: withdrawalRequest.id,
-//     };
-//   } catch (error) {
-//     console.error("Error requesting withdrawal:", error);
-//     return {
-//       success: false,
-//       message: "Failed to submit withdrawal request",
-//     };
-//   }
-// }
-
-// /**
-//  * Get user's withdrawal requests
-//  */
-// export async function getWithdrawalRequests(): Promise<{
-//   success: boolean;
-//   requests?: WithdrawalRequest[];
-//   message?: string;
-// }> {
-//   try {
-//     const { userId } = await auth();
-//     if (!userId) {
-//       return { success: false, message: "Unauthorized" };
-//     }
-
-//     const user = await backendClient.fetch(
-//       `*[_type == "user" && clerkUserId == $userId][0]{ withdrawalRequests }`,
-//       { userId }
-//     );
-
-//     if (!user) {
-//       return { success: false, message: "User not found" };
-//     }
-
-//     return {
-//       success: true,
-//       requests: user.withdrawalRequests || [],
-//     };
-//   } catch (error) {
-//     console.error("Error getting withdrawal requests:", error);
-//     return { success: false, message: "Failed to fetch withdrawal requests" };
-//   }
-// }
-
-// /**
-//  * Cancel withdrawal request (only if pending)
-//  */
-// export async function cancelWithdrawalRequest(requestId: string): Promise<{
-//   success: boolean;
-//   message: string;
-// }> {
-//   try {
-//     const { userId } = await auth();
-//     if (!userId) {
-//       return { success: false, message: "Unauthorized" };
-//     }
-
-//     const user = await backendClient.fetch(
-//       `*[_type == "user" && clerkUserId == $userId][0]{ 
-//         _id, 
-//         withdrawalRequests 
-//       }`,
-//       { userId }
-//     );
-
-//     if (!user) {
-//       return { success: false, message: "User not found" };
-//     }
-
-//     const requests = user.withdrawalRequests || [];
-//     const request = requests.find((r: WithdrawalRequest) => r.id === requestId);
-
-//     if (!request) {
-//       return { success: false, message: "Withdrawal request not found" };
-//     }
-
-//     if (request.status !== "pending") {
-//       return {
-//         success: false,
-//         message: `Cannot cancel request with status: ${request.status}`,
-//       };
-//     }
-
-//     // Update request status to cancelled
-//     const updatedRequests = requests.map((r: WithdrawalRequest) =>
-//       r.id === requestId ? { ...r, status: "cancelled" as const } : r
-//     );
-
-//     await backendClient
-//       .patch(user._id)
-//       .set({ withdrawalRequests: updatedRequests })
-//       .commit();
-
-//     return {
-//       success: true,
-//       message: "Withdrawal request cancelled successfully",
-//     };
-//   } catch (error) {
-//     console.error("Error cancelling withdrawal request:", error);
-//     return {
-//       success: false,
-//       message: "Failed to cancel withdrawal request",
-//     };
-//   }
-// }
+    return { success: true, message: 'Withdrawal request cancelled' };
+  } catch (err) {
+    console.error('cancelWithdrawalRequest error:', err);
+    return { success: false, message: 'Failed to cancel withdrawal' };
+  }
+}

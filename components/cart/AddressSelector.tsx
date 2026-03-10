@@ -1,23 +1,17 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
-import { MapPin, Plus, List } from "lucide-react";
-import { AddAddressSidebar } from "./AddAddressSidebar";
-import { AddressSelectorSkeleton } from "./CartSkeleton";
-import { AllAddressesSidebar } from "./AllAddressesSidebar";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { List, MapPin, Plus } from 'lucide-react';
+import { useState } from 'react';
+import { AddAddressSidebar } from './AddAddressSidebar';
+import { AllAddressesSidebar } from './AllAddressesSidebar';
+import { AddressSelectorSkeleton } from './CartSkeleton';
 
 interface Address {
-  _id: string;
+  id: string;
   name: string;
   email: string;
   address: string;
@@ -44,8 +38,7 @@ export function AddressSelector({
   onAddressesRefresh,
 }: AddressSelectorProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isAllAddressesSidebarOpen, setIsAllAddressesSidebarOpen] =
-    useState(false);
+  const [isAllAddressesSidebarOpen, setIsAllAddressesSidebarOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const MAX_VISIBLE_ADDRESSES = 3;
@@ -104,26 +97,20 @@ export function AddressSelector({
           <MapPin className="w-5 h-5" />
           Shipping Address
         </CardTitle>
-        <CardDescription>
-          Select a shipping address for your order
-        </CardDescription>
+        <CardDescription>Select a shipping address for your order</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <RadioGroup
-          value={selectedAddress?._id || ""}
+          value={selectedAddress?.id || ''}
           onValueChange={(value) => {
-            const address = addresses.find((addr) => addr._id === value);
+            const address = addresses.find((addr) => addr.id === value);
             if (address) onAddressSelect(address);
           }}
         >
           {visibleAddresses.map((address) => (
-            <div key={address._id} className="flex items-start space-x-2">
-              <RadioGroupItem
-                value={address._id}
-                id={address._id}
-                className="mt-1"
-              />
-              <Label htmlFor={address._id} className="flex-1 cursor-pointer">
+            <div key={address.id} className="flex items-start space-x-2">
+              <RadioGroupItem value={address.id} id={address.id} className="mt-1" />
+              <Label htmlFor={address.id} className="flex-1 cursor-pointer">
                 <div className="space-y-1">
                   <div className="font-medium flex items-center gap-2">
                     {address.name}
@@ -133,9 +120,7 @@ export function AddressSelector({
                       </span>
                     )}
                   </div>
-                  <div className="text-sm text-muted-foreground">
-                    {address.address}
-                  </div>
+                  <div className="text-sm text-muted-foreground">{address.address}</div>
                   <div className="text-sm text-muted-foreground">
                     {address.city}, {address.state} {address.zip}
                   </div>
@@ -156,11 +141,7 @@ export function AddressSelector({
           </Button>
         )}
 
-        <Button
-          variant="outline"
-          className="w-full"
-          onClick={() => setIsSidebarOpen(true)}
-        >
+        <Button variant="outline" className="w-full" onClick={() => setIsSidebarOpen(true)}>
           <Plus className="w-4 h-4 mr-2" />
           Add New Address
         </Button>

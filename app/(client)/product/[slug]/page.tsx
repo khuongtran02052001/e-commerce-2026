@@ -1,19 +1,12 @@
-import { Suspense } from "react";
-import ProductPageSkeleton from "@/components/ProductPageSkeleton";
+import ProductContent from '@/components/ProductContent';
+import { getBrand, getProductBySlug, getRelatedProducts } from '@/data/server';
 import {
-  getProductBySlug,
-  getRelatedProducts,
-  getBrand,
-} from "@/sanity/queries";
-import { notFound } from "next/navigation";
-import ProductContent from "@/components/ProductContent";
-import { Product } from "@/sanity.types";
-import { Metadata } from "next";
-import {
+  generateBreadcrumbSchema,
   generateProductMetadata,
   generateProductSchema,
-  generateBreadcrumbSchema,
-} from "@/lib/seo";
+} from '@/lib/seo';
+import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -25,7 +18,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!product) {
     return {
-      title: "Product Not Found",
+      title: 'Product Not Found',
       description: "The product you're looking for could not be found.",
     };
   }
@@ -37,37 +30,30 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return generateProductMetadata(productWithBrand);
 }
 
-const ProductPage = async ({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) => {
+const ProductPage = async ({ params }: { params: Promise<{ slug: string }> }) => {
   const { slug } = await params;
 
   return (
     <div>
-      <Suspense fallback={<ProductPageSkeleton />}>
-        <ProductPageContent slug={slug} />
-      </Suspense>
+      <ProductPageContent slug={slug} />
     </div>
   );
 };
 
 const ProductPageContent = async ({ slug }: { slug: string }) => {
   const product = await getProductBySlug(slug);
-
   if (!product) {
     return notFound();
   }
 
   // Fetch related data on the server side
   const categoryIds =
-    product?.categories?.map(
-      (cat: { _ref: string; _type: string; _key: string }) => cat._ref
-    ) || [];
-  const [relatedProducts, brand] = await Promise.all([
-    getRelatedProducts(categoryIds, product?.slug?.current || "", 4),
-    getBrand(product?.slug?.current as string),
+    product?.categories
+      ?.map((cat: { id?: string; slug?: string; _ref?: string }) => cat.id || cat.slug || cat._ref)
+      .filter((value): value is string => Boolean(value)) || [];
+
+  const [relatedProducts] = await Promise.all([
+    getRelatedProducts(categoryIds, product.brand?.slug!, 4),
   ]);
 
   // Convert null values to undefined for TypeScript compatibility
@@ -77,14 +63,13 @@ const ProductPageContent = async ({ slug }: { slug: string }) => {
     totalReviews: product.totalReviews ?? undefined,
   };
 
-  const productWithBrand = { ...productWithReviews, brand };
-
+  const productWithBrand = { ...productWithReviews, brand: product.brand };
   // Generate structured data
   const productSchema = generateProductSchema(productWithBrand);
   const breadcrumbSchema = generateBreadcrumbSchema([
-    { name: "Home", url: "/" },
-    { name: "Shop", url: "/shop" },
-    { name: productWithReviews.name || "Product", url: `/product/${slug}` },
+    { name: 'Home', url: '/' },
+    { name: 'Shop', url: '/shop' },
+    { name: productWithReviews.name || 'Product', url: `/product/${slug}` },
   ]);
 
   return (
@@ -105,8 +90,8 @@ const ProductPageContent = async ({ slug }: { slug: string }) => {
 
       <ProductContent
         product={productWithReviews}
-        relatedProducts={(relatedProducts || []) as unknown as Product[]}
-        brand={brand}
+        relatedProducts={relatedProducts || []}
+        brand={product.brand ? product.brand : null}
       />
     </>
   );

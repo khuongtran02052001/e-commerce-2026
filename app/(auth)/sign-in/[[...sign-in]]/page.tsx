@@ -1,33 +1,34 @@
-"use client";
+'use client';
 
-import { SignIn } from "@clerk/nextjs";
-import { motion } from "motion/react";
-import Link from "next/link";
-import Logo from "@/components/common/Logo";
-import { ArrowLeft, Shield, Users, Star } from "lucide-react";
-import { contactConfig } from "@/config/contact";
-import Container from "@/components/Container";
-import { useSearchParams } from "next/navigation";
+import Logo from '@/components/common/Logo';
+import Container from '@/components/Container';
+import { Button } from '@/components/ui/button';
+import { contactConfig } from '@/config/contact';
+import { ArrowLeft, Shield, Star, Users } from 'lucide-react';
+import { motion } from 'motion/react';
+import { signIn } from 'next-auth/react';
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 
 const SignInPage = () => {
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get("redirectTo");
+  const redirectTo = searchParams.get('redirectTo');
 
   const features = [
     {
       icon: Shield,
-      title: "Secure Authentication",
-      description: "Your data is protected with enterprise-grade security",
+      title: 'Secure Authentication',
+      description: 'Your data is protected with enterprise-grade security',
     },
     {
       icon: Users,
-      title: "Trusted by Thousands",
-      description: "Join our community of satisfied customers",
+      title: 'Trusted by Thousands',
+      description: 'Join our community of satisfied customers',
     },
     {
       icon: Star,
-      title: "Premium Experience",
-      description: "Access exclusive deals and personalized recommendations",
+      title: 'Premium Experience',
+      description: 'Access exclusive deals and personalized recommendations',
     },
   ];
 
@@ -69,9 +70,8 @@ const SignInPage = () => {
                   Welcome Back!
                 </h1>
                 <p className="text-lg text-dark-text mb-8 leading-relaxed">
-                  Sign in to access your account, track orders, and enjoy
-                  personalized shopping experiences at{" "}
-                  {contactConfig.company.name}.
+                  Sign in to access your account, track orders, and enjoy personalized shopping
+                  experiences at {contactConfig.company.name}.
                 </p>
               </motion.div>
 
@@ -89,12 +89,8 @@ const SignInPage = () => {
                       <feature.icon className="w-5 h-5 text-shop_light_green" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-shop_dark_green mb-1">
-                        {feature.title}
-                      </h3>
-                      <p className="text-sm text-dark-text">
-                        {feature.description}
-                      </p>
+                      <h3 className="font-semibold text-shop_dark_green mb-1">{feature.title}</h3>
+                      <p className="text-sm text-dark-text">{feature.description}</p>
                     </div>
                   </motion.div>
                 ))}
@@ -108,7 +104,7 @@ const SignInPage = () => {
                 className="mt-8 p-6 bg-white/80 backdrop-blur-sm rounded-xl border border-shop_light_green/20 shadow-sm"
               >
                 <p className="text-sm text-dark-text">
-                  Need help? Contact our support team at{" "}
+                  Need help? Contact our support team at{' '}
                   <a
                     href={`mailto:${contactConfig.emails.support}`}
                     className="text-shop_light_green hover:text-shop_dark_green font-medium transition-colors duration-200"
@@ -134,17 +130,23 @@ const SignInPage = () => {
                 transition={{ duration: 0.5, delay: 0.4 }}
                 className="bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-gray-100/50 p-8"
               >
-                {/* Clerk Sign In Component */}
-                <div className="clerk-sign-in">
-                  <SignIn
-                    signUpUrl={`/sign-up${
-                      redirectTo
-                        ? `?redirectTo=${encodeURIComponent(redirectTo)}`
-                        : ""
-                    }`}
-                    forceRedirectUrl={redirectTo || "/user/dashboard"}
-                    fallbackRedirectUrl={redirectTo || "/user/dashboard"}
-                  />
+                <div className="space-y-4">
+                  <h2 className="text-xl font-semibold text-shop_dark_green">Sign in</h2>
+                  <p className="text-sm text-gray-600">
+                    Continue with your Google account. If you are new, we will create your account
+                    automatically.
+                  </p>
+                  <Button
+                    type="button"
+                    className="w-full bg-shop_dark_green hover:bg-shop_light_green"
+                    onClick={() =>
+                      signIn('google', {
+                        callbackUrl: redirectTo || '/user/dashboard',
+                      })
+                    }
+                  >
+                    Continue with Google
+                  </Button>
                 </div>
               </motion.div>
             </div>

@@ -1,7 +1,16 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect, useCallback } from "react";
-import { Card } from "@/components/ui/card";
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import {
   Table,
   TableBody,
@@ -9,29 +18,31 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
-import { RefreshCw, Trash2, Eye, Package } from "lucide-react";
-import { OrdersSkeleton } from "./SkeletonLoaders";
-import { DeleteConfirmationDialog } from "./DeleteConfirmationDialog";
-import OrderDetailsSidebar from "./OrderDetailsSidebar";
-import { Order } from "./types";
-import { safeApiCall, handleApiError } from "./apiHelpers";
+} from '@/components/ui/table';
+import { deleteAdminOrders, getAdminOrderById, getAdminOrders } from '@/data/client/order';
+import { getStatusColor } from '@/lib/renderStatus';
+import { Eye, Package, RefreshCw, Trash2 } from 'lucide-react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { handleApiError } from './apiHelpers';
+import { DeleteConfirmationDialog } from './DeleteConfirmationDialog';
+import OrderDetailsSidebar from './OrderDetailsSidebar';
+import { OrdersSkeleton } from './SkeletonLoaders';
+import { Order } from './types';
+
+const resolveOrderPayload = (payload: unknown): Order | null => {
+  if (!payload || typeof payload !== 'object') return null;
+
+  const record = payload as Record<string, unknown>;
+  if (record.data && typeof record.data === 'object') return record.data as Order;
+  if (record.order && typeof record.order === 'object') return record.order as Order;
+  return payload as Order;
+};
 
 const AdminOrders: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [orders, setOrders] = useState<Order[]>([]);
-  const [currentPage, setCurrentPage] = useState(0);
-  const [orderStatus, setOrderStatus] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [orderStatus, setOrderStatus] = useState('all');
   const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -40,94 +51,72 @@ const AdminOrders: React.FC = () => {
   const [isLoadingOrderDetails, setIsLoadingOrderDetails] = useState(false);
   const [perPage, setPerPage] = useState(20);
   const [pagination, setPagination] = useState({
+    page: 1,
+    perPage: 20,
     totalCount: 0,
     hasNextPage: false,
-    totalPages: 0,
+    totalPages: 1,
   });
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const limit = perPage;
-
   // Utility functions
   const formatCurrency = (amount: number): string => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
     }).format(amount);
   };
 
   const formatDate = (dateString: string): string => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
     });
-  };
-
-  const getStatusColor = (status: string): string => {
-    switch (status.toLowerCase()) {
-      case "completed":
-        return "bg-green-100 text-green-800";
-      case "delivered":
-        return "bg-green-100 text-green-800";
-      case "out_for_delivery":
-        return "bg-blue-100 text-blue-800";
-      case "ready_for_delivery":
-        return "bg-cyan-100 text-cyan-800";
-      case "packed":
-        return "bg-purple-100 text-purple-800";
-      case "order_confirmed":
-        return "bg-emerald-100 text-emerald-800";
-      case "address_confirmed":
-        return "bg-yellow-100 text-yellow-800";
-      case "pending":
-        return "bg-orange-100 text-orange-800";
-      case "cancelled":
-        return "bg-red-100 text-red-800";
-      case "failed_delivery":
-        return "bg-red-100 text-red-800";
-      case "rescheduled":
-        return "bg-amber-100 text-amber-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
   };
 
   // Fetch orders
   const fetchOrders = useCallback(
-    async (page = 0) => {
+    async (page = 1) => {
       setLoading(true);
       try {
-        const statusParam = orderStatus === "all" ? "" : orderStatus;
-        const timestamp = Date.now(); // Add timestamp to bust cache
-        const url = `/api/admin/orders?limit=${limit}&offset=${
-          page * limit
-        }&status=${statusParam}&_t=${timestamp}`;
+        const statusParam = orderStatus === 'all' ? '' : orderStatus;
+        const data = await getAdminOrders({
+          page,
+          perPage,
+          status: statusParam || undefined,
+          cacheBust: true,
+        });
+        const meta = data.meta || {};
+        const resolvedPage = Number(meta.page || page || 1);
+        const resolvedPerPage = Number(meta.perPage || perPage || 20);
+        const totalCount = Number(meta.totalCount || data.totalCount || 0);
+        const hasNextPage = Boolean(
+          typeof meta.hasNextPage === 'boolean' ? meta.hasNextPage : data.hasNextPage,
+        );
+        const totalPages = Math.max(1, Math.ceil(totalCount / resolvedPerPage));
 
-        const data = await safeApiCall(url);
-
-        setOrders(data.orders);
+        setOrders(data.data || []);
         setPagination({
-          totalCount: data.totalCount,
-          hasNextPage: data.hasNextPage,
-          totalPages: data.pagination.totalPages,
+          page: resolvedPage,
+          perPage: resolvedPerPage,
+          totalCount,
+          hasNextPage,
+          totalPages,
         });
       } catch (error) {
-        console.error("Error in fetchOrders:", error);
-        handleApiError(error, "Orders fetch");
+        console.error('Error in fetchOrders:', error);
+        handleApiError(error, 'Orders fetch');
       } finally {
         setLoading(false);
       }
     },
-    [orderStatus, limit]
+    [orderStatus, perPage],
   );
-
   // Selection functions
   const toggleOrderSelection = useCallback((orderId: string) => {
     setSelectedOrders((prev) =>
-      prev.includes(orderId)
-        ? prev.filter((id) => id !== orderId)
-        : [...prev, orderId]
+      prev.includes(orderId) ? prev.filter((id) => id !== orderId) : [...prev, orderId],
     );
   }, []);
 
@@ -135,7 +124,7 @@ const AdminOrders: React.FC = () => {
     if (selectedOrders.length === orders.length && orders.length > 0) {
       setSelectedOrders([]);
     } else {
-      setSelectedOrders(orders.map((order) => order._id));
+      setSelectedOrders(orders.map((order) => order.id).filter((id): id is string => Boolean(id)));
     }
   }, [selectedOrders.length, orders]);
 
@@ -147,16 +136,12 @@ const AdminOrders: React.FC = () => {
 
     try {
       // Fetch complete order details from the individual order API
-      const response = await fetch(`/api/admin/orders/${order._id}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch order details");
-      }
-
-      const data = await response.json();
-      setSelectedOrder(data.order);
+      const orderId = order.id;
+      const data = await getAdminOrderById(orderId);
+      setSelectedOrder(resolveOrderPayload(data));
     } catch (error) {
-      console.error("Error fetching order details:", error);
-      handleApiError(error, "Order details fetch");
+      console.error('Error fetching order details:', error);
+      handleApiError(error, 'Order details fetch');
       // Fall back to the basic order data from the list
       setSelectedOrder(order);
     } finally {
@@ -184,33 +169,28 @@ const AdminOrders: React.FC = () => {
       // Also refresh the selected order details if sidebar is still open
       if (selectedOrder && isSidebarOpen && updatedOrderId) {
         try {
-          const timestamp = Date.now();
-          const updatedOrderData = await safeApiCall(
-            `/api/admin/orders/${updatedOrderId}?_t=${timestamp}`
-          );
-          if (updatedOrderData?.order) {
-            setSelectedOrder(updatedOrderData.order);
-          }
+          const updatedOrderData = await getAdminOrderById(updatedOrderId, true);
+          const latestOrder = resolveOrderPayload(updatedOrderData);
+          if (latestOrder) setSelectedOrder(latestOrder);
         } catch (error) {
-          console.error("Error refreshing order details:", error);
+          console.error('Error refreshing order details:', error);
         }
       }
     } catch (error) {
-      console.error("Error updating orders:", error);
+      console.error('Error updating orders:', error);
     } finally {
       setIsRefreshing(false);
     }
   };
-
   // Pagination functions
   const handlePageChange = (newPage: number) => {
-    setCurrentPage(newPage);
+    setCurrentPage(Math.max(1, newPage));
     setSelectedOrders([]); // Clear selections when changing page
   };
 
   const handlePerPageChange = (newPerPage: string) => {
     setPerPage(parseInt(newPerPage));
-    setCurrentPage(0); // Reset to first page
+    setCurrentPage(1); // Reset to first page
     setSelectedOrders([]);
   };
 
@@ -222,21 +202,14 @@ const AdminOrders: React.FC = () => {
   const handleDeleteOrders = async () => {
     setIsDeleting(true);
     try {
-      const timestamp = Date.now();
-      await safeApiCall(`/api/admin/orders?_t=${timestamp}`, {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orderIds: selectedOrders }),
-      });
+      await deleteAdminOrders(selectedOrders);
 
       // Close dialog and clear selections first
       setIsDeleteDialogOpen(false);
       setSelectedOrders([]);
 
       // Immediately update local state to remove deleted orders
-      setOrders((prevOrders) =>
-        prevOrders.filter((order) => !selectedOrders.includes(order._id))
-      );
+      setOrders((prevOrders) => prevOrders.filter((order) => !selectedOrders.includes(order.id)));
 
       // Update pagination count
       setPagination((prev) => ({
@@ -246,10 +219,10 @@ const AdminOrders: React.FC = () => {
 
       // If all orders on current page were deleted, go back to page 0
       const willBeEmpty = selectedOrders.length === orders.length;
-      const pageToFetch = willBeEmpty && currentPage > 0 ? 0 : currentPage;
+      const pageToFetch = willBeEmpty && currentPage > 1 ? currentPage - 1 : currentPage;
 
       if (pageToFetch !== currentPage) {
-        setCurrentPage(0);
+        setCurrentPage(pageToFetch);
       }
 
       // Wait a moment for Sanity to propagate changes
@@ -258,7 +231,7 @@ const AdminOrders: React.FC = () => {
       // Refresh the orders list to ensure consistency
       await fetchOrders(pageToFetch);
     } catch (error) {
-      handleApiError(error, "Orders delete");
+      handleApiError(error, 'Orders delete');
     } finally {
       setIsDeleting(false);
     }
@@ -281,7 +254,7 @@ const AdminOrders: React.FC = () => {
 
   // Reset page when filters change - Combined effect
   useEffect(() => {
-    setCurrentPage(0);
+    setCurrentPage(1);
     setSelectedOrders([]);
   }, [orderStatus, perPage]);
 
@@ -292,10 +265,7 @@ const AdminOrders: React.FC = () => {
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold">Orders Management</h3>
           <div className="flex items-center gap-2">
-            <Select
-              value={perPage.toString()}
-              onValueChange={handlePerPageChange}
-            >
+            <Select value={perPage.toString()} onValueChange={handlePerPageChange}>
               <SelectTrigger className="w-20">
                 <SelectValue />
               </SelectTrigger>
@@ -314,17 +284,11 @@ const AdminOrders: React.FC = () => {
               <SelectContent>
                 <SelectItem value="all">All Status</SelectItem>
                 <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="address_confirmed">
-                  Address Confirmed
-                </SelectItem>
+                <SelectItem value="address_confirmed">Address Confirmed</SelectItem>
                 <SelectItem value="order_confirmed">Order Confirmed</SelectItem>
                 <SelectItem value="packed">Packed</SelectItem>
-                <SelectItem value="ready_for_delivery">
-                  Ready for Delivery
-                </SelectItem>
-                <SelectItem value="out_for_delivery">
-                  Out for Delivery
-                </SelectItem>
+                <SelectItem value="ready_for_delivery">Ready for Delivery</SelectItem>
+                <SelectItem value="out_for_delivery">Out for Delivery</SelectItem>
                 <SelectItem value="delivered">Delivered</SelectItem>
                 <SelectItem value="completed">Completed</SelectItem>
                 <SelectItem value="cancelled">Cancelled</SelectItem>
@@ -332,16 +296,8 @@ const AdminOrders: React.FC = () => {
                 <SelectItem value="failed_delivery">Failed Delivery</SelectItem>
               </SelectContent>
             </Select>
-            <Button
-              onClick={handleRefresh}
-              size="sm"
-              disabled={loading || isRefreshing}
-            >
-              <RefreshCw
-                className={`h-4 w-4 ${
-                  loading || isRefreshing ? "animate-spin" : ""
-                }`}
-              />
+            <Button onClick={handleRefresh} size="sm" disabled={loading || isRefreshing}>
+              <RefreshCw className={`h-4 w-4 ${loading || isRefreshing ? 'animate-spin' : ''}`} />
             </Button>
           </div>
         </div>
@@ -354,7 +310,7 @@ const AdminOrders: React.FC = () => {
               <div className="flex items-center justify-between bg-blue-50 p-3 rounded-lg border">
                 <span className="text-sm font-medium">
                   {selectedOrders.length} order
-                  {selectedOrders.length > 1 ? "s" : ""} selected
+                  {selectedOrders.length > 1 ? 's' : ''} selected
                 </span>
                 <Button
                   onClick={openDeleteDialog}
@@ -374,10 +330,7 @@ const AdminOrders: React.FC = () => {
                   <TableRow>
                     <TableHead className="w-12">
                       <Checkbox
-                        checked={
-                          selectedOrders.length === orders.length &&
-                          orders.length > 0
-                        }
+                        checked={selectedOrders.length === orders.length && orders.length > 0}
                         onCheckedChange={toggleSelectAll}
                       />
                     </TableHead>
@@ -396,13 +349,11 @@ const AdminOrders: React.FC = () => {
                       <TableCell colSpan={8} className="text-center py-12">
                         <div className="flex flex-col items-center gap-2">
                           <Package className="h-12 w-12 text-gray-400" />
-                          <p className="text-lg font-medium text-gray-900">
-                            No orders found
-                          </p>
+                          <p className="text-lg font-medium text-gray-900">No orders found</p>
                           <p className="text-sm text-gray-500">
-                            {orderStatus !== "all"
+                            {orderStatus !== 'all'
                               ? `No orders with status "${orderStatus}". Try selecting "All Status".`
-                              : "There are no orders in the system yet."}
+                              : 'There are no orders in the system yet.'}
                           </p>
                           <p className="text-xs text-gray-400 mt-2">
                             Total orders in database: {pagination.totalCount}
@@ -411,60 +362,53 @@ const AdminOrders: React.FC = () => {
                       </TableCell>
                     </TableRow>
                   ) : (
-                    orders.map((order) => (
-                      <TableRow key={order._id}>
-                        <TableCell>
-                          <Checkbox
-                            checked={selectedOrders.includes(order._id)}
-                            onCheckedChange={() =>
-                              toggleOrderSelection(order._id)
-                            }
-                          />
-                        </TableCell>
-                        <TableCell className="font-medium">
-                          {order.orderNumber}
-                        </TableCell>
-                        <TableCell>
-                          <div>
-                            <div>{order.customerName}</div>
-                            <div className="text-sm text-muted-foreground">
-                              {order.email}
+                    orders.map((order) => {
+                      const orderId = order.id;
+                      const orderDate = order.orderDate || String(order.createdAt || '');
+                      const statusDisplay = getStatusColor(order.status);
+                      return (
+                        <TableRow key={orderId}>
+                          <TableCell>
+                            <Checkbox
+                              checked={selectedOrders.includes(orderId)}
+                              onCheckedChange={() => toggleOrderSelection(orderId)}
+                            />
+                          </TableCell>
+                          <TableCell className="font-medium">{order.orderNumber}</TableCell>
+                          <TableCell>
+                            <div>
+                              <div>{order.customerName}</div>
+                              <div className="text-sm text-muted-foreground">{order.email}</div>
                             </div>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          {formatCurrency(order.totalPrice)}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <Badge className={getStatusColor(order.status)}>
-                              {order.status}
-                            </Badge>
-                            {(order as any).cancellationRequested && (
-                              <Badge className="bg-orange-100 text-orange-800 text-xs">
-                                ⏳ Cancellation Pending
-                              </Badge>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell className="capitalize">
-                          {order.paymentMethod}
-                        </TableCell>
-                        <TableCell>{formatDate(order.orderDate)}</TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-1">
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => handleShowOrderDetails(order)}
-                              title="Show Details"
-                            >
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))
+                          </TableCell>
+                          <TableCell>{formatCurrency(order.totalPrice)}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <Badge className={statusDisplay.style}>{statusDisplay.text}</Badge>
+                              {(order as any).cancellationRequested && (
+                                <Badge className="bg-orange-100 text-orange-800 text-xs">
+                                  ⏳ Cancellation Pending
+                                </Badge>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell className="capitalize">{order.paymentMethod}</TableCell>
+                          <TableCell>{formatDate(orderDate)}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-1">
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => handleShowOrderDetails(order)}
+                                title="Show Details"
+                              >
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })
                   )}
                 </TableBody>
               </Table>
@@ -473,13 +417,12 @@ const AdminOrders: React.FC = () => {
             <div className="flex items-center justify-between">
               <div className="text-sm text-gray-600">
                 Showing {orders.length} of {pagination.totalCount} orders
-                {currentPage > 0 &&
-                  ` (Page ${currentPage + 1} of ${pagination.totalPages})`}
+                {` (Page ${currentPage} of ${pagination.totalPages})`}
               </div>
               <div className="flex justify-center gap-2">
                 <Button
-                  onClick={() => handlePageChange(Math.max(0, currentPage - 1))}
-                  disabled={currentPage === 0}
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
                   variant="outline"
                 >
                   Previous
@@ -503,10 +446,8 @@ const AdminOrders: React.FC = () => {
         onClose={() => setIsDeleteDialogOpen(false)}
         onConfirm={handleDeleteOrders}
         title="Delete Orders"
-        description={`Are you sure you want to delete ${
-          selectedOrders.length
-        } order${
-          selectedOrders.length > 1 ? "s" : ""
+        description={`Are you sure you want to delete ${selectedOrders.length} order${
+          selectedOrders.length > 1 ? 's' : ''
         }? This action cannot be undone.`}
         itemCount={selectedOrders.length}
         isLoading={isDeleting}

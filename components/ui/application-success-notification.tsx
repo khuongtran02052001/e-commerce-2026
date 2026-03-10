@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { CheckCircle, X, Clock, Sparkles } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
+import { CheckCircle, Clock, Sparkles, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface ApplicationSuccessNotificationProps {
   isVisible: boolean;
   onClose: () => void;
-  type: "premium" | "business";
+  type: 'premium' | 'business';
   userName?: string;
 }
 
@@ -15,7 +15,7 @@ export default function ApplicationSuccessNotification({
   isVisible,
   onClose,
   type,
-  userName = "User",
+  userName = 'User',
 }: ApplicationSuccessNotificationProps) {
   const [isAnimating, setIsAnimating] = useState(false);
 
@@ -34,33 +34,33 @@ export default function ApplicationSuccessNotification({
 
   const config = {
     premium: {
-      title: "🎉 Premium Application Submitted!",
+      title: '🎉 Premium Application Submitted!',
       subtitle: `Congratulations ${userName}!`,
       description:
-        "Your premium account application has been successfully submitted and is now under administrative review.",
-      bgColor: "from-amber-500 to-yellow-500",
-      iconBg: "bg-amber-100",
-      iconColor: "text-amber-600",
+        'Your premium account application has been successfully submitted and is now under administrative review.',
+      bgColor: 'from-amber-500 to-yellow-500',
+      iconBg: 'bg-amber-100',
+      iconColor: 'text-amber-600',
       benefits: [
-        "Exclusive premium features access",
-        "Priority customer support",
-        "Enhanced rewards program",
-        "Eligible for Business upgrades",
+        'Exclusive premium features access',
+        'Priority customer support',
+        'Enhanced rewards program',
+        'Eligible for Business upgrades',
       ],
     },
     business: {
-      title: "🚀 Business Application Submitted!",
+      title: '🚀 Business Application Submitted!',
       subtitle: `Excellent choice ${userName}!`,
       description:
-        "Your business account application has been submitted and is under review for approval.",
-      bgColor: "from-blue-500 to-indigo-500",
-      iconBg: "bg-blue-100",
-      iconColor: "text-blue-600",
+        'Your business account application has been submitted and is under review for approval.',
+      bgColor: 'from-blue-500 to-indigo-500',
+      iconBg: 'bg-blue-100',
+      iconColor: 'text-blue-600',
       benefits: [
-        "2% additional discount on all orders",
-        "Priority business support",
-        "Bulk order management",
-        "Professional invoicing",
+        '2% additional discount on all orders',
+        'Priority business support',
+        'Bulk order management',
+        'Professional invoicing',
       ],
     },
   };
@@ -71,7 +71,7 @@ export default function ApplicationSuccessNotification({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
       <div
         className={`max-w-lg w-full bg-white rounded-2xl shadow-2xl border border-gray-200 transform transition-all duration-500 ${
-          isAnimating ? "scale-100 opacity-100" : "scale-95 opacity-0"
+          isAnimating ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
         }`}
       >
         {/* Header with gradient */}
@@ -107,23 +107,15 @@ export default function ApplicationSuccessNotification({
           {/* Status indicator */}
           <div className="flex items-center gap-2 mb-4 p-3 bg-amber-50 rounded-lg border border-amber-200">
             <Clock className="w-4 h-4 text-amber-600 animate-pulse" />
-            <span className="text-amber-800 font-medium text-sm">
-              Status: Pending Review
-            </span>
+            <span className="text-amber-800 font-medium text-sm">Status: Pending Review</span>
           </div>
 
           {/* What's next */}
           <div className="mb-4">
-            <h4 className="font-semibold text-gray-900 mb-2">
-              What happens next?
-            </h4>
+            <h4 className="font-semibold text-gray-900 mb-2">What happens next?</h4>
             <ul className="text-sm text-gray-600 space-y-1">
-              <li>
-                • Admin team will review your application within 24-48 hours
-              </li>
-              <li>
-                • You&apos;ll receive an email notification once status changes
-              </li>
+              <li>• Admin team will review your application within 24-48 hours</li>
+              <li>• You&apos;ll receive an email notification once status changes</li>
               <li>• Upon approval, benefits will be activated immediately</li>
             </ul>
           </div>
@@ -131,8 +123,7 @@ export default function ApplicationSuccessNotification({
           {/* Benefits preview */}
           <div className="mb-6">
             <h4 className="font-semibold text-gray-900 mb-2">
-              {type === "premium" ? "Premium" : "Business"} Benefits (Upon
-              Approval):
+              {type === 'premium' ? 'Premium' : 'Business'} Benefits (Upon Approval):
             </h4>
             <ul className="text-sm text-gray-600 space-y-1">
               {currentConfig.benefits.map((benefit, index) => (
@@ -143,10 +134,7 @@ export default function ApplicationSuccessNotification({
 
           {/* Actions */}
           <div className="flex gap-3">
-            <Button
-              onClick={onClose}
-              className="flex-1 bg-gray-900 hover:bg-gray-800"
-            >
+            <Button onClick={onClose} className="flex-1 bg-gray-900 hover:bg-gray-800">
               Continue to Dashboard
             </Button>
           </div>

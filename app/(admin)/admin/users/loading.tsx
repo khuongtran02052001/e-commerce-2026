@@ -1,4 +1,4 @@
-import { UsersSkeleton } from "@/components/admin/SkeletonLoaders";
+import { UsersSkeleton } from '@/components/admin/SkeletonLoaders';
 
 export default function UsersLoading() {
   return <UsersSkeleton />;

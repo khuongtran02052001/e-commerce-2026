@@ -1,455 +1,233 @@
-"use server";
+'use server';
 
-import { auth } from "@clerk/nextjs/server";
-import { backendClient } from "@/sanity/lib/backendClient";
-import { addWalletCredit } from "./walletActions";
-import { sendOrderStatusNotification } from "@/lib/notificationService";
-import { revalidatePath } from "next/cache";
-import { isAdmin } from "@/lib/adminUtils";
+import { isAdmin } from '@/lib/adminUtils';
+import { auth } from '@/lib/auth';
+import { getOrderById, updateOrderById } from '@/data/server/order';
+import { sendOrderStatusNotification } from '@/lib/notificationService';
+import { addWalletCredit } from './walletActions';
 
-/**
- * Admin: Approve cancellation request and cancel order with refund
- */
-export async function approveCancellationRequest(
-  orderId: string
-): Promise<{ success: boolean; message: string }> {
+/* ============================================================================
+   1. ADMIN: APPROVE CANCELLATION REQUEST
+============================================================================ */
+export async function approveCancellationRequest(orderId: string) {
   try {
-    const { userId: clerkUserId } = await auth();
+    const session = await auth();
+    const adminEmail = session?.user?.email;
+    if (!adminEmail) return { success: false, message: 'Unauthorized' };
 
-    if (!clerkUserId) {
-      return { success: false, message: "Unauthorized" };
+    // Check if admin
+    if (!isAdmin({ email: session.user.email })) {
+      return { success: false, message: 'Admin access required' };
     }
 
-    // Verify admin status - check both database field and environment variable
-    const adminUser = await backendClient.fetch(
-      `*[_type == "user" && clerkUserId == $clerkUserId][0]{ email, isAdmin }`,
-      { clerkUserId }
-    );
+    // Fetch order from API
+    const order = await getOrderById(orderId, session.accessToken);
 
-    if (!isAdmin(adminUser)) {
-      return {
-        success: false,
-        message: "Admin access required to approve cancellation requests",
-      };
-    }
+    if (!order) return { success: false, message: 'Order not found' };
+    if (!order.cancellationRequested)
+      return { success: false, message: 'No cancellation request found' };
+    if (order.status === 'cancelled') return { success: false, message: 'Order already cancelled' };
 
-    // Fetch order details
-    const order = await backendClient.fetch(
-      `*[_type == "order" && _id == $orderId][0]{
-        _id,
-        orderNumber,
-        status,
-        paymentStatus,
-        totalPrice,
-        amountPaid,
-        clerkUserId,
-        cancellationRequested,
-        cancellationRequestReason
-      }`,
-      { orderId }
-    );
+    // Refund amount
+    const refundAmount = order.amountPaid || order.totalPrice || 0;
+    const shouldRefund = order.paymentStatus === 'paid' && refundAmount > 0;
 
-    if (!order) {
-      return { success: false, message: "Order not found" };
-    }
-
-    if (!order.cancellationRequested) {
-      return {
-        success: false,
-        message: "No cancellation request found for this order",
-      };
-    }
-
-    if (order.status === "cancelled") {
-      return { success: false, message: "Order is already cancelled" };
-    }
-
-    // Determine refund amount
-    let refundAmount = 0;
-    let shouldRefund = false;
-
-    if (order.paymentStatus === "paid") {
-      refundAmount = order.amountPaid || order.totalPrice || 0;
-      shouldRefund = refundAmount > 0;
-    }
-
-    // Add refund to wallet if payment was made
     let walletRefunded = false;
-    if (shouldRefund && refundAmount > 0) {
+
+    if (shouldRefund) {
       const refundResult = await addWalletCredit(
-        order.clerkUserId,
+        order.userId,
         refundAmount,
         `Refund for cancelled order #${order.orderNumber}`,
         orderId,
-        adminUser.email
+        adminEmail,
       );
-
-      if (refundResult.success) {
-        walletRefunded = true;
-      } else {
-        console.error("Failed to add refund to wallet:", refundResult.message);
-      }
+      walletRefunded = refundResult.success;
     }
 
-    // Update order status to cancelled
-    await backendClient
-      .patch(orderId)
-      .set({
-        status: "cancelled",
-        paymentStatus: walletRefunded ? "refunded" : "cancelled",
+    // Update order
+    await updateOrderById(
+      orderId,
+      {
+        status: 'cancelled',
+        paymentStatus: walletRefunded ? 'refunded' : 'cancelled',
         cancelledAt: new Date().toISOString(),
-        cancelledBy: adminUser.email,
-        cancellationReason: order.cancellationRequestReason,
+        cancelledBy: adminEmail,
         refundedToWallet: walletRefunded,
-        refundAmount: walletRefunded ? refundAmount : 0,
+        refundAmount,
         cancellationRequested: false,
-      })
-      .commit();
+      },
+      session.accessToken,
+    );
 
-    // Send notification to customer
-    try {
-      await sendOrderStatusNotification({
-        clerkUserId: order.clerkUserId,
-        orderNumber: order.orderNumber,
-        orderId: order._id,
-        status: "cancelled",
-      });
-    } catch (notificationError) {
-      console.error(
-        "Failed to send cancellation notification:",
-        notificationError
-      );
-    }
+    // Send notification
+    await sendOrderStatusNotification({
+      userEmail: order.email,
+      orderNumber: order.orderNumber,
+      orderId,
+      status: 'cancelled',
+    });
 
-    revalidatePath("/admin/orders");
-    revalidatePath("/user/orders");
-
-    const message = shouldRefund
-      ? `Cancellation approved. $${refundAmount.toFixed(
-          2
-        )} has been credited to the customer's wallet.`
-      : "Cancellation approved successfully.";
-
-    return { success: true, message };
-  } catch (error) {
-    console.error("Error approving cancellation request:", error);
     return {
-      success: false,
-      message: "Failed to approve cancellation request",
+      success: true,
+      message: walletRefunded
+        ? `Cancellation approved. $${refundAmount} refunded to wallet.`
+        : 'Cancellation approved successfully.',
     };
+  } catch (err) {
+    console.error('approveCancellationRequest error:', err);
+    return { success: false, message: 'Failed to approve cancellation request' };
   }
 }
 
-/**
- * Admin: Reject cancellation request and proceed with order confirmation
- */
-export async function rejectCancellationRequest(
-  orderId: string,
-  rejectionReason?: string
-): Promise<{ success: boolean; message: string }> {
+/* ============================================================================
+   2. ADMIN: REJECT CANCELLATION REQUEST
+============================================================================ */
+export async function rejectCancellationRequest(orderId: string, rejectionReason?: string) {
   try {
-    const { userId: clerkUserId } = await auth();
+    const session = await auth();
+    const adminEmail = session?.user?.email;
+    if (!adminEmail) return { success: false, message: 'Unauthorized' };
 
-    if (!clerkUserId) {
-      return { success: false, message: "Unauthorized" };
-    }
+    if (!isAdmin({ email: session.user.email }))
+      return { success: false, message: 'Admin access required' };
 
-    // Verify admin status - check both database field and environment variable
-    const adminUser = await backendClient.fetch(
-      `*[_type == "user" && clerkUserId == $clerkUserId][0]{ email, isAdmin }`,
-      { clerkUserId }
-    );
+    // Get order
+    const order = await getOrderById(orderId, session.accessToken);
 
-    if (!isAdmin(adminUser)) {
-      return {
-        success: false,
-        message: "Admin access required to reject cancellation requests",
-      };
-    }
+    if (!order) return { success: false, message: 'Order not found' };
+    if (!order.cancellationRequested) return { success: false, message: 'Request not found' };
 
-    // Fetch order details
-    const order = await backendClient.fetch(
-      `*[_type == "order" && _id == $orderId][0]{
-        _id,
-        orderNumber,
-        status,
-        cancellationRequested,
-        clerkUserId
-      }`,
-      { orderId }
-    );
-
-    if (!order) {
-      return { success: false, message: "Order not found" };
-    }
-
-    if (!order.cancellationRequested) {
-      return {
-        success: false,
-        message: "No cancellation request found for this order",
-      };
-    }
-
-    // Update order - clear cancellation request and confirm the order
-    await backendClient
-      .patch(orderId)
-      .set({
+    // Update order
+    await updateOrderById(
+      orderId,
+      {
         cancellationRequested: false,
-        cancellationRequestedAt: null,
-        cancellationRequestReason: null,
-        status: "confirmed",
-        orderConfirmedBy: adminUser.email,
+        status: 'confirmed',
+        orderConfirmedBy: adminEmail,
         orderConfirmedAt: new Date().toISOString(),
-      })
-      .commit();
+      },
+      session.accessToken,
+    );
 
-    // Send notification to customer
-    try {
-      await sendOrderStatusNotification({
-        clerkUserId: order.clerkUserId,
-        orderNumber: order.orderNumber,
-        orderId: order._id,
-        status: "confirmed",
-        previousStatus: order.status,
-      });
-    } catch (notificationError) {
-      console.error(
-        "Failed to send confirmation notification:",
-        notificationError
-      );
-    }
-
-    revalidatePath("/admin/orders");
-    revalidatePath("/user/orders");
+    // Notify
+    await sendOrderStatusNotification({
+      userEmail: order.email,
+      orderId,
+      orderNumber: order.orderNumber,
+      status: 'confirmed',
+    });
 
     return {
       success: true,
       message: rejectionReason
-        ? `Cancellation request rejected: ${rejectionReason}. Order confirmed.`
-        : "Cancellation request rejected. Order confirmed and will be processed.",
+        ? `Cancellation rejected: ${rejectionReason}`
+        : 'Cancellation request rejected',
     };
-  } catch (error) {
-    console.error("Error rejecting cancellation request:", error);
-    return { success: false, message: "Failed to reject cancellation request" };
+  } catch (err) {
+    console.error('rejectCancellationRequest error:', err);
+    return { success: false, message: 'Failed to reject cancellation' };
   }
 }
 
-/**
- * Admin: Cancel order and refund to wallet if paid
- */
-export async function cancelOrder(
-  orderId: string,
-  reason: string
-): Promise<{ success: boolean; message: string }> {
+/* ============================================================================
+   3. ADMIN: CANCEL ORDER DIRECTLY
+============================================================================ */
+export async function cancelOrder(orderId: string, reason: string) {
   try {
-    const { userId: clerkUserId } = await auth();
+    const session = await auth();
+    const adminEmail = session?.user?.email;
 
-    if (!clerkUserId) {
-      return { success: false, message: "Unauthorized" };
-    }
+    if (!adminEmail) return { success: false, message: 'Unauthorized' };
+    if (!isAdmin({ email: session.user.email })) return { success: false, message: 'Admin only' };
 
-    // Verify admin status - check both database field and environment variable
-    const adminUser = await backendClient.fetch(
-      `*[_type == "user" && clerkUserId == $clerkUserId][0]{ email, isAdmin }`,
-      { clerkUserId }
-    );
+    const order = await getOrderById(orderId, session.accessToken);
 
-    if (!isAdmin(adminUser)) {
-      return {
-        success: false,
-        message: "Admin access required to cancel orders",
-      };
-    }
+    if (!order) return { success: false, message: 'Order not found' };
+    if (order.status === 'delivered')
+      return { success: false, message: 'Delivered orders cannot be cancelled' };
 
-    // Fetch order details
-    const order = await backendClient.fetch(
-      `*[_type == "order" && _id == $orderId][0]{
-        _id,
-        orderNumber,
-        status,
-        paymentStatus,
-        totalPrice,
-        amountPaid,
-        paymentMethod,
-        clerkUserId
-      }`,
-      { orderId }
-    );
+    const refundAmount = order.amountPaid || order.totalPrice || 0;
+    const shouldRefund = order.paymentStatus === 'paid';
 
-    if (!order) {
-      return { success: false, message: "Order not found" };
-    }
+    let refunded = false;
 
-    if (order.status === "cancelled") {
-      return { success: false, message: "Order is already cancelled" };
-    }
-
-    if (order.status === "delivered") {
-      return {
-        success: false,
-        message:
-          "Cannot cancel delivered orders. Please process a return instead.",
-      };
-    }
-
-    // Determine refund amount
-    let refundAmount = 0;
-    let shouldRefund = false;
-
-    // For paid orders, use amountPaid if available, otherwise use totalPrice
-    if (order.paymentStatus === "paid") {
-      refundAmount = order.amountPaid || order.totalPrice || 0;
-      shouldRefund = refundAmount > 0;
-    }
-
-    // Add refund to wallet if payment was made
-    let walletRefunded = false;
     if (shouldRefund && refundAmount > 0) {
-      const refundResult = await addWalletCredit(
-        order.clerkUserId,
+      const refund = await addWalletCredit(
+        order.userId,
         refundAmount,
         `Refund for cancelled order #${order.orderNumber}`,
         orderId,
-        adminUser.email
+        adminEmail,
       );
-
-      if (refundResult.success) {
-        walletRefunded = true;
-      } else {
-        console.error("Failed to add refund to wallet:", refundResult.message);
-      }
+      refunded = refund.success;
     }
 
-    // Update order status
-    await backendClient
-      .patch(orderId)
-      .set({
-        status: "cancelled",
-        paymentStatus: "cancelled",
+    await updateOrderById(
+      orderId,
+      {
+        status: 'cancelled',
+        paymentStatus: 'cancelled',
         cancelledAt: new Date().toISOString(),
-        cancelledBy: adminUser.email,
         cancellationReason: reason,
-        refundedToWallet: walletRefunded,
-        refundAmount: walletRefunded ? refundAmount : 0,
-      })
-      .commit();
+        refundAmount: refunded ? refundAmount : 0,
+        refundedToWallet: refunded,
+      },
+      session.accessToken,
+    );
 
-    // Send notification to customer
-    try {
-      await sendOrderStatusNotification({
-        clerkUserId: order.clerkUserId,
-        orderNumber: order.orderNumber,
-        orderId: order._id,
-        status: "cancelled",
-      });
-    } catch (notificationError) {
-      console.error(
-        "Failed to send cancellation notification:",
-        notificationError
-      );
-    }
-
-    const message = shouldRefund
-      ? `Order cancelled successfully. $${refundAmount.toFixed(
-          2
-        )} has been credited to the customer's wallet.`
-      : "Order cancelled successfully.";
+    await sendOrderStatusNotification({
+      userEmail: order.email,
+      orderId,
+      orderNumber: order.orderNumber,
+      status: 'cancelled',
+    });
 
     return {
       success: true,
-      message,
+      message: refunded
+        ? `Order cancelled. $${refundAmount} refunded.`
+        : 'Order cancelled successfully.',
     };
-  } catch (error) {
-    console.error("Error cancelling order:", error);
-    return {
-      success: false,
-      message: "Failed to cancel order",
-    };
+  } catch (err) {
+    console.error('cancelOrder error:', err);
+    return { success: false, message: 'Failed to cancel order' };
   }
 }
 
-/**
- * User: Request order cancellation (before shipping)
- * Sets cancellationRequested flag for admin approval
- */
-export async function requestOrderCancellation(
-  orderId: string,
-  reason: string
-): Promise<{ success: boolean; message: string }> {
+/* ============================================================================
+   4. USER: REQUEST CANCELLATION
+============================================================================ */
+export async function requestOrderCancellation(orderId: string, reason: string) {
   try {
-    const { userId: clerkUserId } = await auth();
+    const session = await auth();
+    const userEmail = session?.user?.email;
 
-    if (!clerkUserId) {
-      return { success: false, message: "Unauthorized" };
-    }
+    if (!userEmail) return { success: false, message: 'Unauthorized' };
 
-    // Get order details
-    const order = await backendClient.fetch(
-      `*[_type == "order" && _id == $orderId && clerkUserId == $clerkUserId][0]{
-        _id,
-        orderNumber,
-        status,
-        paymentStatus,
-        totalPrice,
-        amountPaid,
-        paymentMethod,
-        cancellationRequested
-      }`,
-      { orderId, clerkUserId }
-    );
+    const order = await getOrderById(orderId, session.accessToken);
 
-    if (!order) {
-      return { success: false, message: "Order not found" };
-    }
+    if (!order) return { success: false, message: 'Order not found' };
+    if (order.status === 'delivered')
+      return { success: false, message: 'Delivered orders cannot be cancelled' };
 
-    // Check if order can be cancelled
-    if (order.status === "cancelled") {
-      return { success: false, message: "Order is already cancelled" };
-    }
-
-    if (order.cancellationRequested) {
-      return {
-        success: false,
-        message: "Cancellation request already pending admin approval",
-      };
-    }
-
-    if (order.status === "delivered") {
-      return {
-        success: false,
-        message:
-          "Cannot cancel delivered orders. Please contact support for returns.",
-      };
-    }
-
-    if (order.status === "shipped" || order.status === "out_for_delivery") {
-      return {
-        success: false,
-        message:
-          "Order is already shipped. Please contact support to process cancellation.",
-      };
-    }
-
-    // For pending orders, set cancellation request flag for admin approval
-    await backendClient
-      .patch(orderId)
-      .set({
+    // Send cancellation request → Admin review
+    await updateOrderById(
+      orderId,
+      {
         cancellationRequested: true,
-        cancellationRequestedAt: new Date().toISOString(),
         cancellationRequestReason: reason,
-      })
-      .commit();
+        cancellationRequestedAt: new Date().toISOString(),
+      },
+      session.accessToken,
+    );
 
     return {
       success: true,
-      message:
-        "Cancellation request submitted. Our team will review and process your request shortly.",
+      message: 'Cancellation request submitted for admin approval.',
     };
-  } catch (error) {
-    console.error("Error requesting order cancellation:", error);
-    return {
-      success: false,
-      message: "Failed to submit cancellation request",
-    };
+  } catch (err) {
+    console.error('requestOrderCancellation error:', err);
+    return { success: false, message: 'Failed to request cancellation' };
   }
 }

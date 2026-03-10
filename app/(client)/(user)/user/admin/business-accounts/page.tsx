@@ -1,23 +1,17 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { toast } from "sonner";
-import { useUser } from "@clerk/nextjs";
-import {
-  User,
-  Calendar,
-  Mail,
-  CheckCircle,
-  XCircle,
-  Clock,
-  Building2,
-} from "lucide-react";
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { isUserAdmin } from '@/lib/adminUtils';
+import { useUserData } from '@/contexts/UserDataContext';
+import { fetchService } from '@/lib/restClient';
+import { Building2, Calendar, CheckCircle, Clock, Mail, User, XCircle } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 interface BusinessAccount {
-  _id: string;
+  id: string;
   email: string;
   firstName?: string;
   lastName?: string;
@@ -29,63 +23,79 @@ interface BusinessAccount {
 }
 
 export default function BusinessAccountsAdmin() {
-  const { user } = useUser();
+  const { authUser } = useUserData();
   const [accounts, setAccounts] = useState<BusinessAccount[]>([]);
+  const [allAccounts, setAllAccounts] = useState<BusinessAccount[]>([]);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState<string | null>(null);
+  const [adminEmail, setAdminEmail] = useState<string>('');
+  const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
     fetchBusinessAccounts();
   }, []);
 
+  useEffect(() => {
+    setAdminEmail(authUser?.email || '');
+  }, [authUser?.email]);
+
   const fetchBusinessAccounts = async () => {
     try {
-      const response = await fetch("/api/admin/business-accounts");
+      const response = await fetchService('/admin/business-accounts');
       if (response.ok) {
-        const data = await response.json();
-        setAccounts(data.accounts || []);
+        const payload = await response.json();
+        const items = payload?.data || payload?.accounts || [];
+        const list = Array.isArray(items) ? items : [];
+        setAllAccounts(list);
+        const pendingOnly = list.filter(
+          (account: BusinessAccount) =>
+            account.isBusiness && !account.businessApprovedBy,
+        );
+        setAccounts(pendingOnly);
       } else {
-        toast.error("Failed to fetch business accounts");
+        toast.error('Failed to fetch business accounts');
       }
     } catch (error) {
-      console.error("Error fetching business accounts:", error);
-      toast.error("Error loading business accounts");
+      console.error('Error fetching business accounts:', error);
+      toast.error('Error loading business accounts');
     } finally {
       setLoading(false);
     }
   };
 
   const handleApproval = async (accountId: string, approve: boolean) => {
+    if (!adminEmail) {
+      toast.error('Admin email not available');
+      return;
+    }
     setProcessing(accountId);
     try {
-      const response = await fetch("/api/admin/business-accounts/approve", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+      const response = await fetchService('/admin/business-accounts/approve', {
+        method: 'POST',
         body: JSON.stringify({
           accountId,
           approve,
-          adminEmail: user?.emailAddresses?.[0]?.emailAddress,
+          adminEmail,
         }),
       });
 
       if (response.ok) {
-        toast.success(
-          `Business account ${approve ? "approved" : "rejected"} successfully`
-        );
+        toast.success(`Business account ${approve ? 'approved' : 'rejected'} successfully`);
         fetchBusinessAccounts(); // Refresh the list
       } else {
         const errorData = await response.json();
-        toast.error(errorData.error || "Failed to update business account");
+        toast.error(errorData.error || 'Failed to update business account');
       }
     } catch (error) {
-      console.error("Error updating business account:", error);
-      toast.error("Error updating business account");
+      console.error('Error updating business account:', error);
+      toast.error('Error updating business account');
     } finally {
       setProcessing(null);
     }
   };
+
+  const canViewAll = isUserAdmin(adminEmail);
+  const displayedAccounts = showAll && canViewAll ? allAccounts : accounts;
 
   const getStatusBadge = (account: BusinessAccount) => {
     if (account.isBusiness && account.businessApprovedBy) {
@@ -130,31 +140,39 @@ export default function BusinessAccountsAdmin() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          Business Account Management
-        </h1>
-        <p className="text-gray-600">
-          Manage and approve business account requests
-        </p>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Business Account Management</h1>
+        <p className="text-gray-600">Manage and approve business account requests</p>
+        {canViewAll && (
+          <div className="mt-4">
+            <Button
+              size="sm"
+              variant={showAll ? 'default' : 'outline'}
+              onClick={() => setShowAll((prev) => !prev)}
+            >
+              {showAll ? 'Show Pending Only' : 'Show All Accounts'}
+            </Button>
+          </div>
+        )}
       </div>
 
-      {accounts.length === 0 ? (
+      {displayedAccounts.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">
             <Building2 className="w-12 h-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">
-              No Business Accounts
+              {showAll ? 'No Accounts Found' : 'No Pending Requests'}
             </h3>
-            <p className="text-gray-500">No business account requests found.</p>
+            <p className="text-gray-500">
+              {showAll
+                ? 'No business accounts available.'
+                : 'No business account requests to approve.'}
+            </p>
           </CardContent>
         </Card>
       ) : (
         <div className="space-y-4">
-          {accounts.map((account) => (
-            <Card
-              key={account._id}
-              className="hover:shadow-md transition-shadow"
-            >
+          {displayedAccounts.map((account) => (
+            <Card key={account.id} className="hover:shadow-md transition-shadow">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
@@ -174,8 +192,7 @@ export default function BusinessAccountsAdmin() {
                         </div>
                         <div className="flex items-center">
                           <Calendar className="w-4 h-4 mr-1" />
-                          Joined{" "}
-                          {new Date(account.createdAt).toLocaleDateString()}
+                          Joined {new Date(account.createdAt).toLocaleDateString()}
                         </div>
                       </div>
                     </div>
@@ -187,26 +204,20 @@ export default function BusinessAccountsAdmin() {
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
                     <p className="text-sm text-gray-600">
-                      Membership:{" "}
-                      <span className="font-medium capitalize">
-                        {account.membershipType}
-                      </span>
+                      Membership:{' '}
+                      <span className="font-medium capitalize">{account.membershipType}</span>
                     </p>
                     {account.businessApprovedBy && (
                       <p className="text-sm text-gray-600">
-                        Approved by:{" "}
-                        <span className="font-medium">
-                          {account.businessApprovedBy}
-                        </span>
+                        Approved by:{' '}
+                        <span className="font-medium">{account.businessApprovedBy}</span>
                       </p>
                     )}
                     {account.businessApprovedAt && (
                       <p className="text-sm text-gray-600">
-                        Approved on:{" "}
+                        Approved on:{' '}
                         <span className="font-medium">
-                          {new Date(
-                            account.businessApprovedAt
-                          ).toLocaleDateString()}
+                          {new Date(account.businessApprovedAt).toLocaleDateString()}
                         </span>
                       </p>
                     )}
@@ -217,8 +228,8 @@ export default function BusinessAccountsAdmin() {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => handleApproval(account._id, false)}
-                        disabled={processing === account._id}
+                        onClick={() => handleApproval(account.id, false)}
+                        disabled={processing === account.id}
                         className="text-red-600 border-red-200 hover:bg-red-50"
                       >
                         <XCircle className="w-4 h-4 mr-1" />
@@ -226,8 +237,8 @@ export default function BusinessAccountsAdmin() {
                       </Button>
                       <Button
                         size="sm"
-                        onClick={() => handleApproval(account._id, true)}
-                        disabled={processing === account._id}
+                        onClick={() => handleApproval(account.id, true)}
+                        disabled={processing === account.id}
                         className="bg-green-600 hover:bg-green-700"
                       >
                         <CheckCircle className="w-4 h-4 mr-1" />

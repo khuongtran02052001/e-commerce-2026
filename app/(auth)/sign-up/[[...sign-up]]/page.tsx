@@ -1,38 +1,37 @@
-"use client";
+'use client';
 
-import { SignUp } from "@clerk/nextjs";
-import { motion } from "motion/react";
-import Link from "next/link";
-import Logo from "@/components/common/Logo";
-import { ArrowLeft, Gift, ShoppingBag, Truck, CreditCard } from "lucide-react";
-import { contactConfig } from "@/config/contact";
-import Container from "@/components/Container";
-import { useSearchParams } from "next/navigation";
+import Logo from '@/components/common/Logo';
+import Container from '@/components/Container';
+import { contactConfig } from '@/config/contact';
+import { ArrowLeft, CreditCard, Gift, ShoppingBag, Truck } from 'lucide-react';
+import { motion } from 'motion/react';
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 
 const SignUpPage = () => {
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get("redirectTo");
+  const redirectTo = searchParams.get('redirectTo');
 
   const benefits = [
     {
       icon: Gift,
-      title: "Welcome Bonus",
-      description: "Get 10% off your first order when you sign up",
+      title: 'Welcome Bonus',
+      description: 'Get 10% off your first order when you sign up',
     },
     {
       icon: ShoppingBag,
-      title: "Exclusive Deals",
-      description: "Access member-only discounts and early sales",
+      title: 'Exclusive Deals',
+      description: 'Access member-only discounts and early sales',
     },
     {
       icon: Truck,
-      title: "Free Shipping",
-      description: "Enjoy free shipping on orders over $50",
+      title: 'Free Shipping',
+      description: 'Enjoy free shipping on orders over $50',
     },
     {
       icon: CreditCard,
-      title: "Secure Payments",
-      description: "Multiple payment options with bank-level security",
+      title: 'Secure Payments',
+      description: 'Multiple payment options with bank-level security',
     },
   ];
 
@@ -74,9 +73,8 @@ const SignUpPage = () => {
                   Join {contactConfig.company.name}
                 </h1>
                 <p className="text-lg text-dark-text mb-8 leading-relaxed">
-                  Create your account today and unlock exclusive benefits,
-                  personalized recommendations, and seamless shopping
-                  experiences.
+                  Create your account today and unlock exclusive benefits, personalized
+                  recommendations, and seamless shopping experiences.
                 </p>
               </motion.div>
 
@@ -94,12 +92,8 @@ const SignUpPage = () => {
                       <benefit.icon className="w-5 h-5 text-shop_orange" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-shop_dark_green mb-1">
-                        {benefit.title}
-                      </h3>
-                      <p className="text-sm text-dark-text">
-                        {benefit.description}
-                      </p>
+                      <h3 className="font-semibold text-shop_dark_green mb-1">{benefit.title}</h3>
+                      <p className="text-sm text-dark-text">{benefit.description}</p>
                     </div>
                   </motion.div>
                 ))}
@@ -130,9 +124,7 @@ const SignUpPage = () => {
                         </svg>
                       ))}
                     </div>
-                    <span className="text-sm text-dark-text font-medium">
-                      4.8/5 average rating
-                    </span>
+                    <span className="text-sm text-dark-text font-medium">4.8/5 average rating</span>
                   </div>
                 </div>
               </motion.div>
@@ -145,7 +137,7 @@ const SignUpPage = () => {
                 className="mt-6 text-center"
               >
                 <p className="text-sm text-dark-text">
-                  Questions? Contact us at{" "}
+                  Questions? Contact us at{' '}
                   <a
                     href={`mailto:${contactConfig.emails.support}`}
                     className="text-shop_light_green hover:text-shop_dark_green font-medium transition-colors duration-200"
@@ -171,28 +163,23 @@ const SignUpPage = () => {
                 transition={{ duration: 0.5, delay: 0.4 }}
                 className="bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-gray-100/50 p-8"
               >
-                {/* Clerk Sign Up Component */}
-                <div className="clerk-sign-up">
+                {/* <div className="nextauth-sign-up">
                   <SignUp
                     signInUrl={`/sign-in${
-                      redirectTo
-                        ? `?redirectTo=${encodeURIComponent(redirectTo)}`
-                        : ""
+                      redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : ''
                     }`}
-                    forceRedirectUrl={redirectTo || "/user/dashboard"}
-                    fallbackRedirectUrl={redirectTo || "/user/dashboard"}
+                    forceRedirectUrl={redirectTo || '/user/dashboard'}
+                    fallbackRedirectUrl={redirectTo || '/user/dashboard'}
                   />
-                </div>
-
+                </div> */}
+                signup
                 {/* Additional Links */}
                 <div className="mt-6 text-center">
                   <p className="text-sm text-gray-600">
-                    Already have an account?{" "}
+                    Already have an account?{' '}
                     <Link
                       href={`/sign-in${
-                        redirectTo
-                          ? `?redirectTo=${encodeURIComponent(redirectTo)}`
-                          : ""
+                        redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : ''
                       }`}
                       className="text-blue-600 hover:text-blue-800 font-medium transition-colors duration-200"
                     >

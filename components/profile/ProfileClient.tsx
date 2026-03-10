@@ -1,43 +1,29 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { fetchServiceJson } from '@/lib/restClient';
 import {
-  User,
-  Mail,
-  Phone,
-  MapPin,
   Calendar,
-  Shield,
-  Edit,
-  Plus,
-  Home,
   CheckCircle,
-} from "lucide-react";
-import ProfileEditSidebar from "./ProfileEditSidebar";
-import AddressEditSidebar from "./AddressEditSidebar";
-
-interface EmailAddress {
-  emailAddress: string;
-  id: string;
-}
-
-interface ClerkUser {
-  id: string;
-  firstName: string | null;
-  lastName: string | null;
-  emailAddresses: EmailAddress[];
-  imageUrl: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-}
+  Edit,
+  Home,
+  Mail,
+  MapPin,
+  Phone,
+  Plus,
+  Shield,
+  User,
+} from 'lucide-react';
+import { useState } from 'react';
+import AddressEditSidebar from './AddressEditSidebar';
+import ProfileEditSidebar from './ProfileEditSidebar';
 
 interface Address {
-  _id?: string;
+  id: string;
   name: string;
   address: string;
   city: string;
@@ -45,23 +31,24 @@ interface Address {
   zip: string;
   country: string;
   default: boolean;
-  type: "home" | "office" | "other";
+  type: 'home' | 'office' | 'other';
   createdAt?: string;
   phone?: string;
+  subArea?: string;
+  countryCode?: string;
+  stateCode?: string;
 }
 
-interface SanityUser {
-  _id: string;
-  clerkUserId: string;
-  email: string;
-  firstName?: string;
-  lastName?: string;
-  phoneNumber?: string;
+interface UserProfile {
+  id: string;
+  email?: string;
+  firstName?: string | null;
+  lastName?: string | null;
   phone?: string;
   dateOfBirth?: string;
   profileImage?: {
-    asset: {
-      _id: string;
+    url?: string;
+    asset?: {
       url: string;
     };
   };
@@ -77,27 +64,23 @@ interface SanityUser {
 }
 
 interface ProfileClientProps {
-  userData: {
-    clerk: ClerkUser;
-    sanity: SanityUser | null;
-  };
+  user: UserProfile;
 }
 
-export default function ProfileClient({ userData }: ProfileClientProps) {
-  const { clerk, sanity } = userData;
+export default function ProfileClient({ user }: ProfileClientProps) {
+  const [profile, setProfile] = useState<UserProfile>(user);
   const [profileSidebarOpen, setProfileSidebarOpen] = useState(false);
   const [addressSidebarOpen, setAddressSidebarOpen] = useState(false);
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
 
   const displayName =
-    clerk.firstName && clerk.lastName
-      ? `${clerk.firstName} ${clerk.lastName}`
-      : sanity?.firstName && sanity?.lastName
-      ? `${sanity.firstName} ${sanity.lastName}`
-      : clerk.firstName || sanity?.firstName || "User";
+    profile.firstName && profile.lastName
+      ? `${profile.firstName} ${profile.lastName}`
+      : profile.firstName || profile.lastName || 'User';
 
-  const displayEmail =
-    clerk.emailAddresses?.[0]?.emailAddress || sanity?.email || "";
+  const displayEmail = profile.email || '';
+  const avatarUrl = profile.profileImage?.url || profile.profileImage?.asset?.url || '';
+  const userId = profile.id;
 
   const handleEditProfile = () => {
     setProfileSidebarOpen(true);
@@ -113,6 +96,15 @@ export default function ProfileClient({ userData }: ProfileClientProps) {
     setAddressSidebarOpen(true);
   };
 
+  const refreshProfile = async () => {
+    try {
+      const updated = await fetchServiceJson<UserProfile>('/auth/me');
+      setProfile(updated);
+    } catch (error) {
+      console.error('Error refreshing profile:', error);
+    }
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Profile Header */}
@@ -122,34 +114,26 @@ export default function ProfileClient({ userData }: ProfileClientProps) {
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <Avatar className="h-16 w-16">
-                  <AvatarImage
-                    src={clerk.imageUrl || sanity?.profileImage?.asset?.url}
-                    alt={displayName}
-                  />
+                  <AvatarImage src={avatarUrl} alt={displayName} />
                   <AvatarFallback className="bg-blue-100 text-blue-600">
                     {displayName.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900">
-                    {displayName}
-                  </h1>
+                  <h1 className="text-2xl font-bold text-gray-900">{displayName}</h1>
                   <p className="text-gray-600 flex items-center mt-1">
                     <Mail className="h-4 w-4 mr-2" />
                     {displayEmail}
                   </p>
-                  {sanity?.phone && (
+                  {profile.phone && (
                     <p className="text-gray-600 flex items-center mt-1">
                       <Phone className="h-4 w-4 mr-2" />
-                      {sanity.phone}
+                      {profile.phone}
                     </p>
                   )}
                 </div>
               </div>
-              <Button
-                onClick={handleEditProfile}
-                className="flex items-center space-x-2"
-              >
+              <Button onClick={handleEditProfile} className="flex items-center space-x-2">
                 <Edit className="h-4 w-4" />
                 <span>Edit Profile</span>
               </Button>
@@ -164,19 +148,19 @@ export default function ProfileClient({ userData }: ProfileClientProps) {
                 <div>
                   <p className="text-sm text-gray-500">Member Since</p>
                   <p className="font-medium">
-                    {new Date(clerk.createdAt).toLocaleDateString()}
+                    {profile.createdAt ? new Date(profile.createdAt).toLocaleDateString() : '—'}
                   </p>
                 </div>
               </div>
 
-              {sanity?.rewardPoints !== undefined && (
+              {profile.rewardPoints !== undefined && (
                 <div className="flex items-center space-x-3">
                   <div className="p-2 bg-green-100 rounded-lg">
                     <Shield className="h-5 w-5 text-green-600" />
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Reward Points</p>
-                    <p className="font-medium">{sanity.rewardPoints}</p>
+                    <p className="font-medium">{profile.rewardPoints}</p>
                   </div>
                 </div>
               )}
@@ -189,9 +173,13 @@ export default function ProfileClient({ userData }: ProfileClientProps) {
                   <p className="text-sm text-gray-500">Account Status</p>
                   <Badge
                     variant="outline"
-                    className="text-green-600 border-green-200"
+                    className={
+                      profile.isActive === false
+                        ? 'text-gray-500 border-gray-200'
+                        : 'text-green-600 border-green-200'
+                    }
                   >
-                    Active
+                    {profile.isActive === false ? 'Inactive' : 'Active'}
                   </Badge>
                 </div>
               </div>
@@ -213,67 +201,40 @@ export default function ProfileClient({ userData }: ProfileClientProps) {
           <CardContent className="space-y-4">
             <div className="space-y-3">
               <div>
-                <label className="text-sm font-medium text-gray-500">
-                  First Name
-                </label>
+                <label className="text-sm font-medium text-gray-500">First Name</label>
                 <p className="text-gray-900 bg-gray-50 p-2 rounded-md">
-                  {clerk.firstName || "Not provided"}
-                </p>
-                <p className="text-xs text-gray-400 mt-1">
-                  From Clerk (Read-only)
+                  {profile.firstName || 'Not provided'}
                 </p>
               </div>
 
               <div>
-                <label className="text-sm font-medium text-gray-500">
-                  Last Name
-                </label>
+                <label className="text-sm font-medium text-gray-500">Last Name</label>
                 <p className="text-gray-900 bg-gray-50 p-2 rounded-md">
-                  {clerk.lastName || "Not provided"}
-                </p>
-                <p className="text-xs text-gray-400 mt-1">
-                  From Clerk (Read-only)
+                  {profile.lastName || 'Not provided'}
                 </p>
               </div>
 
               <div>
-                <label className="text-sm font-medium text-gray-500">
-                  Email
-                </label>
-                <p className="text-gray-900 bg-gray-50 p-2 rounded-md">
-                  {displayEmail}
-                </p>
-                <p className="text-xs text-gray-400 mt-1">
-                  From Clerk (Read-only)
-                </p>
+                <label className="text-sm font-medium text-gray-500">Email</label>
+                <p className="text-gray-900 bg-gray-50 p-2 rounded-md">{displayEmail}</p>
               </div>
 
-              {sanity && (
+              {(profile.phone || profile.dateOfBirth) && (
                 <>
                   <Separator className="my-4" />
                   <div>
-                    <label className="text-sm font-medium text-gray-500">
-                      Phone Number
-                    </label>
+                    <label className="text-sm font-medium text-gray-500">Phone Number</label>
                     <p className="text-gray-900 bg-white border p-2 rounded-md">
-                      {sanity.phone || "Not provided"}
-                    </p>
-                    <p className="text-xs text-blue-500 mt-1">
-                      Editable in profile
+                      {profile.phone || 'Not provided'}
                     </p>
                   </div>
 
                   <div>
-                    <label className="text-sm font-medium text-gray-500">
-                      Date of Birth
-                    </label>
+                    <label className="text-sm font-medium text-gray-500">Date of Birth</label>
                     <p className="text-gray-900 bg-white border p-2 rounded-md">
-                      {sanity.dateOfBirth
-                        ? new Date(sanity.dateOfBirth).toLocaleDateString()
-                        : "Not provided"}
-                    </p>
-                    <p className="text-xs text-blue-500 mt-1">
-                      Editable in profile
+                      {profile.dateOfBirth
+                        ? new Date(profile.dateOfBirth).toLocaleDateString()
+                        : 'Not provided'}
                     </p>
                   </div>
                 </>
@@ -294,31 +255,23 @@ export default function ProfileClient({ userData }: ProfileClientProps) {
             <div className="space-y-4">
               <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
                 <span className="text-gray-700">Reward Points</span>
-                <span className="font-bold text-blue-600">
-                  {sanity?.rewardPoints || 0}
-                </span>
+                <span className="font-bold text-blue-600">{profile.rewardPoints || 0}</span>
               </div>
 
               <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
                 <span className="text-gray-700">Total Spent</span>
-                <span className="font-bold text-green-600">
-                  ${sanity?.totalSpent || 0}
-                </span>
+                <span className="font-bold text-green-600">${profile.totalSpent || 0}</span>
               </div>
 
               <div className="flex justify-between items-center p-3 bg-purple-50 rounded-lg">
                 <span className="text-gray-700">Loyalty Points</span>
-                <span className="font-bold text-purple-600">
-                  {sanity?.loyaltyPoints || 0}
-                </span>
+                <span className="font-bold text-purple-600">{profile.loyaltyPoints || 0}</span>
               </div>
 
               <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                 <span className="text-gray-700">Last Login</span>
                 <span className="font-medium text-gray-600">
-                  {sanity?.lastLogin
-                    ? new Date(sanity.lastLogin).toLocaleDateString()
-                    : "Today"}
+                  {profile.lastLogin ? new Date(profile.lastLogin).toLocaleDateString() : 'Today'}
                 </span>
               </div>
             </div>
@@ -334,21 +287,18 @@ export default function ProfileClient({ userData }: ProfileClientProps) {
               <MapPin className="h-5 w-5" />
               <span>Shipping Addresses</span>
             </CardTitle>
-            <Button
-              onClick={handleAddAddress}
-              className="flex items-center space-x-2"
-            >
+            <Button onClick={handleAddAddress} className="flex items-center space-x-2">
               <Plus className="h-4 w-4" />
               <span>Add Address</span>
             </Button>
           </div>
         </CardHeader>
         <CardContent>
-          {sanity?.addresses && sanity.addresses.length > 0 ? (
+          {profile.addresses && profile.addresses.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {sanity.addresses.map((address) => (
+              {profile.addresses.map((address) => (
                 <div
-                  key={address._id}
+                  key={address.id}
                   className="border rounded-lg p-4 space-y-3 hover:shadow-md transition-shadow"
                 >
                   <div className="flex items-center justify-between">
@@ -357,10 +307,7 @@ export default function ProfileClient({ userData }: ProfileClientProps) {
                       <span className="font-medium">{address.name}</span>
                     </div>
                     {address.default && (
-                      <Badge
-                        variant="outline"
-                        className="text-green-600 border-green-200"
-                      >
+                      <Badge variant="outline" className="text-green-600 border-green-200">
                         Default
                       </Badge>
                     )}
@@ -374,11 +321,7 @@ export default function ProfileClient({ userData }: ProfileClientProps) {
                   </div>
 
                   <div className="flex justify-end">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleEditAddress(address)}
-                    >
+                    <Button variant="outline" size="sm" onClick={() => handleEditAddress(address)}>
                       <Edit className="h-3 w-3 mr-1" />
                       Edit
                     </Button>
@@ -404,7 +347,8 @@ export default function ProfileClient({ userData }: ProfileClientProps) {
         <ProfileEditSidebar
           isOpen={profileSidebarOpen}
           onClose={() => setProfileSidebarOpen(false)}
-          userData={userData}
+          user={profile}
+          onProfileUpdated={refreshProfile}
         />
       )}
 
@@ -414,7 +358,8 @@ export default function ProfileClient({ userData }: ProfileClientProps) {
           isOpen={addressSidebarOpen}
           onClose={() => setAddressSidebarOpen(false)}
           address={editingAddress}
-          userId={clerk.id}
+          userId={userId}
+          onAddressChange={refreshProfile}
         />
       )}
     </div>

@@ -1,34 +1,18 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect, useCallback } from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogOverlay, DialogPortal, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import {
-  Dialog,
-  DialogTitle,
-  DialogPortal,
-  DialogOverlay,
-} from "@/components/ui/dialog";
-import * as DialogPrimitive from "@radix-ui/react-dialog";
-import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
-import { cn } from "@/lib/utils";
+} from '@/components/ui/select';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import {
   Table,
   TableBody,
@@ -36,30 +20,34 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
+import { Textarea } from '@/components/ui/textarea';
+import { showToast } from '@/lib/toast';
+import { cn } from '@/lib/utils';
+import * as DialogPrimitive from '@radix-ui/react-dialog';
+import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
 import {
+  AlertCircle,
   Bell,
-  Send,
-  Users,
+  CheckCircle,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
   Eye,
   MessageSquare,
   Plus,
-  Search,
-  AlertCircle,
-  CheckCircle,
-  Clock,
   RefreshCw,
   RotateCcw,
+  Search,
+  Send,
   Trash2,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
-import { safeApiCall, handleApiError } from "./apiHelpers";
-import { showToast } from "@/lib/toast";
+  Users,
+} from 'lucide-react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { handleApiError, safeApiCall } from './apiHelpers';
 
 interface User {
-  _id: string;
-  clerkUserId: string;
+  id: string;
   email: string;
   firstName: string;
   lastName: string;
@@ -70,7 +58,7 @@ interface User {
 }
 
 interface SentNotification {
-  id: string; // Sanity _id for deletion
+  id: string;
   notificationId?: string; // Original notification ID
   title: string;
   message: string;
@@ -89,13 +77,20 @@ interface SentNotification {
 }
 
 interface CombinedUser {
-  sanityId?: string;
-  clerkUserId: string;
+  id: string;
   email: string;
   firstName: string;
   lastName: string;
   isActive: boolean;
   inSanity: boolean;
+  businessAppliedAt?: Date | null;
+  businessApprovedAt?: Date | null;
+  businessApprovedBy?: Date | null;
+  businessRejectedAt?: Date | null;
+  premiumAppliedAt?: Date | null;
+  premiumApprovedAt?: Date | null;
+  premiumApprovedBy?: Date | null;
+  premiumRejectedAt?: Date | null;
   activatedAt?: string;
   activatedBy?: string;
 }
@@ -104,26 +99,17 @@ interface AdminNotificationsProps {
   adminEmail: string;
 }
 
-const AdminNotifications: React.FC<AdminNotificationsProps> = ({
-  adminEmail,
-}) => {
+const AdminNotifications: React.FC<AdminNotificationsProps> = ({ adminEmail }) => {
   const [users, setUsers] = useState<User[]>([]);
-  const [sentNotifications, setSentNotifications] = useState<
-    SentNotification[]
-  >([]);
+  const [sentNotifications, setSentNotifications] = useState<SentNotification[]>([]);
   const [loading, setLoading] = useState(false);
   const [sendingNotification, setSendingNotification] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [selectedNotification, setSelectedNotification] =
-    useState<SentNotification | null>(null);
+  const [selectedNotification, setSelectedNotification] = useState<SentNotification | null>(null);
   const [isViewSidebarOpen, setIsViewSidebarOpen] = useState(false);
-  const [deletingNotificationId, setDeletingNotificationId] = useState<
-    string | null
-  >(null);
+  const [deletingNotificationId, setDeletingNotificationId] = useState<string | null>(null);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
-  const [notificationToDelete, setNotificationToDelete] = useState<
-    string | null
-  >(null);
+  const [notificationToDelete, setNotificationToDelete] = useState<string | null>(null);
 
   // Form state
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
@@ -134,22 +120,22 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
     priority: string;
     actionUrl: string;
   }>({
-    title: "",
-    message: "",
-    type: "general",
-    priority: "medium",
-    actionUrl: "",
+    title: '',
+    message: '',
+    type: 'general',
+    priority: 'medium',
+    actionUrl: '',
   });
 
   // Validation errors state
   const [validationErrors, setValidationErrors] = useState({
-    title: "",
-    message: "",
-    recipients: "",
+    title: '',
+    message: '',
+    recipients: '',
   });
 
   // Filter state
-  const [userSearch, setUserSearch] = useState("");
+  const [userSearch, setUserSearch] = useState('');
   const [syncingUsers, setSyncingUsers] = useState(false);
 
   // Pagination and filter state for sent notifications
@@ -157,33 +143,20 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
   const [sentNotificationsLimit] = useState(20);
   const [sentNotificationsTotal, setSentNotificationsTotal] = useState(0);
   const [refreshingNotifications, setRefreshingNotifications] = useState(false);
-  const [notificationTypeFilter, setNotificationTypeFilter] = useState("all");
-  const [notificationPriorityFilter, setNotificationPriorityFilter] =
-    useState("all");
-  const [notificationDateFilter, setNotificationDateFilter] = useState("all");
-  const [isResending, setIsResending] = useState<"same" | "new" | null>(null);
-
+  const [notificationTypeFilter, setNotificationTypeFilter] = useState('all');
+  const [notificationPriorityFilter, setNotificationPriorityFilter] = useState('all');
+  const [notificationDateFilter, setNotificationDateFilter] = useState('all');
+  const [isResending, setIsResending] = useState<'same' | 'new' | null>(null);
+  console.log(users);
   // Fetch users using combined API
   const fetchUsers = useCallback(async () => {
     try {
       setLoading(true);
-      const data = await safeApiCall("/api/admin/users/combined?limit=1000");
+      const { data } = await safeApiCall('/admin/users/combined?limit=1000');
       // Transform the data to match our User interface
-      const transformedUsers =
-        data.users?.map((user: CombinedUser) => ({
-          _id: user.sanityId || user.clerkUserId,
-          clerkUserId: user.clerkUserId,
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          isActive: user.isActive,
-          inSanity: user.inSanity,
-          activatedAt: user.activatedAt,
-          activatedBy: user.activatedBy,
-        })) || [];
-      setUsers(transformedUsers);
+      setUsers(data);
     } catch (error) {
-      handleApiError(error, "Users fetch");
+      handleApiError(error, 'Users fetch');
     } finally {
       setLoading(false);
     }
@@ -196,7 +169,7 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
 
       // Filter only users that aren't already active in Sanity
       const usersToSync = userIds.filter((userId) => {
-        const user = users.find((u) => u.clerkUserId === userId);
+        const user = users.find((u) => u.id === userId);
         return !user?.isActive || !user?.inSanity;
       });
 
@@ -204,10 +177,10 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
         return; // All users are already synced
       }
 
-      const syncResult = await safeApiCall("/api/admin/users/sync-to-sanity", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ clerkUserIds: usersToSync }),
+      const syncResult = await safeApiCall('/admin/users/sync-to-sanity', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: usersToSync }),
       });
 
       // Refresh users list after syncing
@@ -215,7 +188,7 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
 
       return syncResult;
     } catch (error) {
-      handleApiError(error, "User sync to Sanity");
+      handleApiError(error, 'User sync to Sanity');
       throw error;
     } finally {
       setSyncingUsers(false);
@@ -239,28 +212,24 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
         });
 
         // Add filters
-        if (notificationTypeFilter !== "all") {
-          params.append("type", notificationTypeFilter);
+        if (notificationTypeFilter !== 'all') {
+          params.append('type', notificationTypeFilter);
         }
-        if (notificationPriorityFilter !== "all") {
-          params.append("priority", notificationPriorityFilter);
+        if (notificationPriorityFilter !== 'all') {
+          params.append('priority', notificationPriorityFilter);
         }
-        if (notificationDateFilter !== "all") {
-          params.append("dateFilter", notificationDateFilter);
+        if (notificationDateFilter !== 'all') {
+          params.append('dateFilter', notificationDateFilter);
         }
 
-        const data = await safeApiCall(
-          `/api/admin/notifications/sent?${params.toString()}`
-        );
+        const data = await safeApiCall(`/admin/notifications/sent?${params.toString()}`);
 
         setSentNotifications(data.notifications || []);
-        setSentNotificationsTotal(
-          data.pagination?.total || data.totalCount || 0
-        );
+        setSentNotificationsTotal(data.pagination?.total || data.totalCount || 0);
         setSentNotificationsPage(page);
       } catch (error) {
-        console.error("Error fetching sent notifications:", error);
-        handleApiError(error, "Sent notifications fetch");
+        console.error('Error fetching sent notifications:', error);
+        handleApiError(error, 'Sent notifications fetch');
       } finally {
         setLoading(false);
         setRefreshingNotifications(false);
@@ -272,7 +241,7 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
       notificationTypeFilter,
       notificationPriorityFilter,
       notificationDateFilter,
-    ]
+    ],
   );
 
   // Initial data fetch
@@ -326,44 +295,40 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
   // Effect to refetch when filters change
   useEffect(() => {
     if (
-      notificationTypeFilter !== "all" ||
-      notificationPriorityFilter !== "all" ||
-      notificationDateFilter !== "all"
+      notificationTypeFilter !== 'all' ||
+      notificationPriorityFilter !== 'all' ||
+      notificationDateFilter !== 'all'
     ) {
       handleFilterChange();
     }
-  }, [
-    notificationTypeFilter,
-    notificationPriorityFilter,
-    notificationDateFilter,
-  ]);
+  }, [notificationTypeFilter, notificationPriorityFilter, notificationDateFilter]);
 
   // Handle send notification
   const handleSendNotification = async () => {
     // Clear previous errors
     setValidationErrors({
-      title: "",
-      message: "",
-      recipients: "",
+      title: '',
+      message: '',
+      recipients: '',
     });
 
     // Validate fields
     const errors = {
-      title: "",
-      message: "",
-      recipients: "",
+      title: '',
+      message: '',
+      recipients: '',
     };
 
     if (!notificationForm.title.trim()) {
-      errors.title = "Title is required";
+      errors.title = 'Title is required';
     }
 
     if (!notificationForm.message.trim()) {
-      errors.message = "Message is required";
+      errors.message = 'Message is required';
     }
 
     if (selectedUsers.length === 0) {
-      errors.recipients = "Please select at least one recipient";
+      errors.recipients = 'Please select at least one recipient';
     }
 
     // Check if there are any errors
@@ -383,25 +348,25 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
         sentBy: adminEmail,
       };
 
-      await safeApiCall("/api/admin/notifications/send", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      await safeApiCall('/admin/notifications/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
 
       // Reset form
       setNotificationForm({
-        title: "",
-        message: "",
-        type: "general",
-        priority: "medium",
-        actionUrl: "",
+        title: '',
+        message: '',
+        type: 'general',
+        priority: 'medium',
+        actionUrl: '',
       });
       setSelectedUsers([]);
       setValidationErrors({
-        title: "",
-        message: "",
-        recipients: "",
+        title: '',
+        message: '',
+        recipients: '',
       });
       setIsSidebarOpen(false);
 
@@ -411,37 +376,34 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
       fetchSentNotifications(1, true);
 
       showToast.success(
-        "Notification sent successfully!",
-        `Sent to ${selectedUsers.length} recipient(s)`
+        'Notification sent successfully!',
+        `Sent to ${selectedUsers.length} recipient(s)`,
       );
     } catch (error) {
-      handleApiError(error, "Send notification");
+      handleApiError(error, 'Send notification');
     } finally {
       setSendingNotification(false);
     }
   };
 
   // Handle resend notification
-  const handleResendNotification = async (
-    notification: SentNotification,
-    type: "same" | "new"
-  ) => {
+  const handleResendNotification = async (notification: SentNotification, type: 'same' | 'new') => {
     setIsResending(type);
 
     try {
-      if (type === "same") {
+      if (type === 'same') {
         // Resend to same recipients
         const recipientEmails = notification.recipients.map((r) => r.email);
 
         // Find user IDs for these emails
         const selectedUserIds = users
           .filter((user) => recipientEmails.includes(user.email))
-          .map((user) => user._id);
+          .map((user) => user.id ?? user.id);
 
         if (selectedUserIds.length === 0) {
           showToast.error(
-            "No matching users found",
-            "Unable to find recipients in the current user list"
+            'No matching users found',
+            'Unable to find recipients in the current user list',
           );
           return;
         }
@@ -454,14 +416,14 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
           message: notification.message,
           type: notification.type,
           priority: notification.priority,
-          actionUrl: "", // Original notification may not have actionUrl
+          actionUrl: '', // Original notification may not have actionUrl
           recipients: selectedUserIds,
           sentBy: adminEmail,
         };
 
-        await safeApiCall("/api/admin/notifications/send", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
+        await safeApiCall('/admin/notifications/send', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
         });
 
@@ -469,29 +431,26 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
         fetchSentNotifications(sentNotificationsPage, true);
 
         showToast.success(
-          "Notification resent successfully!",
-          `Resent to ${selectedUserIds.length} recipient(s)`
+          'Notification resent successfully!',
+          `Resent to ${selectedUserIds.length} recipient(s)`,
         );
       } else {
         // Type === 'new' - Open sidebar with pre-filled form for new recipients
         setNotificationForm({
           title: notification.title,
           message: notification.message,
-          type: notification.type as "general",
-          priority: notification.priority as "medium",
-          actionUrl: "",
+          type: notification.type as 'general',
+          priority: notification.priority as 'medium',
+          actionUrl: '',
         });
         setSelectedUsers([]);
         setIsViewSidebarOpen(false);
         setIsSidebarOpen(true);
 
-        showToast.info(
-          "Form pre-filled",
-          "Select new recipients and send the notification"
-        );
+        showToast.info('Form pre-filled', 'Select new recipients and send the notification');
       }
     } catch (error) {
-      handleApiError(error, "Resend notification");
+      handleApiError(error, 'Resend notification');
     } finally {
       setIsResending(null);
     }
@@ -517,18 +476,16 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
       setDeletingNotificationId(notificationToDelete);
       setIsDeleteConfirmOpen(false);
 
-      await safeApiCall(`/api/admin/notifications/${notificationToDelete}`, {
-        method: "DELETE",
+      await safeApiCall(`/admin/notifications/${notificationToDelete}`, {
+        method: 'DELETE',
       });
 
       // Remove from local state
-      setSentNotifications((prev) =>
-        prev.filter((notif) => notif.id !== notificationToDelete)
-      );
+      setSentNotifications((prev) => prev.filter((notif) => notif.id !== notificationToDelete));
 
-      showToast.success("Notification deleted successfully");
+      showToast.success('Notification deleted successfully');
     } catch (error) {
-      handleApiError(error, "Delete notification");
+      handleApiError(error, 'Delete notification');
     } finally {
       setDeletingNotificationId(null);
       setNotificationToDelete(null);
@@ -545,9 +502,7 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
   const filteredUsers = users.filter(
     (user) =>
       user.email.toLowerCase().includes(userSearch.toLowerCase()) ||
-      `${user.firstName} ${user.lastName}`
-        .toLowerCase()
-        .includes(userSearch.toLowerCase())
+      `${user.firstName} ${user.lastName}`.toLowerCase().includes(userSearch.toLowerCase()),
   );
 
   // Filter notifications
@@ -557,32 +512,32 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
   // Get priority color
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case "urgent":
-        return "destructive";
-      case "high":
-        return "default";
-      case "medium":
-        return "secondary";
-      case "low":
-        return "outline";
+      case 'urgent':
+        return 'destructive';
+      case 'high':
+        return 'default';
+      case 'medium':
+        return 'secondary';
+      case 'low':
+        return 'outline';
       default:
-        return "secondary";
+        return 'secondary';
     }
   };
 
   // Get type color
   const getTypeColor = (type: string) => {
     switch (type) {
-      case "promo":
-        return "default";
-      case "order":
-        return "secondary";
-      case "system":
-        return "outline";
-      case "marketing":
-        return "default";
+      case 'promo':
+        return 'default';
+      case 'order':
+        return 'secondary';
+      case 'system':
+        return 'outline';
+      case 'marketing':
+        return 'default';
       default:
-        return "secondary";
+        return 'secondary';
     }
   };
 
@@ -592,9 +547,7 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">Notification Management</h1>
-          <p className="text-muted-foreground">
-            Send and manage notifications to users
-          </p>
+          <p className="text-muted-foreground">Send and manage notifications to users</p>
         </div>
         <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
           <SheetTrigger asChild>
@@ -623,17 +576,15 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
                       if (validationErrors.title) {
                         setValidationErrors((prev) => ({
                           ...prev,
-                          title: "",
+                          title: '',
                         }));
                       }
                     }}
                     placeholder="Notification title"
-                    className={validationErrors.title ? "border-red-500" : ""}
+                    className={validationErrors.title ? 'border-red-500' : ''}
                   />
                   {validationErrors.title && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {validationErrors.title}
-                    </p>
+                    <p className="text-red-500 text-sm mt-1">{validationErrors.title}</p>
                   )}
                 </div>
                 <div>
@@ -680,9 +631,7 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
                   </Select>
                 </div>
                 <div>
-                  <label className="text-sm font-medium">
-                    Action URL (Optional)
-                  </label>
+                  <label className="text-sm font-medium">Action URL (Optional)</label>
                   <Input
                     value={notificationForm.actionUrl}
                     onChange={(e) =>
@@ -709,26 +658,22 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
                     if (validationErrors.message) {
                       setValidationErrors((prev) => ({
                         ...prev,
-                        message: "",
+                        message: '',
                       }));
                     }
                   }}
                   placeholder="Notification message"
                   rows={3}
-                  className={validationErrors.message ? "border-red-500" : ""}
+                  className={validationErrors.message ? 'border-red-500' : ''}
                 />
                 {validationErrors.message && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {validationErrors.message}
-                  </p>
+                  <p className="text-red-500 text-sm mt-1">{validationErrors.message}</p>
                 )}
               </div>
 
               {/* User Selection */}
               <div>
-                <label className="text-sm font-medium">
-                  Select Recipients *
-                </label>
+                <label className="text-sm font-medium">Select Recipients *</label>
                 <div className="mt-2">
                   <div className="flex items-center gap-2 mb-3">
                     <Search className="w-4 h-4 text-gray-400" />
@@ -745,22 +690,20 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
                         if (selectedUsers.length === filteredUsers.length) {
                           setSelectedUsers([]);
                         } else {
-                          setSelectedUsers(
-                            filteredUsers.map((u) => u.clerkUserId)
-                          );
+                          setSelectedUsers(filteredUsers.map((u) => u.id));
                         }
                         // Clear recipients error when bulk selecting/deselecting
                         if (validationErrors.recipients) {
                           setValidationErrors((prev) => ({
                             ...prev,
-                            recipients: "",
+                            recipients: '',
                           }));
                         }
                       }}
                     >
                       {selectedUsers.length === filteredUsers.length
-                        ? "Deselect All"
-                        : "Select All"}
+                        ? 'Deselect All'
+                        : 'Select All'}
                     </Button>
                   </div>
 
@@ -771,25 +714,20 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
                         className="flex items-center p-3 border-b last:border-b-0 hover:bg-gray-50"
                       >
                         <input
-                          key={`checkbox-${user._id}`}
+                          key={`checkbox-${user.id}`}
                           type="checkbox"
-                          checked={selectedUsers.includes(user.clerkUserId)}
+                          checked={selectedUsers.includes(user.id)}
                           onChange={(e) => {
                             if (e.target.checked) {
-                              setSelectedUsers((prev) => [
-                                ...prev,
-                                user.clerkUserId,
-                              ]);
+                              setSelectedUsers((prev) => [...prev, user.id]);
                             } else {
-                              setSelectedUsers((prev) =>
-                                prev.filter((id) => id !== user.clerkUserId)
-                              );
+                              setSelectedUsers((prev) => prev.filter((id) => id !== user.id));
                             }
                             // Clear recipients error when user selects/deselects
                             if (validationErrors.recipients) {
                               setValidationErrors((prev) => ({
                                 ...prev,
-                                recipients: "",
+                                recipients: '',
                               }));
                             }
                           }}
@@ -799,28 +737,23 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
                           <div className="font-medium">
                             {user.firstName} {user.lastName}
                           </div>
-                          <div className="text-sm text-gray-500">
-                            {user.email}
-                          </div>
+                          <div className="text-sm text-gray-500">{user.email}</div>
                           {user.inSanity && user.activatedAt && (
                             <div className="text-xs text-green-600 mt-1">
-                              Activated:{" "}
-                              {new Date(user.activatedAt).toLocaleDateString()}
+                              Activated: {new Date(user.activatedAt).toLocaleDateString()}
                               {user.activatedBy && ` by ${user.activatedBy}`}
                             </div>
                           )}
                         </div>
                         <div className="flex flex-col gap-1">
-                          <Badge
-                            variant={user.isActive ? "default" : "secondary"}
-                          >
-                            {user.isActive ? "Active" : "Inactive"}
+                          <Badge variant={user.isActive ? 'default' : 'secondary'}>
+                            {user.isActive ? 'Active' : 'Inactive'}
                           </Badge>
                           <Badge
-                            variant={user.inSanity ? "default" : "outline"}
+                            variant={user.inSanity ? 'default' : 'outline'}
                             className="text-xs"
                           >
-                            {user.inSanity ? "In Sanity" : "Clerk Only"}
+                            {user.inSanity ? 'In Sanity' : 'Clerk Only'}
                           </Badge>
                         </div>
                       </div>
@@ -829,9 +762,7 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
 
                   {selectedUsers.length > 0 && (
                     <div className="mt-2 p-2 bg-blue-50 rounded text-sm">
-                      <div className="text-gray-600">
-                        {selectedUsers.length} user(s) selected
-                      </div>
+                      <div className="text-gray-600">{selectedUsers.length} user(s) selected</div>
                       {syncingUsers && (
                         <div className="text-blue-600 mt-1 flex items-center gap-2">
                           <Clock className="w-3 h-3 animate-spin" />
@@ -840,17 +771,14 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
                       )}
                       {(() => {
                         const usersToSync = selectedUsers.filter((userId) => {
-                          const user = users.find(
-                            (u) => u.clerkUserId === userId
-                          );
+                          const user = users.find((u) => u.id === userId);
                           return !user?.isActive || !user?.inSanity;
                         });
 
                         if (usersToSync.length > 0) {
                           return (
                             <div className="text-orange-600 mt-1 text-xs">
-                              {usersToSync.length} user(s) will be automatically
-                              activated in Sanity
+                              {usersToSync.length} user(s) will be automatically activated in Sanity
                             </div>
                           );
                         }
@@ -859,18 +787,13 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
                     </div>
                   )}
                   {validationErrors.recipients && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {validationErrors.recipients}
-                    </p>
+                    <p className="text-red-500 text-sm mt-1">{validationErrors.recipients}</p>
                   )}
                 </div>
               </div>
 
               <div className="flex justify-end gap-2 pt-4">
-                <Button
-                  variant="outline"
-                  onClick={() => setIsSidebarOpen(false)}
-                >
+                <Button variant="outline" onClick={() => setIsSidebarOpen(false)}>
                   Cancel
                 </Button>
                 <Button
@@ -918,12 +841,8 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
             <div className="flex items-center gap-2">
               <Bell className="w-5 h-5 text-green-500" />
               <div>
-                <div className="text-2xl font-bold">
-                  {sentNotifications.length}
-                </div>
-                <div className="text-sm text-muted-foreground">
-                  Sent Notifications
-                </div>
+                <div className="text-2xl font-bold">{sentNotifications.length}</div>
+                <div className="text-sm text-muted-foreground">Sent Notifications</div>
               </div>
             </div>
           </CardContent>
@@ -934,14 +853,9 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
               <MessageSquare className="w-5 h-5 text-orange-500" />
               <div>
                 <div className="text-2xl font-bold">
-                  {sentNotifications.reduce(
-                    (total, notif) => total + notif.recipientCount,
-                    0
-                  )}
+                  {sentNotifications.reduce((total, notif) => total + notif.recipientCount, 0)}
                 </div>
-                <div className="text-sm text-muted-foreground">
-                  Total Recipients
-                </div>
+                <div className="text-sm text-muted-foreground">Total Recipients</div>
               </div>
             </div>
           </CardContent>
@@ -953,14 +867,11 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
               <div>
                 <div className="text-2xl font-bold">
                   {sentNotifications.reduce(
-                    (total, notif) =>
-                      total + notif.recipients.filter((r) => r.read).length,
-                    0
+                    (total, notif) => total + notif.recipients.filter((r) => r.read).length,
+                    0,
                   )}
                 </div>
-                <div className="text-sm text-muted-foreground">
-                  Read Notifications
-                </div>
+                <div className="text-sm text-muted-foreground">Read Notifications</div>
               </div>
             </div>
           </CardContent>
@@ -981,19 +892,11 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
                 disabled={refreshingNotifications}
                 className="p-2"
               >
-                <RefreshCw
-                  className={cn(
-                    "w-4 h-4",
-                    refreshingNotifications && "animate-spin"
-                  )}
-                />
+                <RefreshCw className={cn('w-4 h-4', refreshingNotifications && 'animate-spin')} />
               </Button>
 
               {/* Type Filter */}
-              <Select
-                value={notificationTypeFilter}
-                onValueChange={handleTypeFilterChange}
-              >
+              <Select value={notificationTypeFilter} onValueChange={handleTypeFilterChange}>
                 <SelectTrigger className="w-32">
                   <SelectValue placeholder="Type" />
                 </SelectTrigger>
@@ -1008,10 +911,7 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
               </Select>
 
               {/* Priority Filter */}
-              <Select
-                value={notificationPriorityFilter}
-                onValueChange={handlePriorityFilterChange}
-              >
+              <Select value={notificationPriorityFilter} onValueChange={handlePriorityFilterChange}>
                 <SelectTrigger className="w-32">
                   <SelectValue placeholder="Priority" />
                 </SelectTrigger>
@@ -1025,10 +925,7 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
               </Select>
 
               {/* Date Filter */}
-              <Select
-                value={notificationDateFilter}
-                onValueChange={handleDateFilterChange}
-              >
+              <Select value={notificationDateFilter} onValueChange={handleDateFilterChange}>
                 <SelectTrigger className="w-32">
                   <SelectValue placeholder="Date" />
                 </SelectTrigger>
@@ -1046,9 +943,7 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
           {loading ? (
             <div className="text-center py-8">Loading notifications...</div>
           ) : filteredNotifications.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              No notifications sent yet
-            </div>
+            <div className="text-center py-8 text-muted-foreground">No notifications sent yet</div>
           ) : (
             <div className="overflow-x-auto">
               <Table>
@@ -1066,19 +961,13 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
                 </TableHeader>
                 <TableBody>
                   {filteredNotifications.map((notification) => {
-                    const readCount = notification.recipients.filter(
-                      (r) => r.read
-                    ).length;
-                    const readRate = Math.round(
-                      (readCount / notification.recipientCount) * 100
-                    );
+                    const readCount = notification.recipients.filter((r) => r.read).length;
+                    const readRate = Math.round((readCount / notification.recipientCount) * 100);
 
                     return (
                       <TableRow key={notification.id}>
                         <TableCell>
-                          <div className="font-medium">
-                            {notification.title}
-                          </div>
+                          <div className="font-medium">{notification.title}</div>
                           <div className="text-sm text-muted-foreground line-clamp-1">
                             {notification.message}
                           </div>
@@ -1089,9 +978,7 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          <Badge
-                            variant={getPriorityColor(notification.priority)}
-                          >
+                          <Badge variant={getPriorityColor(notification.priority)}>
                             {notification.priority}
                           </Badge>
                         </TableCell>
@@ -1101,14 +988,10 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
                             <div className="text-sm">
                               {readCount}/{notification.recipientCount}
                             </div>
-                            <div className="text-xs text-muted-foreground">
-                              ({readRate}%)
-                            </div>
+                            <div className="text-xs text-muted-foreground">({readRate}%)</div>
                           </div>
                         </TableCell>
-                        <TableCell>
-                          {new Date(notification.sentAt).toLocaleDateString()}
-                        </TableCell>
+                        <TableCell>{new Date(notification.sentAt).toLocaleDateString()}</TableCell>
                         <TableCell className="text-sm text-muted-foreground">
                           {notification.sentBy}
                         </TableCell>
@@ -1117,9 +1000,7 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() =>
-                                handleViewNotification(notification)
-                              }
+                              onClick={() => handleViewNotification(notification)}
                               className="p-1 h-8 w-8"
                             >
                               <Eye className="w-4 h-4" />
@@ -1127,12 +1008,8 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() =>
-                                handleDeleteNotification(notification.id)
-                              }
-                              disabled={
-                                deletingNotificationId === notification.id
-                              }
+                              onClick={() => handleDeleteNotification(notification.id)}
+                              disabled={deletingNotificationId === notification.id}
                               className="p-1 h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
                             >
                               {deletingNotificationId === notification.id ? (
@@ -1155,12 +1032,8 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
           {sentNotifications.length > 0 && (
             <div className="flex items-center justify-between mt-6 pt-4 border-t">
               <div className="text-sm text-muted-foreground">
-                Showing{" "}
-                {(sentNotificationsPage - 1) * sentNotificationsLimit + 1} to{" "}
-                {Math.min(
-                  sentNotificationsPage * sentNotificationsLimit,
-                  sentNotificationsTotal
-                )}{" "}
+                Showing {(sentNotificationsPage - 1) * sentNotificationsLimit + 1} to{' '}
+                {Math.min(sentNotificationsPage * sentNotificationsLimit, sentNotificationsTotal)}{' '}
                 of {sentNotificationsTotal} notifications
               </div>
               <div className="flex items-center gap-2">
@@ -1174,7 +1047,7 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
                   <ChevronLeft className="w-4 h-4" />
                 </Button>
                 <span className="text-sm px-3">
-                  Page {sentNotificationsPage} of{" "}
+                  Page {sentNotificationsPage} of{' '}
                   {Math.ceil(sentNotificationsTotal / sentNotificationsLimit)}
                 </span>
                 <Button
@@ -1183,9 +1056,7 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
                   onClick={() => handlePageChange(sentNotificationsPage + 1)}
                   disabled={
                     sentNotificationsPage >=
-                      Math.ceil(
-                        sentNotificationsTotal / sentNotificationsLimit
-                      ) || loading
+                      Math.ceil(sentNotificationsTotal / sentNotificationsLimit) || loading
                   }
                   className="p-2"
                 >
@@ -1199,10 +1070,7 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
 
       {/* Notification Details Sidebar */}
       <Sheet open={isViewSidebarOpen} onOpenChange={setIsViewSidebarOpen}>
-        <SheetContent
-          className="w-[700px] sm:w-[700px] p-6 overflow-y-auto"
-          side="right"
-        >
+        <SheetContent className="w-[700px] sm:w-[700px] p-6 overflow-y-auto" side="right">
           <SheetHeader className="px-0">
             <SheetTitle>Notification Details</SheetTitle>
           </SheetHeader>
@@ -1212,17 +1080,11 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
               {/* Basic Information */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-500">
-                    Title
-                  </label>
-                  <div className="mt-1 p-3 bg-gray-50 rounded-md">
-                    {selectedNotification.title}
-                  </div>
+                  <label className="text-sm font-medium text-gray-500">Title</label>
+                  <div className="mt-1 p-3 bg-gray-50 rounded-md">{selectedNotification.title}</div>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-500">
-                    Type
-                  </label>
+                  <label className="text-sm font-medium text-gray-500">Type</label>
                   <div className="mt-1">
                     <Badge variant={getTypeColor(selectedNotification.type)}>
                       {selectedNotification.type}
@@ -1233,21 +1095,15 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-500">
-                    Priority
-                  </label>
+                  <label className="text-sm font-medium text-gray-500">Priority</label>
                   <div className="mt-1">
-                    <Badge
-                      variant={getPriorityColor(selectedNotification.priority)}
-                    >
+                    <Badge variant={getPriorityColor(selectedNotification.priority)}>
                       {selectedNotification.priority}
                     </Badge>
                   </div>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-500">
-                    Sent At
-                  </label>
+                  <label className="text-sm font-medium text-gray-500">Sent At</label>
                   <div className="mt-1 p-3 bg-gray-50 rounded-md">
                     {new Date(selectedNotification.sentAt).toLocaleString()}
                   </div>
@@ -1256,17 +1112,13 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-500">
-                    Sent By
-                  </label>
+                  <label className="text-sm font-medium text-gray-500">Sent By</label>
                   <div className="mt-1 p-3 bg-gray-50 rounded-md">
                     {selectedNotification.sentBy}
                   </div>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-500">
-                    Recipients
-                  </label>
+                  <label className="text-sm font-medium text-gray-500">Recipients</label>
                   <div className="mt-1 p-3 bg-gray-50 rounded-md">
                     {selectedNotification.recipientCount} recipient(s)
                   </div>
@@ -1275,9 +1127,7 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
 
               {/* Message */}
               <div>
-                <label className="text-sm font-medium text-gray-500">
-                  Message
-                </label>
+                <label className="text-sm font-medium text-gray-500">Message</label>
                 <div className="mt-1 p-3 bg-gray-50 rounded-md whitespace-pre-wrap">
                   {selectedNotification.message}
                 </div>
@@ -1299,34 +1149,30 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {selectedNotification.recipients.map(
-                        (recipient, index) => (
-                          <TableRow key={index}>
-                            <TableCell>{recipient.name}</TableCell>
-                            <TableCell>{recipient.email}</TableCell>
-                            <TableCell>
-                              <div className="flex items-center gap-2">
-                                {recipient.delivered ? (
-                                  <CheckCircle className="w-4 h-4 text-green-500" />
-                                ) : (
-                                  <AlertCircle className="w-4 h-4 text-red-500" />
-                                )}
-                                {recipient.delivered ? "Delivered" : "Failed"}
-                                {recipient.read && (
-                                  <Badge variant="secondary" className="ml-2">
-                                    Read
-                                  </Badge>
-                                )}
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              {recipient.readAt
-                                ? new Date(recipient.readAt).toLocaleString()
-                                : "-"}
-                            </TableCell>
-                          </TableRow>
-                        )
-                      )}
+                      {selectedNotification.recipients.map((recipient, index) => (
+                        <TableRow key={index}>
+                          <TableCell>{recipient.name}</TableCell>
+                          <TableCell>{recipient.email}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              {recipient.delivered ? (
+                                <CheckCircle className="w-4 h-4 text-green-500" />
+                              ) : (
+                                <AlertCircle className="w-4 h-4 text-red-500" />
+                              )}
+                              {recipient.delivered ? 'Delivered' : 'Failed'}
+                              {recipient.read && (
+                                <Badge variant="secondary" className="ml-2">
+                                  Read
+                                </Badge>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            {recipient.readAt ? new Date(recipient.readAt).toLocaleString() : '-'}
+                          </TableCell>
+                        </TableRow>
+                      ))}
                     </TableBody>
                   </Table>
                 </div>
@@ -1336,29 +1182,22 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
               <div className="grid grid-cols-3 gap-4 pt-4 border-t">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-blue-600">
-                    {
-                      selectedNotification.recipients.filter((r) => r.delivered)
-                        .length
-                    }
+                    {selectedNotification.recipients.filter((r) => r.delivered).length}
                   </div>
                   <div className="text-sm text-gray-500">Delivered</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-green-600">
-                    {
-                      selectedNotification.recipients.filter((r) => r.read)
-                        .length
-                    }
+                    {selectedNotification.recipients.filter((r) => r.read).length}
                   </div>
                   <div className="text-sm text-gray-500">Read</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-purple-600">
                     {Math.round(
-                      (selectedNotification.recipients.filter((r) => r.read)
-                        .length /
+                      (selectedNotification.recipients.filter((r) => r.read).length /
                         selectedNotification.recipientCount) *
-                        100
+                        100,
                     )}
                     %
                   </div>
@@ -1369,19 +1208,15 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
               {/* Resend Actions */}
               <div className="pt-6 border-t">
                 <div className="space-y-4">
-                  <h4 className="text-lg font-semibold text-gray-900">
-                    Resend Notification
-                  </h4>
+                  <h4 className="text-lg font-semibold text-gray-900">Resend Notification</h4>
                   <div className="flex flex-col gap-3">
                     <Button
-                      onClick={() =>
-                        handleResendNotification(selectedNotification, "same")
-                      }
+                      onClick={() => handleResendNotification(selectedNotification, 'same')}
                       disabled={!!isResending}
                       className="flex items-center justify-center gap-2 flex-1"
                       variant="outline"
                     >
-                      {isResending === "same" ? (
+                      {isResending === 'same' ? (
                         <>
                           <RefreshCw className="h-4 w-4 animate-spin" />
                           Resending...
@@ -1394,13 +1229,11 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
                       )}
                     </Button>
                     <Button
-                      onClick={() =>
-                        handleResendNotification(selectedNotification, "new")
-                      }
+                      onClick={() => handleResendNotification(selectedNotification, 'new')}
                       disabled={!!isResending}
                       className="flex items-center justify-center gap-2 flex-1"
                     >
-                      {isResending === "new" ? (
+                      {isResending === 'new' ? (
                         <>
                           <RefreshCw className="h-4 w-4 animate-spin" />
                           Setting up...
@@ -1414,8 +1247,8 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
                     </Button>
                   </div>
                   <p className="text-sm text-gray-500">
-                    Resend this notification with the same content to the
-                    original recipients or select new ones.
+                    Resend this notification with the same content to the original recipients or
+                    select new ones.
                   </p>
                 </div>
               </div>
@@ -1430,7 +1263,7 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
           <DialogOverlay />
           <DialogPrimitive.Content
             className={cn(
-              "fixed left-[50%] top-[50%] z-50 grid w-full max-w-md translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-300 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 sm:rounded-lg"
+              'fixed left-[50%] top-[50%] z-50 grid w-full max-w-md translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-300 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 sm:rounded-lg',
             )}
           >
             <VisuallyHidden.Root>
@@ -1441,12 +1274,9 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({
                 <AlertCircle className="h-8 w-8 text-red-600 animate-pulse" />
               </div>
               <div className="space-y-2">
-                <h3 className="text-xl font-bold text-gray-900">
-                  Delete Notification
-                </h3>
+                <h3 className="text-xl font-bold text-gray-900">Delete Notification</h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Are you sure you want to delete this notification? This action
-                  cannot be undone.
+                  Are you sure you want to delete this notification? This action cannot be undone.
                 </p>
               </div>
             </div>

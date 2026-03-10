@@ -1,13 +1,14 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+import { fetchService } from '@/lib/restClient';
+import { AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
+import { useState } from 'react';
 
 const NewsletterForm = () => {
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<{
-    type: "success" | "error" | "info";
+    type: 'success' | 'error' | 'info';
     text: string;
   } | null>(null);
 
@@ -20,8 +21,8 @@ const NewsletterForm = () => {
     // Basic validation
     if (!email.trim()) {
       setMessage({
-        type: "error",
-        text: "Please enter your email address",
+        type: 'error',
+        text: 'Please enter your email address',
       });
       return;
     }
@@ -30,8 +31,8 @@ const NewsletterForm = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       setMessage({
-        type: "error",
-        text: "Please enter a valid email address",
+        type: 'error',
+        text: 'Please enter a valid email address',
       });
       return;
     }
@@ -39,11 +40,8 @@ const NewsletterForm = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/newsletter/subscribe", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+      const response = await fetchService('/newsletter/subscribe', {
+        method: 'POST',
         body: JSON.stringify({ email: email.trim().toLowerCase() }),
       });
 
@@ -51,33 +49,32 @@ const NewsletterForm = () => {
 
       if (response.ok) {
         setMessage({
-          type: "success",
+          type: 'success',
           text:
-            data.message ||
-            "Thank you for subscribing! Check your email for a welcome message.",
+            data.message || 'Thank you for subscribing! Check your email for a welcome message.',
         });
-        setEmail(""); // Clear input on success
+        setEmail(''); // Clear input on success
       } else {
         // Check if already subscribed
         if (data.alreadySubscribed) {
           setMessage({
-            type: "info",
+            type: 'info',
             text:
               data.error ||
               "You're already subscribed to our newsletter! Check your inbox for our latest updates.",
           });
         } else {
           setMessage({
-            type: "error",
-            text: data.error || "Failed to subscribe. Please try again.",
+            type: 'error',
+            text: data.error || 'Failed to subscribe. Please try again.',
           });
         }
       }
     } catch (error) {
-      console.error("Newsletter subscription error:", error);
+      console.error('Newsletter subscription error:', error);
       setMessage({
-        type: "error",
-        text: "Something went wrong. Please try again later.",
+        type: 'error',
+        text: 'Something went wrong. Please try again later.',
       });
     } finally {
       setIsLoading(false);
@@ -106,7 +103,7 @@ const NewsletterForm = () => {
               Subscribing...
             </>
           ) : (
-            "Subscribe"
+            'Subscribe'
           )}
         </button>
       </form>
@@ -115,22 +112,16 @@ const NewsletterForm = () => {
       {message && (
         <div
           className={`p-3 rounded-lg text-sm flex items-start gap-2 animate-in fade-in slide-in-from-top-2 duration-300 ${
-            message.type === "success"
-              ? "bg-green-50 text-green-800 border border-green-200"
-              : message.type === "info"
-              ? "bg-blue-50 text-blue-800 border border-blue-200"
-              : "bg-red-50 text-red-800 border border-red-200"
+            message.type === 'success'
+              ? 'bg-green-50 text-green-800 border border-green-200'
+              : message.type === 'info'
+                ? 'bg-blue-50 text-blue-800 border border-blue-200'
+                : 'bg-red-50 text-red-800 border border-red-200'
           }`}
         >
-          {message.type === "success" && (
-            <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
-          )}
-          {message.type === "error" && (
-            <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
-          )}
-          {message.type === "info" && (
-            <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
-          )}
+          {message.type === 'success' && <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />}
+          {message.type === 'error' && <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />}
+          {message.type === 'info' && <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />}
           <span className="flex-1">{message.text}</span>
         </div>
       )}

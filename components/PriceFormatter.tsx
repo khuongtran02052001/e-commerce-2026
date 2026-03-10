@@ -1,26 +1,35 @@
-import { memo } from "react";
-import { twMerge } from "tailwind-merge";
+import { formatCompactUSD } from '@/lib/formatCurrency';
+import { memo } from 'react';
+import { twMerge } from 'tailwind-merge';
 
 interface Props {
-  amount: number | undefined;
+  amount?: number;
   className?: string;
+  compact?: boolean; // grid
+  showDecimals?: boolean; // checkout
 }
 
-const PriceFormatter = memo(({ amount, className }: Props) => {
-  const formattedPrice = new Number(amount).toLocaleString("en-US", {
-    currency: "USD",
-    style: "currency",
-    minimumFractionDigits: 2,
-  });
-  return (
-    <span
-      className={twMerge("text-sm font-semibold text-dark-color", className)}
-    >
-      {formattedPrice}
-    </span>
-  );
-});
+const PriceFormatter = memo(
+  ({ amount = 0, className, compact = false, showDecimals = false }: Props) => {
+    const value = Number(amount) || 0;
 
-PriceFormatter.displayName = "PriceFormatter";
+    const full = value.toLocaleString('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: showDecimals ? 2 : 0,
+      maximumFractionDigits: showDecimals ? 2 : 0,
+    });
+
+    const compactValue = formatCompactUSD(value);
+
+    return (
+      <p title={full} className={twMerge('text-sm font-semibold text-dark-color', className)}>
+        {compact ? compactValue : full}
+      </p>
+    );
+  },
+);
+
+PriceFormatter.displayName = 'PriceFormatter';
 
 export default PriceFormatter;

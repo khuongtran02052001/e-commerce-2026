@@ -1,8 +1,8 @@
-import AccessDeniedContent from "@/components/admin/AccessDeniedContent";
-import { Metadata } from "next";
+import AccessDeniedContent from '@/components/admin/AccessDeniedContent';
+import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: "Access Denied - Admin Panel",
+  title: 'Access Denied - Admin Panel',
   description: "You don't have permission to access the admin panel",
 };
 

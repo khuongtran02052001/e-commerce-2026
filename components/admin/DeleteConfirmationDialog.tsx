@@ -1,15 +1,10 @@
-import { FC } from "react";
-import {
-  Dialog,
-  DialogPortal,
-  DialogOverlay,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import * as DialogPrimitive from "@radix-ui/react-dialog";
-import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
-import { Button } from "@/components/ui/button";
-import { Trash2, AlertTriangle, X } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogOverlay, DialogPortal, DialogTitle } from '@/components/ui/dialog';
+import { cn } from '@/lib/utils';
+import * as DialogPrimitive from '@radix-ui/react-dialog';
+import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
+import { AlertTriangle, Trash2, X } from 'lucide-react';
+import { FC } from 'react';
 
 interface DeleteConfirmationDialogProps {
   isOpen: boolean;
@@ -36,7 +31,7 @@ export const DeleteConfirmationDialog: FC<DeleteConfirmationDialogProps> = ({
         <DialogOverlay />
         <DialogPrimitive.Content
           className={cn(
-            "fixed left-[50%] top-[50%] z-50 grid w-full max-w-md translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-300 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 sm:rounded-lg"
+            'fixed left-[50%] top-[50%] z-50 grid w-full max-w-md translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-300 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 sm:rounded-lg',
           )}
         >
           <VisuallyHidden.Root>
@@ -52,10 +47,10 @@ export const DeleteConfirmationDialog: FC<DeleteConfirmationDialogProps> = ({
                 {description}
                 {itemCount > 1 && (
                   <>
-                    {" "}
+                    {' '}
                     <span className="font-semibold text-red-600">
-                      {itemCount} {itemCount === 1 ? "item" : "items"}
-                    </span>{" "}
+                      {itemCount} {itemCount === 1 ? 'item' : 'items'}
+                    </span>{' '}
                     will be permanently deleted.
                   </>
                 )}
@@ -85,7 +80,7 @@ export const DeleteConfirmationDialog: FC<DeleteConfirmationDialogProps> = ({
               ) : (
                 <>
                   <Trash2 className="w-4 h-4 mr-2" />
-                  Delete {itemCount > 1 ? `${itemCount} Items` : ""}
+                  Delete {itemCount > 1 ? `${itemCount} Items` : ''}
                 </>
               )}
             </Button>

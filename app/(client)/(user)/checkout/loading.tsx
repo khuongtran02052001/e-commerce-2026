@@ -1,8 +1,5 @@
-import Container from "@/components/Container";
-import {
-  CheckoutHeaderSkeleton,
-  CheckoutSkeleton,
-} from "@/components/checkout/CheckoutSkeleton";
+import Container from '@/components/Container';
+import { CheckoutHeaderSkeleton, CheckoutSkeleton } from '@/components/checkout/CheckoutSkeleton';
 
 export default function CheckoutLoading() {
   return (

@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import Container from "@/components/Container";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Card } from "@/components/ui/card";
+import Container from '@/components/Container';
+import { Card } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const ProductPageSkeleton = () => {
   return (
@@ -27,10 +27,7 @@ const ProductPageSkeleton = () => {
               {/* Thumbnail Images */}
               <div className="flex gap-2">
                 {[...Array(4)].map((_, index) => (
-                  <Skeleton
-                    key={index}
-                    className="w-16 h-16 rounded-md bg-gray-200"
-                  />
+                  <Skeleton key={index} className="w-16 h-16 rounded-md bg-gray-200" />
                 ))}
               </div>
             </div>
@@ -48,10 +45,7 @@ const ProductPageSkeleton = () => {
               <div className="flex items-center gap-2">
                 <div className="flex gap-1">
                   {[...Array(5)].map((_, index) => (
-                    <Skeleton
-                      key={index}
-                      className="w-3 h-3 rounded bg-gray-200"
-                    />
+                    <Skeleton key={index} className="w-3 h-3 rounded bg-gray-200" />
                   ))}
                 </div>
                 <Skeleton className="h-4 w-12 bg-gray-200" />
@@ -78,10 +72,7 @@ const ProductPageSkeleton = () => {
               <div className="space-y-3">
                 <Skeleton className="h-5 w-32 bg-gray-200" />
                 {[...Array(3)].map((_, index) => (
-                  <div
-                    key={index}
-                    className="flex justify-between items-center"
-                  >
+                  <div key={index} className="flex justify-between items-center">
                     <Skeleton className="h-4 w-20 bg-gray-200" />
                     <Skeleton className="h-4 w-16 bg-gray-200" />
                   </div>
@@ -146,10 +137,7 @@ const ProductPageSkeleton = () => {
         {/* Trust Indicators Skeleton */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-8">
           {[...Array(3)].map((_, index) => (
-            <Card
-              key={index}
-              className="border-2 border-gray-100 text-center p-4 space-y-2"
-            >
+            <Card key={index} className="border-2 border-gray-100 text-center p-4 space-y-2">
               <Skeleton className="h-8 w-8 bg-gray-200 mx-auto" />
               <Skeleton className="h-4 w-24 bg-gray-200 mx-auto" />
               <Skeleton className="h-3 w-32 bg-gray-200 mx-auto" />
@@ -160,10 +148,7 @@ const ProductPageSkeleton = () => {
         {/* Product Specifications Skeleton */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
           {[...Array(4)].map((_, index) => (
-            <Card
-              key={index}
-              className="border-2 border-gray-100 p-4 space-y-3"
-            >
+            <Card key={index} className="border-2 border-gray-100 p-4 space-y-3">
               <div className="flex items-center gap-2 mb-2">
                 <Skeleton className="h-5 w-5 bg-gray-200" />
                 <Skeleton className="h-4 w-20 bg-gray-200" />
@@ -220,10 +205,7 @@ const ProductPageSkeleton = () => {
                     </div>
                     <div className="flex gap-1">
                       {[...Array(5)].map((_, starIndex) => (
-                        <Skeleton
-                          key={starIndex}
-                          className="h-3 w-3 bg-gray-200"
-                        />
+                        <Skeleton key={starIndex} className="h-3 w-3 bg-gray-200" />
                       ))}
                     </div>
                     <Skeleton className="h-4 w-3/4 bg-gray-200" />

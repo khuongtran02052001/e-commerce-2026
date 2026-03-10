@@ -1,23 +1,23 @@
-"use client";
-import { Category, Product } from "@/sanity.types";
-import { Button } from "../ui/button";
-import { useEffect, useState } from "react";
-import { client } from "@/sanity/lib/client";
-import { motion } from "motion/react";
-import { Grid3X3 } from "lucide-react";
-import ProductCard from "../ProductCard";
-import NoProductAvailable from "./NoProductAvailable";
-import { useRouter } from "next/navigation";
+'use client';
+import { fetchService } from '@/lib/restClient';
+import { ICategory, IProduct } from '@/mock-data';
+import { Grid3X3 } from 'lucide-react';
+import { motion } from 'motion/react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import ProductCard from '../ProductCard';
+import { Button } from '../ui/button';
+import NoProductAvailable from './NoProductAvailable';
 
 interface Props {
-  categories: Category[];
+  categories: ICategory[];
   slug: string;
-  initialProducts: Product[];
+  initialProducts: IProduct[];
 }
 
 const CategoryProducts = ({ categories, slug, initialProducts }: Props) => {
   const [currentSlug, setCurrentSlug] = useState(slug);
-  const [products, setProducts] = useState<Product[]>(initialProducts);
+  const [products, setProducts] = useState<IProduct[]>(initialProducts);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -31,19 +31,17 @@ const CategoryProducts = ({ categories, slug, initialProducts }: Props) => {
     const fetchCategoryProducts = async () => {
       setLoading(true);
       try {
-        const query = `
-      *[_type == "product" && references(*[_type == "category" && slug.current == $slug]._id)] {
-        ...,
-        brand->{
-          _id,
-          title
+        const response = await fetchService(
+          `/products?category=${encodeURIComponent(currentSlug)}`,
+        );
+        if (!response.ok) {
+          throw new Error('Failed to fetch category products');
         }
-      }
-    `;
-        const products = await client.fetch(query, { slug: currentSlug });
-        setProducts(products);
+        const data = await response.json();
+        const items = Array.isArray(data) ? data : data?.data || [];
+        setProducts(items);
       } catch (error) {
-        console.error("Error fetching category products:", error);
+        console.error('Error fetching category products:', error);
       } finally {
         setLoading(false);
       }
@@ -65,11 +63,11 @@ const CategoryProducts = ({ categories, slug, initialProducts }: Props) => {
       <div className="flex flex-col md:min-w-40 border rounded-lg overflow-hidden bg-white shadow-sm">
         {categories?.map((item) => (
           <Button
-            key={item?._id}
-            onClick={() => handleCategoryChange(item?.slug?.current as string)}
+            key={item?.id}
+            onClick={() => handleCategoryChange(item?.slug as string)}
             className={`bg-transparent border-0 p-0 rounded-none text-dark-color shadow-none hover:bg-shop_light_green hover:text-white font-semibold transition-all duration-200 border-b last:border-b-0 capitalize ${
-              item?.slug?.current === currentSlug &&
-              "bg-shop_light_green text-white border-shop_light_green"
+              item?.slug === currentSlug &&
+              'bg-shop_light_green text-white border-shop_light_green'
             }`}
           >
             <p className="w-full text-left px-4 py-3">{item?.title}</p>
@@ -119,14 +117,10 @@ const CategoryProducts = ({ categories, slug, initialProducts }: Props) => {
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-lg font-semibold text-shop_dark_green">
-                    Products in{" "}
-                    {currentSlug
-                      ? currentSlug.replace(/-/g, " ")
-                      : "this category"}
+                    Products in {currentSlug ? currentSlug.replace(/-/g, ' ') : 'this category'}
                   </h3>
                   <p className="text-sm text-gray-600">
-                    {products.length} product{products.length !== 1 ? "s" : ""}{" "}
-                    found
+                    {products.length} product{products.length !== 1 ? 's' : ''} found
                   </p>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-gray-500">
@@ -143,9 +137,9 @@ const CategoryProducts = ({ categories, slug, initialProducts }: Props) => {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.4, delay: 0.1 }}
             >
-              {products?.map((product: Product, index: number) => (
+              {products?.map((product: IProduct, index: number) => (
                 <motion.div
-                  key={product?._id}
+                  key={product?.id}
                   layout
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -165,8 +159,7 @@ const CategoryProducts = ({ categories, slug, initialProducts }: Props) => {
             {/* Empty State Header */}
             <div className="mb-6">
               <h3 className="text-lg font-semibold text-shop_dark_green">
-                Products in{" "}
-                {currentSlug ? currentSlug.replace(/-/g, " ") : "this category"}
+                Products in {currentSlug ? currentSlug.replace(/-/g, ' ') : 'this category'}
               </h3>
               <p className="text-sm text-gray-600">0 products found</p>
             </div>

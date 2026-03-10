@@ -1,33 +1,37 @@
-"use client";
+'use client';
 
-import React, { useEffect } from "react";
-import { useUser } from "@clerk/nextjs";
-import { useRouter, usePathname } from "next/navigation";
-import { useIsAdmin } from "@/lib/adminUtils";
-import Container from "@/components/Container";
-import AdminTopNavigation from "@/components/admin/AdminTopNavigation";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import AdminTopNavigation from '@/components/admin/AdminTopNavigation';
+import Container from '@/components/Container';
+import Footer from '@/components/Footer';
+import Header from '@/components/Header';
+import { useUserData } from '@/contexts/UserDataContext';
+import { isAdmin } from '@/lib/adminUtils';
+import { useSession } from 'next-auth/react';
+import { usePathname, useRouter } from 'next/navigation';
+import React, { useEffect } from 'react';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
 }
 
 const AdminLayout = ({ children }: AdminLayoutProps) => {
-  const { user, isLoaded } = useUser();
+  const { data: session, status } = useSession();
+  const { authUser: user, isLoading: isUserLoading } = useUserData();
   const router = useRouter();
   const pathname = usePathname();
-  const isAdmin = useIsAdmin(user?.primaryEmailAddress?.emailAddress);
+  const isAdminUser = isAdmin(user);
+  const isAdminBySessionEmail = isAdmin({ email: session?.user?.email ?? undefined });
+  const hasAdminAccess = isAdminUser || isAdminBySessionEmail;
 
   // Redirect non-admin users
   useEffect(() => {
-    if (isLoaded && !isAdmin) {
-      router.push("/admin/access-denied");
+    if (status === 'authenticated' && !isUserLoading && !hasAdminAccess) {
+      router.push('/403');
     }
-  }, [isLoaded, isAdmin, router]);
+  }, [hasAdminAccess, isUserLoading, router, status]);
 
   // Show loading while checking authentication
-  if (!isLoaded) {
+  if (status === 'loading' || isUserLoading) {
     return (
       <Container className="py-10">
         <div className="flex items-center justify-center min-h-[400px]">
@@ -38,7 +42,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
   }
 
   // If not admin, don't render anything (redirect will happen)
-  if (!isAdmin) {
+  if (status === 'authenticated' && !hasAdminAccess) {
     return null;
   }
 

@@ -1,11 +1,19 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Textarea } from "@/components/ui/textarea";
+import AccountRequestsOverview from '@/components/admin/AccountRequestsOverview';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogPortal,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import {
   Table,
   TableBody,
@@ -13,36 +21,29 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
+import { fetchService } from '@/lib/restClient';
+import { cn } from '@/lib/utils';
+import * as DialogPrimitive from '@radix-ui/react-dialog';
+import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogPortal,
-  DialogOverlay,
-} from "@/components/ui/dialog";
-import * as DialogPrimitive from "@radix-ui/react-dialog";
-import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
-import { cn } from "@/lib/utils";
-import {
-  Crown,
-  Building2,
-  CheckCircle,
-  XCircle,
-  Clock,
-  Mail,
-  Calendar,
   AlertTriangle,
+  Building2,
+  Calendar,
+  CheckCircle,
+  Clock,
+  Crown,
+  Mail,
   RefreshCw,
-} from "lucide-react";
-import { toast } from "sonner";
-import AccountRequestsOverview from "@/components/admin/AccountRequestsOverview";
+  XCircle,
+} from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 interface UserRequest {
-  _id: string;
+  id: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -65,25 +66,23 @@ const ApprovedAccountsTable = ({
   setCancelDialog: (dialog: {
     isOpen: boolean;
     userId: string;
-    type: "premium" | "business";
+    type: 'premium' | 'business';
     userEmail: string;
   }) => void;
 }) => {
   const allApprovedAccounts = [
     ...premiumAccounts.map((account) => ({
       ...account,
-      accountType: "premium" as const,
+      accountType: 'premium' as const,
     })),
     ...businessAccounts.map((account) => ({
       ...account,
-      accountType: "business" as const,
+      accountType: 'business' as const,
     })),
   ].sort((a, b) => {
-    const dateA =
-      a.accountType === "premium" ? a.premiumApprovedAt : a.businessApprovedAt;
-    const dateB =
-      b.accountType === "premium" ? b.premiumApprovedAt : b.businessApprovedAt;
-    return new Date(dateB || "").getTime() - new Date(dateA || "").getTime();
+    const dateA = a.accountType === 'premium' ? a.premiumApprovedAt : a.businessApprovedAt;
+    const dateB = b.accountType === 'premium' ? b.premiumApprovedAt : b.businessApprovedAt;
+    return new Date(dateB || '').getTime() - new Date(dateA || '').getTime();
   });
 
   if (allApprovedAccounts.length === 0) {
@@ -91,9 +90,7 @@ const ApprovedAccountsTable = ({
       <Card>
         <CardContent className="flex flex-col items-center justify-center py-12">
           <CheckCircle className="w-12 h-12 text-gray-400 mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            No Approved Accounts
-          </h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">No Approved Accounts</h3>
           <p className="text-gray-600 text-center">
             There are currently no approved accounts to manage.
           </p>
@@ -120,33 +117,29 @@ const ApprovedAccountsTable = ({
                 <TableHead className="font-semibold">Account Type</TableHead>
                 <TableHead className="font-semibold">Approved Date</TableHead>
                 <TableHead className="font-semibold">Status</TableHead>
-                <TableHead className="font-semibold text-center">
-                  Actions
-                </TableHead>
+                <TableHead className="font-semibold text-center">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {allApprovedAccounts.map((account) => {
                 const approvedAt =
-                  account.accountType === "premium"
+                  account.accountType === 'premium'
                     ? account.premiumApprovedAt
                     : account.businessApprovedAt;
 
                 return (
                   <TableRow
-                    key={`${account._id}-${account.accountType}`}
+                    key={`${account.id}-${account.accountType}`}
                     className="hover:bg-gray-50/50 transition-colors"
                   >
                     <TableCell className="py-4">
                       <div className="flex items-center gap-3">
                         <div
                           className={`p-2 rounded-lg ${
-                            account.accountType === "premium"
-                              ? "bg-amber-100"
-                              : "bg-blue-100"
+                            account.accountType === 'premium' ? 'bg-amber-100' : 'bg-blue-100'
                           }`}
                         >
-                          {account.accountType === "premium" ? (
+                          {account.accountType === 'premium' ? (
                             <Crown className="w-4 h-4 text-amber-600" />
                           ) : (
                             <Building2 className="w-4 h-4 text-blue-600" />
@@ -167,19 +160,17 @@ const ApprovedAccountsTable = ({
                     <TableCell className="py-4">
                       <Badge
                         className={
-                          account.accountType === "premium"
-                            ? "bg-amber-100 text-amber-800 border-amber-200"
-                            : "bg-blue-100 text-blue-800 border-blue-200"
+                          account.accountType === 'premium'
+                            ? 'bg-amber-100 text-amber-800 border-amber-200'
+                            : 'bg-blue-100 text-blue-800 border-blue-200'
                         }
                       >
-                        {account.accountType === "premium" ? (
+                        {account.accountType === 'premium' ? (
                           <Crown className="w-3 h-3 mr-1" />
                         ) : (
                           <Building2 className="w-3 h-3 mr-1" />
                         )}
-                        {account.accountType === "premium"
-                          ? "Premium"
-                          : "Business"}
+                        {account.accountType === 'premium' ? 'Premium' : 'Business'}
                       </Badge>
                     </TableCell>
 
@@ -207,7 +198,7 @@ const ApprovedAccountsTable = ({
                           onClick={() => {
                             setCancelDialog({
                               isOpen: true,
-                              userId: account._id,
+                              userId: account.id,
                               type: account.accountType,
                               userEmail: account.email,
                             });
@@ -232,25 +223,23 @@ const ApprovedAccountsTable = ({
         <div className="md:hidden space-y-4 p-4">
           {allApprovedAccounts.map((account) => {
             const approvedAt =
-              account.accountType === "premium"
+              account.accountType === 'premium'
                 ? account.premiumApprovedAt
                 : account.businessApprovedAt;
 
             return (
               <Card
-                key={`${account._id}-${account.accountType}`}
+                key={`${account.id}-${account.accountType}`}
                 className="border border-gray-200"
               >
                 <CardContent className="p-4 space-y-3">
                   <div className="flex items-center gap-3">
                     <div
                       className={`p-2 rounded-lg ${
-                        account.accountType === "premium"
-                          ? "bg-amber-100"
-                          : "bg-blue-100"
+                        account.accountType === 'premium' ? 'bg-amber-100' : 'bg-blue-100'
                       }`}
                     >
-                      {account.accountType === "premium" ? (
+                      {account.accountType === 'premium' ? (
                         <Crown className="w-4 h-4 text-amber-600" />
                       ) : (
                         <Building2 className="w-4 h-4 text-blue-600" />
@@ -272,27 +261,23 @@ const ApprovedAccountsTable = ({
                       <div className="text-gray-600">Account Type:</div>
                       <Badge
                         className={
-                          account.accountType === "premium"
-                            ? "bg-amber-100 text-amber-800 border-amber-200"
-                            : "bg-blue-100 text-blue-800 border-blue-200"
+                          account.accountType === 'premium'
+                            ? 'bg-amber-100 text-amber-800 border-amber-200'
+                            : 'bg-blue-100 text-blue-800 border-blue-200'
                         }
                       >
-                        {account.accountType === "premium" ? (
+                        {account.accountType === 'premium' ? (
                           <Crown className="w-3 h-3 mr-1" />
                         ) : (
                           <Building2 className="w-3 h-3 mr-1" />
                         )}
-                        {account.accountType === "premium"
-                          ? "Premium"
-                          : "Business"}
+                        {account.accountType === 'premium' ? 'Premium' : 'Business'}
                       </Badge>
                     </div>
                     <div className="space-y-1 text-right">
                       <div className="text-gray-600">Approved:</div>
                       <div className="text-sm">
-                        {approvedAt
-                          ? new Date(approvedAt).toLocaleDateString()
-                          : "-"}
+                        {approvedAt ? new Date(approvedAt).toLocaleDateString() : '-'}
                       </div>
                     </div>
                   </div>
@@ -306,7 +291,7 @@ const ApprovedAccountsTable = ({
                       onClick={() => {
                         setCancelDialog({
                           isOpen: true,
-                          userId: account._id,
+                          userId: account.id,
                           type: account.accountType,
                           userEmail: account.email,
                         });
@@ -338,28 +323,25 @@ const RequestTable = ({
   getStatusBadge,
 }: {
   users: UserRequest[];
-  type: "premium" | "business";
-  handleApprove: (userId: string, type: "premium" | "business") => void;
+  type: 'premium' | 'business';
+  handleApprove: (userId: string, type: 'premium' | 'business') => void;
   setRejectDialog: (dialog: {
     isOpen: boolean;
     userId: string;
-    type: "premium" | "business";
+    type: 'premium' | 'business';
     userEmail: string;
   }) => void;
   actionLoading: string | null;
-  getStatusBadge: (
-    status: string,
-    type: "premium" | "business"
-  ) => React.ReactNode;
+  getStatusBadge: (status: string, type: 'premium' | 'business') => React.ReactNode;
 }) => {
   if (users.length === 0) {
-    const Icon = type === "premium" ? Crown : Building2;
+    const Icon = type === 'premium' ? Crown : Building2;
     return (
       <Card>
         <CardContent className="flex flex-col items-center justify-center py-12">
           <Icon className="w-12 h-12 text-gray-400 mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            No {type === "premium" ? "Premium" : "Business"} Requests
+            No {type === 'premium' ? 'Premium' : 'Business'} Requests
           </h3>
           <p className="text-gray-600 text-center">
             There are currently no {type} account requests to review.
@@ -373,12 +355,12 @@ const RequestTable = ({
     <Card className="overflow-hidden">
       <CardHeader className="bg-gradient-to-r from-gray-50 to-gray-100 pb-4">
         <CardTitle className="flex items-center gap-2 text-lg">
-          {type === "premium" ? (
+          {type === 'premium' ? (
             <Crown className="w-5 h-5 text-amber-600" />
           ) : (
             <Building2 className="w-5 h-5 text-blue-600" />
           )}
-          {type === "premium" ? "Premium" : "Business"} Account Requests
+          {type === 'premium' ? 'Premium' : 'Business'} Account Requests
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
@@ -390,33 +372,26 @@ const RequestTable = ({
                 <TableHead className="font-semibold">User</TableHead>
                 <TableHead className="font-semibold">Applied Date</TableHead>
                 <TableHead className="font-semibold">Status</TableHead>
-                <TableHead className="font-semibold text-center">
-                  Actions
-                </TableHead>
+                <TableHead className="font-semibold text-center">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {users.map((user) => {
-                const status =
-                  type === "premium" ? user.premiumStatus : user.businessStatus;
+                const requestId = user.id ?? user.id;
+                const status = type === 'premium' ? user.premiumStatus : user.businessStatus;
                 const appliedAt =
-                  type === "premium"
-                    ? user.premiumAppliedAt
-                    : user.businessAppliedAt;
+                  type === 'premium' ? user.premiumAppliedAt : user.businessAppliedAt;
 
                 return (
-                  <TableRow
-                    key={user._id}
-                    className="hover:bg-gray-50/50 transition-colors"
-                  >
+                  <TableRow key={requestId} className="hover:bg-gray-50/50 transition-colors">
                     <TableCell className="py-4">
                       <div className="flex items-center gap-3">
                         <div
                           className={`p-2 rounded-lg ${
-                            type === "premium" ? "bg-amber-100" : "bg-blue-100"
+                            type === 'premium' ? 'bg-amber-100' : 'bg-blue-100'
                           }`}
                         >
-                          {type === "premium" ? (
+                          {type === 'premium' ? (
                             <Crown className="w-4 h-4 text-amber-600" />
                           ) : (
                             <Building2 className="w-4 h-4 text-blue-600" />
@@ -447,7 +422,7 @@ const RequestTable = ({
 
                     <TableCell className="py-4">
                       {getStatusBadge(status, type)}
-                      {status === "rejected" && user.rejectionReason && (
+                      {status === 'rejected' && user.rejectionReason && (
                         <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded text-xs max-w-xs">
                           <div className="flex items-start gap-1">
                             <AlertTriangle className="w-3 h-3 text-red-500 mt-0.5 flex-shrink-0" />
@@ -460,27 +435,27 @@ const RequestTable = ({
                     </TableCell>
 
                     <TableCell className="py-4">
-                      {status === "pending" && (
+                      {status === 'pending' && (
                         <div className="flex gap-2 justify-center flex-wrap">
                           <Button
-                            onClick={() => handleApprove(user._id, type)}
-                            disabled={actionLoading === user._id}
+                            onClick={() => handleApprove(requestId, type)}
+                            disabled={actionLoading === requestId}
                             size="sm"
                             className="bg-green-600 hover:bg-green-700 text-white"
                           >
                             <CheckCircle className="w-3 h-3 mr-1" />
-                            {actionLoading === user._id ? "..." : "Approve"}
+                            {actionLoading === requestId ? '...' : 'Approve'}
                           </Button>
                           <Button
                             onClick={() =>
                               setRejectDialog({
                                 isOpen: true,
-                                userId: user._id,
+                                userId: requestId,
                                 type,
                                 userEmail: user.email,
                               })
                             }
-                            disabled={actionLoading === user._id}
+                            disabled={actionLoading === requestId}
                             variant="destructive"
                             size="sm"
                           >
@@ -489,7 +464,7 @@ const RequestTable = ({
                           </Button>
                         </div>
                       )}
-                      {status !== "pending" && (
+                      {status !== 'pending' && (
                         <div className="text-center text-sm text-gray-500">
                           No actions available
                         </div>
@@ -505,23 +480,20 @@ const RequestTable = ({
         {/* Mobile Card View */}
         <div className="md:hidden space-y-4 p-4">
           {users.map((user) => {
-            const status =
-              type === "premium" ? user.premiumStatus : user.businessStatus;
-            const appliedAt =
-              type === "premium"
-                ? user.premiumAppliedAt
-                : user.businessAppliedAt;
+            const requestId = user.id ?? user.id;
+            const status = type === 'premium' ? user.premiumStatus : user.businessStatus;
+            const appliedAt = type === 'premium' ? user.premiumAppliedAt : user.businessAppliedAt;
 
             return (
-              <Card key={user._id} className="border border-gray-200">
+              <Card key={requestId} className="border border-gray-200">
                 <CardContent className="p-4 space-y-3">
                   <div className="flex items-center gap-3">
                     <div
                       className={`p-2 rounded-lg ${
-                        type === "premium" ? "bg-amber-100" : "bg-blue-100"
+                        type === 'premium' ? 'bg-amber-100' : 'bg-blue-100'
                       }`}
                     >
-                      {type === "premium" ? (
+                      {type === 'premium' ? (
                         <Crown className="w-4 h-4 text-amber-600" />
                       ) : (
                         <Building2 className="w-4 h-4 text-blue-600" />
@@ -546,38 +518,36 @@ const RequestTable = ({
                     </div>
                   )}
 
-                  {status === "rejected" && user.rejectionReason && (
+                  {status === 'rejected' && user.rejectionReason && (
                     <div className="p-2 bg-red-50 border border-red-200 rounded text-xs">
                       <div className="flex items-start gap-1">
                         <AlertTriangle className="w-3 h-3 text-red-500 mt-0.5 flex-shrink-0" />
-                        <span className="text-red-700">
-                          {user.rejectionReason}
-                        </span>
+                        <span className="text-red-700">{user.rejectionReason}</span>
                       </div>
                     </div>
                   )}
 
-                  {status === "pending" && (
+                  {status === 'pending' && (
                     <div className="flex gap-2 pt-2">
                       <Button
-                        onClick={() => handleApprove(user._id, type)}
-                        disabled={actionLoading === user._id}
+                        onClick={() => handleApprove(requestId, type)}
+                        disabled={actionLoading === requestId}
                         size="sm"
                         className="flex-1 bg-green-600 hover:bg-green-700 text-white"
                       >
                         <CheckCircle className="w-3 h-3 mr-1" />
-                        {actionLoading === user._id ? "..." : "Approve"}
+                        {actionLoading === requestId ? '...' : 'Approve'}
                       </Button>
                       <Button
                         onClick={() =>
                           setRejectDialog({
                             isOpen: true,
-                            userId: user._id,
+                            userId: requestId,
                             type,
                             userEmail: user.email,
                           })
                         }
-                        disabled={actionLoading === user._id}
+                        disabled={actionLoading === requestId}
                         variant="destructive"
                         size="sm"
                         className="flex-1"
@@ -600,12 +570,8 @@ const RequestTable = ({
 export default function AccountRequestsClient() {
   const [premiumRequests, setPremiumRequests] = useState<UserRequest[]>([]);
   const [businessRequests, setBusinessRequests] = useState<UserRequest[]>([]);
-  const [approvedPremiumAccounts, setApprovedPremiumAccounts] = useState<
-    UserRequest[]
-  >([]);
-  const [approvedBusinessAccounts, setApprovedBusinessAccounts] = useState<
-    UserRequest[]
-  >([]);
+  const [approvedPremiumAccounts, setApprovedPremiumAccounts] = useState<UserRequest[]>([]);
+  const [approvedBusinessAccounts, setApprovedBusinessAccounts] = useState<UserRequest[]>([]);
   const [allUsers, setAllUsers] = useState<UserRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -613,27 +579,27 @@ export default function AccountRequestsClient() {
   const [rejectDialog, setRejectDialog] = useState<{
     isOpen: boolean;
     userId: string;
-    type: "premium" | "business";
+    type: 'premium' | 'business';
     userEmail: string;
   }>({
     isOpen: false,
-    userId: "",
-    type: "premium",
-    userEmail: "",
+    userId: '',
+    type: 'premium',
+    userEmail: '',
   });
   const [cancelDialog, setCancelDialog] = useState<{
     isOpen: boolean;
     userId: string;
-    type: "premium" | "business";
+    type: 'premium' | 'business';
     userEmail: string;
   }>({
     isOpen: false,
-    userId: "",
-    type: "premium",
-    userEmail: "",
+    userId: '',
+    type: 'premium',
+    userEmail: '',
   });
-  const [rejectReason, setRejectReason] = useState("");
-  const [cancelReason, setCancelReason] = useState("");
+  const [rejectReason, setRejectReason] = useState('');
+  const [cancelReason, setCancelReason] = useState('');
 
   useEffect(() => {
     fetchRequests();
@@ -643,16 +609,9 @@ export default function AccountRequestsClient() {
     try {
       setLoading(true);
       const timestamp = new Date().getTime();
-      const response = await fetch(
-        `/api/admin/account-requests?t=${timestamp}`,
-        {
-          method: "GET",
-          headers: {
-            "Cache-Control": "no-cache",
-            Pragma: "no-cache",
-          },
-        }
-      );
+      const response = await fetchService(`/admin/account-requests?t=${timestamp}`, {
+        method: 'GET',
+      });
       if (response.ok) {
         const data = await response.json();
         setPremiumRequests(data.premiumRequests || []);
@@ -662,22 +621,18 @@ export default function AccountRequestsClient() {
         setAllUsers(data.allUsers || []);
       }
     } catch (error) {
-      console.error("Error fetching requests:", error);
-      toast.error("Failed to fetch account requests");
+      console.error('Error fetching requests:', error);
+      toast.error('Failed to fetch account requests');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleApprove = async (
-    userId: string,
-    type: "premium" | "business"
-  ) => {
+  const handleApprove = async (userId: string, type: 'premium' | 'business') => {
     try {
       setActionLoading(userId);
-      const response = await fetch("/api/admin/approve-account", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetchService('/admin/approve-account', {
+        method: 'POST',
         body: JSON.stringify({ userId, type }),
       });
 
@@ -686,17 +641,17 @@ export default function AccountRequestsClient() {
         toast.success(data.message);
         setTimeout(async () => {
           setRefreshing(true);
-          toast.info("Updating account lists...", { duration: 1000 });
+          toast.info('Updating account lists...', { duration: 1000 });
           await fetchRequests();
           setRefreshing(false);
         }, 500);
       } else {
         const error = await response.json();
-        toast.error(error.message || "Failed to approve account");
+        toast.error(error.message || 'Failed to approve account');
       }
     } catch (error) {
-      console.error("Error approving account:", error);
-      toast.error("Failed to approve account");
+      console.error('Error approving account:', error);
+      toast.error('Failed to approve account');
     } finally {
       setActionLoading(null);
     }
@@ -704,15 +659,14 @@ export default function AccountRequestsClient() {
 
   const handleReject = async () => {
     if (!rejectReason.trim()) {
-      toast.error("Please provide a reason for rejection");
+      toast.error('Please provide a reason for rejection');
       return;
     }
 
     try {
       setActionLoading(rejectDialog.userId);
-      const response = await fetch("/api/admin/reject-account", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetchService('/admin/reject-account', {
+        method: 'POST',
         body: JSON.stringify({
           userId: rejectDialog.userId,
           type: rejectDialog.type,
@@ -725,24 +679,24 @@ export default function AccountRequestsClient() {
         toast.success(data.message);
         setRejectDialog({
           isOpen: false,
-          userId: "",
-          type: "premium",
-          userEmail: "",
+          userId: '',
+          type: 'premium',
+          userEmail: '',
         });
-        setRejectReason("");
+        setRejectReason('');
         setTimeout(async () => {
           setRefreshing(true);
-          toast.info("Updating account lists...", { duration: 1000 });
+          toast.info('Updating account lists...', { duration: 1000 });
           await fetchRequests();
           setRefreshing(false);
         }, 500);
       } else {
         const error = await response.json();
-        toast.error(error.message || "Failed to reject account");
+        toast.error(error.message || 'Failed to reject account');
       }
     } catch (error) {
-      console.error("Error rejecting account:", error);
-      toast.error("Failed to reject account");
+      console.error('Error rejecting account:', error);
+      toast.error('Failed to reject account');
     } finally {
       setActionLoading(null);
     }
@@ -750,15 +704,14 @@ export default function AccountRequestsClient() {
 
   const handleCancel = async () => {
     if (!cancelReason.trim()) {
-      toast.error("Please provide a reason for cancellation");
+      toast.error('Please provide a reason for cancellation');
       return;
     }
 
     try {
       setActionLoading(cancelDialog.userId);
-      const response = await fetch("/api/admin/cancel-account", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetchService('/admin/cancel-account', {
+        method: 'POST',
         body: JSON.stringify({
           accountId: cancelDialog.userId,
           type: cancelDialog.type,
@@ -771,54 +724,48 @@ export default function AccountRequestsClient() {
         toast.success(data.message);
         setCancelDialog({
           isOpen: false,
-          userId: "",
-          type: "premium",
-          userEmail: "",
+          userId: '',
+          type: 'premium',
+          userEmail: '',
         });
-        setCancelReason("");
+        setCancelReason('');
         setTimeout(async () => {
           setRefreshing(true);
-          toast.info("Updating account lists...", { duration: 1000 });
+          toast.info('Updating account lists...', { duration: 1000 });
           await fetchRequests();
           setRefreshing(false);
         }, 500);
       } else {
         const error = await response.json();
-        toast.error(error.message || "Failed to cancel account");
+        toast.error(error.message || 'Failed to cancel account');
       }
     } catch (error) {
-      console.error("Error cancelling account:", error);
-      toast.error("Failed to cancel account");
+      console.error('Error cancelling account:', error);
+      toast.error('Failed to cancel account');
     } finally {
       setActionLoading(null);
     }
   };
 
-  const getStatusBadge = (status: string, type: "premium" | "business") => {
+  const getStatusBadge = (status: string, type: 'premium' | 'business') => {
     switch (status) {
-      case "pending":
+      case 'pending':
         return (
-          <Badge
-            variant="secondary"
-            className="bg-amber-100 text-amber-800 border-amber-200"
-          >
+          <Badge variant="secondary" className="bg-amber-100 text-amber-800 border-amber-200">
             <Clock className="w-3 h-3 mr-1" />
             Pending
           </Badge>
         );
-      case "active":
+      case 'active':
         return (
           <Badge className="bg-green-100 text-green-800 border-green-200">
             <CheckCircle className="w-3 h-3 mr-1" />
             Active
           </Badge>
         );
-      case "rejected":
+      case 'rejected':
         return (
-          <Badge
-            variant="destructive"
-            className="bg-red-100 text-red-800 border-red-200"
-          >
+          <Badge variant="destructive" className="bg-red-100 text-red-800 border-red-200">
             <XCircle className="w-3 h-3 mr-1" />
             Rejected
           </Badge>
@@ -878,24 +825,14 @@ export default function AccountRequestsClient() {
   }
 
   const stats = {
-    totalPremiumRequests: allUsers.filter((u) => u.premiumStatus !== "none")
-      .length,
-    totalBusinessRequests: allUsers.filter((u) => u.businessStatus !== "none")
-      .length,
+    totalPremiumRequests: allUsers.filter((u) => u.premiumStatus !== 'none').length,
+    totalBusinessRequests: allUsers.filter((u) => u.businessStatus !== 'none').length,
     pendingPremiumRequests: premiumRequests.length,
     pendingBusinessRequests: businessRequests.length,
-    approvedPremiumRequests: allUsers.filter(
-      (u) => u.premiumStatus === "active"
-    ).length,
-    approvedBusinessRequests: allUsers.filter(
-      (u) => u.businessStatus === "active"
-    ).length,
-    rejectedPremiumRequests: allUsers.filter(
-      (u) => u.premiumStatus === "rejected"
-    ).length,
-    rejectedBusinessRequests: allUsers.filter(
-      (u) => u.businessStatus === "rejected"
-    ).length,
+    approvedPremiumRequests: allUsers.filter((u) => u.premiumStatus === 'active').length,
+    approvedBusinessRequests: allUsers.filter((u) => u.businessStatus === 'active').length,
+    rejectedPremiumRequests: allUsers.filter((u) => u.premiumStatus === 'rejected').length,
+    rejectedBusinessRequests: allUsers.filter((u) => u.businessStatus === 'rejected').length,
   };
 
   return (
@@ -903,21 +840,11 @@ export default function AccountRequestsClient() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Account Requests</h1>
-          <p className="text-gray-600 mt-1">
-            Manage premium and business account applications
-          </p>
+          <p className="text-gray-600 mt-1">Manage premium and business account applications</p>
         </div>
-        <Button
-          onClick={fetchRequests}
-          variant="outline"
-          disabled={loading || refreshing}
-        >
-          <RefreshCw
-            className={`w-4 h-4 mr-2 ${
-              loading || refreshing ? "animate-spin" : ""
-            }`}
-          />
-          {refreshing ? "Updating..." : "Refresh"}
+        <Button onClick={fetchRequests} variant="outline" disabled={loading || refreshing}>
+          <RefreshCw className={`w-4 h-4 mr-2 ${loading || refreshing ? 'animate-spin' : ''}`} />
+          {refreshing ? 'Updating...' : 'Refresh'}
         </Button>
       </div>
 
@@ -935,8 +862,7 @@ export default function AccountRequestsClient() {
           </TabsTrigger>
           <TabsTrigger value="approved" className="flex items-center gap-2">
             <CheckCircle className="w-4 h-4" />
-            Approved Accounts (
-            {approvedPremiumAccounts.length + approvedBusinessAccounts.length})
+            Approved Accounts ({approvedPremiumAccounts.length + approvedBusinessAccounts.length})
           </TabsTrigger>
         </TabsList>
 
@@ -978,24 +904,23 @@ export default function AccountRequestsClient() {
           if (!open) {
             setRejectDialog({
               isOpen: false,
-              userId: "",
-              type: "premium",
-              userEmail: "",
+              userId: '',
+              type: 'premium',
+              userEmail: '',
             });
-            setRejectReason("");
+            setRejectReason('');
           }
         }}
       >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              Reject {rejectDialog.type === "premium" ? "Premium" : "Business"}{" "}
-              Application
+              Reject {rejectDialog.type === 'premium' ? 'Premium' : 'Business'} Application
             </DialogTitle>
             <DialogDescription>
               Please provide a reason for rejecting {rejectDialog.userEmail}
-              &apos;s {rejectDialog.type} account application. This reason will
-              be visible to the user.
+              &apos;s {rejectDialog.type} account application. This reason will be visible to the
+              user.
             </DialogDescription>
           </DialogHeader>
 
@@ -1014,11 +939,11 @@ export default function AccountRequestsClient() {
               onClick={() => {
                 setRejectDialog({
                   isOpen: false,
-                  userId: "",
-                  type: "premium",
-                  userEmail: "",
+                  userId: '',
+                  type: 'premium',
+                  userEmail: '',
                 });
-                setRejectReason("");
+                setRejectReason('');
               }}
             >
               Cancel
@@ -1026,13 +951,9 @@ export default function AccountRequestsClient() {
             <Button
               variant="destructive"
               onClick={handleReject}
-              disabled={
-                !rejectReason.trim() || actionLoading === rejectDialog.userId
-              }
+              disabled={!rejectReason.trim() || actionLoading === rejectDialog.userId}
             >
-              {actionLoading === rejectDialog.userId
-                ? "Rejecting..."
-                : "Reject Application"}
+              {actionLoading === rejectDialog.userId ? 'Rejecting...' : 'Reject Application'}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -1045,11 +966,11 @@ export default function AccountRequestsClient() {
           if (!open) {
             setCancelDialog({
               isOpen: false,
-              userId: "",
-              type: "premium",
-              userEmail: "",
+              userId: '',
+              type: 'premium',
+              userEmail: '',
             });
-            setCancelReason("");
+            setCancelReason('');
           }
         }}
       >
@@ -1057,14 +978,12 @@ export default function AccountRequestsClient() {
           <DialogOverlay />
           <DialogPrimitive.Content
             className={cn(
-              "fixed left-[50%] top-[50%] z-50 grid w-full max-w-md translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-300 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 sm:rounded-lg"
+              'fixed left-[50%] top-[50%] z-50 grid w-full max-w-md translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-300 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 sm:rounded-lg',
             )}
           >
             <VisuallyHidden.Root>
               <DialogTitle>
-                Cancel{" "}
-                {cancelDialog.type === "premium" ? "Premium" : "Business"}{" "}
-                Account
+                Cancel {cancelDialog.type === 'premium' ? 'Premium' : 'Business'} Account
               </DialogTitle>
             </VisuallyHidden.Root>
             <div className="text-center space-y-4">
@@ -1073,15 +992,12 @@ export default function AccountRequestsClient() {
               </div>
               <div className="space-y-2">
                 <h3 className="text-xl font-bold text-gray-900">
-                  Cancel{" "}
-                  {cancelDialog.type === "premium" ? "Premium" : "Business"}{" "}
-                  Account
+                  Cancel {cancelDialog.type === 'premium' ? 'Premium' : 'Business'} Account
                 </h3>
                 <p className="text-sm text-gray-600">
-                  Please provide a reason for cancelling{" "}
-                  {cancelDialog.userEmail}&apos;s {cancelDialog.type} account.
-                  This action will deactivate their account and they will lose
-                  access to {cancelDialog.type} features.
+                  Please provide a reason for cancelling {cancelDialog.userEmail}&apos;s{' '}
+                  {cancelDialog.type} account. This action will deactivate their account and they
+                  will lose access to {cancelDialog.type} features.
                 </p>
               </div>
             </div>
@@ -1102,11 +1018,11 @@ export default function AccountRequestsClient() {
                 onClick={() => {
                   setCancelDialog({
                     isOpen: false,
-                    userId: "",
-                    type: "premium",
-                    userEmail: "",
+                    userId: '',
+                    type: 'premium',
+                    userEmail: '',
                   });
-                  setCancelReason("");
+                  setCancelReason('');
                 }}
                 className="min-w-[80px]"
               >
@@ -1115,9 +1031,7 @@ export default function AccountRequestsClient() {
               <Button
                 variant="destructive"
                 onClick={handleCancel}
-                disabled={
-                  !cancelReason.trim() || actionLoading === cancelDialog.userId
-                }
+                disabled={!cancelReason.trim() || actionLoading === cancelDialog.userId}
                 className="min-w-[120px] bg-red-600 hover:bg-red-700"
               >
                 {actionLoading === cancelDialog.userId ? (

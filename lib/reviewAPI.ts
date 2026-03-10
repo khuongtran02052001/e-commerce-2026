@@ -1,4 +1,5 @@
 // Client-side API service for reviews
+import { fetchService } from '@/lib/restClient';
 
 export interface SubmitReviewData {
   productId: string;
@@ -16,7 +17,7 @@ export interface ReviewResponse {
 
 export interface ProductReviewsData {
   reviews: Array<{
-    _id: string;
+    id: string;
     rating: number;
     title: string;
     content: string;
@@ -24,7 +25,7 @@ export interface ProductReviewsData {
     isVerifiedPurchase: boolean;
     createdAt: string;
     user: {
-      _id: string;
+      id: string;
       firstName: string;
       lastName: string;
       profileImage?: {
@@ -46,15 +47,10 @@ export interface ProductReviewsData {
 }
 
 // Submit a new review
-export async function submitReviewAPI(
-  data: SubmitReviewData
-): Promise<ReviewResponse> {
+export async function submitReviewAPI(data: SubmitReviewData): Promise<ReviewResponse> {
   try {
-    const response = await fetch("/api/user/reviews", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+    const response = await fetchService('/reviews', {
+      method: 'POST',
       body: JSON.stringify(data),
     });
 
@@ -63,75 +59,60 @@ export async function submitReviewAPI(
     if (!response.ok) {
       return {
         success: false,
-        message: result.error || "Failed to submit review",
+        message: result.error || 'Failed to submit review',
       };
     }
 
     return result;
   } catch (error) {
-    console.error("Error submitting review:", error);
+    console.error('Error submitting review:', error);
     return {
       success: false,
-      message: "Failed to submit review. Please try again.",
-      error: error instanceof Error ? error.message : "Unknown error",
+      message: 'Failed to submit review. Please try again.',
+      error: error instanceof Error ? error.message : 'Unknown error',
     };
   }
 }
 
 // Get reviews for a product
-export async function getProductReviewsAPI(
-  productId: string
-): Promise<ProductReviewsData | null> {
+export async function getProductReviewsAPI(productId: string): Promise<ProductReviewsData | null> {
   try {
-    const response = await fetch(`/api/user/reviews?productId=${productId}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await fetchService(`/reviews?productId=${productId}`);
 
     if (!response.ok) {
-      console.error("Failed to fetch reviews");
+      console.error('Failed to fetch reviews');
       return null;
     }
 
-    const data = await response.json();
+    const { data } = await response.json();
     return data;
   } catch (error) {
-    console.error("Error fetching product reviews:", error);
+    console.error('Error fetching product reviews:', error);
     return null;
   }
 }
 
 // Mark a review as helpful
-export async function markReviewHelpfulAPI(
-  reviewId: string
-): Promise<ReviewResponse> {
+export async function markReviewHelpfulAPI(reviewId: string): Promise<ReviewResponse> {
   try {
-    const response = await fetch("/api/user/reviews", {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ reviewId }),
-    });
+    const response = await fetchService(`/reviews/${reviewId}/helpful`, { method: 'PATCH' });
 
     const result = await response.json();
 
     if (!response.ok) {
       return {
         success: false,
-        message: result.error || "Failed to update review",
+        message: result.error || 'Failed to update review',
       };
     }
 
     return result;
   } catch (error) {
-    console.error("Error marking review as helpful:", error);
+    console.error('Error marking review as helpful:', error);
     return {
       success: false,
-      message: "Failed to update review",
-      error: error instanceof Error ? error.message : "Unknown error",
+      message: 'Failed to update review',
+      error: error instanceof Error ? error.message : 'Unknown error',
     };
   }
 }

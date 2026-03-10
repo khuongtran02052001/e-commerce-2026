@@ -1,36 +1,39 @@
-import { auth, currentUser } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
-import { sanityFetch } from "@/sanity/lib/live";
-import { USER_BY_CLERK_ID_QUERY } from "@/sanity/queries/userQueries";
-import ProfileClient from "@/components/profile/ProfileClient";
+import ProfileClient from '@/components/profile/ProfileClient';
+import { auth } from '@/lib/auth';
+import { fetchServiceJsonServer } from '@/lib/restClient';
+import { redirect } from 'next/navigation';
 
-interface SanityUser {
-  _id: string;
-  clerkUserId: string;
-  email: string;
-  firstName?: string;
-  lastName?: string;
+interface Address {
+  id: string;
+  name: string;
+  address: string;
+  city: string;
+  state: string;
+  zip: string;
+  country: string;
+  default: boolean;
+  type: 'home' | 'office' | 'other';
+  createdAt?: string;
+  phone?: string;
+  subArea?: string;
+  countryCode?: string;
+  stateCode?: string;
+}
+
+interface UserProfile {
+  id: string;
+  email?: string;
+  firstName?: string | null;
+  lastName?: string | null;
   phone?: string;
   dateOfBirth?: string;
   profileImage?: {
-    asset: {
-      _id: string;
+    url?: string;
+    asset?: {
       url: string;
     };
   };
-  addresses?: Array<{
-    _id: string;
-    name: string;
-    address: string;
-    city: string;
-    state: string;
-    zip: string;
-    country: string;
-    default: boolean;
-    type: "home" | "office" | "other";
-    createdAt: string;
-    phone?: string;
-  }>;
+  addresses?: Address[];
   preferences?: Record<string, unknown>;
   loyaltyPoints?: number;
   rewardPoints?: number;
@@ -42,52 +45,53 @@ interface SanityUser {
 }
 
 export default async function ProfilePage() {
-  const { userId } = await auth();
+  const session = await auth();
+  const accessToken = session?.accessToken;
+  const sessionUser = session?.user;
 
-  if (!userId) {
-    redirect("/sign-in");
+  if (!sessionUser) {
+    redirect('/sign-in');
   }
 
-  const clerkUser = await currentUser();
+  let user: UserProfile | null = null;
 
-  if (!clerkUser) {
-    redirect("/sign-in");
+  if (accessToken) {
+    try {
+      const authMe = await fetchServiceJsonServer<{ data?: UserProfile; user?: UserProfile }>(
+        '/auth/me',
+        { accessToken },
+      );
+      user = authMe?.data || authMe?.user || null;
+    } catch (error) {
+      console.error('Error fetching auth user:', error);
+    }
   }
 
-  // Fetch user data from Sanity
-  let sanityUser: SanityUser | null = null;
-  try {
-    const { data } = await sanityFetch({
-      query: USER_BY_CLERK_ID_QUERY,
-      params: { clerkUserId: userId },
-    });
-    sanityUser = data;
-  } catch (error) {
-    console.error("Error fetching user from Sanity:", error);
+  if (!user) {
+    user = {
+      id: sessionUser.id,
+      email: sessionUser.email ?? undefined,
+      firstName: sessionUser.name?.split(' ')[0] ?? undefined,
+      lastName: sessionUser.name?.split(' ').slice(1).join(' ') || undefined,
+      profileImage: sessionUser.image
+        ? {
+            url: sessionUser.image,
+          }
+        : undefined,
+    };
   }
 
-  // Combine Clerk and Sanity data - serialize Clerk objects to plain data
-  const userData = {
-    clerk: {
-      id: clerkUser.id,
-      firstName: clerkUser.firstName,
-      lastName: clerkUser.lastName,
-      emailAddresses: clerkUser.emailAddresses.map((email) => ({
-        id: email.id,
-        emailAddress: email.emailAddress,
-        verification: email.verification
-          ? {
-              status: email.verification.status,
-              strategy: email.verification.strategy,
-            }
-          : null,
-      })),
-      imageUrl: clerkUser.imageUrl,
-      createdAt: new Date(clerkUser.createdAt),
-      updatedAt: new Date(clerkUser.updatedAt),
-    },
-    sanity: sanityUser,
+  const normalizedUser: UserProfile = {
+    ...user,
+    id: user.id || user.id,
+    profileImage:
+      user.profileImage ||
+      (session?.user?.image
+        ? {
+            url: session.user.image,
+          }
+        : undefined),
   };
 
-  return <ProfileClient userData={userData} />;
+  return <ProfileClient user={normalizedUser} />;
 }

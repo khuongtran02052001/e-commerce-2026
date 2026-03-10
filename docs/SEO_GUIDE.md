@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document outlines the comprehensive SEO implementation for ShopCart e-commerce platform at **https://shopcartpro.reactbd.org**. The implementation follows modern SEO best practices and is optimized for Next.js 16.
+This document outlines the comprehensive SEO implementation for ShopCart e-commerce platform at **https://e-commerce-2026-three.vercel.app/**. The implementation follows modern SEO best practices and is optimized for Next.js 16.
 
 ## Table of Contents
 
@@ -55,7 +55,7 @@ This document outlines the comprehensive SEO implementation for ShopCart e-comme
 
 **Implementation:**
 
-- metadataBase: `https://shopcartpro.reactbd.org`
+- metadataBase: `https://e-commerce-2026-three.vercel.app`
 - Title template: `%s | ShopCart - Premium Online Shopping`
 - Default title & description
 - Open Graph configuration
@@ -67,10 +67,10 @@ This document outlines the comprehensive SEO implementation for ShopCart e-comme
 
 ```typescript
 export const metadata: Metadata = {
-  metadataBase: new URL("https://shopcartpro.reactbd.org"),
+  metadataBase: new URL('https://e-commerce-2026-three.vercel.app'),
   title: {
-    template: "%s | ShopCart - Premium Online Shopping",
-    default: "ShopCart - Your Trusted Online Shopping Destination",
+    template: '%s | ShopCart - Premium Online Shopping',
+    default: 'ShopCart - Your Trusted Online Shopping Destination',
   },
   // ... rest of configuration
 };
@@ -114,7 +114,7 @@ export const metadata: Metadata = {
   "@context": "https://schema.org",
   "@type": "Organization",
   "name": "ShopCart",
-  "url": "https://shopcartpro.reactbd.org",
+  "url": "https://e-commerce-2026-three.vercel.app",
   // ...
 }
 </script>
@@ -141,7 +141,7 @@ export const metadata: Metadata = {
 2. **Breadcrumb Schema** - Navigation path:
    - Home → Shop → Product Name
 
-**Example URL:** `https://shopcartpro.reactbd.org/product/iphone-15-pro`
+**Example URL:** `https://e-commerce-2026-three.vercel.app/product/iphone-15-pro`
 
 ### Category Pages
 
@@ -160,7 +160,7 @@ export const metadata: Metadata = {
    - Home → Categories → Category Name
 2. **ItemList Schema** - All products in category
 
-**Example URL:** `https://shopcartpro.reactbd.org/category/electronics`
+**Example URL:** `https://e-commerce-2026-three.vercel.app/category/electronics`
 
 ---
 
@@ -195,7 +195,7 @@ Structured data helps search engines understand your content better, enabling:
   },
   "offers": {
     "@type": "Offer",
-    "url": "https://shopcartpro.reactbd.org/product/iphone-15-pro",
+    "url": "https://e-commerce-2026-three.vercel.app/product/iphone-15-pro",
     "priceCurrency": "USD",
     "price": 999,
     "availability": "https://schema.org/InStock",
@@ -220,13 +220,13 @@ Structured data helps search engines understand your content better, enabling:
       "@type": "ListItem",
       "position": 1,
       "name": "Home",
-      "item": "https://shopcartpro.reactbd.org"
+      "item": "https://e-commerce-2026-three.vercel.app"
     },
     {
       "@type": "ListItem",
       "position": 2,
       "name": "Shop",
-      "item": "https://shopcartpro.reactbd.org/shop"
+      "item": "https://e-commerce-2026-three.vercel.app/shop"
     }
   ]
 }
@@ -239,8 +239,8 @@ Structured data helps search engines understand your content better, enabling:
   "@context": "https://schema.org",
   "@type": "Organization",
   "name": "ShopCart",
-  "url": "https://shopcartpro.reactbd.org",
-  "logo": "https://shopcartpro.reactbd.org/logo.png",
+  "url": "https://e-commerce-2026-three.vercel.app",
+  "logo": "https://e-commerce-2026-three.vercel.app/logo.png",
   "contactPoint": {
     "@type": "ContactPoint",
     "telephone": "+1-555-123-4567",
@@ -257,12 +257,12 @@ Structured data helps search engines understand your content better, enabling:
   "@context": "https://schema.org",
   "@type": "WebSite",
   "name": "ShopCart",
-  "url": "https://shopcartpro.reactbd.org",
+  "url": "https://e-commerce-2026-three.vercel.app",
   "potentialAction": {
     "@type": "SearchAction",
     "target": {
       "@type": "EntryPoint",
-      "urlTemplate": "https://shopcartpro.reactbd.org/shop?search={search_term_string}"
+      "urlTemplate": "https://e-commerce-2026-three.vercel.app/shop?search={search_term_string}"
     },
     "query-input": "required name=search_term_string"
   }
@@ -291,7 +291,7 @@ Structured data helps search engines understand your content better, enabling:
 3. All category pages
 4. All brand pages
 
-**URL:** `https://shopcartpro.reactbd.org/sitemap.xml`
+**URL:** `https://e-commerce-2026-three.vercel.app/sitemap.xml`
 
 **Priorities:**
 
@@ -321,10 +321,10 @@ Disallow: /studio/
 Disallow: /_next/
 Disallow: /checkout/
 
-Sitemap: https://shopcartpro.reactbd.org/sitemap.xml
+Sitemap: https://e-commerce-2026-three.vercel.app/sitemap.xml
 ```
 
-**URL:** `https://shopcartpro.reactbd.org/robots.txt`
+**URL:** `https://e-commerce-2026-three.vercel.app/robots.txt`
 
 ---
 
@@ -435,33 +435,28 @@ Sitemap: https://shopcartpro.reactbd.org/sitemap.xml
 ### Tools
 
 1. **Google Search Console**
-
    - Submit sitemap
    - Monitor indexing status
    - Check for errors
    - View search analytics
 
 2. **Google Rich Results Test**
-
    - URL: https://search.google.com/test/rich-results
    - Test product pages
    - Validate structured data
    - Check for errors/warnings
 
 3. **Schema.org Validator**
-
    - URL: https://validator.schema.org/
    - Validate all schemas
    - Check syntax errors
 
 4. **Facebook Sharing Debugger**
-
    - URL: https://developers.facebook.com/tools/debug/
    - Test Open Graph tags
    - Clear cache when needed
 
 5. **Twitter Card Validator**
-
    - URL: https://cards-dev.twitter.com/validator
    - Test Twitter Cards
    - Preview appearance
@@ -535,7 +530,6 @@ When adding new page types:
 When adding/editing products in Sanity CMS:
 
 1. **Fill all SEO fields**:
-
    - Product name (concise, keyword-rich)
    - Description (detailed, unique)
    - Images (high-quality, descriptive filenames)
@@ -578,7 +572,7 @@ Update these in `.env`:
 
 ```env
 # Base URL for SEO
-NEXT_PUBLIC_BASE_URL=https://shopcartpro.reactbd.org
+NEXT_PUBLIC_BASE_URL=https://e-commerce-2026-three.vercel.app
 
 # Google Search Console verification
 GOOGLE_SITE_VERIFICATION=your-verification-code

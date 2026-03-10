@@ -7,23 +7,25 @@
 /* @custom-variant dark (&:is(.dark *)); */
 
 @theme {
-  --color-shop_light_pink: #fcf0e4;
-  --color-shop_dark_green: #063c28;
-  --color-shop_btn_dark_green: #063d29;
-  --color-shop_light_bg: #f6f6f6;
-  --color-shop_light_green: #3b9c3c;
-  --color-shop_orange: #fb6c08;
-  --color-dark-color: #151515;
-  --color-light-color: #52525b;
-  --color-light-orange: #fca99b;
-  --color-light-blue: #7688db;
-  --color-dark-blue: #6c7fd8;
-  --color-dark-text: #686e7d;
-  --color-light-bg: #f8f8fb;
+  --color-shop_light_pink: #f8edf3;
+  --color-shop_dark_green: #711c47;
+  --color-shop_btn_dark_green: #5f183d;
+  --color-shop_light_bg: #f9f4f8;
+  --color-shop_light_green: #9b3864;
+  --color-shop_orange: #d16f9a;
+  --color-dark-color: #262d37;
+  --color-light-color: #433f41;
+  --color-light-orange: #f4dbe8;
+  --color-light-blue: #b6a8d8;
+  --color-dark-blue: #7f6eab;
+  --color-dark-text: #6a6a6a;
+  --color-light-bg: #fdf9fc;
   --color-dark-red: #f02757;
-  --color-light-text: #ababab;
-  --color-light-green: #93d991;
-  --color-product-bg: #f1f3f8;
+  --color-light-text: #9a8ea0;
+  --color-light-green: #e9c7d9;
+  --color-product-bg: #f7f1f6;
+  --color-shop_light_blue: #d8cde9;
+  --color-shop_dark_blue: #6b5b8f;
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
 
@@ -156,30 +158,30 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
+    --background: 325 38% 97%;
+    --foreground: 218 17% 19%;
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
+    --card-foreground: 218 17% 19%;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
+    --popover-foreground: 218 17% 19%;
+    --primary: 325 60% 28%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 320 43% 93%;
+    --secondary-foreground: 325 38% 24%;
+    --muted: 320 28% 94%;
+    --muted-foreground: 229 4% 42%;
+    --accent: 327 54% 52%;
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+    --border: 319 24% 87%;
+    --input: 319 24% 87%;
+    --ring: 325 60% 28%;
+    --chart-1: 325 60% 28%;
+    --chart-2: 329 46% 41%;
+    --chart-3: 326 51% 63%;
+    --chart-4: 218 17% 19%;
+    --chart-5: 229 4% 42%;
     --radius: 0.5rem;
   }
   .dark {
@@ -225,7 +227,7 @@
     @apply bg-background text-foreground;
   }
   .hoverEffect {
-    @apply duration-300 ease-in-out transition-all cursor-pointer;
+    @apply duration-200 ease-out transition-colors cursor-pointer;
   }
   button {
     @apply cursor-pointer;
@@ -429,28 +431,28 @@
 }
 
 /* Authentication Pages Styling */
-.clerk-sign-in,
-.clerk-sign-up {
+.nextauth-sign-in,
+.nextauth-sign-up {
   width: 100%;
 }
 
 /* Minimal responsive adjustments */
 @media (max-width: 640px) {
-  .clerk-sign-in,
-  .clerk-sign-up {
+  .nextauth-sign-in,
+  .nextauth-sign-up {
     padding: 1rem 0.5rem !important;
   }
 }
 
 :root {
-  --sidebar: hsl(0 0% 98%);
-  --sidebar-foreground: hsl(240 5.3% 26.1%);
-  --sidebar-primary: hsl(240 5.9% 10%);
-  --sidebar-primary-foreground: hsl(0 0% 98%);
-  --sidebar-accent: hsl(240 4.8% 95.9%);
-  --sidebar-accent-foreground: hsl(240 5.9% 10%);
-  --sidebar-border: hsl(220 13% 91%);
-  --sidebar-ring: hsl(217.2 91.2% 59.8%);
+  --sidebar: hsl(325 38% 97%);
+  --sidebar-foreground: hsl(218 17% 19%);
+  --sidebar-primary: hsl(325 60% 28%);
+  --sidebar-primary-foreground: hsl(0 0% 100%);
+  --sidebar-accent: hsl(320 43% 93%);
+  --sidebar-accent-foreground: hsl(325 38% 24%);
+  --sidebar-border: hsl(319 24% 87%);
+  --sidebar-ring: hsl(325 60% 28%);
 }
 
 .dark {
@@ -491,19 +493,19 @@
 }
 
 [data-sonner-toaster][data-theme="light"] {
-  --sonner-loading-bar: #3b9c3c;
-  --sonner-success: #3b9c3c;
-  --sonner-success-bg: #f0f9f0;
-  --sonner-success-border: #93d991;
+  --sonner-loading-bar: #9b3864;
+  --sonner-success: #9b3864;
+  --sonner-success-bg: #faeef5;
+  --sonner-success-border: #e9c7d9;
   --sonner-error: #f02757;
   --sonner-error-bg: #fef2f2;
   --sonner-error-border: #fca5a5;
-  --sonner-warning: #fb6c08;
-  --sonner-warning-bg: #fff7ed;
-  --sonner-warning-border: #fca99b;
-  --sonner-info: #7688db;
-  --sonner-info-bg: #f0f4ff;
-  --sonner-info-border: #a5b4fc;
+  --sonner-warning: #d16f9a;
+  --sonner-warning-bg: #fff2f8;
+  --sonner-warning-border: #f2c1d9;
+  --sonner-info: #7f6eab;
+  --sonner-info-bg: #f4f1fb;
+  --sonner-info-border: #d8cde9;
 }
 
 [data-sonner-toast][data-type="success"] {
@@ -596,13 +598,15 @@
 
 /* Grid-based Accordion Animation */
 .admin-accordion-grid {
-  transition: grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+  transition:
+    grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1),
     opacity 0.3s ease-in-out;
 }
 
 /* Legacy accordion support (can be removed if not used) */
 .admin-accordion-content {
-  transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+  transition:
+    max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
     opacity 0.3s ease-in-out;
 }
 
@@ -625,12 +629,12 @@
 /* Hover Effects */
 .admin-nav-item:hover {
   transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 4px 12px rgba(59, 156, 60, 0.15);
+  box-shadow: 0 8px 20px rgba(113, 28, 71, 0.16);
 }
 
 .admin-nav-item.active {
   transform: translateY(-1px) scale(1.02);
-  box-shadow: 0 6px 16px rgba(59, 156, 60, 0.2);
+  box-shadow: 0 10px 24px rgba(113, 28, 71, 0.22);
 } /* Responsive Table Styles */
 .responsive-table-container {
   @apply overflow-x-auto;
@@ -703,7 +707,8 @@
 
 /* Enhanced easing for smooth mobile menu animation */
 .mobile-menu-container {
-  transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+  transition:
+    max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
     opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
     margin-top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }

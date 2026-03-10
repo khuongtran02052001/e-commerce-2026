@@ -1,41 +1,37 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Card } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
+import { EmployeeRole, getRoleDisplayName } from '@/types/domain/employee';
 import {
   Briefcase,
-  RefreshCw,
-  UserCheck,
-  Phone,
-  Package,
-  Truck,
-  ShieldCheck,
   Calculator,
   CheckCircle2,
-} from "lucide-react";
-import {
-  EmployeeRole,
-  getRoleDisplayName,
-  getRoleBadgeColor,
-} from "@/types/employee";
+  Package,
+  Phone,
+  RefreshCw,
+  ShieldCheck,
+  Truck,
+  UserCheck,
+} from 'lucide-react';
+import React, { useState } from 'react';
 
 interface CombinedUser {
   id: string;
@@ -84,30 +80,23 @@ const ROLE_ICONS = {
 };
 
 const ROLE_PERMISSIONS = {
-  callcenter: ["Confirm customer address", "Confirm orders", "View orders"],
-  packer: ["View confirmed orders", "Mark orders as packed"],
-  warehouse: [
-    "View packed orders",
-    "Assign orders to deliverymen",
-    "Manage warehouse",
-  ],
-  deliveryman: [
-    "View assigned deliveries",
-    "Mark orders as delivered",
-    "Collect cash payments",
-  ],
-  incharge: ["Monitor all orders", "Assign deliverymen", "View analytics"],
-  accounts: [
-    "Receive payments from deliverymen",
-    "View financial analytics",
-    "Monitor all orders",
-  ],
+  callcenter: ['Confirm customer address', 'Confirm orders', 'View orders'],
+  packer: ['View confirmed orders', 'Mark orders as packed'],
+  warehouse: ['View packed orders', 'Assign orders to deliverymen', 'Manage warehouse'],
+  deliveryman: ['View assigned deliveries', 'Mark orders as delivered', 'Collect cash payments'],
+  incharge: ['Monitor all orders', 'Assign deliverymen', 'View analytics'],
+  accounts: ['Receive payments from deliverymen', 'View financial analytics', 'Monitor all orders'],
 };
 
-export const EmployeeAssignmentSidebar: React.FC<
-  EmployeeAssignmentSidebarProps
-> = ({ isOpen, onClose, user, onAssignRole, onRemoveRole, isLoading }) => {
-  const [selectedRole, setSelectedRole] = useState<EmployeeRole>("callcenter");
+export const EmployeeAssignmentSidebar: React.FC<EmployeeAssignmentSidebarProps> = ({
+  isOpen,
+  onClose,
+  user,
+  onAssignRole,
+  onRemoveRole,
+  isLoading,
+}) => {
+  const [selectedRole, setSelectedRole] = useState<EmployeeRole>('callcenter');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [showConfirmRemove, setShowConfirmRemove] = useState(false);
 
@@ -116,7 +105,7 @@ export const EmployeeAssignmentSidebar: React.FC<
     if (user?.isEmployee && user.employeeRole) {
       setSelectedRole(user.employeeRole as EmployeeRole);
     } else {
-      setSelectedRole("callcenter");
+      setSelectedRole('callcenter');
     }
     // Reset confirmation dialog when user changes
     setShowConfirmRemove(false);
@@ -129,11 +118,11 @@ export const EmployeeAssignmentSidebar: React.FC<
       return;
     }
 
-    setActionLoading("assign");
+    setActionLoading('assign');
     try {
       await onAssignRole(user.sanityId, selectedRole);
     } catch (error) {
-      console.error("Error assigning role:", error);
+      console.error('Error assigning role:', error);
     } finally {
       setActionLoading(null);
     }
@@ -144,11 +133,11 @@ export const EmployeeAssignmentSidebar: React.FC<
       return;
     }
 
-    setActionLoading("update");
+    setActionLoading('update');
     try {
       await onAssignRole(user.sanityId, selectedRole);
     } catch (error) {
-      console.error("Error updating role:", error);
+      console.error('Error updating role:', error);
     } finally {
       setActionLoading(null);
     }
@@ -159,13 +148,13 @@ export const EmployeeAssignmentSidebar: React.FC<
       return;
     }
 
-    setActionLoading("remove");
+    setActionLoading('remove');
     setShowConfirmRemove(false);
     try {
       await onRemoveRole(user.sanityId, user.fullName);
       // onClose is now called from parent after data refresh
     } catch (error) {
-      console.error("Error removing role:", error);
+      console.error('Error removing role:', error);
     } finally {
       setActionLoading(null);
     }
@@ -194,25 +183,17 @@ export const EmployeeAssignmentSidebar: React.FC<
             <Briefcase className="h-5 w-5" />
             Employee Role Assignment
           </SheetTitle>
-          <SheetDescription>
-            Manage employee role for {user.fullName}
-          </SheetDescription>
+          <SheetDescription>Manage employee role for {user.fullName}</SheetDescription>
         </SheetHeader>
 
         <div className="mt-6 space-y-6 p-4">
           {/* User Info Card */}
           <Card className="p-4">
             <div className="flex items-center gap-3">
-              <img
-                src={user.imageUrl}
-                alt={user.fullName}
-                className="w-12 h-12 rounded-full"
-              />
+              <img src={user.imageUrl} alt={user.fullName} className="w-12 h-12 rounded-full" />
               <div className="flex-1 min-w-0">
                 <h3 className="font-semibold truncate">{user.fullName}</h3>
-                <p className="text-sm text-muted-foreground truncate">
-                  {user.email}
-                </p>
+                <p className="text-sm text-muted-foreground truncate">{user.email}</p>
               </div>
             </div>
 
@@ -221,8 +202,8 @@ export const EmployeeAssignmentSidebar: React.FC<
             <div className="space-y-2 text-sm">
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">Status:</span>
-                <Badge variant={user.isActive ? "default" : "secondary"}>
-                  {user.isActive ? "Active" : "Inactive"}
+                <Badge variant={user.isActive ? 'default' : 'secondary'}>
+                  {user.isActive ? 'Active' : 'Inactive'}
                 </Badge>
               </div>
 
@@ -241,9 +222,7 @@ export const EmployeeAssignmentSidebar: React.FC<
           {/* Role Selection - Show for both new and existing employees */}
           <div className="space-y-3">
             <Label htmlFor="role-select" className="text-base font-semibold">
-              {user.isEmployee
-                ? "Update Employee Role"
-                : "Select Employee Role"}
+              {user.isEmployee ? 'Update Employee Role' : 'Select Employee Role'}
             </Label>
 
             <Select
@@ -256,12 +235,12 @@ export const EmployeeAssignmentSidebar: React.FC<
               <SelectContent>
                 {(
                   [
-                    "callcenter",
-                    "packer",
-                    "warehouse",
-                    "deliveryman",
-                    "incharge",
-                    "accounts",
+                    'callcenter',
+                    'packer',
+                    'warehouse',
+                    'deliveryman',
+                    'incharge',
+                    'accounts',
                   ] as EmployeeRole[]
                 ).map((role) => {
                   const Icon = ROLE_ICONS[role];
@@ -288,10 +267,7 @@ export const EmployeeAssignmentSidebar: React.FC<
             </div>
             <ul className="space-y-2">
               {ROLE_PERMISSIONS[selectedRole].map((permission, index) => (
-                <li
-                  key={index}
-                  className="flex items-start gap-2 text-sm text-muted-foreground"
-                >
+                <li key={index} className="flex items-start gap-2 text-sm text-muted-foreground">
                   <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
                   <span>{permission}</span>
                 </li>
@@ -304,8 +280,7 @@ export const EmployeeAssignmentSidebar: React.FC<
             {!user.sanityId ? (
               <div className="text-center p-4 bg-muted rounded-lg">
                 <p className="text-sm text-muted-foreground">
-                  User must be in Sanity database before assigning an employee
-                  role.
+                  User must be in Sanity database before assigning an employee role.
                 </p>
               </div>
             ) : (
@@ -319,8 +294,7 @@ export const EmployeeAssignmentSidebar: React.FC<
                             Confirm Removal
                           </p>
                           <p className="text-sm text-muted-foreground">
-                            Are you sure you want to remove the employee role
-                            from {user.fullName}?
+                            Are you sure you want to remove the employee role from {user.fullName}?
                           </p>
                         </div>
                         <div className="flex gap-2">
@@ -338,7 +312,7 @@ export const EmployeeAssignmentSidebar: React.FC<
                             disabled={isAnyActionLoading}
                             className="flex-1"
                           >
-                            {actionLoading === "remove" ? (
+                            {actionLoading === 'remove' ? (
                               <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
                             ) : (
                               <Briefcase className="h-4 w-4 mr-2" />
@@ -355,16 +329,14 @@ export const EmployeeAssignmentSidebar: React.FC<
                             disabled={isAnyActionLoading}
                             className="w-full"
                           >
-                            {actionLoading === "update" || isLoading ? (
+                            {actionLoading === 'update' || isLoading ? (
                               <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
                             ) : (
                               <UserCheck className="h-4 w-4 mr-2" />
                             )}
-                            {actionLoading === "update" || isLoading
-                              ? "Updating..."
-                              : `Update to ${getRoleDisplayName(
-                                  selectedRole
-                                )} Role`}
+                            {actionLoading === 'update' || isLoading
+                              ? 'Updating...'
+                              : `Update to ${getRoleDisplayName(selectedRole)} Role`}
                           </Button>
                         )}
                         <Button
@@ -385,13 +357,13 @@ export const EmployeeAssignmentSidebar: React.FC<
                     disabled={isAnyActionLoading}
                     className="w-full"
                   >
-                    {actionLoading === "assign" || isLoading ? (
+                    {actionLoading === 'assign' || isLoading ? (
                       <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
                     ) : (
                       <UserCheck className="h-4 w-4 mr-2" />
                     )}
-                    {actionLoading === "assign" || isLoading
-                      ? "Assigning..."
+                    {actionLoading === 'assign' || isLoading
+                      ? 'Assigning...'
                       : `Assign ${getRoleDisplayName(selectedRole)} Role`}
                   </Button>
                 )}

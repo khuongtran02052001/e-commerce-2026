@@ -1,25 +1,15 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { useUser } from "@clerk/nextjs";
 import {
+  cancelWithdrawalRequest,
   getUserWalletBalance,
   getWalletTransactions,
-  requestWithdrawal,
-  cancelWithdrawalRequest,
   getWithdrawalRequests,
-} from "@/actions/walletActions";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+  requestWithdrawal,
+} from '@/actions/walletActions';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -27,20 +17,18 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
-import {
-  Wallet,
-  ArrowDownToLine,
-  ArrowUpFromLine,
-  X,
-  RefreshCw,
-} from "lucide-react";
-import { toast } from "sonner";
-import PriceFormatter from "./PriceFormatter";
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { useUserData } from '@/contexts/UserDataContext';
+import { ArrowDownToLine, ArrowUpFromLine, RefreshCw, Wallet, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
+import PriceFormatter from './PriceFormatter';
 
 interface Transaction {
-  _id: string;
+  id: string;
   type: string;
   amount: number;
   balanceBefore: number;
@@ -52,7 +40,7 @@ interface Transaction {
 }
 
 interface WithdrawalRequest {
-  _id: string;
+  id: string;
   amount: number;
   method: string;
   bankDetails?: {
@@ -67,61 +55,61 @@ interface WithdrawalRequest {
 }
 
 export default function WalletDashboard() {
-  const { user } = useUser();
+  const { authUser, isAuthenticated } = useUserData();
   const [balance, setBalance] = useState<number>(0);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [withdrawalRequests, setWithdrawalRequests] = useState<
-    WithdrawalRequest[]
-  >([]);
+  const [withdrawalRequests, setWithdrawalRequests] = useState<WithdrawalRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showWithdrawDialog, setShowWithdrawDialog] = useState(false);
-  const [withdrawAmount, setWithdrawAmount] = useState("");
-  const [withdrawMethod, setWithdrawMethod] = useState("bank");
+  const [withdrawAmount, setWithdrawAmount] = useState('');
+  const [withdrawMethod, setWithdrawMethod] = useState('bank');
   const [bankDetails, setBankDetails] = useState({
-    accountHolderName: "",
-    bankName: "",
-    accountNumber: "",
-    routingNumber: "",
+    accountHolderName: '',
+    bankName: '',
+    accountNumber: '',
+    routingNumber: '',
   });
-  const [paypalEmail, setPaypalEmail] = useState("");
+  const [paypalEmail, setPaypalEmail] = useState('');
 
   useEffect(() => {
-    if (user) {
+    if (isAuthenticated && authUser) {
       loadWalletData();
     }
-  }, [user]);
+  }, [authUser, isAuthenticated]);
 
   const loadWalletData = async () => {
     setIsLoading(true);
     try {
-      const [balanceData, transactionsData, withdrawalsData] =
-        await Promise.all([
-          getUserWalletBalance(),
-          getWalletTransactions(),
-          getWithdrawalRequests(),
-        ]);
+      const [balanceData, transactionsData, withdrawalsData] = await Promise.all([
+        getUserWalletBalance(),
+        getWalletTransactions(),
+        getWithdrawalRequests(),
+      ]);
 
-      if (balanceData.success && balanceData.balance !== undefined)
-        setBalance(balanceData.balance);
+      if (balanceData.success && balanceData.balance !== undefined) setBalance(balanceData.balance);
       if (transactionsData.success && transactionsData.transactions) {
+        const list = Array.isArray(transactionsData.transactions)
+          ? transactionsData.transactions
+          : [];
         setTransactions(
-          transactionsData.transactions.map((t, index) => ({
-            ...t,
-            _id: t.id || `transaction-${index}`,
-          }))
+          list.map((t, index) => ({
+            ...(t as Transaction),
+            id: (t as Transaction).id || (t as any).id || `transaction-${index}`,
+          })),
         );
       }
       if (withdrawalsData.success && withdrawalsData.requests) {
+        const list = Array.isArray(withdrawalsData.requests) ? withdrawalsData.requests : [];
         setWithdrawalRequests(
-          withdrawalsData.requests.map((r, index) => ({
-            ...r,
-            _id: r.id || `withdrawal-${index}`,
-          }))
+          list.map((r, index) => ({
+            ...(r as WithdrawalRequest),
+            id: (r as WithdrawalRequest).id || (r as any).id || `withdrawal-${index}`,
+          })),
         );
       }
     } catch (error) {
-      console.error("Error loading wallet data:", error);
-      toast.error("Failed to load wallet data");
+      console.error('Error loading wallet data:', error);
+      toast.error('Failed to load wallet data');
     } finally {
       setIsLoading(false);
     }
@@ -131,48 +119,46 @@ export default function WalletDashboard() {
     const amount = parseFloat(withdrawAmount);
 
     if (isNaN(amount) || amount < 10) {
-      toast.error("Minimum withdrawal amount is $10");
+      toast.error('Minimum withdrawal amount is $10');
       return;
     }
 
     if (amount > balance) {
-      toast.error("Insufficient balance");
+      toast.error('Insufficient balance');
       return;
     }
 
     if (
-      withdrawMethod === "bank" &&
-      (!bankDetails.accountHolderName ||
-        !bankDetails.accountNumber ||
-        !bankDetails.bankName)
+      withdrawMethod === 'bank' &&
+      (!bankDetails.accountHolderName || !bankDetails.accountNumber || !bankDetails.bankName)
     ) {
-      toast.error("Please fill in all bank details");
+      toast.error('Please fill in all bank details');
       return;
     }
 
-    if (withdrawMethod === "paypal" && !paypalEmail) {
-      toast.error("Please enter PayPal email");
+    if (withdrawMethod === 'paypal' && !paypalEmail) {
+      toast.error('Please enter PayPal email');
       return;
     }
 
     const result = await requestWithdrawal({
       amount,
-      method: withdrawMethod as "bank" | "paypal",
-      bankDetails: withdrawMethod === "bank" ? bankDetails : undefined,
-      paypalEmail: withdrawMethod === "paypal" ? paypalEmail : undefined,
+      method: withdrawMethod as 'bank' | 'paypal',
+      bankDetails: withdrawMethod === 'bank' ? bankDetails : undefined,
+      paypalEmail: withdrawMethod === 'paypal' ? paypalEmail : undefined,
     });
 
     if (result.success) {
       toast.success(result.message);
       setShowWithdrawDialog(false);
-      setWithdrawAmount("");
+      setWithdrawAmount('');
       setBankDetails({
-        accountHolderName: "",
-        bankName: "",
-        accountNumber: "",
-        routingNumber: "",
+        accountHolderName: '',
+        bankName: '',
+        accountNumber: '',
+        routingNumber: '',
       });
-      setPaypalEmail("");
+      setPaypalEmail('');
       loadWalletData();
     } else {
       toast.error(result.message);
@@ -191,37 +177,36 @@ export default function WalletDashboard() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "completed":
-        return "bg-green-500";
-      case "pending":
-        return "bg-yellow-500";
-      case "failed":
-        return "bg-red-500";
-      case "cancelled":
-        return "bg-gray-500";
-      case "approved":
-        return "bg-blue-500";
-      case "processing":
-        return "bg-purple-500";
-      case "rejected":
-        return "bg-red-600";
+      case 'completed':
+        return 'bg-green-500';
+      case 'pending':
+        return 'bg-yellow-500';
+      case 'failed':
+        return 'bg-red-500';
+      case 'cancelled':
+        return 'bg-gray-500';
+      case 'approved':
+        return 'bg-blue-500';
+      case 'processing':
+        return 'bg-purple-500';
+      case 'rejected':
+        return 'bg-red-600';
       default:
-        return "bg-gray-400";
+        return 'bg-gray-400';
     }
   };
 
   const getTransactionIcon = (type: string) => {
-    if (type.includes("credit"))
-      return <ArrowUpFromLine className="w-4 h-4 text-green-600" />;
+    if (type.includes('credit')) return <ArrowUpFromLine className="w-4 h-4 text-green-600" />;
     return <ArrowDownToLine className="w-4 h-4 text-red-600" />;
   };
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center p-8">
-        Loading wallet...
-      </div>
-    );
+    return <div className="flex items-center justify-center p-8">Loading wallet...</div>;
+  }
+
+  if (!isAuthenticated) {
+    return <div className="flex items-center justify-center p-8">Please sign in to view wallet.</div>;
   }
 
   return (
@@ -250,10 +235,7 @@ export default function WalletDashboard() {
                 Can be used for future orders or withdrawn
               </p>
             </div>
-            <Dialog
-              open={showWithdrawDialog}
-              onOpenChange={setShowWithdrawDialog}
-            >
+            <Dialog open={showWithdrawDialog} onOpenChange={setShowWithdrawDialog}>
               <DialogTrigger asChild>
                 <Button disabled={balance < 10}>
                   <ArrowDownToLine className="w-4 h-4 mr-2" />
@@ -264,8 +246,8 @@ export default function WalletDashboard() {
                 <DialogHeader>
                   <DialogTitle>Withdraw Funds</DialogTitle>
                   <DialogDescription>
-                    Minimum withdrawal amount is $10. Funds will be transferred
-                    within 3-5 business days.
+                    Minimum withdrawal amount is $10. Funds will be transferred within 3-5 business
+                    days.
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
@@ -287,10 +269,7 @@ export default function WalletDashboard() {
 
                   <div>
                     <Label>Withdrawal Method</Label>
-                    <RadioGroup
-                      value={withdrawMethod}
-                      onValueChange={setWithdrawMethod}
-                    >
+                    <RadioGroup value={withdrawMethod} onValueChange={setWithdrawMethod}>
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="bank" id="bank" />
                         <Label htmlFor="bank" className="cursor-pointer">
@@ -306,12 +285,10 @@ export default function WalletDashboard() {
                     </RadioGroup>
                   </div>
 
-                  {withdrawMethod === "bank" && (
+                  {withdrawMethod === 'bank' && (
                     <div className="space-y-3">
                       <div>
-                        <Label htmlFor="accountHolder">
-                          Account Holder Name
-                        </Label>
+                        <Label htmlFor="accountHolder">Account Holder Name</Label>
                         <Input
                           id="accountHolder"
                           value={bankDetails.accountHolderName}
@@ -365,7 +342,7 @@ export default function WalletDashboard() {
                     </div>
                   )}
 
-                  {withdrawMethod === "paypal" && (
+                  {withdrawMethod === 'paypal' && (
                     <div>
                       <Label htmlFor="paypalEmail">PayPal Email</Label>
                       <Input
@@ -398,32 +375,25 @@ export default function WalletDashboard() {
             <div className="space-y-3">
               {withdrawalRequests.map((request) => (
                 <div
-                  key={request._id}
+                  key={request.id}
                   className="flex items-center justify-between p-3 border rounded-lg"
                 >
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <PriceFormatter
-                        amount={request.amount}
-                        className="font-semibold"
-                      />
-                      <Badge className={getStatusColor(request.status)}>
-                        {request.status}
-                      </Badge>
+                      <PriceFormatter amount={request.amount} className="font-semibold" />
+                      <Badge className={getStatusColor(request.status)}>{request.status}</Badge>
                     </div>
                     <p className="text-sm text-muted-foreground mt-1">
-                      {request.method.toUpperCase()} •{" "}
+                      {request.method.toUpperCase()} •{' '}
                       {new Date(request.requestedAt).toLocaleDateString()}
                     </p>
                     {request.rejectionReason && (
-                      <p className="text-sm text-red-600 mt-1">
-                        Reason: {request.rejectionReason}
-                      </p>
+                      <p className="text-sm text-red-600 mt-1">Reason: {request.rejectionReason}</p>
                     )}
                   </div>
-                  {request.status === "pending" && (
+                  {request.status === 'pending' && (
                     <Button
-                      onClick={() => handleCancelWithdrawal(request._id)}
+                      onClick={() => handleCancelWithdrawal(request.id)}
                       variant="ghost"
                       size="icon"
                     >
@@ -445,19 +415,12 @@ export default function WalletDashboard() {
         </CardHeader>
         <CardContent>
           {transactions.length === 0 ? (
-            <p className="text-center text-muted-foreground py-8">
-              No transactions yet
-            </p>
+            <p className="text-center text-muted-foreground py-8">No transactions yet</p>
           ) : (
             <div className="space-y-3">
               {transactions.map((transaction) => (
-                <div
-                  key={transaction._id}
-                  className="flex items-start gap-3 p-3 border rounded-lg"
-                >
-                  <div className="mt-1">
-                    {getTransactionIcon(transaction.type)}
-                  </div>
+                <div key={transaction.id} className="flex items-start gap-3 p-3 border rounded-lg">
+                  <div className="mt-1">{getTransactionIcon(transaction.type)}</div>
                   <div className="flex-1">
                     <div className="flex items-start justify-between">
                       <div>
@@ -469,18 +432,14 @@ export default function WalletDashboard() {
                       <div className="text-right">
                         <p
                           className={`font-semibold ${
-                            transaction.type.includes("credit")
-                              ? "text-green-600"
-                              : "text-red-600"
+                            transaction.type.includes('credit') ? 'text-green-600' : 'text-red-600'
                           }`}
                         >
-                          {transaction.type.includes("credit") ? "+" : "-"}
+                          {transaction.type.includes('credit') ? '+' : '-'}
                           <PriceFormatter amount={transaction.amount} />
                         </p>
                         <Badge
-                          className={`${getStatusColor(
-                            transaction.status
-                          )} mt-1`}
+                          className={`${getStatusColor(transaction.status)} mt-1`}
                           variant="secondary"
                         >
                           {transaction.status}
@@ -488,8 +447,7 @@ export default function WalletDashboard() {
                       </div>
                     </div>
                     <div className="text-xs text-muted-foreground mt-2">
-                      Balance:{" "}
-                      <PriceFormatter amount={transaction.balanceBefore} /> →{" "}
+                      Balance: <PriceFormatter amount={transaction.balanceBefore} /> →{' '}
                       <PriceFormatter amount={transaction.balanceAfter} />
                     </div>
                   </div>

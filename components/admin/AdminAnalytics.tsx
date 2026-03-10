@@ -1,75 +1,38 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect } from "react";
-import { motion } from "motion/react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { AnalyticsSkeleton } from '@/components/admin/SkeletonLoaders';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { AnalyticsSkeleton } from "@/components/admin/SkeletonLoaders";
+} from '@/components/ui/select';
+import { getAdminAnalytics, type AnalyticsData } from '@/data/client/admin';
 import {
-  TrendingUp,
-  TrendingDown,
-  DollarSign,
-  ShoppingCart,
-  Users,
-  Package,
-  Calendar,
-  RefreshCw,
-  BarChart3,
-  PieChart,
   Activity,
-  ArrowUpRight,
   ArrowDownRight,
-} from "lucide-react";
-
-interface AnalyticsData {
-  revenue: {
-    total: number;
-    change: number;
-    trend: number[];
-  };
-  orders: {
-    total: number;
-    change: number;
-    pending: number;
-    completed: number;
-    cancelled: number;
-  };
-  customers: {
-    total: number;
-    change: number;
-    active: number;
-    new: number;
-  };
-  products: {
-    total: number;
-    change: number;
-    lowStock: number;
-    outOfStock: number;
-  };
-  topProducts: Array<{
-    name: string;
-    sales: number;
-    revenue: number;
-  }>;
-  recentActivity: Array<{
-    action: string;
-    time: string;
-    value: string;
-  }>;
-}
+  ArrowUpRight,
+  BarChart3,
+  Calendar,
+  DollarSign,
+  Package,
+  PieChart,
+  RefreshCw,
+  ShoppingCart,
+  TrendingUp,
+  Users,
+} from 'lucide-react';
+import { motion } from 'motion/react';
+import React, { useEffect, useState } from 'react';
 
 const AdminAnalytics = () => {
   const [loading, setLoading] = useState(true);
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
-  const [timeRange, setTimeRange] = useState("30d");
+  const [timeRange, setTimeRange] = useState('30d');
 
   useEffect(() => {
     fetchAnalytics();
@@ -78,11 +41,10 @@ const AdminAnalytics = () => {
   const fetchAnalytics = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`/api/admin/analytics?period=${timeRange}`);
-      const data = await response.json();
+      const data = await getAdminAnalytics(timeRange);
       setAnalytics(data);
     } catch (error) {
-      console.error("Error fetching analytics:", error);
+      console.error('Error fetching analytics:', error);
     } finally {
       setLoading(false);
     }
@@ -94,7 +56,7 @@ const AdminAnalytics = () => {
     change,
     icon: Icon,
     color,
-    format = "number",
+    format = 'number',
     subtitle,
   }: {
     title: string;
@@ -102,12 +64,12 @@ const AdminAnalytics = () => {
     change: number;
     icon: React.ComponentType<{ className?: string }>;
     color: string;
-    format?: "number" | "currency";
+    format?: 'number' | 'currency';
     subtitle?: string;
   }) => {
     const isPositive = change >= 0;
     const formatValue = (val: number) => {
-      if (format === "currency") return `$${val.toLocaleString()}`;
+      if (format === 'currency') return `$${val.toLocaleString()}`;
       return val.toLocaleString();
     };
 
@@ -122,12 +84,8 @@ const AdminAnalytics = () => {
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="space-y-1">
-            <div className="text-2xl font-bold text-dark-color">
-              {formatValue(value)}
-            </div>
-            {subtitle && (
-              <div className="text-xs text-light-color">{subtitle}</div>
-            )}
+            <div className="text-2xl font-bold text-dark-color">{formatValue(value)}</div>
+            {subtitle && <div className="text-xs text-light-color">{subtitle}</div>}
           </div>
           <div className="flex items-center gap-2">
             {isPositive ? (
@@ -135,11 +93,8 @@ const AdminAnalytics = () => {
             ) : (
               <ArrowDownRight className="w-4 h-4 text-red-500" />
             )}
-            <Badge
-              variant={isPositive ? "default" : "destructive"}
-              className="text-xs"
-            >
-              {isPositive ? "+" : ""}
+            <Badge variant={isPositive ? 'default' : 'destructive'} className="text-xs">
+              {isPositive ? '+' : ''}
               {change}%
             </Badge>
             <span className="text-xs text-light-color">vs last period</span>
@@ -275,27 +230,21 @@ const AdminAnalytics = () => {
                     <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                     <span className="text-sm font-medium">Completed</span>
                   </div>
-                  <Badge variant="outline">
-                    {analytics?.orders?.completed || 0}
-                  </Badge>
+                  <Badge variant="outline">{analytics?.orders?.completed || 0}</Badge>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
                     <span className="text-sm font-medium">Pending</span>
                   </div>
-                  <Badge variant="outline">
-                    {analytics?.orders?.pending || 0}
-                  </Badge>
+                  <Badge variant="outline">{analytics?.orders?.pending || 0}</Badge>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 bg-red-500 rounded-full"></div>
                     <span className="text-sm font-medium">Cancelled</span>
                   </div>
-                  <Badge variant="outline">
-                    {analytics?.orders?.cancelled || 0}
-                  </Badge>
+                  <Badge variant="outline">{analytics?.orders?.cancelled || 0}</Badge>
                 </div>
               </div>
             </CardContent>
@@ -323,12 +272,8 @@ const AdminAnalytics = () => {
                     className="flex items-center justify-between p-3 bg-shop_light_bg rounded-lg"
                   >
                     <div>
-                      <div className="font-medium text-sm text-dark-color">
-                        {product.name}
-                      </div>
-                      <div className="text-xs text-light-color">
-                        {product.sales} sales
-                      </div>
+                      <div className="font-medium text-sm text-dark-color">{product.name}</div>
+                      <div className="text-xs text-light-color">{product.sales} sales</div>
                     </div>
                     <Badge className="bg-shop_light_green/20 text-shop_dark_green">
                       ${product.revenue.toLocaleString()}
@@ -368,17 +313,13 @@ const AdminAnalytics = () => {
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-2 h-2 bg-shop_light_green rounded-full"></div>
-                    <span className="text-sm text-dark-color">
-                      {activity.action}
-                    </span>
+                    <span className="text-sm text-dark-color">{activity.action}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Badge variant="outline" className="text-xs">
                       {activity.value}
                     </Badge>
-                    <span className="text-xs text-light-color">
-                      {activity.time}
-                    </span>
+                    <span className="text-xs text-light-color">{activity.time}</span>
                   </div>
                 </div>
               )) || (

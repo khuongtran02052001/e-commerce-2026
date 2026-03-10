@@ -1,15 +1,26 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Crown, X, Sparkles } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import Link from "next/link";
+import { useUserData } from '@/contexts/UserDataContext';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Crown, Sparkles, X } from 'lucide-react';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 export default function PremiumFloatingButton() {
   const [isExpanded, setIsExpanded] = useState(false);
-  const upgradeUrl =
-    process.env.NEXT_PUBLIC_PAID_VERION ||
-    "https://www.buymeacoffee.com/reactbd";
+  const { authUser: user } = useUserData();
+  const [hidePremium, setHidePremium] = useState(false);
+  const upgradeUrl = process.env.NEXT_PUBLIC_PAID_VERION || '#';
+
+  useEffect(() => {
+    setHidePremium(
+      user?.isAdmin === true || user?.premiumStatus === 'active' || user?.isActive === true,
+    );
+  }, [user]);
+
+  if (hidePremium) {
+    return null;
+  }
 
   return (
     <>
@@ -32,7 +43,7 @@ export default function PremiumFloatingButton() {
               initial={{ opacity: 0, y: 20, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 20, scale: 0.9 }}
-              transition={{ type: "spring", damping: 20, stiffness: 300 }}
+              transition={{ type: 'spring', damping: 20, stiffness: 300 }}
               className="absolute bottom-20 right-0 w-96 bg-linear-to-br from-purple-600 via-indigo-600 to-purple-700 rounded-2xl shadow-2xl overflow-hidden max-h-[80vh] overflow-y-auto"
             >
               {/* Animated background particles */}
@@ -45,7 +56,7 @@ export default function PremiumFloatingButton() {
                   transition={{
                     duration: 3,
                     repeat: Infinity,
-                    ease: "easeInOut",
+                    ease: 'easeInOut',
                   }}
                   className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"
                 />
@@ -57,7 +68,7 @@ export default function PremiumFloatingButton() {
                   transition={{
                     duration: 4,
                     repeat: Infinity,
-                    ease: "easeInOut",
+                    ease: 'easeInOut',
                   }}
                   className="absolute -bottom-10 -left-10 w-40 h-40 bg-purple-300/10 rounded-full blur-2xl"
                 />
@@ -83,32 +94,28 @@ export default function PremiumFloatingButton() {
                       transition={{
                         duration: 2,
                         repeat: Infinity,
-                        ease: "easeInOut",
+                        ease: 'easeInOut',
                       }}
                       className="bg-white/20 backdrop-blur-sm p-3 rounded-xl"
                     >
                       <Crown className="w-8 h-8 text-yellow-300" />
                     </motion.div>
                     <div>
-                      <h3 className="text-xl font-bold text-white">
-                        Go Premium
-                      </h3>
-                      <p className="text-sm text-purple-100">
-                        Unlock All Features
-                      </p>
+                      <h3 className="text-xl font-bold text-white">Go Premium</h3>
+                      <p className="text-sm text-purple-100">Unlock All Features</p>
                     </div>
                   </div>
 
                   <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 space-y-2">
                     {[
-                      "Employee Management System",
-                      "Advanced Analytics Dashboard",
-                      "Review Management Tools",
-                      "Subscription Management",
-                      "Customer Insights & Reports",
-                      "Export Data to Excel/CSV",
-                      "Custom Admin Branding",
-                      "Priority Support & Updates",
+                      'Employee Management System',
+                      'Advanced Analytics Dashboard',
+                      'Review Management Tools',
+                      'Subscription Management',
+                      'Customer Insights & Reports',
+                      'Export Data to Excel/CSV',
+                      'Custom Admin Branding',
+                      'Priority Support & Updates',
                     ].map((feature, index) => (
                       <motion.div
                         key={feature}
@@ -157,7 +164,7 @@ export default function PremiumFloatingButton() {
             transition={{
               duration: 2,
               repeat: Infinity,
-              ease: "easeInOut",
+              ease: 'easeInOut',
             }}
             className="absolute inset-0 bg-linear-to-r from-purple-500 to-indigo-500 rounded-full blur-md"
           />
@@ -172,7 +179,7 @@ export default function PremiumFloatingButton() {
               transition={{
                 duration: 3,
                 repeat: Infinity,
-                ease: "linear",
+                ease: 'linear',
               }}
               className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent rounded-full"
             />
@@ -185,7 +192,7 @@ export default function PremiumFloatingButton() {
               transition={{
                 duration: 2,
                 repeat: Infinity,
-                ease: "easeInOut",
+                ease: 'easeInOut',
               }}
             >
               <Crown className="w-7 h-7 text-yellow-300 relative z-10" />

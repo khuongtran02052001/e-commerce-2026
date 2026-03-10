@@ -1,0 +1,108 @@
+<mxfile host="app.diagrams.net" modified="2026-03-04T11:40:00.000Z" agent="Codex" version="24.7.17" type="device">
+  <diagram id="app-full-flow-v2" name="App Full Flow">
+    <mxGraphModel dx="1600" dy="960" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1920" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <mxCell id="title" value="ShopCart - Full System Flow" style="text;html=1;align=left;verticalAlign=middle;fontSize=30;fontStyle=1;fontColor=#111827;" vertex="1" parent="1">
+          <mxGeometry x="40" y="20" width="520" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="subtitle" value="Next.js + NextAuth + REST + Role-based Employee Workflow" style="text;html=1;align=left;verticalAlign=middle;fontSize=14;fontColor=#6b7280;" vertex="1" parent="1">
+          <mxGeometry x="40" y="58" width="560" height="24" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="lane1" value="Client" style="swimlane;html=1;rounded=1;horizontal=1;startSize=32;fillColor=#f8fafc;strokeColor=#cbd5e1;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="100" width="1840" height="180" as="geometry"/>
+        </mxCell>
+        <mxCell id="lane2" value="Frontend (Next.js)" style="swimlane;html=1;rounded=1;horizontal=1;startSize=32;fillColor=#fffbeb;strokeColor=#fcd34d;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="300" width="1840" height="260" as="geometry"/>
+        </mxCell>
+        <mxCell id="lane3" value="Backend (service-system)" style="swimlane;html=1;rounded=1;horizontal=1;startSize=32;fillColor=#fdf2f8;strokeColor=#f9a8d4;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="580" width="1840" height="280" as="geometry"/>
+        </mxCell>
+        <mxCell id="lane4" value="Employee Workflow" style="swimlane;html=1;rounded=1;horizontal=1;startSize=32;fillColor=#ecfeff;strokeColor=#67e8f9;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="880" width="1840" height="260" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="c1" value="Browser / Mobile" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dbeafe;strokeColor=#2563eb;fontStyle=1;fontColor=#1e3a8a;" vertex="1" parent="1">
+          <mxGeometry x="120" y="158" width="190" height="58" as="geometry"/>
+        </mxCell>
+        <mxCell id="c2" value="Google OAuth" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e0f2fe;strokeColor=#0284c7;" vertex="1" parent="1">
+          <mxGeometry x="430" y="158" width="170" height="58" as="geometry"/>
+        </mxCell>
+        <mxCell id="c3" value="Admin / Employee / User" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ede9fe;strokeColor=#7c3aed;" vertex="1" parent="1">
+          <mxGeometry x="710" y="158" width="230" height="58" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="f1" value="Routes&#xa;/, /shop, /product/[slug], /blog" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#f59e0b;" vertex="1" parent="1">
+          <mxGeometry x="120" y="365" width="290" height="72" as="geometry"/>
+        </mxCell>
+        <mxCell id="f2" value="Protected Routes&#xa;/user/*, /employee, /admin/*" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#f59e0b;" vertex="1" parent="1">
+          <mxGeometry x="450" y="365" width="300" height="72" as="geometry"/>
+        </mxCell>
+        <mxCell id="f3" value="NextAuth Session&#xa;stores accessToken" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#f59e0b;" vertex="1" parent="1">
+          <mxGeometry x="790" y="365" width="240" height="72" as="geometry"/>
+        </mxCell>
+        <mxCell id="f4" value="restClient + data/client + data/server" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#f59e0b;" vertex="1" parent="1">
+          <mxGeometry x="1070" y="365" width="320" height="72" as="geometry"/>
+        </mxCell>
+        <mxCell id="f5" value="UI Guards&#xa;role-based rendering" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#f59e0b;" vertex="1" parent="1">
+          <mxGeometry x="1430" y="365" width="230" height="72" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="b1" value="POST /auth/google-login" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#db2777;" vertex="1" parent="1">
+          <mxGeometry x="120" y="650" width="230" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="b2" value="GET /auth/me&#xa;(isAdmin, isEmployee, employeeRole)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#db2777;" vertex="1" parent="1">
+          <mxGeometry x="390" y="650" width="300" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="b3" value="Orders API&#xa;POST/GET/PATCH /orders" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#db2777;" vertex="1" parent="1">
+          <mxGeometry x="730" y="650" width="230" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="b4" value="Employee/Admin API&#xa;/admin/employees/*&#xa;/admin/orders/*" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#db2777;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="650" width="250" height="76" as="geometry"/>
+        </mxCell>
+        <mxCell id="b5" value="Analytics / Reviews / Blogs" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#db2777;" vertex="1" parent="1">
+          <mxGeometry x="1290" y="650" width="220" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="b6" value="Database&#xa;Users, Orders, Products, Reviews" style="shape=cylinder;whiteSpace=wrap;html=1;boundedLbl=1;fillColor=#f1f5f9;strokeColor=#334155;" vertex="1" parent="1">
+          <mxGeometry x="1560" y="640" width="220" height="84" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="w0" value="Order Created" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#0891b2;" vertex="1" parent="1"><mxGeometry x="100" y="955" width="150" height="52" as="geometry"/></mxCell>
+        <mxCell id="w1" value="CALL_CENTER&#xa;address-confirm" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eff6ff;strokeColor=#2563eb;" vertex="1" parent="1"><mxGeometry x="280" y="955" width="170" height="52" as="geometry"/></mxCell>
+        <mxCell id="w2" value="CALL_CENTER&#xa;order-confirm" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eff6ff;strokeColor=#2563eb;" vertex="1" parent="1"><mxGeometry x="480" y="955" width="170" height="52" as="geometry"/></mxCell>
+        <mxCell id="w3" value="PACKER&#xa;pack" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f3ff;strokeColor=#7c3aed;" vertex="1" parent="1"><mxGeometry x="680" y="955" width="140" height="52" as="geometry"/></mxCell>
+        <mxCell id="w4" value="PACKER&#xa;assign-deliveryman" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f3ff;strokeColor=#7c3aed;" vertex="1" parent="1"><mxGeometry x="850" y="955" width="190" height="52" as="geometry"/></mxCell>
+        <mxCell id="w5" value="DELIVERYMAN&#xa;start-delivery" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ecfeff;strokeColor=#0e7490;" vertex="1" parent="1"><mxGeometry x="1070" y="955" width="170" height="52" as="geometry"/></mxCell>
+        <mxCell id="w6" value="DELIVERYMAN&#xa;deliver / reschedule / failed" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ecfeff;strokeColor=#0e7490;" vertex="1" parent="1"><mxGeometry x="1270" y="955" width="220" height="52" as="geometry"/></mxCell>
+        <mxCell id="w7" value="ACCOUNTS&#xa;receive-payment" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fffbeb;strokeColor=#d97706;" vertex="1" parent="1"><mxGeometry x="1520" y="955" width="180" height="52" as="geometry"/></mxCell>
+
+        <mxCell id="x1" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#64748b;" edge="1" parent="1" source="c1" target="f1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="x2" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#64748b;" edge="1" parent="1" source="c2" target="b1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="x3" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#64748b;" edge="1" parent="1" source="c3" target="f2"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <mxCell id="x4" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#b45309;" edge="1" parent="1" source="f2" target="f3"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="x5" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#b45309;" edge="1" parent="1" source="f3" target="f4"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="x6" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#b45309;" edge="1" parent="1" source="f4" target="f5"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <mxCell id="x7" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#be185d;" edge="1" parent="1" source="f3" target="b2"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="x8" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#be185d;" edge="1" parent="1" source="f4" target="b3"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="x9" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#be185d;" edge="1" parent="1" source="f4" target="b4"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="x10" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#be185d;" edge="1" parent="1" source="f4" target="b5"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="x11" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#334155;" edge="1" parent="1" source="b3" target="b6"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="x12" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#334155;" edge="1" parent="1" source="b4" target="b6"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <mxCell id="wx1" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#0f766e;" edge="1" parent="1" source="w0" target="w1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="wx2" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#0f766e;" edge="1" parent="1" source="w1" target="w2"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="wx3" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#0f766e;" edge="1" parent="1" source="w2" target="w3"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="wx4" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#0f766e;" edge="1" parent="1" source="w3" target="w4"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="wx5" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#0f766e;" edge="1" parent="1" source="w4" target="w5"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="wx6" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#0f766e;" edge="1" parent="1" source="w5" target="w6"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="wx7" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#0f766e;" edge="1" parent="1" source="w6" target="w7"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

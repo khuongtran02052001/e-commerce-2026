@@ -1,6 +1,6 @@
 // Review Types
 export interface Review {
-  _id: string;
+  id: string;
   product: {
     _ref: string;
   };
@@ -11,7 +11,7 @@ export interface Review {
   title: string;
   content: string;
   isVerifiedPurchase: boolean;
-  status: "pending" | "approved" | "rejected";
+  status: 'pending' | 'approved' | 'rejected';
   helpful: number;
   helpfulBy: Array<{
     _ref: string;
@@ -23,9 +23,9 @@ export interface Review {
   approvedBy?: string;
 }
 
-export interface ReviewWithDetails extends Omit<Review, "user" | "product"> {
+export interface ReviewWithDetails extends Omit<Review, 'user' | 'product'> {
   user: {
-    _id: string;
+    id: string;
     firstName: string;
     lastName: string;
     email?: string;
@@ -36,7 +36,7 @@ export interface ReviewWithDetails extends Omit<Review, "user" | "product"> {
     };
   };
   product?: {
-    _id: string;
+    id: string;
     name: string;
     slug: {
       current: string;

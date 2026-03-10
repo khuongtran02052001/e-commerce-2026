@@ -44,7 +44,6 @@ The assignment dialog shows role-specific permissions:
 ### Files Modified
 
 1. **components/admin/AdminUsers.tsx**
-
    - Added employee-related imports (Briefcase icon, Dialog components, employee actions)
    - Updated `CombinedUser` interface with employee fields
    - Added `employeeDialog` state management
@@ -77,7 +76,7 @@ const [employeeDialog, setEmployeeDialog] = useState<{
 }>({
   isOpen: false,
   user: null,
-  selectedRole: "callcenter",
+  selectedRole: 'callcenter',
   isAssigning: false,
 });
 ```

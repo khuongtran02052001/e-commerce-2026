@@ -1,28 +1,22 @@
-import { FC } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart";
+} from '@/components/ui/chart';
+import { FC } from 'react';
 import {
   Area,
   AreaChart,
-  XAxis,
-  YAxis,
-  CartesianGrid,
   Bar,
   BarChart,
+  CartesianGrid,
   Line,
   LineChart,
-} from "recharts";
+  XAxis,
+  YAxis,
+} from 'recharts';
 
 interface ChartData {
   month: string;
@@ -37,16 +31,16 @@ interface RevenueTrendChartProps {
 
 const chartConfig = {
   revenue: {
-    label: "Revenue",
-    color: "hsl(var(--chart-1))",
+    label: 'Revenue',
+    color: 'hsl(var(--chart-1))',
   },
   orders: {
-    label: "Orders",
-    color: "hsl(var(--chart-2))",
+    label: 'Orders',
+    color: 'hsl(var(--chart-2))',
   },
   users: {
-    label: "New Users",
-    color: "hsl(var(--chart-3))",
+    label: 'New Users',
+    color: 'hsl(var(--chart-3))',
   },
 } satisfies ChartConfig;
 
@@ -83,16 +77,8 @@ export const RevenueTrendChart: FC<RevenueTrendChartProps> = ({ data }) => {
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
             <defs>
               <linearGradient id="fillRevenue" x1="0" y1="0" x2="0" y2="1">
-                <stop
-                  offset="5%"
-                  stopColor="var(--color-revenue)"
-                  stopOpacity={0.8}
-                />
-                <stop
-                  offset="95%"
-                  stopColor="var(--color-revenue)"
-                  stopOpacity={0.1}
-                />
+                <stop offset="5%" stopColor="var(--color-revenue)" stopOpacity={0.8} />
+                <stop offset="95%" stopColor="var(--color-revenue)" stopOpacity={0.1} />
               </linearGradient>
             </defs>
             <Area
@@ -115,9 +101,7 @@ export const OrdersChart: FC<RevenueTrendChartProps> = ({ data }) => {
     <Card>
       <CardHeader>
         <CardTitle>Orders Overview</CardTitle>
-        <CardDescription>
-          Monthly orders and new user registrations
-        </CardDescription>
+        <CardDescription>Monthly orders and new user registrations</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>

@@ -1,27 +1,15 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
 import {
   assignEmployeeRole,
+  getAllEmployees,
+  getAllUsers,
+  manageEmployeeUser,
   removeEmployeeRole,
   updateEmployeeStatus,
-  getAllUsers,
-  getAllEmployees,
-} from "@/actions/employeeActions";
-import {
-  Employee,
-  EmployeeRole,
-  getRoleDisplayName,
-  getRoleBadgeColor,
-} from "@/types/employee";
-import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+} from '@/actions/employeeActions';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -29,24 +17,29 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { toast } from "sonner";
-import { Badge } from "@/components/ui/badge";
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
-  UserPlus,
-  UserMinus,
-  Ban,
-  CheckCircle,
-  Search,
-  Filter,
-  Users,
-} from "lucide-react";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Employee,
+  EmployeeRole,
+  getRoleBadgeColor,
+  getRoleDisplayName,
+} from '@/types/domain/employee';
+import { Ban, CheckCircle, Search, UserMinus, UserPlus, Users } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 interface User {
-  _id: string;
+  id: string;
   email: string;
   firstName: string;
   lastName: string;
@@ -60,14 +53,14 @@ export default function EmployeeManagement() {
   const [users, setUsers] = useState<User[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterRole, setFilterRole] = useState<string>("all");
-  const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterRole, setFilterRole] = useState<string>('all');
+  const [filterStatus, setFilterStatus] = useState<string>('all');
   const [showAssignDialog, setShowAssignDialog] = useState(false);
   const [showSuspendDialog, setShowSuspendDialog] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [selectedRole, setSelectedRole] = useState<EmployeeRole>("callcenter");
-  const [suspensionReason, setSuspensionReason] = useState("");
+  const [selectedRole, setSelectedRole] = useState<EmployeeRole>('callcenter');
+  const [suspensionReason, setSuspensionReason] = useState('');
 
   useEffect(() => {
     loadData();
@@ -76,24 +69,38 @@ export default function EmployeeManagement() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [usersData, employeesData] = await Promise.all([
-        getAllUsers(),
-        getAllEmployees(),
-      ]);
+      const [usersData, employeesData] = await Promise.all([getAllUsers(), getAllEmployees()]);
       setUsers(usersData);
       setEmployees(employeesData);
     } catch (error) {
-      console.error("Error loading data:", error);
-      toast.error("Failed to load data");
+      console.error('Error loading data:', error);
+      toast.error('Failed to load data');
     } finally {
       setLoading(false);
     }
   };
 
+  const parseEmployeeRole = (value?: string): EmployeeRole => {
+    const role = String(value || '')
+      .trim()
+      .toLowerCase();
+    if (role === 'callcenter' || role === 'packer' || role === 'deliveryman' || role === 'incharge' || role === 'accounts') {
+      return role;
+    }
+    return 'callcenter';
+  };
+
   const handleAssignRole = async () => {
     if (!selectedUser) return;
 
-    const result = await assignEmployeeRole(selectedUser._id, selectedRole);
+    const manageResult = await manageEmployeeUser({
+      email: selectedUser.email,
+      role: selectedRole,
+      active: true,
+    });
+    const result = manageResult.success
+      ? manageResult
+      : await assignEmployeeRole(selectedUser.id, selectedRole);
 
     if (result.success) {
       toast.success(result.message);
@@ -105,8 +112,7 @@ export default function EmployeeManagement() {
   };
 
   const handleRemoveRole = async (userId: string) => {
-    if (!confirm("Are you sure you want to remove this employee role?")) return;
-
+    if (!confirm('Are you sure you want to remove this employee role?')) return;
     const result = await removeEmployeeRole(userId);
 
     if (result.success) {
@@ -120,16 +126,20 @@ export default function EmployeeManagement() {
   const handleSuspend = async () => {
     if (!selectedUser) return;
 
-    const result = await updateEmployeeStatus(
-      selectedUser._id,
-      "suspended",
-      suspensionReason
-    );
+    const currentRole = parseEmployeeRole(selectedUser.employeeRole);
+    const manageResult = await manageEmployeeUser({
+      email: selectedUser.email,
+      role: currentRole,
+      active: false,
+    });
+    const result = manageResult.success
+      ? manageResult
+      : await updateEmployeeStatus(selectedUser.id, 'suspended', suspensionReason);
 
     if (result.success) {
       toast.success(result.message);
       setShowSuspendDialog(false);
-      setSuspensionReason("");
+      setSuspensionReason('');
       loadData();
     } else {
       toast.error(result.message);
@@ -137,7 +147,20 @@ export default function EmployeeManagement() {
   };
 
   const handleActivate = async (userId: string) => {
-    const result = await updateEmployeeStatus(userId, "active");
+    const currentEmployee = employees.find((emp) => emp.id === userId || emp.id === userId);
+    if (!currentEmployee) {
+      toast.error('Employee not found');
+      return;
+    }
+
+    const manageResult = await manageEmployeeUser({
+      email: currentEmployee.email,
+      role: currentEmployee.role,
+      active: true,
+    });
+    const result = manageResult.success
+      ? manageResult
+      : await updateEmployeeStatus(userId, 'active');
 
     if (result.success) {
       toast.success(result.message);
@@ -153,8 +176,8 @@ export default function EmployeeManagement() {
       emp.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       emp.email.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesRole = filterRole === "all" || emp.role === filterRole;
-    const matchesStatus = filterStatus === "all" || emp.status === filterStatus;
+    const matchesRole = filterRole === 'all' || emp.role === filterRole;
+    const matchesStatus = filterStatus === 'all' || emp.status === filterStatus;
 
     return matchesSearch && matchesRole && matchesStatus;
   });
@@ -195,7 +218,7 @@ export default function EmployeeManagement() {
             <div>
               <p className="text-sm text-gray-600">Call Center</p>
               <p className="text-2xl font-bold">
-                {employees.filter((e) => e.role === "callcenter").length}
+                {employees.filter((e) => e.role === 'callcenter').length}
               </p>
             </div>
             <div className="h-8 w-8 rounded-full bg-blue-100"></div>
@@ -206,7 +229,7 @@ export default function EmployeeManagement() {
             <div>
               <p className="text-sm text-gray-600">Packers</p>
               <p className="text-2xl font-bold">
-                {employees.filter((e) => e.role === "packer").length}
+                {employees.filter((e) => e.role === 'packer').length}
               </p>
             </div>
             <div className="h-8 w-8 rounded-full bg-purple-100"></div>
@@ -217,7 +240,7 @@ export default function EmployeeManagement() {
             <div>
               <p className="text-sm text-gray-600">Delivery</p>
               <p className="text-2xl font-bold">
-                {employees.filter((e) => e.role === "deliveryman").length}
+                {employees.filter((e) => e.role === 'deliveryman').length}
               </p>
             </div>
             <div className="h-8 w-8 rounded-full bg-green-100"></div>
@@ -228,7 +251,7 @@ export default function EmployeeManagement() {
             <div>
               <p className="text-sm text-gray-600">Active</p>
               <p className="text-2xl font-bold text-green-600">
-                {employees.filter((e) => e.status === "active").length}
+                {employees.filter((e) => e.status === 'active').length}
               </p>
             </div>
             <CheckCircle className="h-8 w-8 text-green-500" />
@@ -327,24 +350,19 @@ export default function EmployeeManagement() {
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredEmployees.length === 0 ? (
                 <tr>
-                  <td
-                    colSpan={6}
-                    className="px-6 py-8 text-center text-gray-500"
-                  >
+                  <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
                     No employees found
                   </td>
                 </tr>
               ) : (
                 filteredEmployees.map((employee) => (
-                  <tr key={employee._id} className="hover:bg-gray-50">
+                  <tr key={employee.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
                         <div className="text-sm font-medium text-gray-900">
                           {employee.firstName} {employee.lastName}
                         </div>
-                        <div className="text-sm text-gray-500">
-                          {employee.email}
-                        </div>
+                        <div className="text-sm text-gray-500">{employee.email}</div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -355,11 +373,11 @@ export default function EmployeeManagement() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <Badge
                         variant={
-                          employee.status === "active"
-                            ? "default"
-                            : employee.status === "suspended"
-                            ? "destructive"
-                            : "secondary"
+                          employee.status === 'active'
+                            ? 'default'
+                            : employee.status === 'suspended'
+                              ? 'destructive'
+                              : 'secondary'
                         }
                       >
                         {employee.status}
@@ -368,26 +386,15 @@ export default function EmployeeManagement() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {employee.performance ? (
                         <div>
-                          <div>
-                            Processed:{" "}
-                            {employee.performance.ordersProcessed || 0}
-                          </div>
-                          {employee.role === "callcenter" && (
-                            <div>
-                              Confirmed:{" "}
-                              {employee.performance.ordersConfirmed || 0}
-                            </div>
+                          <div>Processed: {employee.performance.ordersProcessed || 0}</div>
+                          {employee.role === 'callcenter' && (
+                            <div>Confirmed: {employee.performance.ordersConfirmed || 0}</div>
                           )}
-                          {employee.role === "packer" && (
-                            <div>
-                              Packed: {employee.performance.ordersPacked || 0}
-                            </div>
+                          {employee.role === 'packer' && (
+                            <div>Packed: {employee.performance.ordersPacked || 0}</div>
                           )}
-                          {employee.role === "deliveryman" && (
-                            <div>
-                              Delivered:{" "}
-                              {employee.performance.ordersDelivered || 0}
-                            </div>
+                          {employee.role === 'deliveryman' && (
+                            <div>Delivered: {employee.performance.ordersDelivered || 0}</div>
                           )}
                         </div>
                       ) : (
@@ -396,23 +403,19 @@ export default function EmployeeManagement() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       <div>
-                        <div>
-                          {new Date(employee.assignedAt).toLocaleDateString()}
-                        </div>
-                        <div className="text-xs text-gray-400">
-                          by {employee.assignedBy}
-                        </div>
+                        <div>{new Date(employee.assignedAt).toLocaleDateString()}</div>
+                        <div className="text-xs text-gray-400">by {employee.assignedBy}</div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex justify-end gap-2">
-                        {employee.status === "active" ? (
+                        {employee.status === 'active' ? (
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={() => {
                               setSelectedUser({
-                                _id: employee._id,
+                                id: employee.id,
                                 email: employee.email,
                                 firstName: employee.firstName,
                                 lastName: employee.lastName,
@@ -428,11 +431,11 @@ export default function EmployeeManagement() {
                             <Ban className="h-3 w-3" />
                             Suspend
                           </Button>
-                        ) : employee.status === "suspended" ? (
+                        ) : employee.status === 'suspended' ? (
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handleActivate(employee._id)}
+                            onClick={() => handleActivate(employee.id)}
                             className="flex items-center gap-1 text-green-600"
                           >
                             <CheckCircle className="h-3 w-3" />
@@ -442,7 +445,7 @@ export default function EmployeeManagement() {
                         <Button
                           variant="destructive"
                           size="sm"
-                          onClick={() => handleRemoveRole(employee._id)}
+                          onClick={() => handleRemoveRole(employee.id)}
                           className="flex items-center gap-1"
                         >
                           <UserMinus className="h-3 w-3" />
@@ -463,17 +466,15 @@ export default function EmployeeManagement() {
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>Assign Employee Role</DialogTitle>
-            <DialogDescription>
-              Select a user and assign them an employee role
-            </DialogDescription>
+            <DialogDescription>Select a user and assign them an employee role</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
               <Label htmlFor="user">Select User</Label>
               <Select
-                value={selectedUser?._id}
+                value={selectedUser?.id}
                 onValueChange={(value) => {
-                  const user = nonEmployeeUsers.find((u) => u._id === value);
+                  const user = nonEmployeeUsers.find((u) => u.id === value);
                   setSelectedUser(user || null);
                 }}
               >
@@ -482,7 +483,7 @@ export default function EmployeeManagement() {
                 </SelectTrigger>
                 <SelectContent>
                   {nonEmployeeUsers.map((user) => (
-                    <SelectItem key={user._id} value={user._id}>
+                    <SelectItem key={user.id} value={user.id}>
                       {user.firstName} {user.lastName} ({user.email})
                     </SelectItem>
                   ))}
@@ -493,9 +494,7 @@ export default function EmployeeManagement() {
               <Label htmlFor="role">Employee Role</Label>
               <Select
                 value={selectedRole}
-                onValueChange={(value) =>
-                  setSelectedRole(value as EmployeeRole)
-                }
+                onValueChange={(value) => setSelectedRole(value as EmployeeRole)}
               >
                 <SelectTrigger id="role">
                   <SelectValue />
@@ -511,10 +510,7 @@ export default function EmployeeManagement() {
             </div>
           </div>
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setShowAssignDialog(false)}
-            >
+            <Button variant="outline" onClick={() => setShowAssignDialog(false)}>
               Cancel
             </Button>
             <Button onClick={handleAssignRole} disabled={!selectedUser}>
@@ -530,8 +526,7 @@ export default function EmployeeManagement() {
           <DialogHeader>
             <DialogTitle>Suspend Employee</DialogTitle>
             <DialogDescription>
-              Provide a reason for suspending {selectedUser?.firstName}{" "}
-              {selectedUser?.lastName}
+              Provide a reason for suspending {selectedUser?.firstName} {selectedUser?.lastName}
             </DialogDescription>
           </DialogHeader>
           <div>
@@ -549,7 +544,7 @@ export default function EmployeeManagement() {
               variant="outline"
               onClick={() => {
                 setShowSuspendDialog(false);
-                setSuspensionReason("");
+                setSuspensionReason('');
               }}
             >
               Cancel

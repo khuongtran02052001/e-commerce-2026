@@ -1,47 +1,39 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { X, Star, Zap, Gift } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { toast } from "sonner";
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { fetchService } from '@/lib/restClient';
+import { Gift, Star, X, Zap } from 'lucide-react';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
 interface PremiumBannerProps {
   onRegister: () => void;
   onDismiss?: () => void;
 }
 
-export default function PremiumBanner({
-  onRegister,
-  onDismiss,
-}: PremiumBannerProps) {
+export default function PremiumBanner({ onRegister, onDismiss }: PremiumBannerProps) {
   const [isRegistering, setIsRegistering] = useState(false);
 
   const handleRegister = async () => {
     setIsRegistering(true);
     try {
-      const response = await fetch("/api/user/status", {
-        method: "POST",
-      });
+      const response = await fetchService('/user/status', { method: 'POST' });
 
       if (response.ok) {
         const data = await response.json();
-        toast.success(
-          data.message || "Successfully registered for premium services!",
-          {
-            description:
-              "Welcome to premium! Enjoy exclusive offers and priority support.",
-            duration: 5000,
-          }
-        );
+        toast.success(data.message || 'Successfully registered for premium services!', {
+          description: 'Welcome to premium! Enjoy exclusive offers and priority support.',
+          duration: 5000,
+        });
         onRegister();
       } else {
         const error = await response.json();
-        toast.error(error.error || "Failed to register for premium services");
+        toast.error(error.error || 'Failed to register for premium services');
       }
     } catch (error) {
-      console.error("Error registering for premium:", error);
-      toast.error("Something went wrong. Please try again.");
+      console.error('Error registering for premium:', error);
+      toast.error('Something went wrong. Please try again.');
     } finally {
       setIsRegistering(false);
     }
@@ -66,18 +58,14 @@ export default function PremiumBanner({
         <div className="flex-1">
           <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
             Unlock Premium Benefits!
-            <Badge
-              variant="secondary"
-              className="bg-yellow-400 text-yellow-900"
-            >
+            <Badge variant="secondary" className="bg-yellow-400 text-yellow-900">
               Free
             </Badge>
           </h3>
 
           <p className="text-white/90 text-sm mb-4">
-            Get access to exclusive offers, priority customer support, early
-            access to sales, and personalized recommendations. Join our premium
-            community today!
+            Get access to exclusive offers, priority customer support, early access to sales, and
+            personalized recommendations. Join our premium community today!
           </p>
 
           <div className="flex flex-wrap gap-4 mb-4 text-sm">
@@ -100,7 +88,7 @@ export default function PremiumBanner({
             disabled={isRegistering}
             className="bg-white text-shop_dark_green hover:bg-white/90 font-semibold"
           >
-            {isRegistering ? "Registering..." : "Apply for Premium Services"}
+            {isRegistering ? 'Registering...' : 'Apply for Premium Services'}
           </Button>
         </div>
       </div>

@@ -1,29 +1,20 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Category, Product } from "@/sanity.types";
-import { urlFor } from "@/sanity/lib/image";
-import Image from "next/image";
-import Link from "next/link";
-import {
-  ArrowLeft,
-  ArrowRight,
-  Tag,
-  Grid3X3,
-  Filter,
-  TrendingUp,
-} from "lucide-react";
-import Title from "./Title";
-import CategoryProducts from "./product/CategoryProducts";
-import CategoryDetailSkeleton from "./CategoryDetailSkeleton";
+import type { ICategory, IProduct } from '@/mock-data';
+import { ArrowLeft, ArrowRight, Filter, Grid3X3, Tag, TrendingUp } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useState } from 'react';
+import Title from './Title';
+import CategoryProducts from './product/CategoryProducts';
 
 interface Props {
-  categories: Category[];
+  categories: ICategory[];
   slug: string;
   categoryTitle: string;
-  currentCategory?: Category;
-  relatedCategories: Category[];
-  initialProducts: Product[];
+  currentCategory?: ICategory;
+  relatedCategories: ICategory[];
+  initialProducts: IProduct[];
 }
 
 const CategoryPageClient = ({
@@ -45,10 +36,10 @@ const CategoryPageClient = ({
           <div className="flex-1">
             <div className="flex items-start gap-4 mb-4">
               {/* Category Image */}
-              {currentCategory?.image && (
+              {currentCategory?.imageUrl && (
                 <div className="flex-shrink-0 w-16 h-16 lg:w-20 lg:h-20 bg-gradient-to-br from-shop_light_pink to-shop_light_bg rounded-xl overflow-hidden">
                   <Image
-                    src={urlFor(currentCategory.image).url()}
+                    src={currentCategory.imageUrl}
                     alt={categoryTitle}
                     width={80}
                     height={80}
@@ -127,11 +118,7 @@ const CategoryPageClient = ({
       </div>
 
       {/* Main Content */}
-      <CategoryProducts
-        categories={categories}
-        slug={slug}
-        initialProducts={initialProducts}
-      />
+      <CategoryProducts categories={categories} slug={slug} initialProducts={initialProducts} />
 
       {/* Related Categories Section */}
       {relatedCategories.length > 0 && (
@@ -150,22 +137,22 @@ const CategoryPageClient = ({
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {relatedCategories.map((category) => (
-              <Link
-                key={category._id}
-                href={`/category/${category.slug?.current}`}
-                className="group bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border border-gray-100 hover:border-shop_light_green p-4 text-center"
-              >
-                {/* Category Image */}
-                <div className="w-12 h-12 mx-auto mb-3 bg-gradient-to-br from-shop_light_pink to-shop_light_bg rounded-lg flex items-center justify-center">
-                  {category.image ? (
-                    <Image
-                      src={urlFor(category.image).url()}
-                      alt={category.title || "Category"}
-                      width={32}
-                      height={32}
-                      className="w-8 h-8 object-contain"
-                    />
+              {relatedCategories.map((category) => (
+                <Link
+                  key={category.id}
+                  href={`/category/${category.slug}`}
+                  className="group bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border border-gray-100 hover:border-shop_light_green p-4 text-center"
+                >
+                  {/* Category Image */}
+                  <div className="w-12 h-12 mx-auto mb-3 bg-gradient-to-br from-shop_light_pink to-shop_light_bg rounded-lg flex items-center justify-center">
+                    {category.imageUrl ? (
+                      <Image
+                        src={category.imageUrl}
+                        alt={category.title || 'Category'}
+                        width={32}
+                        height={32}
+                        className="w-8 h-8 object-contain"
+                      />
                   ) : (
                     <Grid3X3 className="w-6 h-6 text-shop_light_green opacity-60" />
                   )}
@@ -188,8 +175,8 @@ const CategoryPageClient = ({
             Discover More Amazing Products
           </h3>
           <p className="text-dark-text mb-6 text-sm lg:text-base">
-            Can&apos;t find what you&apos;re looking for in {categoryTitle}?
-            Explore our complete collection of products across all categories.
+            Can&apos;t find what you&apos;re looking for in {categoryTitle}? Explore our complete
+            collection of products across all categories.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link

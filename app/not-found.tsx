@@ -1,5 +1,5 @@
-import Logo from "@/components/common/Logo";
-import Link from "next/link";
+import Logo from '@/components/common/Logo';
+import Link from 'next/link';
 
 const NotFoundPage = () => {
   return (
@@ -8,12 +8,9 @@ const NotFoundPage = () => {
         <div className="text-center">
           <Logo />
 
-          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
-            Looking for something?
-          </h2>
+          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">Looking for something?</h2>
           <p className="mt-2 text-sm text-gray-600">
-            We&apos;re sorry. The Web address you entered is not a functioning
-            page on our site.
+            We&apos;re sorry. The Web address you entered is not a functioning page on our site.
           </p>
         </div>
         <div className="mt-8 space-y-6">
@@ -34,14 +31,11 @@ const NotFoundPage = () => {
         </div>
         <div className="mt-8 text-center">
           <p className="text-sm text-gray-600">
-            Need help? Visit the{" "}
-            <Link
-              href="/help"
-              className="font-medium text-amazon-blue hover:text-amazon-blue-dark"
-            >
+            Need help? Visit the{' '}
+            <Link href="/help" className="font-medium text-amazon-blue hover:text-amazon-blue-dark">
               Help section
-            </Link>{" "}
-            or{" "}
+            </Link>{' '}
+            or{' '}
             <Link
               href="/contact"
               className="font-medium text-amazon-blue hover:text-amazon-blue-dark"

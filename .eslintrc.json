@@ -6,6 +6,8 @@
     "react-hooks/exhaustive-deps": "off",
     "@typescript-eslint/no-explicit-any": "warn",
     "react/no-unescaped-entities": "off",
-    "prefer-const": "warn"
+    "prefer-const": "warn",
+    "tailwindCSS.lint.suggestCanonicalClasses": "off",
+    "tailwindCSS.lint.validation": "off"
   }
 }

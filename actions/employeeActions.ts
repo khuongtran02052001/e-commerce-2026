@@ -1,367 +1,282 @@
-"use server";
+'use server';
 
-import { auth } from "@clerk/nextjs/server";
-import { backendClient } from "@/sanity/lib/backendClient";
-import {
-  Employee,
-  EmployeeRole,
-  EmployeeStatus,
-  ROLE_PERMISSIONS,
-} from "@/types/employee";
+import { auth } from '@/lib/auth';
+import { fetchServiceJsonServer } from '@/lib/restClient';
+import { Employee, EmployeeRole, EmployeeStatus } from '@/types/domain/employee';
 
-// Assign employee role to a user
-export async function assignEmployeeRole(
-  userId: string,
-  role: EmployeeRole
-): Promise<{ success: boolean; message: string; employee?: Employee }> {
+type ApiAny = Record<string, any>;
+
+const toUiRole = (role?: string): EmployeeRole => {
+  const normalized = String(role || '')
+    .trim()
+    .toUpperCase();
+
+  const map: Record<string, EmployeeRole> = {
+    CALL_CENTER: 'callcenter',
+    CALLCENTER: 'callcenter',
+    PACKER: 'packer',
+    WAREHOUSE: 'warehouse',
+    WARE_HOUSE: 'warehouse',
+    DELIVERYMAN: 'deliveryman',
+    DELIVERY_MAN: 'deliveryman',
+    INCHARGE: 'incharge',
+    IN_CHARGE: 'incharge',
+    ACCOUNTS: 'accounts',
+  };
+
+  return map[normalized] ?? 'callcenter';
+};
+
+const toApiRole = (role: EmployeeRole): string => {
+  const map: Record<EmployeeRole, string> = {
+    callcenter: 'CALL_CENTER',
+    packer: 'PACKER',
+    warehouse: 'WARE_HOUSE',
+    deliveryman: 'DELIVERYMAN',
+    incharge: 'IN_CHARGE',
+    accounts: 'ACCOUNTS',
+  };
+  return map[role];
+};
+
+const normalizeEmployee = (value: ApiAny): Employee => {
+  const id = value?.id || value?.userId || '';
+  return {
+    id,
+    userId: value?.userId || id,
+    email: value?.email || '',
+    firstName: value?.firstName || '',
+    lastName: value?.lastName || '',
+    role: toUiRole(value?.role || value?.employeeRole),
+    status: String(
+      value?.status || value?.employeeStatus || 'active',
+    ).toLowerCase() as EmployeeStatus,
+    assignedBy: value?.assignedBy || value?.assignedById || '',
+    assignedAt:
+      value?.assignedAt || value?.updatedAt || value?.createdAt || new Date().toISOString(),
+    suspendedAt: value?.suspendedAt,
+    suspendedBy: value?.suspendedBy,
+    suspensionReason: value?.suspensionReason,
+    activatedAt: value?.activatedAt,
+    permissions: value?.permissions || {},
+    performance: value?.performance || value?.metrics || {},
+    createdAt: value?.createdAt || new Date().toISOString(),
+    updatedAt: value?.updatedAt || new Date().toISOString(),
+  };
+};
+
+const unwrapList = (payload: any, key: string) => {
+  const direct = Array.isArray(payload?.[key]) ? payload[key] : null;
+  const inData = Array.isArray(payload?.data?.[key]) ? payload.data[key] : null;
+  const dataArray = Array.isArray(payload?.data) ? payload.data : null;
+  const plainArray = Array.isArray(payload) ? payload : null;
+  return direct || inData || dataArray || plainArray || [];
+};
+
+const unwrapObject = (payload: any, key: string) =>
+  payload?.[key] || payload?.data?.[key] || payload?.data || payload || null;
+
+async function getSessionOrUnauthorized() {
+  const session = await auth();
+  if (!session?.accessToken) {
+    throw new Error('Unauthorized');
+  }
+  return session;
+}
+
+export async function getAllUsers(): Promise<
+  Array<{
+    id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    isEmployee: boolean;
+    employeeRole?: string;
+    employeeStatus?: string;
+    createdAt: string;
+  }>
+> {
   try {
-    const { userId: clerkUserId } = await auth();
-
-    if (!clerkUserId) {
-      return { success: false, message: "Unauthorized" };
-    }
-
-    // Get admin user to verify permissions
-    const adminUser = await backendClient.fetch(
-      `*[_type == "user" && clerkUserId == $clerkUserId][0]`,
-      { clerkUserId }
-    );
-
-    if (!adminUser) {
-      return { success: false, message: "Admin user not found" };
-    }
-
-    // Get user to assign role to
-    const user = await backendClient.fetch(
-      `*[_type == "user" && _id == $userId][0]`,
-      { userId }
-    );
-
-    if (!user) {
-      return { success: false, message: "User not found" };
-    }
-
-    // Update user with employee fields
-    const updatedUser = await backendClient
-      .patch(userId)
-      .set({
-        isEmployee: true,
-        employeeRole: role,
-        employeeStatus: "active",
-        employeeAssignedBy: adminUser.email,
-        employeeAssignedAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      })
-      .commit();
-
-    return {
-      success: true,
-      message: `Successfully assigned ${role} role to ${user.firstName} ${user.lastName}`,
-      employee: {
-        _id: updatedUser._id,
-        userId: updatedUser._id,
-        clerkUserId: updatedUser.clerkUserId,
-        email: updatedUser.email,
-        firstName: updatedUser.firstName,
-        lastName: updatedUser.lastName,
-        role,
-        status: "active",
-        assignedBy: adminUser.email,
-        assignedAt: new Date().toISOString(),
-        permissions: ROLE_PERMISSIONS[role],
-        createdAt: updatedUser.createdAt,
-        updatedAt: updatedUser.updatedAt,
-      },
-    };
-  } catch (error) {
-    console.error("Error assigning employee role:", error);
-    return {
-      success: false,
-      message:
-        error instanceof Error
-          ? error.message
-          : "Failed to assign employee role",
-    };
+    const session = await getSessionOrUnauthorized();
+    const res = await fetchServiceJsonServer<ApiAny>('/admin/users/combined?limit=200&offset=0', {
+      accessToken: session.accessToken,
+      cache: 'no-store',
+    });
+    const rows = unwrapList(res, 'users');
+    return rows.map((u: ApiAny) => ({
+      id: u.id,
+      email: u.email || '',
+      firstName: u.firstName || '',
+      lastName: u.lastName || '',
+      isEmployee: Boolean(u.isEmployee),
+      employeeRole: u.employeeRole || u.role,
+      employeeStatus: u.employeeStatus || u.status,
+      createdAt: u.createdAt || new Date().toISOString(),
+    }));
+  } catch (err) {
+    console.error('Error fetching users:', err);
+    return [];
   }
 }
 
-// Remove employee role from user
-export async function removeEmployeeRole(
-  userId: string
-): Promise<{ success: boolean; message: string }> {
+export async function getAllEmployees(): Promise<Employee[]> {
   try {
-    const { userId: clerkUserId } = await auth();
-
-    if (!clerkUserId) {
-      return { success: false, message: "Unauthorized" };
-    }
-
-    await backendClient
-      .patch(userId)
-      .set({
-        isEmployee: false,
-        employeeRole: undefined,
-        employeeStatus: "inactive",
-        updatedAt: new Date().toISOString(),
-      })
-      .commit();
-
-    return { success: true, message: "Employee role removed successfully" };
-  } catch (error) {
-    console.error("Error removing employee role:", error);
-    return {
-      success: false,
-      message:
-        error instanceof Error
-          ? error.message
-          : "Failed to remove employee role",
-    };
+    const session = await getSessionOrUnauthorized();
+    const res = await fetchServiceJsonServer<ApiAny>('/admin/employees', {
+      accessToken: session.accessToken,
+      cache: 'no-store',
+    });
+    return unwrapList(res, 'employees').map(normalizeEmployee);
+  } catch (err) {
+    console.error('Error fetching employees:', err);
+    return [];
   }
 }
 
-// Update employee status
-export async function updateEmployeeStatus(
-  userId: string,
-  status: EmployeeStatus,
-  reason?: string
-): Promise<{ success: boolean; message: string }> {
+export async function getEmployeesByRole(role: EmployeeRole): Promise<Employee[]> {
   try {
-    const { userId: clerkUserId } = await auth();
-
-    if (!clerkUserId) {
-      return { success: false, message: "Unauthorized" };
-    }
-
-    const adminUser = await backendClient.fetch(
-      `*[_type == "user" && clerkUserId == $clerkUserId][0]`,
-      { clerkUserId }
+    const session = await getSessionOrUnauthorized();
+    const apiRole = toApiRole(role);
+    const roleCandidates = Array.from(
+      new Set([
+        apiRole,
+        apiRole.replace('DELIVERYMAN', 'DELIVERY_MAN'),
+        apiRole.replace('DELIVERY_MAN', 'DELIVERYMAN'),
+        apiRole.toLowerCase(),
+      ]),
     );
 
-    if (!adminUser) {
-      return { success: false, message: "Admin user not found" };
-    }
+    const urls = roleCandidates.flatMap((roleValue) => [
+      `/admin/employees?role=${encodeURIComponent(roleValue)}&page=1&perPage=200`,
+      `/admin/employees?role=${encodeURIComponent(roleValue)}&limit=200&offset=0`,
+      `/admin/employees?role=${encodeURIComponent(roleValue)}`,
+    ]);
 
-    const updateData: any = {
-      employeeStatus: status,
-      updatedAt: new Date().toISOString(),
-    };
-
-    if (status === "suspended") {
-      updateData.employeeSuspendedBy = adminUser.email;
-      updateData.employeeSuspendedAt = new Date().toISOString();
-      if (reason) {
-        updateData.employeeSuspensionReason = reason;
+    for (const url of urls) {
+      try {
+        const res = await fetchServiceJsonServer<ApiAny>(url, {
+          accessToken: session.accessToken,
+          cache: 'no-store',
+        });
+        const employees: Employee[] = unwrapList(res, 'employees').map(normalizeEmployee);
+        if (employees.length) return employees.filter((emp: Employee) => emp.role === role);
+      } catch {
+        // try next URL variant
       }
     }
 
-    await backendClient.patch(userId).set(updateData).commit();
-
-    return { success: true, message: `Employee status updated to ${status}` };
-  } catch (error) {
-    console.error("Error updating employee status:", error);
-    return {
-      success: false,
-      message:
-        error instanceof Error
-          ? error.message
-          : "Failed to update employee status",
-    };
-  }
-}
-
-// Get all employees
-export async function getAllEmployees(): Promise<Employee[]> {
-  try {
-    const employees = await backendClient.fetch(
-      `*[_type == "user" && isEmployee == true] | order(employeeAssignedAt desc) {
-        _id,
-        "userId": _id,
-        clerkUserId,
-        email,
-        firstName,
-        lastName,
-        employeeRole,
-        employeeStatus,
-        employeeAssignedBy,
-        employeeAssignedAt,
-        employeeSuspendedBy,
-        employeeSuspendedAt,
-        employeeSuspensionReason,
-        employeePerformance,
-        createdAt,
-        updatedAt
-      }`
+    // Final fallback: fetch all employees and filter client-side
+    const allRes = await fetchServiceJsonServer<ApiAny>('/admin/employees', {
+      accessToken: session.accessToken,
+      cache: 'no-store',
+    });
+    return (unwrapList(allRes, 'employees').map(normalizeEmployee) as Employee[]).filter(
+      (emp: Employee) => emp.role === role,
     );
-
-    return employees.map((emp: any) => ({
-      ...emp,
-      role: emp.employeeRole,
-      status: emp.employeeStatus,
-      assignedBy: emp.employeeAssignedBy,
-      assignedAt: emp.employeeAssignedAt,
-      suspendedBy: emp.employeeSuspendedBy,
-      suspendedAt: emp.employeeSuspendedAt,
-      suspensionReason: emp.employeeSuspensionReason,
-      permissions: ROLE_PERMISSIONS[emp.employeeRole as EmployeeRole],
-      performance: emp.employeePerformance,
-    }));
-  } catch (error) {
-    console.error("Error fetching employees:", error);
+  } catch (err) {
+    console.error('Error fetching employees by role:', err);
     return [];
   }
 }
 
-// Get employees by role
-export async function getEmployeesByRole(
-  role: EmployeeRole
-): Promise<Employee[]> {
-  try {
-    const employees = await backendClient.fetch(
-      `*[_type == "user" && isEmployee == true && employeeRole == $role && employeeStatus == "active"] | order(firstName asc) {
-        _id,
-        "userId": _id,
-        clerkUserId,
-        email,
-        firstName,
-        lastName,
-        employeeRole,
-        employeeStatus,
-        employeeAssignedBy,
-        employeeAssignedAt,
-        employeePerformance,
-        createdAt,
-        updatedAt
-      }`,
-      { role }
-    );
-
-    return employees.map((emp: any) => ({
-      ...emp,
-      role: emp.employeeRole,
-      status: emp.employeeStatus,
-      assignedBy: emp.employeeAssignedBy,
-      assignedAt: emp.employeeAssignedAt,
-      permissions: ROLE_PERMISSIONS[emp.employeeRole as EmployeeRole],
-      performance: emp.employeePerformance,
-    }));
-  } catch (error) {
-    console.error("Error fetching employees by role:", error);
-    return [];
-  }
-}
-
-// Get current employee info
 export async function getCurrentEmployee(): Promise<Employee | null> {
   try {
-    const { userId: clerkUserId } = await auth();
-
-    if (!clerkUserId) {
-      return null;
-    }
-
-    const user = await backendClient.fetch(
-      `*[_type == "user" && clerkUserId == $clerkUserId && isEmployee == true][0] {
-        _id,
-        "userId": _id,
-        clerkUserId,
-        email,
-        firstName,
-        lastName,
-        employeeRole,
-        employeeStatus,
-        employeeAssignedBy,
-        employeeAssignedAt,
-        employeePerformance,
-        createdAt,
-        updatedAt
-      }`,
-      { clerkUserId }
-    );
-
-    if (!user || !user.employeeRole) {
-      return null;
-    }
-
-    return {
-      ...user,
-      role: user.employeeRole,
-      status: user.employeeStatus,
-      assignedBy: user.employeeAssignedBy,
-      assignedAt: user.employeeAssignedAt,
-      permissions: ROLE_PERMISSIONS[user.employeeRole as EmployeeRole],
-      performance: user.employeePerformance,
-    };
-  } catch (error) {
-    console.error("Error fetching current employee:", error);
+    const session = await getSessionOrUnauthorized();
+    const res = await fetchServiceJsonServer<ApiAny>('/admin/employees/me/metrics', {
+      accessToken: session.accessToken,
+      cache: 'no-store',
+    });
+    const employeeLike = unwrapObject(res, 'employee');
+    if (!employeeLike) return null;
+    return normalizeEmployee(employeeLike);
+  } catch (err) {
+    console.error('Error fetching current employee:', err);
     return null;
   }
 }
 
-// Get all users (potential employees)
-export async function getAllUsers() {
+export async function assignEmployeeRole(
+  userId: string,
+  role: EmployeeRole,
+): Promise<{ success: boolean; message: string; employee?: Employee }> {
   try {
-    const users = await backendClient.fetch(
-      `*[_type == "user"] | order(createdAt desc) {
-        _id,
-        clerkUserId,
-        email,
-        firstName,
-        lastName,
-        isEmployee,
-        employeeRole,
-        employeeStatus,
-        isActive,
-        createdAt
-      }`
-    );
+    const session = await getSessionOrUnauthorized();
+    const res = await fetchServiceJsonServer<ApiAny>('/admin/employees/assign-role', {
+      method: 'POST',
+      body: JSON.stringify({ userId, role: toApiRole(role) }),
+      accessToken: session.accessToken,
+    });
 
-    return users;
-  } catch (error) {
-    console.error("Error fetching users:", error);
-    return [];
+    return {
+      success: res?.success !== false,
+      message: res?.message || 'Employee role assigned',
+      employee: res?.employee ? normalizeEmployee(res.employee) : undefined,
+    };
+  } catch (err) {
+    console.error('Error assigning employee role:', err);
+    return { success: false, message: 'Failed to assign employee role' };
   }
 }
 
-// Update employee performance
-export async function updateEmployeePerformance(
-  userId: string,
-  performanceData: Partial<{
-    ordersProcessed: number;
-    ordersConfirmed: number;
-    ordersPacked: number;
-    ordersAssignedForDelivery: number;
-    ordersDelivered: number;
-    cashCollected: number;
-    paymentsReceived: number;
-  }>
-): Promise<{ success: boolean; message: string }> {
+export async function removeEmployeeRole(userId: string) {
   try {
-    const user = await backendClient.fetch(
-      `*[_type == "user" && _id == $userId][0] { employeePerformance }`,
-      { userId }
-    );
+    const session = await getSessionOrUnauthorized();
+    const res = await fetchServiceJsonServer<ApiAny>(`/admin/employees/${userId}/role`, {
+      method: 'DELETE',
+      accessToken: session.accessToken,
+    });
+    return { success: res?.success !== false, message: res?.message || 'Employee role removed' };
+  } catch (err) {
+    console.error('Error removing employee role:', err);
+    return { success: false, message: 'Failed to remove role' };
+  }
+}
 
-    const currentPerformance = user?.employeePerformance || {};
+export async function updateEmployeeStatus(
+  userId: string,
+  status: EmployeeStatus,
+  reason?: string,
+) {
+  try {
+    const session = await getSessionOrUnauthorized();
+    const url =
+      status === 'suspended'
+        ? `/admin/employees/${userId}/suspend`
+        : `/admin/employees/${userId}/activate`;
+    const method = 'PATCH';
+    const body = status === 'suspended' ? { reason: reason || 'Suspended by admin' } : {};
 
-    await backendClient
-      .patch(userId)
-      .set({
-        employeePerformance: {
-          ...currentPerformance,
-          ...performanceData,
-          lastActiveAt: new Date().toISOString(),
-        },
-        updatedAt: new Date().toISOString(),
-      })
-      .commit();
+    const res = await fetchServiceJsonServer<ApiAny>(url, {
+      method,
+      body: JSON.stringify(body),
+      accessToken: session.accessToken,
+    });
+    return { success: res?.success !== false, message: res?.message || 'Employee status updated' };
+  } catch (err) {
+    console.error('Error updating employee status:', err);
+    return { success: false, message: 'Failed to update employee status' };
+  }
+}
 
-    return { success: true, message: "Performance updated successfully" };
-  } catch (error) {
-    console.error("Error updating employee performance:", error);
-    return {
-      success: false,
-      message:
-        error instanceof Error ? error.message : "Failed to update performance",
-    };
+export async function manageEmployeeUser(payload: {
+  email: string;
+  role: EmployeeRole;
+  active: boolean;
+}) {
+  try {
+    const session = await getSessionOrUnauthorized();
+    const res = await fetchServiceJsonServer<ApiAny>('/admin/employees/manage-user', {
+      method: 'POST',
+      body: JSON.stringify({
+        email: payload.email,
+        role: toApiRole(payload.role),
+        active: payload.active,
+      }),
+      accessToken: session.accessToken,
+    });
+    return { success: res?.success !== false, message: res?.message || 'Updated successfully' };
+  } catch (err) {
+    console.error('Error managing employee user:', err);
+    return { success: false, message: 'Failed to manage employee' };
   }
 }

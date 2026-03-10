@@ -1,13 +1,11 @@
-import { Category } from "@/sanity.types";
-import Container from "./Container";
-import Title from "./Title";
-import Link from "next/link";
-import Image from "next/image";
-import { urlFor } from "@/sanity/lib/image";
-import { ICategoryMock } from "@/mock-data";
+import { ICategory } from '@/mock-data';
+import Image from 'next/image';
+import Link from 'next/link';
+import Container from './Container';
+import Title from './Title';
 
 interface Props {
-  categories: ICategoryMock[];
+  categories: ICategory[];
 }
 
 const HomeCategories = ({ categories }: Props) => {
@@ -26,7 +24,7 @@ const HomeCategories = ({ categories }: Props) => {
           Explore our most popular product categories and find what you need
         </p>
         <Link
-          href={"/category"}
+          href={'/category'}
           className="inline-flex items-center gap-2 mt-6 px-6 py-3 bg-shop_light_pink text-shop_dark_green/80 font-semibold rounded-full hover:bg-shop_light_blue hover:text-shop_dark_green border-2 border-shop_light_blue hover:border-shop_dark_green hoverEffect"
         >
           Browse All Categories
@@ -81,13 +79,9 @@ const HomeCategories = ({ categories }: Props) => {
                 <div className="flex items-center justify-center gap-2">
                   <div className="flex items-center gap-1">
                     <div className="w-2 h-2 bg-shop_light_blue rounded-full"></div>
-                    <span className="text-sm font-semibold text-shop_dark_blue">
-                      Explore
-                    </span>
+                    <span className="text-sm font-semibold text-shop_dark_blue">Explore</span>
                   </div>
-                  <span className="text-sm text-light-color">
-                    this category
-                  </span>
+                  <span className="text-sm text-light-color">this category</span>
                 </div>
 
                 {/* Decorative Bar */}
@@ -123,9 +117,7 @@ const HomeCategories = ({ categories }: Props) => {
         {/* Categories Stats */}
         <div className="flex flex-wrap items-center justify-center gap-8 mt-12 pt-8 border-t border-shop_light_blue/20">
           <div className="text-center">
-            <div className="text-2xl font-bold text-shop_dark_blue">
-              {categories?.length}+
-            </div>
+            <div className="text-2xl font-bold text-shop_dark_blue">{categories?.length}+</div>
             <div className="text-sm text-light-color">Categories</div>
           </div>
           <div className="text-center">

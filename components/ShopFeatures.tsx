@@ -1,20 +1,20 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import Container from "./Container";
-import Title from "./Title";
-import FeatureModal from "./FeatureModal";
 import {
-  ShieldCheck,
-  Truck,
-  CreditCard,
-  Headphones,
-  RefreshCw,
   Award,
   Clock,
+  CreditCard,
+  Headphones,
   Heart,
   LucideIcon,
-} from "lucide-react";
+  RefreshCw,
+  ShieldCheck,
+  Truck,
+} from 'lucide-react';
+import { useState } from 'react';
+import Container from './Container';
+import FeatureModal from './FeatureModal';
+import Title from './Title';
 
 interface FeatureType {
   icon: LucideIcon;
@@ -28,194 +28,192 @@ interface FeatureType {
 }
 
 const ShopFeatures = () => {
-  const [selectedFeature, setSelectedFeature] = useState<FeatureType | null>(
-    null
-  );
+  const [selectedFeature, setSelectedFeature] = useState<FeatureType | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const features: FeatureType[] = [
     {
       icon: ShieldCheck,
-      title: "Secure Shopping",
-      description: "100% secure payment with SSL encryption",
-      color: "from-blue-500 to-blue-600",
-      bgColor: "bg-blue-50",
-      iconColor: "text-blue-600",
+      title: 'Secure Shopping',
+      description: '100% secure payment with SSL encryption',
+      color: 'from-blue-500 to-blue-600',
+      bgColor: 'bg-blue-50',
+      iconColor: 'text-blue-600',
       details: [
-        "Advanced SSL encryption protects all your transactions and personal data during checkout",
-        "PCI DSS compliant payment processing ensures industry-standard security measures",
-        "Secure payment gateways from trusted providers like Stripe and PayPal",
-        "Regular security audits and monitoring to detect and prevent fraud",
-        "Your financial information is never stored on our servers",
+        'Advanced SSL encryption protects all your transactions and personal data during checkout',
+        'PCI DSS compliant payment processing ensures industry-standard security measures',
+        'Secure payment gateways from trusted providers like Stripe and PayPal',
+        'Regular security audits and monitoring to detect and prevent fraud',
+        'Your financial information is never stored on our servers',
       ],
       benefits: [
-        "Shop with complete confidence",
-        "Protected personal information",
-        "Safe payment processing",
-        "Fraud prevention systems",
-        "Encrypted data transmission",
-        "Verified secure checkout",
+        'Shop with complete confidence',
+        'Protected personal information',
+        'Safe payment processing',
+        'Fraud prevention systems',
+        'Encrypted data transmission',
+        'Verified secure checkout',
       ],
     },
     {
       icon: Truck,
-      title: "Free Delivery",
-      description: "Free shipping on orders over $50",
-      color: "from-green-500 to-green-600",
-      bgColor: "bg-green-50",
-      iconColor: "text-green-600",
+      title: 'Free Delivery',
+      description: 'Free shipping on orders over $50',
+      color: 'from-green-500 to-green-600',
+      bgColor: 'bg-green-50',
+      iconColor: 'text-green-600',
       details: [
-        "Enjoy free standard shipping on all orders over $50 to anywhere in the country",
-        "Track your package in real-time with our advanced tracking system",
-        "Partner with reliable carriers for timely and safe delivery",
-        "Eco-friendly packaging materials to reduce environmental impact",
-        "Delivery within 3-7 business days depending on your location",
+        'Enjoy free standard shipping on all orders over $50 to anywhere in the country',
+        'Track your package in real-time with our advanced tracking system',
+        'Partner with reliable carriers for timely and safe delivery',
+        'Eco-friendly packaging materials to reduce environmental impact',
+        'Delivery within 3-7 business days depending on your location',
       ],
       benefits: [
-        "Save money on shipping",
-        "Real-time order tracking",
-        "Reliable delivery partners",
-        "Eco-friendly packaging",
-        "Doorstep delivery",
-        "No hidden charges",
+        'Save money on shipping',
+        'Real-time order tracking',
+        'Reliable delivery partners',
+        'Eco-friendly packaging',
+        'Doorstep delivery',
+        'No hidden charges',
       ],
     },
     {
       icon: CreditCard,
-      title: "Easy Payments",
-      description: "Multiple payment options available",
-      color: "from-purple-500 to-purple-600",
-      bgColor: "bg-purple-50",
-      iconColor: "text-purple-600",
+      title: 'Easy Payments',
+      description: 'Multiple payment options available',
+      color: 'from-purple-500 to-purple-600',
+      bgColor: 'bg-purple-50',
+      iconColor: 'text-purple-600',
       details: [
-        "Accept all major credit and debit cards including Visa, Mastercard, and Amex",
-        "Digital wallets like PayPal, Apple Pay, and Google Pay for faster checkout",
-        "Buy now, pay later options available through trusted partners",
-        "Secure one-click checkout for returning customers",
-        "International payment methods supported for global shopping",
+        'Accept all major credit and debit cards including Visa, Mastercard, and Amex',
+        'Digital wallets like PayPal, Apple Pay, and Google Pay for faster checkout',
+        'Buy now, pay later options available through trusted partners',
+        'Secure one-click checkout for returning customers',
+        'International payment methods supported for global shopping',
       ],
       benefits: [
-        "Multiple payment options",
-        "Quick one-click checkout",
-        "Flexible payment plans",
-        "Saved payment methods",
-        "International cards accepted",
-        "Instant payment confirmation",
+        'Multiple payment options',
+        'Quick one-click checkout',
+        'Flexible payment plans',
+        'Saved payment methods',
+        'International cards accepted',
+        'Instant payment confirmation',
       ],
     },
     {
       icon: Headphones,
-      title: "24/7 Support",
-      description: "Dedicated customer support anytime",
-      color: "from-orange-500 to-orange-600",
-      bgColor: "bg-orange-50",
-      iconColor: "text-orange-600",
+      title: '24/7 Support',
+      description: 'Dedicated customer support anytime',
+      color: 'from-orange-500 to-orange-600',
+      bgColor: 'bg-orange-50',
+      iconColor: 'text-orange-600',
       details: [
-        "Round-the-clock customer support via live chat, email, and phone",
-        "Knowledgeable support team ready to help with any questions or issues",
-        "Average response time of under 2 minutes for live chat inquiries",
-        "Multi-language support to assist customers worldwide",
-        "Comprehensive FAQ and help center for self-service solutions",
+        'Round-the-clock customer support via live chat, email, and phone',
+        'Knowledgeable support team ready to help with any questions or issues',
+        'Average response time of under 2 minutes for live chat inquiries',
+        'Multi-language support to assist customers worldwide',
+        'Comprehensive FAQ and help center for self-service solutions',
       ],
       benefits: [
-        "24/7 availability",
-        "Quick response times",
-        "Expert assistance",
-        "Multiple contact channels",
-        "Multi-language support",
-        "Helpful resources",
+        '24/7 availability',
+        'Quick response times',
+        'Expert assistance',
+        'Multiple contact channels',
+        'Multi-language support',
+        'Helpful resources',
       ],
     },
     {
       icon: RefreshCw,
-      title: "Easy Returns",
-      description: "30-day hassle-free return policy",
-      color: "from-pink-500 to-pink-600",
-      bgColor: "bg-pink-50",
-      iconColor: "text-pink-600",
+      title: 'Easy Returns',
+      description: '30-day hassle-free return policy',
+      color: 'from-pink-500 to-pink-600',
+      bgColor: 'bg-pink-50',
+      iconColor: 'text-pink-600',
       details: [
-        "Return any product within 30 days of delivery with no questions asked",
-        "Simple online return process - just request a return in your account",
-        "Free return shipping labels provided for your convenience",
-        "Full refund processed within 5-7 business days after receiving the return",
-        "Exchange options available for different sizes or colors",
+        'Return any product within 30 days of delivery with no questions asked',
+        'Simple online return process - just request a return in your account',
+        'Free return shipping labels provided for your convenience',
+        'Full refund processed within 5-7 business days after receiving the return',
+        'Exchange options available for different sizes or colors',
       ],
       benefits: [
-        "30-day return window",
-        "No-hassle process",
-        "Free return shipping",
-        "Quick refund processing",
-        "Easy exchanges",
-        "Full money-back guarantee",
+        '30-day return window',
+        'No-hassle process',
+        'Free return shipping',
+        'Quick refund processing',
+        'Easy exchanges',
+        'Full money-back guarantee',
       ],
     },
     {
       icon: Award,
-      title: "Quality Assured",
-      description: "100% authentic products guaranteed",
-      color: "from-yellow-500 to-yellow-600",
-      bgColor: "bg-yellow-50",
-      iconColor: "text-yellow-600",
+      title: 'Quality Assured',
+      description: '100% authentic products guaranteed',
+      color: 'from-yellow-500 to-yellow-600',
+      bgColor: 'bg-yellow-50',
+      iconColor: 'text-yellow-600',
       details: [
-        "Every product is sourced directly from authorized manufacturers and distributors",
-        "Rigorous quality checks performed before shipping to ensure product condition",
-        "Authenticity certificates available for luxury and high-value items",
-        "Zero-tolerance policy for counterfeit products",
-        "Quality guarantee backed by our comprehensive warranty program",
+        'Every product is sourced directly from authorized manufacturers and distributors',
+        'Rigorous quality checks performed before shipping to ensure product condition',
+        'Authenticity certificates available for luxury and high-value items',
+        'Zero-tolerance policy for counterfeit products',
+        'Quality guarantee backed by our comprehensive warranty program',
       ],
       benefits: [
-        "100% authentic products",
-        "Quality inspections",
-        "Authorized sellers only",
-        "Warranty coverage",
-        "Authenticity certificates",
-        "Premium product standards",
+        '100% authentic products',
+        'Quality inspections',
+        'Authorized sellers only',
+        'Warranty coverage',
+        'Authenticity certificates',
+        'Premium product standards',
       ],
     },
     {
       icon: Clock,
-      title: "Fast Processing",
-      description: "Orders processed within 24 hours",
-      color: "from-indigo-500 to-indigo-600",
-      bgColor: "bg-indigo-50",
-      iconColor: "text-indigo-600",
+      title: 'Fast Processing',
+      description: 'Orders processed within 24 hours',
+      color: 'from-indigo-500 to-indigo-600',
+      bgColor: 'bg-indigo-50',
+      iconColor: 'text-indigo-600',
       details: [
-        "All orders placed before 3 PM are processed and shipped the same day",
-        "Automated order confirmation sent immediately after purchase",
-        "Express shipping options available for urgent deliveries",
-        "Real-time inventory system prevents overselling and delays",
-        "Priority processing for members and repeat customers",
+        'All orders placed before 3 PM are processed and shipped the same day',
+        'Automated order confirmation sent immediately after purchase',
+        'Express shipping options available for urgent deliveries',
+        'Real-time inventory system prevents overselling and delays',
+        'Priority processing for members and repeat customers',
       ],
       benefits: [
-        "Same-day processing",
-        "Immediate confirmation",
-        "Express shipping options",
-        "Real-time updates",
-        "Priority handling",
-        "No processing delays",
+        'Same-day processing',
+        'Immediate confirmation',
+        'Express shipping options',
+        'Real-time updates',
+        'Priority handling',
+        'No processing delays',
       ],
     },
     {
       icon: Heart,
-      title: "Best Prices",
-      description: "Competitive pricing with great deals",
-      color: "from-red-500 to-red-600",
-      bgColor: "bg-red-50",
-      iconColor: "text-red-600",
+      title: 'Best Prices',
+      description: 'Competitive pricing with great deals',
+      color: 'from-red-500 to-red-600',
+      bgColor: 'bg-red-50',
+      iconColor: 'text-red-600',
       details: [
         "Price match guarantee - we'll match any lower price you find elsewhere",
-        "Exclusive member discounts and early access to sales",
-        "Daily deals and flash sales on popular products",
-        "Seasonal promotions and special holiday offers",
-        "Loyalty rewards program - earn points with every purchase",
+        'Exclusive member discounts and early access to sales',
+        'Daily deals and flash sales on popular products',
+        'Seasonal promotions and special holiday offers',
+        'Loyalty rewards program - earn points with every purchase',
       ],
       benefits: [
-        "Competitive pricing",
-        "Price match guarantee",
-        "Exclusive member deals",
-        "Regular promotions",
-        "Loyalty rewards",
-        "Best value for money",
+        'Competitive pricing',
+        'Price match guarantee',
+        'Exclusive member deals',
+        'Regular promotions',
+        'Loyalty rewards',
+        'Best value for money',
       ],
     },
   ];
@@ -236,14 +234,12 @@ const ShopFeatures = () => {
       <div className="text-center mb-12">
         <div className="inline-flex items-center gap-3 mb-4">
           <div className="h-1 w-12 bg-gradient-to-r from-shop_light_blue to-shop_dark_blue rounded-full"></div>
-          <Title className="text-3xl lg:text-4xl font-bold text-dark-color">
-            Why Shop With Us
-          </Title>
+          <Title className="text-3xl lg:text-4xl font-bold text-dark-color">Why Shop With Us</Title>
           <div className="h-1 w-12 bg-gradient-to-l from-shop_light_blue to-shop_dark_blue rounded-full"></div>
         </div>
         <p className="text-light-color text-lg max-w-2xl mx-auto">
-          Experience the best online shopping with our commitment to quality,
-          security, and exceptional service
+          Experience the best online shopping with our commitment to quality, security, and
+          exceptional service
         </p>
       </div>
 
@@ -276,9 +272,7 @@ const ShopFeatures = () => {
                   <h3 className="text-lg font-bold text-dark-color group-hover:text-shop_dark_blue hoverEffect">
                     {feature.title}
                   </h3>
-                  <p className="text-sm text-light-color leading-relaxed">
-                    {feature.description}
-                  </p>
+                  <p className="text-sm text-light-color leading-relaxed">{feature.description}</p>
                   <div className="text-xs text-shop_dark_blue font-medium pt-2 opacity-0 group-hover:opacity-100 hoverEffect">
                     Click to learn more →
                   </div>
@@ -288,7 +282,7 @@ const ShopFeatures = () => {
                 <div className="mt-4 w-full bg-gray-100 rounded-full h-1.5">
                   <div
                     className={`bg-gradient-to-r ${feature.color} h-1.5 rounded-full hoverEffect group-hover:w-full transition-all duration-500`}
-                    style={{ width: "40%" }}
+                    style={{ width: '40%' }}
                   ></div>
                 </div>
               </button>
@@ -303,33 +297,25 @@ const ShopFeatures = () => {
               <div className="text-3xl font-bold bg-gradient-to-r from-shop_dark_blue to-shop_light_blue bg-clip-text text-transparent mb-2">
                 50K+
               </div>
-              <div className="text-sm text-light-color font-medium">
-                Happy Customers
-              </div>
+              <div className="text-sm text-light-color font-medium">Happy Customers</div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold bg-gradient-to-r from-shop_dark_blue to-shop_light_blue bg-clip-text text-transparent mb-2">
                 100K+
               </div>
-              <div className="text-sm text-light-color font-medium">
-                Products Sold
-              </div>
+              <div className="text-sm text-light-color font-medium">Products Sold</div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold bg-gradient-to-r from-shop_dark_blue to-shop_light_blue bg-clip-text text-transparent mb-2">
                 99%
               </div>
-              <div className="text-sm text-light-color font-medium">
-                Satisfaction Rate
-              </div>
+              <div className="text-sm text-light-color font-medium">Satisfaction Rate</div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold bg-gradient-to-r from-shop_dark_blue to-shop_light_blue bg-clip-text text-transparent mb-2">
                 24/7
               </div>
-              <div className="text-sm text-light-color font-medium">
-                Customer Support
-              </div>
+              <div className="text-sm text-light-color font-medium">Customer Support</div>
             </div>
           </div>
         </div>
@@ -357,11 +343,7 @@ const ShopFeatures = () => {
       </div>
 
       {/* Feature Modal */}
-      <FeatureModal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        feature={selectedFeature}
-      />
+      <FeatureModal isOpen={isModalOpen} onClose={handleCloseModal} feature={selectedFeature} />
     </Container>
   );
 };

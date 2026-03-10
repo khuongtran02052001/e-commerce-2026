@@ -1,18 +1,17 @@
-import { memo } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { StarIcon } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { Product } from "@/sanity.types";
-import { urlFor } from "@/sanity/lib/image";
-import AddToCartButton from "./AddToCartButton";
-import FavoriteButton from "./FavoriteButton";
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { IProduct } from '@/mock-data';
+import { StarIcon } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { memo } from 'react';
+import AddToCartButton from './AddToCartButton';
+import FavoriteButton from './FavoriteButton';
 
 interface RelatedProductsProps {
-  currentProduct: Product;
-  relatedProducts: Product[];
+  currentProduct: IProduct;
+  relatedProducts: IProduct[];
 }
 
 const RelatedProducts = memo(({ relatedProducts }: RelatedProductsProps) => {
@@ -31,10 +30,8 @@ const RelatedProducts = memo(({ relatedProducts }: RelatedProductsProps) => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {relatedProducts.map((product: Product) => {
-          const imageUrl = product?.images?.[0]
-            ? urlFor(product.images[0]).url()
-            : null;
+        {relatedProducts.map((product: IProduct) => {
+          const imageUrl = product?.images?.[0] ? product.images?.[0].url : null;
           const originalPrice =
             product?.discount && product?.price
               ? (product.price / (1 - product.discount / 100)).toFixed(2)
@@ -43,7 +40,7 @@ const RelatedProducts = memo(({ relatedProducts }: RelatedProductsProps) => {
 
           return (
             <Card
-              key={product._id}
+              key={product.id}
               className="group hover:shadow-xl transition-all duration-300 border-2 hover:border-shop_light_green/30"
             >
               <CardContent className="p-4">
@@ -52,16 +49,14 @@ const RelatedProducts = memo(({ relatedProducts }: RelatedProductsProps) => {
                   {imageUrl ? (
                     <Image
                       src={imageUrl}
-                      alt={"productImage"}
+                      alt={'productImage'}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-300"
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                     />
                   ) : (
                     <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
-                      <span className="text-gray-500 text-sm">
-                        Product Image
-                      </span>
+                      <span className="text-gray-500 text-sm">Product Image</span>
                     </div>
                   )}
 
@@ -90,7 +85,7 @@ const RelatedProducts = memo(({ relatedProducts }: RelatedProductsProps) => {
                 {/* Product Info */}
                 <div className="space-y-2">
                   <Link
-                    href={`/product/${product?.slug?.current}`}
+                    href={`/product/${product?.slug}`}
                     className="block hover:text-shop_light_green transition-colors"
                   >
                     <h3 className="font-semibold text-shop_dark_green line-clamp-2 text-sm">
@@ -107,8 +102,8 @@ const RelatedProducts = memo(({ relatedProducts }: RelatedProductsProps) => {
                           size={12}
                           className={`${
                             index < 4
-                              ? "text-shop_light_green fill-shop_light_green"
-                              : "text-gray-300"
+                              ? 'text-shop_light_green fill-shop_light_green'
+                              : 'text-gray-300'
                           }`}
                         />
                       ))}
@@ -122,9 +117,7 @@ const RelatedProducts = memo(({ relatedProducts }: RelatedProductsProps) => {
                       ${product?.price}
                     </span>
                     {originalPrice && (
-                      <span className="text-sm text-gray-500 line-through">
-                        ${originalPrice}
-                      </span>
+                      <span className="text-sm text-gray-500 line-through">${originalPrice}</span>
                     )}
                   </div>
 
@@ -154,6 +147,6 @@ const RelatedProducts = memo(({ relatedProducts }: RelatedProductsProps) => {
   );
 });
 
-RelatedProducts.displayName = "RelatedProducts";
+RelatedProducts.displayName = 'RelatedProducts';
 
 export default RelatedProducts;

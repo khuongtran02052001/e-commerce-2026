@@ -1,15 +1,13 @@
-"use client";
+'use client';
 
-import { motion } from "motion/react";
-import { ReactNode } from "react";
+import { motion } from 'motion/react';
+import { ReactNode } from 'react';
 
 interface ProductClientWrapperProps {
   children: ReactNode;
 }
 
-export const ProductAnimationWrapper = ({
-  children,
-}: ProductClientWrapperProps) => {
+export const ProductAnimationWrapper = ({ children }: ProductClientWrapperProps) => {
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -22,9 +20,7 @@ export const ProductAnimationWrapper = ({
   );
 };
 
-export const ProductImageWrapper = ({
-  children,
-}: ProductClientWrapperProps) => {
+export const ProductImageWrapper = ({ children }: ProductClientWrapperProps) => {
   return (
     <motion.div
       initial={{ opacity: 0, x: -20 }}
@@ -37,9 +33,7 @@ export const ProductImageWrapper = ({
   );
 };
 
-export const ProductDetailsWrapper = ({
-  children,
-}: ProductClientWrapperProps) => {
+export const ProductDetailsWrapper = ({ children }: ProductClientWrapperProps) => {
   return (
     <motion.div
       initial={{ opacity: 0, x: 20 }}

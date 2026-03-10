@@ -1,27 +1,19 @@
 // Analytics Dashboard Component for viewing comprehensive e-commerce analytics
-"use client";
+'use client';
 
-import React, { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import {
-  TrendingUp,
-  ShoppingCart,
-  Package,
-  DollarSign,
-  Users,
-  RefreshCw,
-  Award,
-  Heart,
-} from "lucide-react";
+} from '@/components/ui/select';
+import { formatCurrency } from '@/lib/formatCurrency';
+import { Award, DollarSign, Package, RefreshCw, ShoppingCart, TrendingUp } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
 
 interface BestSeller {
   productId: string;
@@ -46,19 +38,19 @@ interface AnalyticsData {
 const AnalyticsDashboard: React.FC = () => {
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(false);
-  const [timeframe, setTimeframe] = useState("monthly");
+  const [timeframe, setTimeframe] = useState('monthly');
 
   const fetchAnalytics = async (selectedTimeframe: string) => {
     setLoading(true);
     try {
       const response = await fetch(
-        `/api/analytics/best-sellers?timeframe=${selectedTimeframe}&limit=10`
+        `/analytics/best-sellers?timeframe=${selectedTimeframe}&limit=10`,
       );
-      if (!response.ok) throw new Error("Failed to fetch analytics");
+      if (!response.ok) throw new Error('Failed to fetch analytics');
       const result = await response.json();
       setData(result.data);
     } catch (error) {
-      console.error("Error fetching analytics:", error);
+      console.error('Error fetching analytics:', error);
     } finally {
       setLoading(false);
     }
@@ -68,22 +60,13 @@ const AnalyticsDashboard: React.FC = () => {
     fetchAnalytics(timeframe);
   }, [timeframe]);
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(amount);
-  };
-
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">Analytics Dashboard</h2>
-          <p className="text-muted-foreground">
-            Track sales performance and customer behavior
-          </p>
+          <p className="text-muted-foreground">Track sales performance and customer behavior</p>
         </div>
         <div className="flex items-center gap-3">
           <Select value={timeframe} onValueChange={setTimeframe}>
@@ -96,12 +79,8 @@ const AnalyticsDashboard: React.FC = () => {
               <SelectItem value="yearly">Yearly</SelectItem>
             </SelectContent>
           </Select>
-          <Button
-            onClick={() => fetchAnalytics(timeframe)}
-            disabled={loading}
-            size="sm"
-          >
-            <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+          <Button onClick={() => fetchAnalytics(timeframe)} disabled={loading} size="sm">
+            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
           </Button>
         </div>
       </div>
@@ -111,43 +90,31 @@ const AnalyticsDashboard: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Total Revenue
-              </CardTitle>
+              <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
                 {formatCurrency(data.analytics.totalRevenue)}
               </div>
-              <p className="text-xs text-muted-foreground">
-                {timeframe} revenue
-              </p>
+              <p className="text-xs text-muted-foreground">{timeframe} revenue</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Total Orders
-              </CardTitle>
+              <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
               <ShoppingCart className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                {data.analytics.totalOrders}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                {timeframe} orders
-              </p>
+              <div className="text-2xl font-bold">{data.analytics.totalOrders}</div>
+              <p className="text-xs text-muted-foreground">{timeframe} orders</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Avg Order Value
-              </CardTitle>
+              <CardTitle className="text-sm font-medium">Avg Order Value</CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -160,9 +127,7 @@ const AnalyticsDashboard: React.FC = () => {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Products Sold
-              </CardTitle>
+              <CardTitle className="text-sm font-medium">Products Sold</CardTitle>
               <Package className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -209,15 +174,11 @@ const AnalyticsDashboard: React.FC = () => {
 
                   <div className="flex-1 min-w-0">
                     <h3 className="font-medium truncate">{product.name}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {product.category}
-                    </p>
+                    <p className="text-sm text-muted-foreground">{product.category}</p>
                   </div>
 
                   <div className="text-right">
-                    <div className="font-medium">
-                      {formatCurrency(product.revenue)}
-                    </div>
+                    <div className="font-medium">{formatCurrency(product.revenue)}</div>
                     <div className="text-sm text-muted-foreground">
                       {product.salesCount} units sold
                     </div>

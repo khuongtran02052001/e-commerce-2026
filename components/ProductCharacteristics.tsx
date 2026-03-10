@@ -1,49 +1,30 @@
-import { Product, BRAND_QUERYResult } from "@/sanity.types";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "./ui/accordion";
+import { IBrand, IProduct } from '@/mock-data';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
 
 interface ProductCharacteristicsProps {
-  product: Product;
-  brand: BRAND_QUERYResult | null;
+  product: IProduct;
+  brand: IBrand | null;
 }
 
-const ProductCharacteristics = ({
-  product,
-  brand,
-}: ProductCharacteristicsProps) => {
+const ProductCharacteristics = ({ product, brand }: ProductCharacteristicsProps) => {
   return (
     <Accordion type="single" collapsible>
       <AccordionItem value="item-1">
-        <AccordionTrigger className="font-bold">
-          {product?.name}: Characteristics
-        </AccordionTrigger>
+        <AccordionTrigger className="font-bold">{product?.name}: Characteristics</AccordionTrigger>
         <AccordionContent className="flex flex-col gap-1">
           <p className="flex items-center justify-between">
-            Brand:{" "}
-            {brand && brand.length > 0 && (
-              <span className="font-semibold tracking-wide">
-                {brand[0]?.brandName}
-              </span>
-            )}
+            Brand: {brand && <span className="font-semibold tracking-wide">{brand.name}</span>}
           </p>
           <p className="flex items-center justify-between">
-            Collection:{" "}
-            <span className="font-semibold tracking-wide">2025</span>
+            Collection: <span className="font-semibold tracking-wide">2025</span>
           </p>
           <p className="flex items-center justify-between">
-            Type:{" "}
+            Type: <span className="font-semibold tracking-wide">{product?.status}</span>
+          </p>
+          <p className="flex items-center justify-between">
+            Stock:{' '}
             <span className="font-semibold tracking-wide">
-              {product?.variant}
-            </span>
-          </p>
-          <p className="flex items-center justify-between">
-            Stock:{" "}
-            <span className="font-semibold tracking-wide">
-              {product?.stock ? "Available" : "Out of Stock"}
+              {product?.stock ? 'Available' : 'Out of Stock'}
             </span>
           </p>
         </AccordionContent>

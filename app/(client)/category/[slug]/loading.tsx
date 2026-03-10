@@ -1,4 +1,4 @@
-import CategoryDetailSkeleton from "@/components/CategoryDetailSkeleton";
+import CategoryDetailSkeleton from '@/components/CategoryDetailSkeleton';
 
 const CategoryDetailLoading = () => {
   return <CategoryDetailSkeleton />;

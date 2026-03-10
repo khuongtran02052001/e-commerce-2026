@@ -1,30 +1,37 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { toast } from "sonner";
-import { User, Crown, Building2 } from "lucide-react";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useUserData } from '@/contexts/UserDataContext';
+import { fetchService } from '@/lib/restClient';
+import { Crown, User } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 export default function AdminUserManagement() {
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
+  const [adminEmail, setAdminEmail] = useState('');
+  const { authUser } = useUserData();
+
+  useEffect(() => {
+    if (authUser?.email) {
+      setAdminEmail(authUser.email);
+    }
+  }, [authUser?.email]);
 
   const handleSetPremium = async (setPremium: boolean) => {
     if (!email.trim()) {
-      toast.error("Please enter an email address");
+      toast.error('Please enter an email address');
       return;
     }
 
     setLoading(true);
     try {
-      const response = await fetch("/api/admin/manage-user", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+      const response = await fetchService('/admin/manage-user', {
+        method: 'POST',
         body: JSON.stringify({
           email: email.trim(),
           setPremium,
@@ -35,13 +42,13 @@ export default function AdminUserManagement() {
 
       if (response.ok) {
         toast.success(data.message);
-        setEmail(""); // Clear the input
+        setEmail(''); // Clear the input
       } else {
-        toast.error(data.error || "Failed to manage user");
+        toast.error(data.error || 'Failed to manage user');
       }
     } catch (error) {
-      console.error("Error managing user:", error);
-      toast.error("Error managing user");
+      console.error('Error managing user:', error);
+      toast.error('Error managing user');
     } finally {
       setLoading(false);
     }
@@ -50,12 +57,8 @@ export default function AdminUserManagement() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          Admin User Management
-        </h1>
-        <p className="text-gray-600">
-          Manage user premium status and account settings
-        </p>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Admin User Management</h1>
+        <p className="text-gray-600">Manage user premium status and account settings</p>
       </div>
 
       <div className="max-w-md">
@@ -86,27 +89,21 @@ export default function AdminUserManagement() {
                 className="bg-yellow-600 hover:bg-yellow-700"
               >
                 <Crown className="w-4 h-4 mr-2" />
-                {loading ? "Processing..." : "Set as Premium User"}
+                {loading ? 'Processing...' : 'Set as Premium User'}
               </Button>
 
-              <Button
-                onClick={() => handleSetPremium(false)}
-                disabled={loading}
-                variant="outline"
-              >
+              <Button onClick={() => handleSetPremium(false)} disabled={loading} variant="outline">
                 <User className="w-4 h-4 mr-2" />
-                {loading ? "Processing..." : "Set as Standard User"}
+                {loading ? 'Processing...' : 'Set as Standard User'}
               </Button>
             </div>
 
             <div className="text-sm text-gray-600 space-y-1">
               <p>
-                <strong>Premium User:</strong> isActive = true, gets premium
-                features
+                <strong>Premium User:</strong> isActive = true, gets premium features
               </p>
               <p>
-                <strong>Standard User:</strong> isActive = false, basic features
-                only
+                <strong>Standard User:</strong> isActive = false, basic features only
               </p>
             </div>
           </CardContent>
@@ -121,11 +118,12 @@ export default function AdminUserManagement() {
           <CardContent>
             <div className="space-y-2">
               <Button
-                onClick={() => setEmail("dev.reactbd@gmail.com")}
+                onClick={() => setEmail(adminEmail)}
                 variant="outline"
                 size="sm"
+                disabled={!adminEmail}
               >
-                Set Current User (dev.reactbd@gmail.com)
+                {adminEmail ? `Set Current User (${adminEmail})` : 'Set Current User'}
               </Button>
             </div>
           </CardContent>

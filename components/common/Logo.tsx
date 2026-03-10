@@ -1,23 +1,18 @@
-import { cn } from "@/lib/utils";
-import Link from "next/link";
-import { ShoppingCart } from "lucide-react";
+import { cn } from '@/lib/utils';
+import { ShoppingCart } from 'lucide-react';
+import Link from 'next/link';
 
 interface Props {
   className?: string;
-  variant?: "default" | "sm";
+  variant?: 'default' | 'sm';
 }
 
-const Logo = ({ className, variant = "default" }: Props) => {
+const Logo = ({ className, variant = 'default' }: Props) => {
   // Small variant for footer
-  if (variant === "sm") {
+  if (variant === 'sm') {
     return (
-      <Link href={"/"}>
-        <div
-          className={cn(
-            "flex items-center gap-1.5 group hoverEffect",
-            className
-          )}
-        >
+      <Link href={'/'}>
+        <div className={cn('flex items-center gap-1.5 group hoverEffect', className)}>
           {/* Cart Icon with Creative Styling (smaller) */}
           <div className="relative">
             <div className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-shop_orange rounded-full animate-pulse group-hover:bg-shop_light_green hoverEffect"></div>
@@ -34,7 +29,7 @@ const Logo = ({ className, variant = "default" }: Props) => {
                 Shop
               </span>
               <span className="bg-gradient-to-r from-shop_light_green to-shop_orange bg-clip-text text-transparent group-hover:from-shop_dark_green group-hover:to-shop_light_green hoverEffect">
-                cart
+                Beautify
               </span>
             </h1>
 
@@ -51,10 +46,8 @@ const Logo = ({ className, variant = "default" }: Props) => {
 
   // Default full logo
   return (
-    <Link href={"/"}>
-      <div
-        className={cn("flex items-center gap-2 group hoverEffect", className)}
-      >
+    <Link href={'/'}>
+      <div className={cn('flex items-center gap-2 group hoverEffect', className)}>
         {/* Cart Icon with Creative Styling */}
         <div className="relative">
           <div className="absolute -top-1 -right-1 w-3 h-3 bg-shop_orange rounded-full animate-pulse group-hover:bg-shop_light_green hoverEffect"></div>
@@ -71,7 +64,7 @@ const Logo = ({ className, variant = "default" }: Props) => {
               Shop
             </span>
             <span className="bg-gradient-to-r from-shop_light_green to-shop_orange bg-clip-text text-transparent group-hover:from-shop_dark_green group-hover:to-shop_light_green hoverEffect">
-              cart
+              Beautify
             </span>
           </h1>
 

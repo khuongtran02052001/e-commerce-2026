@@ -1,37 +1,33 @@
-"use client";
-import {
-  internalGroqTypeReferenceTo,
-  SanityImageCrop,
-  SanityImageHotspot,
-} from "@/sanity.types";
-import { urlFor } from "@/sanity/lib/image";
-import Image from "next/image";
-import { useState } from "react";
-import { motion, AnimatePresence } from "motion/react";
+'use client';
+/**
+ * Legacy compatibility:
+ * supports both REST `image.url` and old Sanity image object via `urlFor`.
+ * Remove Sanity branch when all product images are normalized to URL strings.
+ */
+import { urlFor } from '@/lib/image';
+import { IProductImageMock } from '@/mock-data';
+// import { urlFor } from '@/sanity/lib/image';
+import { AnimatePresence, motion } from 'motion/react';
+import Image from 'next/image';
+import { useState } from 'react';
 
 interface Props {
-  images?: Array<{
-    asset?: {
-      _ref: string;
-      _type: "reference";
-      _weak?: boolean;
-      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
-    };
-    hotspot?: SanityImageHotspot;
-    crop?: SanityImageCrop;
-    _type: "image";
-    _key: string;
-  }>;
+  images?: IProductImageMock[];
   isStock?: number;
 }
 
 const ImageView = ({ images = [], isStock }: Props) => {
   const [active, setActive] = useState(images[0]);
+  const resolveImageSrc = (image?: IProductImageMock) => {
+    if (!image) return '';
+    if (image.url) return image.url;
+    return urlFor(image).url();
+  };
   return (
     <div className="w-full space-y-2 md:space-y-4">
       <AnimatePresence mode="wait">
         <motion.div
-          key={active?._key}
+          key={active?.id}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -39,13 +35,13 @@ const ImageView = ({ images = [], isStock }: Props) => {
           className="w-full max-h-[550px] min-h-[450px] border border-dark-color/10 rounded-md group overflow-hidden"
         >
           <Image
-            src={urlFor(active).url()}
+            src={resolveImageSrc(active)}
             alt="productImage"
             width={700}
             height={700}
             priority
             className={`w-full h-96 max-h-[550px] min-h-[500px] object-contain group-hover:scale-110 hoverEffect rounded-md ${
-              isStock === 0 ? "opacity-50" : ""
+              isStock === 0 ? 'opacity-50' : ''
             }`}
           />
         </motion.div>
@@ -53,15 +49,15 @@ const ImageView = ({ images = [], isStock }: Props) => {
       <div className="grid grid-cols-6 gap-2 h-20 md:h-24">
         {images.map((image) => (
           <button
-            key={image._key}
+            key={image.id}
             onClick={() => setActive(image)}
             className={`border rounded-md overflow-hidden ${
-              active._key === image._key ? "ring-1 ring-dark-color" : ""
+              active.id === image.id ? 'ring-1 ring-dark-color' : ''
             }`}
           >
             <Image
-              src={urlFor(image).url()}
-              alt={`Thumbnail ${image._key}`}
+              src={resolveImageSrc(image)}
+              alt={`Thumbnail ${image.id}`}
               width={100}
               height={100}
               className="w-full h-auto object-contain"

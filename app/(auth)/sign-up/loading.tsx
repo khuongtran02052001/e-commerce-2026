@@ -1,4 +1,4 @@
-import { Loader2, Users, Star, Award } from "lucide-react";
+import { Award, Loader2, Star, Users } from 'lucide-react';
 
 const SignUpLoading = () => {
   return (

@@ -1,10 +1,10 @@
-import { Dispatch, SetStateAction } from "react";
-import Title from "../Title";
-import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
-import { Label } from "../ui/label";
-import { IBrandMock } from "@/mock-data";
+import { IBrand } from '@/mock-data';
+import { Dispatch, SetStateAction } from 'react';
+import Title from '../Title';
+import { Label } from '../ui/label';
+import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
 interface Props {
-  brands: IBrandMock[];
+  brands: IBrand[];
   selectedBrand?: string | null;
   setSelectedBrand: Dispatch<SetStateAction<string | null>>;
 }
@@ -19,7 +19,7 @@ const BrandList = ({ brands, selectedBrand, setSelectedBrand }: Props) => {
         </span>
       </div>
 
-      <RadioGroup value={selectedBrand || ""} className="space-y-1">
+      <RadioGroup value={selectedBrand || ''} className="space-y-1">
         {brands?.map((brand) => (
           <div
             key={brand?.id}
@@ -35,11 +35,11 @@ const BrandList = ({ brands, selectedBrand, setSelectedBrand }: Props) => {
               htmlFor={brand?.slug}
               className={`flex-1 cursor-pointer transition-colors duration-150 ${
                 selectedBrand === brand?.slug
-                  ? "font-medium text-shop_dark_green"
-                  : "text-gray-700 group-hover:text-gray-900"
+                  ? 'font-medium text-shop_dark_green'
+                  : 'text-gray-700 group-hover:text-gray-900'
               }`}
             >
-              {brand?.title}
+              {brand?.name}
             </Label>
           </div>
         ))}

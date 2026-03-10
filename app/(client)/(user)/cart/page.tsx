@@ -1,7 +1,7 @@
-import Container from "@/components/Container";
-import { ClientCartContent } from "@/components/cart/ClientCartContent";
-import { ShoppingBag } from "lucide-react";
-import DynamicBreadcrumb from "@/components/DynamicBreadcrumb";
+import Container from '@/components/Container';
+import DynamicBreadcrumb from '@/components/DynamicBreadcrumb';
+import { ClientCartContent } from '@/components/cart/ClientCartContent';
+import { ShoppingBag } from 'lucide-react';
 
 function CartPage() {
   return (

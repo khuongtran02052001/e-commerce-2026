@@ -1,33 +1,26 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState } from "react";
-import useCartStore from "@/store";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
-import EmptyCart from "@/components/EmptyCart";
-import PriceFormatter from "@/components/PriceFormatter";
-import Link from "next/link";
-import Image from "next/image";
-import { urlFor } from "@/sanity/lib/image";
-import { CartItemControls } from "./CartItemControls";
-import { AddressSelector } from "./AddressSelector";
-import { CheckoutButton } from "./CheckoutButton";
-import { OrderPlacementSkeleton } from "./OrderPlacementSkeleton";
-import { Trash2, AlertTriangle, X } from "lucide-react";
-import { toast } from "sonner";
-import {
-  Dialog,
-  DialogPortal,
-  DialogOverlay,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import * as DialogPrimitive from "@radix-ui/react-dialog";
-import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
-import { cn } from "@/lib/utils";
+import EmptyCart from '@/components/EmptyCart';
+import PriceFormatter from '@/components/PriceFormatter';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogOverlay, DialogPortal, DialogTitle } from '@/components/ui/dialog';
+import { Separator } from '@/components/ui/separator';
+import { cn } from '@/lib/utils';
+import useCartStore from '@/store';
+import * as DialogPrimitive from '@radix-ui/react-dialog';
+import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
+import { AlertTriangle, Trash2, X } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
+import { AddressSelector } from './AddressSelector';
+import { CartItemControls } from './CartItemControls';
+import { CheckoutButton } from './CheckoutButton';
 
 interface Address {
-  _id: string;
+  id: string;
   name: string;
   email: string;
   address: string;
@@ -39,7 +32,7 @@ interface Address {
 }
 
 interface UserOrder {
-  _id: string;
+  id: string;
   orderNumber: string;
   totalPrice: number;
   currency: string;
@@ -58,7 +51,6 @@ interface ServerCartContentProps {
 
 export function ServerCartContent({
   userEmail,
-
   userAddresses,
   userOrders,
   onAddressesRefresh,
@@ -75,7 +67,7 @@ export function ServerCartContent({
 
   // Reset order placement state when cart page loads to clear any stale state
   useEffect(() => {
-    setOrderPlacementState(false, "validating");
+    setOrderPlacementState(false, 'validating');
   }, [setOrderPlacementState]);
 
   const handleResetCart = () => {
@@ -85,7 +77,7 @@ export function ServerCartContent({
   const confirmResetCart = () => {
     resetCart();
     setShowClearModal(false);
-    toast.success("Cart cleared successfully");
+    toast.success('Cart cleared successfully');
   };
 
   // Set default address on mount
@@ -109,8 +101,7 @@ export function ServerCartContent({
   const totalDiscount = getTotalDiscount(); // Total discount amount
   const currentSubtotal = grossSubtotal - totalDiscount; // After discount
   const shipping = currentSubtotal > 100 ? 0 : 10;
-  const tax =
-    currentSubtotal * (parseFloat(process.env.TAX_AMOUNT || "0") || 0);
+  const tax = currentSubtotal * (parseFloat(process.env.TAX_AMOUNT || '0') || 0);
   const finalTotal = currentSubtotal + shipping + tax;
 
   // Don't show order placement skeleton in ServerCartContent
@@ -128,7 +119,7 @@ export function ServerCartContent({
             <div className="space-y-3">
               {userOrders.slice(0, 3).map((order) => (
                 <div
-                  key={order._id}
+                  key={order.id}
                   className="flex justify-between items-center p-3 border rounded"
                 >
                   <div>
@@ -140,9 +131,7 @@ export function ServerCartContent({
                   <div className="text-right">
                     <PriceFormatter amount={order.totalPrice} />
                     <Badge
-                      variant={
-                        order.status === "delivered" ? "default" : "secondary"
-                      }
+                      variant={order.status === 'delivered' ? 'default' : 'secondary'}
                       className="ml-2"
                     >
                       {order.status}
@@ -169,17 +158,17 @@ export function ServerCartContent({
       {/* Cart Items */}
       <div className="lg:col-span-2 space-y-4">
         {cart.map((item) => (
-          <div key={item.product._id} className="border rounded-lg p-4">
+          <div key={item.product.id} className="border rounded-lg p-4">
             <div className="flex gap-4">
               {/* Product Image */}
               <div className="relative w-24 h-24 flex-shrink-0">
                 <Image
                   src={
-                    item.product.images?.[0]
-                      ? urlFor(item.product.images[0]).url()
-                      : "/placeholder.jpg"
+                    (typeof item.product.images?.[0] === 'string'
+                      ? item.product.images[0]
+                      : item.product.images?.[0]?.url) || '/placeholder.jpg'
                   }
-                  alt={item.product.name || "Product"}
+                  alt={item.product.name || 'Product'}
                   fill
                   className="object-cover rounded-md"
                 />
@@ -189,32 +178,18 @@ export function ServerCartContent({
               <div className="flex-1">
                 <div className="flex justify-between">
                   <div>
-                    <Link href={`/product/${item.product.slug?.current}`}>
+                    <Link href={`/product/${item.product.slug}`}>
                       <h3 className="font-semibold hover:text-primary transition-colors">
                         {item.product.name}
                       </h3>
                     </Link>
                     {item.product.categories && (
                       <div className="flex gap-2 mt-1">
-                        {item.product.categories?.slice(0, 2).map(
-                          (
-                            category: {
-                              _ref?: string;
-                              _type?: string;
-                              name?: string;
-                              title?: string;
-                            },
-                            idx: number
-                          ) => (
-                            <Badge
-                              key={idx}
-                              variant="secondary"
-                              className="text-xs"
-                            >
-                              {category?.name || category?.title || "Category"}
-                            </Badge>
-                          )
-                        )}
+                        {item.product.categories?.slice(0, 2).map((ct, idx: number) => (
+                          <Badge key={idx} variant="secondary" className="text-xs">
+                            {ct?.title || 'Category'}
+                          </Badge>
+                        ))}
                       </div>
                     )}
                   </div>
@@ -222,9 +197,7 @@ export function ServerCartContent({
                     <div className="font-semibold">
                       <PriceFormatter amount={item.product.price} />
                     </div>
-                    <div className="text-sm text-muted-foreground">
-                      per item
-                    </div>
+                    <div className="text-sm text-muted-foreground">per item</div>
                   </div>
                 </div>
 
@@ -234,24 +207,17 @@ export function ServerCartContent({
                     Out of Stock
                   </Badge>
                 )}
-                {item.product.stock &&
-                  item.product.stock < 5 &&
-                  item.product.stock > 0 && (
-                    <Badge
-                      variant="outline"
-                      className="mt-2 text-orange-600 border-orange-600"
-                    >
-                      Only {item.product.stock} left
-                    </Badge>
-                  )}
+                {item.product.stock && item.product.stock < 5 && item.product.stock > 0 && (
+                  <Badge variant="outline" className="mt-2 text-orange-600 border-orange-600">
+                    Only {item.product.stock} left
+                  </Badge>
+                )}
 
                 {/* Controls */}
                 <div className="flex justify-between items-center mt-4">
                   <CartItemControls product={item.product} />
                   <div className="font-bold">
-                    <PriceFormatter
-                      amount={(item.product.price || 0) * item.quantity}
-                    />
+                    <PriceFormatter amount={(item.product.price || 0) * item.quantity} />
                   </div>
                 </div>
               </div>
@@ -322,15 +288,10 @@ export function ServerCartContent({
               <PriceFormatter amount={finalTotal} />
             </div>
 
-            {shipping === 0 && (
-              <p className="text-sm text-green-600">
-                🎉 You got free shipping!
-              </p>
-            )}
+            {shipping === 0 && <p className="text-sm text-green-600">🎉 You got free shipping!</p>}
             {currentSubtotal < 100 && (
               <p className="text-sm text-muted-foreground">
-                Add <PriceFormatter amount={100 - currentSubtotal} /> more for
-                free shipping
+                Add <PriceFormatter amount={100 - currentSubtotal} /> more for free shipping
               </p>
             )}
           </div>
@@ -348,7 +309,7 @@ export function ServerCartContent({
           <DialogOverlay />
           <DialogPrimitive.Content
             className={cn(
-              "fixed left-[50%] top-[50%] z-50 grid w-full max-w-md translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-300 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 sm:rounded-lg"
+              'fixed left-[50%] top-[50%] z-50 grid w-full max-w-md translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-300 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 sm:rounded-lg',
             )}
           >
             <VisuallyHidden.Root>
@@ -361,10 +322,10 @@ export function ServerCartContent({
               <div className="space-y-2">
                 <h3 className="text-xl font-bold text-gray-900">Clear Cart</h3>
                 <p className="text-gray-600 leading-relaxed">
-                  You&apos;re about to remove{" "}
+                  You&apos;re about to remove{' '}
                   <span className="font-semibold text-red-600">
-                    {cart.length} {cart.length === 1 ? "item" : "items"}
-                  </span>{" "}
+                    {cart.length} {cart.length === 1 ? 'item' : 'items'}
+                  </span>{' '}
                   from your cart. This action cannot be undone.
                 </p>
               </div>

@@ -1,32 +1,25 @@
-"use client";
-import React, { useState } from "react";
-import { TableBody, TableCell, TableRow } from "./ui/table";
-import PriceFormatter from "./PriceFormatter";
-import { MY_ORDERS_QUERYResult } from "@/sanity.types";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "./ui/tooltip";
-import { format } from "date-fns";
-import { CreditCard, Eye, Download } from "lucide-react";
-import { toast } from "sonner";
-import { Button } from "./ui/button";
-import { ORDER_STATUSES, PAYMENT_STATUSES } from "@/lib/orderStatus";
-import Link from "next/link";
-import Image from "next/image";
-import { urlFor } from "@/sanity/lib/image";
+'use client';
+import { ORDER_STATUSES, PAYMENT_STATUSES } from '@/lib/orderStatus';
+import { fetchService } from '@/lib/restClient';
+import { getOrderId, getOrderImageUrl, UserOrder } from '@/types/domain/order';
+import { format } from 'date-fns';
+import { CreditCard, Download, Eye } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useState } from 'react';
+import { toast } from 'sonner';
+import PriceFormatter from './PriceFormatter';
+import { Button } from './ui/button';
+import { TableBody, TableCell, TableRow } from './ui/table';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 
-const OrdersComponent = ({ orders }: { orders: MY_ORDERS_QUERYResult }) => {
+const OrdersComponent = ({ orders }: { orders: UserOrder[] }) => {
   const [payingOrderId] = useState<string | null>(null);
-  const [generatingInvoiceId, setGeneratingInvoiceId] = useState<string | null>(
-    null
-  );
+  const [generatingInvoiceId, setGeneratingInvoiceId] = useState<string | null>(null);
 
   // Helper function to render product images with stacked layout
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const renderProductImages = (products: any[]) => {
+  const renderProductImages = (products: UserOrder['products']) => {
     if (!products || products.length === 0) return null;
 
     const maxVisible = 3;
@@ -37,19 +30,19 @@ const OrdersComponent = ({ orders }: { orders: MY_ORDERS_QUERYResult }) => {
       <div className="flex items-center">
         <div className="flex items-center">
           {displayProducts.map((item, index) => {
-            const imageUrl = item.product?.images?.[0] || item.product?.image;
+            const imageUrl = getOrderImageUrl(item.product);
             return (
               <div
                 key={index}
                 className={`relative w-8 h-8 rounded-full overflow-hidden border-2 border-white shadow-sm bg-gray-100 ${
-                  index > 0 ? "-ml-2" : ""
+                  index > 0 ? '-ml-2' : ''
                 } z-${30 - index * 10}`}
                 style={{ zIndex: 30 - index * 10 }}
               >
                 {imageUrl ? (
                   <Image
-                    src={urlFor(imageUrl).url()}
-                    alt={item.product?.name || "Product"}
+                    src={imageUrl}
+                    alt={item.product?.name || 'Product'}
                     fill
                     className="object-cover"
                   />
@@ -63,9 +56,7 @@ const OrdersComponent = ({ orders }: { orders: MY_ORDERS_QUERYResult }) => {
           })}
           {remainingCount > 0 && (
             <div className="-ml-2 w-8 h-8 rounded-full bg-gray-600 border-2 border-white shadow-sm flex items-center justify-center z-10">
-              <span className="text-xs font-semibold text-white">
-                +{remainingCount}
-              </span>
+              <span className="text-xs font-semibold text-white">+{remainingCount}</span>
             </div>
           )}
         </div>
@@ -85,31 +76,29 @@ const OrdersComponent = ({ orders }: { orders: MY_ORDERS_QUERYResult }) => {
 
     setGeneratingInvoiceId(orderId);
     try {
-      const response = await fetch(`/api/orders/${orderId}/generate-invoice`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+      const response = await fetchService(`/orders/${orderId}/generate-invoice`, {
+        method: 'POST',
       });
 
       const data = await response.json();
 
       if (response.ok && data.success) {
-        toast.success(data.message || "Invoice generated successfully!");
+        toast.success(data.message || 'Invoice generated successfully!');
         // Refresh the page to show updated invoice data
         window.location.reload();
       } else {
-        toast.error(data.error || "Failed to generate invoice");
+        toast.error(data.error || 'Failed to generate invoice');
       }
     } catch (error) {
-      console.error("Invoice generation error:", error);
-      toast.error("Failed to generate invoice");
+      console.error('Invoice generation error:', error);
+      toast.error('Failed to generate invoice');
     } finally {
       setGeneratingInvoiceId(null);
     }
   };
 
-  const isOrderPayable = (order: MY_ORDERS_QUERYResult[number]) => {
+  const isOrderPayable = (order: UserOrder) => {
+    if (!order) return false;
     // Order is payable if payment is not completed and order is not cancelled
     const isPaid = order.paymentStatus === PAYMENT_STATUSES.PAID;
     const isCancelled = order.status === ORDER_STATUSES.CANCELLED;
@@ -121,23 +110,21 @@ const OrdersComponent = ({ orders }: { orders: MY_ORDERS_QUERYResult }) => {
       <TableBody>
         <TooltipProvider>
           {orders.map((order) => (
-            <Tooltip key={order?.orderNumber}>
+            <Tooltip key={getOrderId(order) || order?.orderNumber}>
               <TooltipTrigger asChild>
                 <TableRow className="hover:bg-gray-50 h-16">
                   <TableCell className="font-medium text-sm">
                     <div className="flex flex-col">
                       <span className="truncate max-w-20 sm:max-w-none">
-                        {order.orderNumber?.slice(-10) ?? "N/A"}...
+                        {order.orderNumber?.slice(-10) ?? 'N/A'}...
                       </span>
                       <span className="text-xs text-gray-500 md:hidden">
-                        {order?.orderDate &&
-                          format(new Date(order.orderDate), "dd/MM")}
+                        {order?.orderDate && format(new Date(order.orderDate), 'dd/MM')}
                       </span>
                     </div>
                   </TableCell>
                   <TableCell className="hidden md:table-cell text-sm">
-                    {order?.orderDate &&
-                      format(new Date(order.orderDate), "dd/MM/yyyy")}
+                    {order?.orderDate && format(new Date(order.orderDate), 'dd/MM/yyyy')}
                   </TableCell>
                   <TableCell className="text-sm">
                     <div className="flex flex-col">
@@ -150,15 +137,14 @@ const OrdersComponent = ({ orders }: { orders: MY_ORDERS_QUERYResult }) => {
                     </div>
                   </TableCell>
                   <TableCell className="hidden sm:table-cell text-sm text-gray-600">
-                    <span className="truncate max-w-[150px] inline-block">
-                      {order.email}
-                    </span>
+                    <span className="truncate max-w-[150px] inline-block">{order.email}</span>
                   </TableCell>
                   <TableCell className="py-2">
                     {renderProductImages(order.products || [])}
                   </TableCell>
                   <TableCell className="font-medium text-sm">
                     <PriceFormatter
+                      showDecimals
                       amount={order?.totalPrice}
                       className="text-black font-medium"
                     />
@@ -167,17 +153,16 @@ const OrdersComponent = ({ orders }: { orders: MY_ORDERS_QUERYResult }) => {
                     {order?.status && (
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${
-                          order.paymentStatus === "paid" ||
-                          order.status === "completed" ||
-                          order.status === "delivered"
-                            ? "bg-green-100 text-green-800"
-                            : order.status === "cancelled"
-                            ? "bg-red-100 text-red-800"
-                            : "bg-yellow-100 text-yellow-800"
+                          order.paymentStatus === 'paid' ||
+                          order.status === 'completed' ||
+                          order.status === 'delivered'
+                            ? 'bg-green-100 text-green-800'
+                            : order.status === 'cancelled'
+                              ? 'bg-red-100 text-red-800'
+                              : 'bg-yellow-100 text-yellow-800'
                         }`}
                       >
-                        {order?.status.charAt(0).toUpperCase() +
-                          order?.status.slice(1)}
+                        {order?.status.charAt(0).toUpperCase() + order?.status.slice(1)}
                       </span>
                     )}
                   </TableCell>
@@ -186,38 +171,34 @@ const OrdersComponent = ({ orders }: { orders: MY_ORDERS_QUERYResult }) => {
                     {order?.invoice?.hosted_invoice_url ? (
                       <div className="flex items-center gap-1">
                         <span className="text-xs text-gray-600 truncate max-w-16 lg:max-w-20">
-                          {order?.invoice?.number ||
-                            "INV-" + order.orderNumber?.slice(-6)}
+                          {order?.invoice?.number || 'INV-' + order.orderNumber?.slice(-6)}
                         </span>
                         <Button
                           size="sm"
                           variant="ghost"
                           className="h-6 w-6 p-0 shrink-0"
                           onClick={() => {
-                            window.open(
-                              order.invoice?.hosted_invoice_url,
-                              "_blank"
-                            );
+                            window.open(order.invoice?.hosted_invoice_url, '_blank');
                           }}
                         >
                           <Download className="w-3 h-3" />
                         </Button>
                       </div>
-                    ) : order?.paymentStatus === "paid" ? (
+                    ) : order?.paymentStatus === 'paid' ? (
                       <Button
                         size="sm"
                         variant="outline"
                         className="h-6 px-2 text-xs"
-                        disabled={generatingInvoiceId === order._id}
-                        onClick={() => handleGenerateInvoice(order._id)}
+                        disabled={generatingInvoiceId === getOrderId(order)}
+                        onClick={() => handleGenerateInvoice(getOrderId(order))}
                       >
-                        {generatingInvoiceId === order._id ? (
+                        {generatingInvoiceId === getOrderId(order) ? (
                           <>
                             <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-gray-600 mr-1"></div>
                             Gen...
                           </>
                         ) : (
-                          "Generate"
+                          'Generate'
                         )}
                       </Button>
                     ) : (
@@ -226,30 +207,23 @@ const OrdersComponent = ({ orders }: { orders: MY_ORDERS_QUERYResult }) => {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center justify-center gap-1 flex-wrap">
-                      <Button
-                        asChild
-                        size="sm"
-                        variant="outline"
-                        className="h-8 px-2 text-xs"
-                      >
-                        <Link href={`/user/orders/${order._id}`}>
+                      <Button asChild size="sm" variant="outline" className="h-8 px-2 text-xs">
+                        <Link href={`/user/orders/${getOrderId(order)}`}>
                           <Eye className="w-3 h-3 sm:mr-1" />
                           <span className="hidden sm:inline">View</span>
                         </Link>
                       </Button>
                       {isOrderPayable(order) && (
                         <Button
-                          onClick={() => handlePayNow(order._id)}
-                          disabled={payingOrderId === order._id}
+                          onClick={() => handlePayNow(getOrderId(order))}
+                          disabled={payingOrderId === getOrderId(order)}
                           size="sm"
                           className="bg-blue-600 hover:bg-blue-700 text-white h-8 px-2 text-xs"
                         >
-                          {payingOrderId === order._id ? (
+                          {payingOrderId === getOrderId(order) ? (
                             <>
                               <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white sm:mr-1"></div>
-                              <span className="hidden sm:inline">
-                                Paying...
-                              </span>
+                              <span className="hidden sm:inline">Paying...</span>
                             </>
                           ) : (
                             <>

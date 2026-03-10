@@ -1,7 +1,18 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect, useCallback } from "react";
-import { Card } from "@/components/ui/card";
+import { assignEmployeeRole, removeEmployeeRole } from '@/actions/employeeActions';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import {
   Table,
   TableBody,
@@ -9,43 +20,18 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  RefreshCw,
-  Trash2,
-  UserCheck,
-  UserX,
-  Database,
-  Briefcase,
-} from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { UsersSkeleton } from "./SkeletonLoaders";
-import { DeleteConfirmationDialog } from "./DeleteConfirmationDialog";
-import { UserActionModal } from "./UserActionModal";
-import { UserDetailsSidebar } from "./UserDetailsSidebar";
-import { EmployeeAssignmentSidebar } from "./EmployeeAssignmentSidebar";
-import { safeApiCall, handleApiError } from "./apiHelpers";
-import {
-  assignEmployeeRole,
-  removeEmployeeRole,
-} from "@/actions/employeeActions";
-import {
-  EmployeeRole,
-  getRoleDisplayName,
-  getRoleBadgeColor,
-} from "@/types/employee";
-import { toast } from "sonner";
-import { cn } from "@/lib/utils";
+} from '@/components/ui/table';
+import { cn } from '@/lib/utils';
+import { EmployeeRole } from '@/types/domain/employee';
+import { Briefcase, Database, RefreshCw, Trash2, UserCheck, UserX } from 'lucide-react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { toast } from 'sonner';
+import { DeleteConfirmationDialog } from './DeleteConfirmationDialog';
+import { EmployeeAssignmentSidebar } from './EmployeeAssignmentSidebar';
+import { UsersSkeleton } from './SkeletonLoaders';
+import { UserActionModal } from './UserActionModal';
+import { UserDetailsSidebar } from './UserDetailsSidebar';
+import { handleApiError, safeApiCall } from './apiHelpers';
 
 interface CombinedUser {
   id: string;
@@ -81,23 +67,21 @@ const AdminUsers: React.FC = () => {
   const [totalUsersCount, setTotalUsersCount] = useState(0);
   const [sanityUsersCount, setSanityUsersCount] = useState(0);
   const [activeUsersCount, setActiveUsersCount] = useState(0);
-  const [currentPage, setCurrentPage] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(20);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [activatingUsers, setActivatingUsers] = useState<Set<string>>(
-    new Set()
-  );
+  const [activatingUsers, setActivatingUsers] = useState<Set<string>>(new Set());
   const [tableLoading, setTableLoading] = useState(false);
 
   // Modal state
   const [actionModal, setActionModal] = useState<{
     isOpen: boolean;
     user: CombinedUser | null;
-    action: "activate" | "deactivate" | "delete" | null;
+    action: 'activate' | 'deactivate' | 'delete' | null;
   }>({
     isOpen: false,
     user: null,
@@ -136,28 +120,25 @@ const AdminUsers: React.FC = () => {
   // Reset page when search changes or per page changes
   useEffect(() => {
     if (debouncedSearchTerm !== searchTerm) {
-      setCurrentPage(0);
+      setCurrentPage(1);
     }
   }, [debouncedSearchTerm, searchTerm]);
 
   useEffect(() => {
-    setCurrentPage(0);
+    setCurrentPage(1);
   }, [perPage]);
 
   // Utility functions
   const formatDate = (timestamp: number): string => {
-    return new Date(timestamp).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
+    return new Date(timestamp).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
     });
   };
 
   // Modal handlers
-  const openActionModal = (
-    user: CombinedUser,
-    action: "activate" | "deactivate" | "delete"
-  ) => {
+  const openActionModal = (user: CombinedUser, action: 'activate' | 'deactivate' | 'delete') => {
     setActionModal({
       isOpen: true,
       user,
@@ -193,17 +174,17 @@ const AdminUsers: React.FC = () => {
     setActivatingUsers((prev) => new Set(prev).add(userId));
 
     try {
-      const action = activate ? "activate" : "deactivate";
-      await safeApiCall(`/api/admin/users/${userId}/activate`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const action = activate ? 'activate' : 'deactivate';
+      await safeApiCall(`/admin/users/${userId}/activate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action }),
       });
 
       // Immediately fetch fresh data
       await fetchUsers(currentPage, true);
     } catch (error) {
-      handleApiError(error, `User ${activate ? "activation" : "deactivation"}`);
+      handleApiError(error, `User ${activate ? 'activation' : 'deactivation'}`);
     } finally {
       setActivatingUsers((prev) => {
         const newSet = new Set(prev);
@@ -217,7 +198,7 @@ const AdminUsers: React.FC = () => {
   const handleUserUpdate = (updatedUser: CombinedUser) => {
     // Update the user in the users list
     setUsers((prevUsers) =>
-      prevUsers.map((user) => (user.id === updatedUser.id ? updatedUser : user))
+      prevUsers.map((user) => (user.id === updatedUser.id ? updatedUser : user)),
     );
 
     // Update the sidebar state with the new user data
@@ -236,14 +217,14 @@ const AdminUsers: React.FC = () => {
     setActivatingUsers((prev) => new Set(prev).add(userId));
 
     try {
-      await safeApiCall(`/api/admin/users/${userId}/delete-sanity`, {
-        method: "DELETE",
+      await safeApiCall(`/admin/users/${userId}/delete-sanity`, {
+        method: 'DELETE',
       });
 
       // Immediately fetch fresh data
       await fetchUsers(currentPage, true);
     } catch (error) {
-      handleApiError(error, "User deletion from Sanity");
+      handleApiError(error, 'User deletion from Sanity');
     } finally {
       setActivatingUsers((prev) => {
         const newSet = new Set(prev);
@@ -261,13 +242,13 @@ const AdminUsers: React.FC = () => {
     closeActionModal();
 
     switch (action) {
-      case "activate":
+      case 'activate':
         await handleUserActivation(user.id, true);
         break;
-      case "deactivate":
+      case 'deactivate':
         await handleUserActivation(user.id, false);
         break;
-      case "delete":
+      case 'delete':
         await handleUserDeletion(user.id);
         break;
     }
@@ -302,8 +283,8 @@ const AdminUsers: React.FC = () => {
         toast.error(result.message);
       }
     } catch (error) {
-      console.error("Error assigning employee role:", error);
-      toast.error("Failed to assign employee role");
+      console.error('Error assigning employee role:', error);
+      toast.error('Failed to assign employee role');
     }
   };
 
@@ -321,42 +302,40 @@ const AdminUsers: React.FC = () => {
         toast.error(result.message);
       }
     } catch (error) {
-      console.error("Error removing employee role:", error);
-      toast.error("Failed to remove employee role");
+      console.error('Error removing employee role:', error);
+      toast.error('Failed to remove employee role');
     }
   };
 
   // Fetch users
   const fetchUsers = useCallback(
-    async (page = 0, forceFresh = false) => {
+    async (page = 1, forceFresh = false) => {
       setTableLoading(true);
       try {
         // Add cache-busting parameter for fresh data
-        const cacheBuster = forceFresh ? `&_t=${Date.now()}` : "";
+        const cacheBuster = forceFresh ? `&_t=${Date.now()}` : '';
         const data = await safeApiCall(
-          `/api/admin/users/combined?limit=${perPage}&offset=${
-            page * perPage
-          }&query=${debouncedSearchTerm}${cacheBuster}`
+          `/admin/users/combined?page=${page}&perPage=${perPage}&query=${debouncedSearchTerm}${cacheBuster}`,
         );
-        setUsers(data.users);
-        setTotalUsersCount(data.totalCount);
+        const meta = data.meta || data.pagination || {};
+        const totalCount = Number(meta.totalCount || data.totalCount || 0);
+        setUsers(data.data);
+        setTotalUsersCount(totalCount);
         setSanityUsersCount(data.sanityUsersCount || 0);
         setActiveUsersCount(data.activeUsersCount || 0);
       } catch (error) {
-        handleApiError(error, "Users fetch");
+        handleApiError(error, 'Users fetch');
       } finally {
         setTableLoading(false);
       }
     },
-    [debouncedSearchTerm, perPage]
+    [debouncedSearchTerm, perPage],
   );
 
   // Selection functions
   const toggleUserSelection = (userId: string) => {
     setSelectedUsers((prev) =>
-      prev.includes(userId)
-        ? prev.filter((id) => id !== userId)
-        : [...prev, userId]
+      prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId],
     );
   };
 
@@ -376,9 +355,9 @@ const AdminUsers: React.FC = () => {
   const handleDeleteUsers = async () => {
     setIsDeleting(true);
     try {
-      await safeApiCall("/api/admin/users", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
+      await safeApiCall('/admin/users', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userIds: selectedUsers }),
       });
 
@@ -386,7 +365,7 @@ const AdminUsers: React.FC = () => {
       setSelectedUsers([]);
       setIsDeleteDialogOpen(false);
     } catch (error) {
-      handleApiError(error, "Users delete");
+      handleApiError(error, 'Users delete');
     } finally {
       setIsDeleting(false);
     }
@@ -420,9 +399,7 @@ const AdminUsers: React.FC = () => {
           </div>
           <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-2">
             <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground whitespace-nowrap">
-                Show:
-              </span>
+              <span className="text-sm text-muted-foreground whitespace-nowrap">Show:</span>
               <Select
                 value={perPage.toString()}
                 onValueChange={(value) => setPerPage(Number(value))}
@@ -452,9 +429,7 @@ const AdminUsers: React.FC = () => {
                 className="shrink-0"
                 disabled={tableLoading}
               >
-                <RefreshCw
-                  className={cn("h-4 w-4", tableLoading && "animate-spin")}
-                />
+                <RefreshCw className={cn('h-4 w-4', tableLoading && 'animate-spin')} />
               </Button>
             </div>
           </div>
@@ -468,7 +443,7 @@ const AdminUsers: React.FC = () => {
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 bg-blue-50 p-3 rounded-lg border">
                 <span className="text-sm font-medium text-center sm:text-left">
                   {selectedUsers.length} user
-                  {selectedUsers.length > 1 ? "s" : ""} selected
+                  {selectedUsers.length > 1 ? 's' : ''} selected
                 </span>
                 <Button
                   onClick={openDeleteDialog}
@@ -494,43 +469,29 @@ const AdminUsers: React.FC = () => {
                     <TableRow>
                       <TableHead className="w-12">
                         <Checkbox
-                          checked={
-                            selectedUsers.length === users.length &&
-                            users.length > 0
-                          }
+                          checked={selectedUsers.length === users.length && users.length > 0}
                           onCheckedChange={selectAllUsers}
                         />
                       </TableHead>
                       <TableHead className="min-w-[200px]">User</TableHead>
-                      <TableHead className="hidden lg:table-cell min-w-[200px]">
-                        Email
-                      </TableHead>
-                      <TableHead className="hidden xl:table-cell min-w-[120px]">
-                        Joined
-                      </TableHead>
+                      <TableHead className="hidden lg:table-cell min-w-[200px]">Email</TableHead>
+                      <TableHead className="hidden xl:table-cell min-w-[120px]">Joined</TableHead>
                       <TableHead className="hidden xl:table-cell min-w-[120px]">
                         Last Sign In
                       </TableHead>
-                      <TableHead className="hidden lg:table-cell min-w-[120px]">
-                        Status
-                      </TableHead>
-                      <TableHead className="min-w-[140px]">
-                        Sanity Status
-                      </TableHead>
+                      <TableHead className="hidden lg:table-cell min-w-[120px]">Status</TableHead>
+                      <TableHead className="min-w-[140px]">Sanity Status</TableHead>
                       <TableHead className="min-w-[120px]">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {users.length === 0 ? (
                       <TableRow>
-                        <TableCell
-                          colSpan={8}
-                          className="text-center py-8 text-muted-foreground"
-                        >
-                          No users found.{" "}
+                        <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                          No users found.{' '}
                           {totalUsersCount > 0
                             ? `Total users: ${totalUsersCount}`
-                            : "No users in database."}
+                            : 'No users in database.'}
                         </TableCell>
                       </TableRow>
                     ) : (
@@ -539,9 +500,7 @@ const AdminUsers: React.FC = () => {
                           <TableCell>
                             <Checkbox
                               checked={selectedUsers.includes(user.id)}
-                              onCheckedChange={() =>
-                                toggleUserSelection(user.id)
-                              }
+                              onCheckedChange={() => toggleUserSelection(user.id)}
                             />
                           </TableCell>
                           <TableCell>
@@ -552,60 +511,41 @@ const AdminUsers: React.FC = () => {
                                 className="w-8 h-8 rounded-full"
                               />
                               <div>
-                                <div className="font-medium">
-                                  {user.fullName}
-                                </div>
-                                <div className="text-sm text-gray-500 lg:hidden">
-                                  {user.email}
-                                </div>
+                                <div className="font-medium">{user.fullName}</div>
+                                <div className="text-sm text-gray-500 lg:hidden">{user.email}</div>
                                 {user.inSanity && (
                                   <div className="text-xs text-muted-foreground">
-                                    Points: {user.loyaltyPoints} | Spent: $
-                                    {user.totalSpent}
+                                    Points: {user.loyaltyPoints} | Spent: ${user.totalSpent}
                                   </div>
                                 )}
                               </div>
                             </div>
                           </TableCell>
-                          <TableCell className="hidden lg:table-cell">
-                            {user.email}
-                          </TableCell>
+                          <TableCell className="hidden lg:table-cell">{user.email}</TableCell>
                           <TableCell className="hidden xl:table-cell">
                             {formatDate(user.createdAt)}
                           </TableCell>
                           <TableCell className="hidden xl:table-cell">
-                            {user.lastSignInAt
-                              ? formatDate(user.lastSignInAt)
-                              : "Never"}
+                            {user.lastSignInAt ? formatDate(user.lastSignInAt) : 'Never'}
                           </TableCell>
                           <TableCell className="hidden lg:table-cell">
                             <div className="flex gap-1">
-                              <Badge
-                                variant={
-                                  user.emailVerified ? "default" : "secondary"
-                                }
-                              >
-                                {user.emailVerified ? "Verified" : "Unverified"}
+                              <Badge variant={user.emailVerified ? 'default' : 'secondary'}>
+                                {user.emailVerified ? 'Verified' : 'Unverified'}
                               </Badge>
-                              {user.banned && (
-                                <Badge variant="destructive">Banned</Badge>
-                              )}
-                              {user.locked && (
-                                <Badge variant="outline">Locked</Badge>
-                              )}
+                              {user.banned && <Badge variant="destructive">Banned</Badge>}
+                              {user.locked && <Badge variant="outline">Locked</Badge>}
                             </div>
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
                               {user.inSanity ? (
                                 <Badge
-                                  variant={
-                                    user.isActive ? "default" : "secondary"
-                                  }
+                                  variant={user.isActive ? 'default' : 'secondary'}
                                   className="text-xs"
                                 >
                                   <Database className="h-3 w-3 mr-1" />
-                                  {user.isActive ? "Active" : "Inactive"}
+                                  {user.isActive ? 'Active' : 'Inactive'}
                                 </Badge>
                               ) : (
                                 <Badge variant="outline" className="text-xs">
@@ -618,15 +558,11 @@ const AdminUsers: React.FC = () => {
                                   {user.employeeRole}
                                 </Badge>
                               )}
-                              {!user.isEmployee &&
-                                user.notificationCount > 0 && (
-                                  <Badge
-                                    variant="outline"
-                                    className="text-xs hidden lg:inline-flex"
-                                  >
-                                    {user.notificationCount} notifications
-                                  </Badge>
-                                )}
+                              {!user.isEmployee && user.notificationCount > 0 && (
+                                <Badge variant="outline" className="text-xs hidden lg:inline-flex">
+                                  {user.notificationCount} notifications
+                                </Badge>
+                              )}
                             </div>
                           </TableCell>
                           <TableCell>
@@ -648,31 +584,25 @@ const AdminUsers: React.FC = () => {
                               ) : (
                                 <>
                                   <Button
-                                    variant={
-                                      user.isEmployee ? "outline" : "secondary"
-                                    }
+                                    variant={user.isEmployee ? 'outline' : 'secondary'}
                                     size="sm"
                                     onClick={() => openEmployeeDialog(user)}
                                     className="h-8 px-3"
                                     title={
                                       user.isEmployee
-                                        ? "Manage Employee Role"
-                                        : "Assign Employee Role"
+                                        ? 'Manage Employee Role'
+                                        : 'Assign Employee Role'
                                     }
                                   >
                                     <Briefcase className="h-3 w-3" />
                                   </Button>
                                   <Button
-                                    variant={
-                                      user.isActive ? "destructive" : "default"
-                                    }
+                                    variant={user.isActive ? 'destructive' : 'default'}
                                     size="sm"
                                     onClick={() =>
                                       openActionModal(
                                         user,
-                                        user.isActive
-                                          ? "deactivate"
-                                          : "activate"
+                                        user.isActive ? 'deactivate' : 'activate',
                                       )
                                     }
                                     disabled={activatingUsers.has(user.id)}
@@ -689,9 +619,7 @@ const AdminUsers: React.FC = () => {
                                   <Button
                                     variant="outline"
                                     size="sm"
-                                    onClick={() =>
-                                      openActionModal(user, "delete")
-                                    }
+                                    onClick={() => openActionModal(user, 'delete')}
                                     disabled={activatingUsers.has(user.id)}
                                     className="h-8 px-3"
                                   >
@@ -712,17 +640,17 @@ const AdminUsers: React.FC = () => {
               <div className="block md:hidden space-y-3">
                 {users.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
-                    No users found.{" "}
+                    No users found.{' '}
                     {totalUsersCount > 0
                       ? `Total users: ${totalUsersCount}`
-                      : "No users in database."}
+                      : 'No users in database.'}
                   </div>
                 ) : (
                   users.map((user, index) => (
                     <Card
                       key={user.id}
                       className="mobile-user-card p-3"
-                      style={{ "--card-index": index } as React.CSSProperties}
+                      style={{ '--card-index': index } as React.CSSProperties}
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -736,19 +664,14 @@ const AdminUsers: React.FC = () => {
                             className="w-10 h-10 rounded-full shrink-0"
                           />
                           <div className="flex-1 min-w-0">
-                            <div className="font-medium text-sm truncate">
-                              {user.fullName}
-                            </div>
-                            <div className="text-xs text-gray-500 truncate">
-                              {user.email}
-                            </div>
+                            <div className="font-medium text-sm truncate">{user.fullName}</div>
+                            <div className="text-xs text-gray-500 truncate">{user.email}</div>
                             <div className="text-xs text-muted-foreground mt-1">
                               Joined: {formatDate(user.createdAt)}
                             </div>
                             {user.inSanity && (
                               <div className="text-xs text-muted-foreground">
-                                Points: {user.loyaltyPoints} | Spent: $
-                                {user.totalSpent}
+                                Points: {user.loyaltyPoints} | Spent: ${user.totalSpent}
                               </div>
                             )}
                           </div>
@@ -759,12 +682,10 @@ const AdminUsers: React.FC = () => {
                         {/* Status Badges */}
                         <div className="flex flex-wrap gap-1">
                           <Badge
-                            variant={
-                              user.emailVerified ? "default" : "secondary"
-                            }
+                            variant={user.emailVerified ? 'default' : 'secondary'}
                             className="text-xs"
                           >
-                            {user.emailVerified ? "Verified" : "Unverified"}
+                            {user.emailVerified ? 'Verified' : 'Unverified'}
                           </Badge>
                           {user.banned && (
                             <Badge variant="destructive" className="text-xs">
@@ -778,11 +699,11 @@ const AdminUsers: React.FC = () => {
                           )}
                           {user.inSanity ? (
                             <Badge
-                              variant={user.isActive ? "default" : "secondary"}
+                              variant={user.isActive ? 'default' : 'secondary'}
                               className="text-xs"
                             >
                               <Database className="h-3 w-3 mr-1" />
-                              {user.isActive ? "Active" : "Inactive"}
+                              {user.isActive ? 'Active' : 'Inactive'}
                             </Badge>
                           ) : (
                             <Badge variant="outline" className="text-xs">
@@ -805,10 +726,7 @@ const AdminUsers: React.FC = () => {
                         {/* Actions */}
                         <div className="flex items-center justify-between pt-1 border-t border-gray-100">
                           <div className="text-xs text-muted-foreground">
-                            Last:{" "}
-                            {user.lastSignInAt
-                              ? formatDate(user.lastSignInAt)
-                              : "Never"}
+                            Last: {user.lastSignInAt ? formatDate(user.lastSignInAt) : 'Never'}
                           </div>
                           <div className="flex items-center gap-2">
                             {!user.inSanity ? (
@@ -831,26 +749,19 @@ const AdminUsers: React.FC = () => {
                             ) : (
                               <>
                                 <Button
-                                  variant={
-                                    user.isEmployee ? "outline" : "secondary"
-                                  }
+                                  variant={user.isEmployee ? 'outline' : 'secondary'}
                                   size="sm"
                                   onClick={() => openEmployeeDialog(user)}
                                   className="h-7 px-2 text-xs"
                                 >
                                   <Briefcase className="h-3 w-3 mr-1" />
-                                  {user.isEmployee ? "Manage" : "Assign"}
+                                  {user.isEmployee ? 'Manage' : 'Assign'}
                                 </Button>
                                 <Button
-                                  variant={
-                                    user.isActive ? "destructive" : "default"
-                                  }
+                                  variant={user.isActive ? 'destructive' : 'default'}
                                   size="sm"
                                   onClick={() =>
-                                    openActionModal(
-                                      user,
-                                      user.isActive ? "deactivate" : "activate"
-                                    )
+                                    openActionModal(user, user.isActive ? 'deactivate' : 'activate')
                                   }
                                   disabled={activatingUsers.has(user.id)}
                                   className="h-7 px-2 text-xs"
@@ -872,9 +783,7 @@ const AdminUsers: React.FC = () => {
                                 <Button
                                   variant="outline"
                                   size="sm"
-                                  onClick={() =>
-                                    openActionModal(user, "delete")
-                                  }
+                                  onClick={() => openActionModal(user, 'delete')}
                                   disabled={activatingUsers.has(user.id)}
                                   className="h-7 px-2 text-xs"
                                 >
@@ -893,27 +802,25 @@ const AdminUsers: React.FC = () => {
 
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="text-sm text-muted-foreground text-center sm:text-left">
-                Showing {Math.min(currentPage * perPage + 1, totalUsersCount)}{" "}
-                to {Math.min((currentPage + 1) * perPage, totalUsersCount)} of{" "}
-                {totalUsersCount} users
+                Showing {Math.min((currentPage - 1) * perPage + 1, totalUsersCount)} to{' '}
+                {Math.min(currentPage * perPage, totalUsersCount)} of {totalUsersCount} users
               </div>
               <div className="flex items-center justify-center sm:justify-end gap-2">
                 <Button
-                  onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
-                  disabled={currentPage === 0 || tableLoading}
+                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                  disabled={currentPage === 1 || tableLoading}
                   variant="outline"
                   size="sm"
                 >
                   Previous
                 </Button>
                 <span className="text-sm text-muted-foreground px-2 whitespace-nowrap">
-                  Page {currentPage + 1} of{" "}
-                  {Math.max(1, Math.ceil(totalUsersCount / perPage))}
+                  Page {currentPage} of {Math.max(1, Math.ceil(totalUsersCount / perPage))}
                 </span>
                 <Button
                   onClick={() => setCurrentPage(currentPage + 1)}
                   disabled={
-                    (currentPage + 1) * perPage >= totalUsersCount ||
+                    currentPage * perPage >= totalUsersCount ||
                     tableLoading ||
                     totalUsersCount <= perPage
                   }
@@ -934,10 +841,8 @@ const AdminUsers: React.FC = () => {
         onClose={() => setIsDeleteDialogOpen(false)}
         onConfirm={handleDeleteUsers}
         title="Delete Users"
-        description={`Are you sure you want to delete ${
-          selectedUsers.length
-        } user${
-          selectedUsers.length > 1 ? "s" : ""
+        description={`Are you sure you want to delete ${selectedUsers.length} user${
+          selectedUsers.length > 1 ? 's' : ''
         }? This action cannot be undone.`}
         itemCount={selectedUsers.length}
         isLoading={isDeleting}
@@ -961,7 +866,7 @@ const AdminUsers: React.FC = () => {
             : null
         }
         action={actionModal.action}
-        isLoading={activatingUsers.has(actionModal.user?.id || "")}
+        isLoading={activatingUsers.has(actionModal.user?.id || '')}
       />
 
       {/* User Details Sidebar */}
@@ -972,7 +877,7 @@ const AdminUsers: React.FC = () => {
         onActivate={handleUserActivation}
         onDelete={handleUserDeletion}
         onUserUpdate={handleUserUpdate}
-        isLoading={activatingUsers.has(sidebarState.user?.id || "")}
+        isLoading={activatingUsers.has(sidebarState.user?.id || '')}
       />
 
       {/* Employee Assignment Sidebar */}
@@ -982,7 +887,7 @@ const AdminUsers: React.FC = () => {
         user={employeeSidebarState.user}
         onAssignRole={handleAssignEmployee}
         onRemoveRole={handleRemoveEmployee}
-        isLoading={activatingUsers.has(employeeSidebarState.user?.id || "")}
+        isLoading={activatingUsers.has(employeeSidebarState.user?.id || '')}
       />
     </>
   );

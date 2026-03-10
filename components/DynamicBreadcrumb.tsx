@@ -1,9 +1,5 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Home } from "lucide-react";
-import { useEffect, useState } from "react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -11,7 +7,11 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
+} from '@/components/ui/breadcrumb';
+import { Home } from 'lucide-react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 interface DynamicBreadcrumbProps {
   customItems?: Array<{
@@ -38,16 +38,14 @@ interface DynamicBreadcrumbProps {
 
 const DynamicBreadcrumb = ({
   customItems,
-  className = "",
+  className = '',
   productData,
   categoryData,
   brandData,
   parentPath,
 }: DynamicBreadcrumbProps) => {
   const pathname = usePathname();
-  const [detectedParentPath, setDetectedParentPath] = useState<string | null>(
-    null
-  );
+  const [detectedParentPath, setDetectedParentPath] = useState<string | null>(null);
 
   // Detect parent path from referrer or session storage
   useEffect(() => {
@@ -57,8 +55,8 @@ const DynamicBreadcrumb = ({
     }
 
     // Clear parent context if we're on dashboard itself
-    if (pathname === "/dashboard") {
-      sessionStorage.removeItem("breadcrumb-parent");
+    if (pathname === '/dashboard') {
+      sessionStorage.removeItem('breadcrumb-parent');
       setDetectedParentPath(null);
       return;
     }
@@ -70,28 +68,25 @@ const DynamicBreadcrumb = ({
       const referrerPath = referrerUrl.pathname;
 
       // If we came from dashboard, include it in breadcrumb
-      if (
-        referrerPath === "/dashboard" ||
-        referrerPath.startsWith("/dashboard/")
-      ) {
-        setDetectedParentPath("/dashboard");
+      if (referrerPath === '/dashboard' || referrerPath.startsWith('/dashboard/')) {
+        setDetectedParentPath('/dashboard');
       }
     }
 
     // Also check session storage for navigation context
-    const storedParent = sessionStorage.getItem("breadcrumb-parent");
-    if (storedParent === "/dashboard") {
-      setDetectedParentPath("/dashboard");
+    const storedParent = sessionStorage.getItem('breadcrumb-parent');
+    if (storedParent === '/dashboard') {
+      setDetectedParentPath('/dashboard');
     }
   }, [parentPath, pathname]);
 
   const formatSegmentLabel = (segment: string): string => {
     // Handle special cases
     const specialCases: Record<string, string> = {
-      "sign-in": "Sign In",
-      "sign-up": "Sign Up",
-      "my-account": "My Account",
-      "order-history": "Order History",
+      'sign-in': 'Sign In',
+      'sign-up': 'Sign Up',
+      'my-account': 'My Account',
+      'order-history': 'Order History',
     };
 
     if (specialCases[segment]) {
@@ -99,16 +94,14 @@ const DynamicBreadcrumb = ({
     }
 
     return segment
-      .split("-")
+      .split('-')
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ");
+      .join(' ');
   };
 
   // Generate breadcrumb items from pathname with parent context support
   const generateBreadcrumbs = () => {
-    const pathSegments = pathname
-      .split("/")
-      .filter((segment) => segment !== "");
+    const pathSegments = pathname.split('/').filter((segment) => segment !== '');
 
     const breadcrumbs: Array<{
       label: string;
@@ -118,8 +111,8 @@ const DynamicBreadcrumb = ({
 
     // Always start with Home
     breadcrumbs.push({
-      label: "Home",
-      href: "/",
+      label: 'Home',
+      href: '/',
       isLast: pathSegments.length === 0,
     });
 
@@ -130,12 +123,9 @@ const DynamicBreadcrumb = ({
 
     // For nested routes with parent context (e.g., dashboard/cart)
     const activeParentPath = parentPath || detectedParentPath;
-    if (
-      activeParentPath &&
-      !pathSegments.includes(activeParentPath.replace("/", ""))
-    ) {
+    if (activeParentPath && !pathSegments.includes(activeParentPath.replace('/', ''))) {
       // Add the parent to the breadcrumbs
-      const parentSegment = activeParentPath.replace("/", "");
+      const parentSegment = activeParentPath.replace('/', '');
       breadcrumbs.push({
         label: formatSegmentLabel(parentSegment),
         href: activeParentPath,
@@ -144,13 +134,13 @@ const DynamicBreadcrumb = ({
     }
 
     // Build breadcrumbs for each segment
-    let currentPath = "";
+    let currentPath = '';
     pathSegments.forEach((segment, index) => {
       const isLast = index === pathSegments.length - 1;
       const parentSegment = pathSegments[index - 1];
 
       // Skip route groups like (client), (user), (public)
-      if (segment.startsWith("(") && segment.endsWith(")")) {
+      if (segment.startsWith('(') && segment.endsWith(')')) {
         return;
       }
 
@@ -158,7 +148,7 @@ const DynamicBreadcrumb = ({
       currentPath += `/${segment}`;
 
       // Handle dynamic routes with provided data
-      if (parentSegment === "product" && productData && isLast) {
+      if (parentSegment === 'product' && productData && isLast) {
         breadcrumbs.push({
           label: productData.name,
           href: undefined,
@@ -167,7 +157,7 @@ const DynamicBreadcrumb = ({
         return;
       }
 
-      if (parentSegment === "category" && categoryData && isLast) {
+      if (parentSegment === 'category' && categoryData && isLast) {
         breadcrumbs.push({
           label: categoryData.name,
           href: undefined,
@@ -176,7 +166,7 @@ const DynamicBreadcrumb = ({
         return;
       }
 
-      if (parentSegment === "brands" && brandData && isLast) {
+      if (parentSegment === 'brands' && brandData && isLast) {
         breadcrumbs.push({
           label: brandData.name,
           href: undefined,
@@ -229,15 +219,13 @@ const DynamicBreadcrumb = ({
                 ) : (
                   <BreadcrumbLink asChild>
                     <Link
-                      href={crumb.href || "/"}
+                      href={crumb.href || '/'}
                       className={`flex items-center hover:text-shop_light_green transition-colors ${
-                        index === 0 ? "flex items-center" : ""
+                        index === 0 ? 'flex items-center' : ''
                       }`}
                     >
                       {index === 0 && <Home size={16} />}
-                      <span className={index === 0 ? "ml-1" : ""}>
-                        {crumb.label}
-                      </span>
+                      <span className={index === 0 ? 'ml-1' : ''}>{crumb.label}</span>
                     </Link>
                   </BreadcrumbLink>
                 )}

@@ -1,35 +1,33 @@
-"use client";
-import Logo from "./common/Logo";
-import { motion } from "motion/react";
-import { ShoppingBag, Package, Truck, CheckCircle } from "lucide-react";
-import { useState, useEffect } from "react";
+'use client';
+import { CheckCircle, Package, ShoppingBag, Truck } from 'lucide-react';
+import { motion } from 'motion/react';
+import { useEffect, useState } from 'react';
+import Logo from './common/Logo';
 
 const Loading = () => {
   const [currentStep, setCurrentStep] = useState(0);
-  const [loadingText, setLoadingText] = useState(
-    "Preparing your shopping experience..."
-  );
+  const [loadingText, setLoadingText] = useState('Preparing your shopping experience...');
 
   const loadingSteps = [
     {
       icon: ShoppingBag,
-      text: "Preparing your shopping experience...",
-      color: "text-shop_dark_green",
+      text: 'Preparing your shopping experience...',
+      color: 'text-shop_dark_green',
     },
     {
       icon: Package,
-      text: "Loading products...",
-      color: "text-shop_light_green",
+      text: 'Loading products...',
+      color: 'text-shop_light_green',
     },
     {
       icon: Truck,
-      text: "Setting up delivery options...",
-      color: "text-shop_orange",
+      text: 'Setting up delivery options...',
+      color: 'text-shop_orange',
     },
     {
       icon: CheckCircle,
-      text: "Almost ready!",
-      color: "text-shop_light_green",
+      text: 'Almost ready!',
+      color: 'text-shop_light_green',
     },
   ];
 
@@ -66,10 +64,10 @@ const Loading = () => {
               key={index}
               className={`w-3 h-3 rounded-full ${
                 index === currentStep
-                  ? "bg-shop_orange shadow-lg"
+                  ? 'bg-shop_orange shadow-lg'
                   : index < currentStep
-                  ? "bg-shop_light_green"
-                  : "bg-gray-300"
+                    ? 'bg-shop_light_green'
+                    : 'bg-gray-300'
               }`}
               animate={{
                 scale: index === currentStep ? [1, 1.3, 1] : 1,
@@ -114,23 +112,19 @@ const Loading = () => {
             transition={{ duration: 0.4 }}
             className="space-y-2"
           >
-            <h2 className="text-xl font-semibold text-shop_dark_green">
-              {loadingText}
-            </h2>
-            <p className="text-sm text-gray-600">
-              Please wait while we set up everything for you
-            </p>
+            <h2 className="text-xl font-semibold text-shop_dark_green">{loadingText}</h2>
+            <p className="text-sm text-gray-600">Please wait while we set up everything for you</p>
           </motion.div>
 
           {/* Progress Bar */}
-          <div className="w-64 h-2 bg-gray-200 rounded-full overflow-hidden">
+          <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
             <motion.div
               className="h-full bg-gradient-to-r from-shop_light_green to-shop_orange rounded-full"
-              initial={{ width: "0%" }}
+              initial={{ width: '0%' }}
               animate={{
                 width: `${((currentStep + 1) / loadingSteps.length) * 100}%`,
               }}
-              transition={{ duration: 0.6, ease: "easeInOut" }}
+              transition={{ duration: 0.6, ease: 'easeInOut' }}
             />
           </div>
 
@@ -140,8 +134,7 @@ const Loading = () => {
             animate={{ opacity: [0.7, 1, 0.7] }}
             transition={{ duration: 1.5, repeat: Infinity }}
           >
-            {Math.round(((currentStep + 1) / loadingSteps.length) * 100)}%
-            Complete
+            {Math.round(((currentStep + 1) / loadingSteps.length) * 100)}% Complete
           </motion.p>
         </div>
       </div>

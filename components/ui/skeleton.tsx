@@ -1,5 +1,5 @@
-import { ReactNode, FC } from "react";
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils';
+import { FC, ReactNode } from 'react';
 
 interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string;
@@ -8,10 +8,7 @@ interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const Skeleton: FC<SkeletonProps> = ({ className, children, ...props }) => {
   return (
-    <div
-      className={cn("animate-pulse bg-muted rounded-md", className)}
-      {...props}
-    >
+    <div className={cn('animate-pulse bg-muted rounded-md', className)} {...props}>
       {children}
     </div>
   );

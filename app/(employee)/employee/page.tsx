@@ -1,4 +1,5 @@
+import EmployeeOrderManagement from '@/components/admin/EmployeeOrderManagement';
+
 export default function EmployeePage() {
-  // Content handled by layout - shows paid feature message
-  return null;
+  return <EmployeeOrderManagement />;
 }

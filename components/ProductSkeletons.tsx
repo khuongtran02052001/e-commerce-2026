@@ -1,5 +1,5 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 
 // Product Grid Skeleton for shop pages
 export const ProductGridSkeleton = () => (
@@ -177,10 +177,7 @@ export const BrandsGridSkeleton = () => (
 
     <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
       {[...Array(16)].map((_, i) => (
-        <Card
-          key={i}
-          className="aspect-square p-4 flex items-center justify-center"
-        >
+        <Card key={i} className="aspect-square p-4 flex items-center justify-center">
           <Skeleton className="h-16 w-16 rounded-lg" />
         </Card>
       ))}

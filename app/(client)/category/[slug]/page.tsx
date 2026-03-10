@@ -1,5 +1,6 @@
-import Container from "@/components/Container";
-import Title from "@/components/Title";
+import Container from '@/components/Container';
+import CategoryProducts from '@/components/product/CategoryProducts';
+import Title from '@/components/Title';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -7,30 +8,19 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { getCategories } from "@/sanity/queries";
-import { Category, Product } from "@/sanity.types";
-import { urlFor } from "@/sanity/lib/image";
-import Image from "next/image";
-import Link from "next/link";
+} from '@/components/ui/breadcrumb';
 import {
-  ArrowLeft,
-  ArrowRight,
-  Package,
-  Tag,
-  Grid3X3,
-  Filter,
-  TrendingUp,
-} from "lucide-react";
-import React from "react";
-import CategoryProducts from "@/components/product/CategoryProducts";
-import { client } from "@/sanity/lib/client";
-import { Metadata } from "next";
-import {
-  generateCategoryMetadata,
   generateBreadcrumbSchema,
+  generateCategoryMetadata,
   generateItemListSchema,
-} from "@/lib/seo";
+} from '@/lib/seo';
+import { getCategories } from '@/data/server';
+import { getProductsByCategory } from '@/data/server/product';
+import { ICategory, IProduct } from '@/mock-data';
+import { ArrowLeft, ArrowRight, Filter, Grid3X3, Package, Tag, TrendingUp } from 'lucide-react';
+import { Metadata } from 'next';
+import Image from 'next/image';
+import Link from 'next/link';
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -38,73 +28,52 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const categories: Category[] = await getCategories();
 
-  // Fetch products for the current category to get count
-  const query = `
-    *[_type == "product" && references(*[_type == "category" && slug.current == $slug]._id)] {
-      _id
-    }
-  `;
-  const products = await client.fetch(query, { slug });
+  const [categoriesResult, productsResult] = await Promise.all([
+    getCategories(),
+    getProductsByCategory(slug),
+  ]);
+  const categories = categoriesResult ?? [];
+  const products = productsResult ?? [];
 
   // Find the current category
-  const currentCategory = categories.find(
-    (cat: Category) => cat.slug?.current === slug
-  );
+  const currentCategory = categories.find((cat: ICategory) => cat.slug === slug);
 
   if (!currentCategory) {
     return {
-      title: "Category Not Found",
+      title: 'Category Not Found',
       description: "The category you're looking for could not be found.",
     };
   }
 
-  return generateCategoryMetadata(currentCategory, products.length);
+  return generateCategoryMetadata(currentCategory, products?.length || 0);
 }
 
-const CategoryPage = async ({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) => {
+const CategoryPage = async ({ params }: { params: Promise<{ slug: string }> }) => {
   const { slug } = await params;
-  const categories: Category[] = await getCategories();
 
-  // Fetch products for the current category
-  const query = `
-    *[_type == "product" && references(*[_type == "category" && slug.current == $slug]._id)] {
-      ...,
-      brand->{
-        _id,
-        name
-      }
-    }
-  `;
-  const products: Product[] = await client.fetch(query, { slug });
+  const [categoriesResult, productsResult] = await Promise.all([
+    getCategories(),
+    getProductsByCategory(slug),
+  ]);
+  const categories = categoriesResult ?? [];
+  const products = productsResult ?? [];
 
   // Find the current category to get its proper title
-  const currentCategory = categories.find(
-    (cat: Category) => cat.slug?.current === slug
-  );
+  const currentCategory = categories.find((cat: ICategory) => cat.slug === slug);
   const categoryTitle = currentCategory?.title || slug;
 
   // Get related categories (exclude current category)
-  const relatedCategories = categories
-    .filter((cat) => cat.slug?.current !== slug)
-    .slice(0, 6);
+  const relatedCategories = categories.filter((cat) => cat.slug !== slug).slice(0, 6);
 
   // Generate structured data
   const breadcrumbSchema = generateBreadcrumbSchema([
-    { name: "Home", url: "/" },
-    { name: "Categories", url: "/category" },
+    { name: 'Home', url: '/' },
+    { name: 'Categories', url: '/category' },
     { name: categoryTitle, url: `/category/${slug}` },
   ]);
 
-  const itemListSchema = generateItemListSchema(
-    products,
-    `${categoryTitle} Products`
-  );
+  const itemListSchema = generateItemListSchema(products, `${categoryTitle} Products`);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-shop_light_bg via-white to-shop_light_pink">
@@ -153,17 +122,17 @@ const CategoryPage = async ({
             <div className="flex-1">
               <div className="flex items-start gap-4 mb-4">
                 {/* Category Image */}
-                {currentCategory?.image && (
+                {currentCategory?.imageUrl ? (
                   <div className="flex-shrink-0 w-16 h-16 lg:w-20 lg:h-20 bg-gradient-to-br from-shop_light_pink to-shop_light_bg rounded-xl overflow-hidden">
                     <Image
-                      src={urlFor(currentCategory.image).url()}
+                      src={currentCategory.imageUrl}
                       alt={categoryTitle}
                       width={80}
                       height={80}
                       className="w-full h-full object-contain"
                     />
                   </div>
-                )}
+                ) : null}
 
                 <div className="flex-1">
                   <Title className="text-2xl lg:text-3xl font-bold text-shop_dark_green mb-2">
@@ -235,11 +204,7 @@ const CategoryPage = async ({
         </div>
 
         {/* Main Content */}
-        <CategoryProducts
-          categories={categories}
-          slug={slug}
-          initialProducts={products}
-        />
+        <CategoryProducts categories={categories} slug={slug} initialProducts={products} />
 
         {/* Related Categories Section */}
         {relatedCategories.length > 0 && (
@@ -258,18 +223,18 @@ const CategoryPage = async ({
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-              {relatedCategories.map((category) => (
+              {relatedCategories.map((category: ICategory) => (
                 <Link
-                  key={category._id}
-                  href={`/category/${category.slug?.current}`}
+                  key={category.id}
+                  href={`/category/${category.slug}`}
                   className="group bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border border-gray-100 hover:border-shop_light_green p-4 text-center"
                 >
                   {/* Category Image */}
                   <div className="w-12 h-12 mx-auto mb-3 bg-gradient-to-br from-shop_light_pink to-shop_light_bg rounded-lg flex items-center justify-center">
-                    {category.image ? (
+                    {category.imageUrl ? (
                       <Image
-                        src={urlFor(category.image).url()}
-                        alt={category.title || "Category"}
+                        src={category.imageUrl}
+                        alt={category.title || 'Category'}
                         width={32}
                         height={32}
                         className="w-8 h-8 object-contain"
@@ -296,8 +261,8 @@ const CategoryPage = async ({
               Discover More Amazing Products
             </h3>
             <p className="text-dark-text mb-6 text-sm lg:text-base">
-              Can&apos;t find what you&apos;re looking for in {categoryTitle}?
-              Explore our complete collection of products across all categories.
+              Can&apos;t find what you&apos;re looking for in {categoryTitle}? Explore our complete
+              collection of products across all categories.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link

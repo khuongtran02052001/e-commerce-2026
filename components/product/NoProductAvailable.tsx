@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
-import { Package, Search, ArrowRight, Grid3X3 } from "lucide-react";
-import Link from "next/link";
+import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
+import { ArrowRight, Grid3X3, Package, Search } from 'lucide-react';
+import Link from 'next/link';
 
 const NoProductAvailable = ({
   selectedTab,
@@ -15,8 +15,8 @@ const NoProductAvailable = ({
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center py-16 min-h-80 space-y-8 text-center bg-gradient-to-br from-gray-50/50 to-white rounded-xl border border-gray-200/50 w-full",
-        className
+        'flex flex-col items-center justify-center py-16 min-h-80 space-y-8 text-center bg-gradient-to-br from-gray-50/50 to-white rounded-xl border border-gray-200/50 w-full',
+        className,
       )}
     >
       {/* Icon */}
@@ -43,13 +43,13 @@ const NoProductAvailable = ({
       >
         <h2 className="text-2xl font-bold text-gray-800">No Products Found</h2>
         <p className="text-gray-600 max-w-md">
-          We couldn&apos;t find any products{" "}
+          We couldn&apos;t find any products{' '}
           {selectedTab && (
             <>
-              in the{" "}
+              in the{' '}
               <span className="font-semibold text-shop_dark_green capitalize">
-                {selectedTab.replace(/-/g, " ")}
-              </span>{" "}
+                {selectedTab.replace(/-/g, ' ')}
+              </span>{' '}
               category
             </>
           )}
@@ -64,9 +64,7 @@ const NoProductAvailable = ({
         transition={{ delay: 0.4, duration: 0.5 }}
         className="space-y-4 w-full max-w-md"
       >
-        <p className="text-sm text-gray-500 font-medium">
-          What would you like to do?
-        </p>
+        <p className="text-sm text-gray-500 font-medium">What would you like to do?</p>
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link

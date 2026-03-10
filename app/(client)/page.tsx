@@ -1,25 +1,21 @@
-import HomeCategories from "@/components/HomeCategories";
-import LatestBlog from "@/components/LatestBlog";
-import HomeBanner from "@/components/HomeBanner";
-import ProductGrid from "@/components/ProductGrid";
-import ShopByBrands from "@/components/ShopByBrands";
-import ShopFeatures from "@/components/ShopFeatures";
-// import { getCategories } from "@/sanity/queries";
-import { generateOrganizationSchema, generateWebsiteSchema } from "@/lib/seo";
-import { mockCategories } from "@/mock-data";
+import HomeBanner from '@/components/HomeBanner';
+import HomeCategories from '@/components/HomeCategories';
+import LatestBlog from '@/components/LatestBlog';
+import ProductGrid from '@/components/ProductGrid';
+import ShopByBrands from '@/components/ShopByBrands';
+import ShopFeatures from '@/components/ShopFeatures';
+import { getAllProducts, getCategories } from '@/data/server';
 
 export default async function Home() {
-  // const categories = await mockCategories(8);
-  const categories = mockCategories;
-
+  const [categories, products] = await Promise.all([getCategories(), getAllProducts()]);
+  const safeCategories = categories || [];
   // Generate structured data
-  const organizationSchema = generateOrganizationSchema();
-  const websiteSchema = generateWebsiteSchema();
-
+  // const organizationSchema = generateOrganizationSchema();
+  // const websiteSchema = generateWebsiteSchema();
   return (
     <div>
       {/* JSON-LD Structured Data */}
-      <script
+      {/* <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(organizationSchema),
@@ -30,12 +26,11 @@ export default async function Home() {
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(websiteSchema),
         }}
-      />
-
+      /> */}
       <HomeBanner />
       <div className="py-10">
-        <ProductGrid />
-        <HomeCategories categories={categories} />
+        <ProductGrid data={products!} />
+        <HomeCategories categories={safeCategories} />
         <ShopFeatures />
         <ShopByBrands />
         <LatestBlog />

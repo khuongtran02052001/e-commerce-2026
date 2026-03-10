@@ -1,19 +1,19 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { CreditCard, Package } from "lucide-react";
-import useCartStore, { CartItem } from "@/store";
-import { toast } from "sonner";
-import { useUser } from "@clerk/nextjs";
-import { useOrderPlacement } from "@/hooks/useOrderPlacement";
-import { PAYMENT_METHODS } from "@/lib/orderStatus";
-import { trackCheckoutStarted } from "@/lib/analytics";
+import { Button } from '@/components/ui/button';
+import { useOrderPlacement } from '@/hooks/useOrderPlacement';
+import { trackCheckoutStarted } from '@/lib/analytics';
+import { PAYMENT_METHODS } from '@/lib/orderStatus';
+import useCartStore, { CartItem } from '@/store';
+import { CreditCard, Package } from 'lucide-react';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
-import { OrderPlacementOverlay } from "./OrderPlacementSkeleton";
+import { useUserData } from '@/contexts/UserDataContext';
+import { OrderPlacementOverlay } from './OrderPlacementSkeleton';
 
 interface Address {
-  _id: string;
+  id: string;
   name: string;
   email: string;
   address: string;
@@ -30,40 +30,36 @@ interface CheckoutButtonProps {
 }
 
 export function CheckoutButton({ cart, selectedAddress }: CheckoutButtonProps) {
-  const { user } = useUser();
+  const { authUser } = useUserData();
   const { resetCart, setOrderPlacementState } = useCartStore();
   const { placeOrder, isPlacingOrder, orderStep } = useOrderPlacement({
-    user: user ? { emailAddresses: user.emailAddresses } : null,
+    user: authUser ? { id: authUser.id, email: authUser.email ?? undefined } : null,
   });
-  const [actionType, setActionType] = useState<"checkout" | "order" | null>(
-    null
-  );
+  const [actionType, setActionType] = useState<'checkout' | 'order' | null>(null);
 
   const handleCheckout = async () => {
     if (!selectedAddress) {
-      toast.error("Please select a shipping address");
+      toast.error('Please select a shipping address');
       return;
     }
 
     // Check stock status
     const outOfStockItems = cart.filter((item) => item.product.stock === 0);
     if (outOfStockItems.length > 0) {
-      toast.error(
-        "Some items are out of stock. Please remove them to continue."
-      );
+      toast.error('Some items are out of stock. Please remove them to continue.');
       return;
     }
 
     // Set loading state for checkout button
-    setActionType("checkout");
+    setActionType('checkout');
 
     // Track checkout started
     const cartValue = cart.reduce(
       (sum, item) => sum + (item.product.price || 0) * item.quantity,
-      0
+      0,
     );
     trackCheckoutStarted({
-      userId: user?.id,
+      userId: authUser?.email || authUser?.id,
       cartValue,
       itemCount: cart.length,
     });
@@ -75,20 +71,18 @@ export function CheckoutButton({ cart, selectedAddress }: CheckoutButtonProps) {
 
   const handlePlaceOrder = async () => {
     if (!selectedAddress) {
-      toast.error("Please select a shipping address");
+      toast.error('Please select a shipping address');
       return;
     }
 
     // Check stock status
     const outOfStockItems = cart.filter((item) => item.product.stock === 0);
     if (outOfStockItems.length > 0) {
-      toast.error(
-        "Some items are out of stock. Please remove them to continue."
-      );
+      toast.error('Some items are out of stock. Please remove them to continue.');
       return;
     }
 
-    setActionType("order");
+    setActionType('order');
 
     // Calculate pricing using new structure
     // Get gross subtotal and discount from store functions
@@ -109,8 +103,7 @@ export function CheckoutButton({ cart, selectedAddress }: CheckoutButtonProps) {
 
     const currentSubtotal = grossSubtotal - totalDiscount;
     const shipping = currentSubtotal > 100 ? 0 : 10;
-    const tax =
-      currentSubtotal * (parseFloat(process.env.TAX_AMOUNT || "0") || 0);
+    const tax = currentSubtotal * (parseFloat(process.env.TAX_AMOUNT || '0') || 0);
     const orderTotal = currentSubtotal + shipping + tax;
 
     const result = await placeOrder(
@@ -120,19 +113,19 @@ export function CheckoutButton({ cart, selectedAddress }: CheckoutButtonProps) {
       shipping,
       tax,
       orderTotal,
-      false // redirectToCheckout = false
+      false, // redirectToCheckout = false
     );
 
     if (result?.success && result.redirectTo) {
       setTimeout(() => {
         // Clear cart and reset order placement state just before redirect
         resetCart();
-        setOrderPlacementState(false, "validating");
+        setOrderPlacementState(false, 'validating');
         window.location.href = result.redirectTo;
       }, 1500);
     } else {
       // Reset state if no redirect
-      setOrderPlacementState(false, "validating");
+      setOrderPlacementState(false, 'validating');
     }
 
     setActionType(null);
@@ -143,7 +136,7 @@ export function CheckoutButton({ cart, selectedAddress }: CheckoutButtonProps) {
   return (
     <>
       {/* Show overlay skeleton only for place order action */}
-      {isPlacingOrder && actionType === "order" && (
+      {isPlacingOrder && actionType === 'order' && (
         <OrderPlacementOverlay step={orderStep} isCheckoutRedirect={false} />
       )}
 
@@ -158,9 +151,7 @@ export function CheckoutButton({ cart, selectedAddress }: CheckoutButtonProps) {
 
         {!selectedAddress && (
           <div className="p-3 bg-orange-50 border border-orange-200 rounded-md">
-            <p className="text-sm text-orange-700">
-              Please select a shipping address to continue
-            </p>
+            <p className="text-sm text-orange-700">Please select a shipping address to continue</p>
           </div>
         )}
 
@@ -169,7 +160,7 @@ export function CheckoutButton({ cart, selectedAddress }: CheckoutButtonProps) {
             onClick={handleCheckout}
             disabled={
               isPlacingOrder ||
-              actionType === "checkout" ||
+              actionType === 'checkout' ||
               hasOutOfStockItems ||
               !selectedAddress ||
               cart.length === 0
@@ -177,7 +168,7 @@ export function CheckoutButton({ cart, selectedAddress }: CheckoutButtonProps) {
             className="w-full h-12 text-lg font-semibold"
             size="lg"
           >
-            {actionType === "checkout" ? (
+            {actionType === 'checkout' ? (
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 Redirecting...
@@ -192,17 +183,12 @@ export function CheckoutButton({ cart, selectedAddress }: CheckoutButtonProps) {
 
           <Button
             onClick={handlePlaceOrder}
-            disabled={
-              isPlacingOrder ||
-              hasOutOfStockItems ||
-              !selectedAddress ||
-              cart.length === 0
-            }
+            disabled={isPlacingOrder || hasOutOfStockItems || !selectedAddress || cart.length === 0}
             variant="outline"
             className="w-full h-12 text-lg font-semibold"
             size="lg"
           >
-            {isPlacingOrder && actionType === "order" ? (
+            {isPlacingOrder && actionType === 'order' ? (
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 border-2 border-gray-600 border-t-transparent rounded-full animate-spin" />
                 Placing Order...

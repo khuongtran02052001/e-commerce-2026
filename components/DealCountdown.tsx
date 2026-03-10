@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { Timer } from "lucide-react";
+import { Timer } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 const DealCountdown = () => {
   const [timeLeft, setTimeLeft] = useState({
@@ -39,11 +39,9 @@ const DealCountdown = () => {
   const TimeUnit = ({ value, label }: { value: number; label: string }) => (
     <div className="flex flex-col items-center bg-white rounded-lg p-2 sm:p-3 shadow-md border">
       <span className="text-lg sm:text-2xl md:text-3xl font-bold text-shop_dark_green">
-        {value.toString().padStart(2, "0")}
+        {value.toString().padStart(2, '0')}
       </span>
-      <span className="text-xs sm:text-sm text-gray-600 font-medium">
-        {label}
-      </span>
+      <span className="text-xs sm:text-sm text-gray-600 font-medium">{label}</span>
     </div>
   );
 
@@ -51,9 +49,7 @@ const DealCountdown = () => {
     <div className="flex items-center gap-2 sm:gap-4">
       <div className="flex items-center gap-1 sm:gap-2 text-red-600">
         <Timer className="w-4 h-4 sm:w-5 sm:h-5" />
-        <span className="text-sm sm:text-base font-semibold">
-          Deal Ends In:
-        </span>
+        <span className="text-sm sm:text-base font-semibold">Deal Ends In:</span>
       </div>
       <div className="grid grid-cols-4 gap-1 sm:gap-2">
         <TimeUnit value={timeLeft.days} label="Days" />

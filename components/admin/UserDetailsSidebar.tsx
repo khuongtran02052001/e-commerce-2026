@@ -1,30 +1,30 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Card } from "@/components/ui/card";
-import { showToast } from "@/lib/toast";
+} from '@/components/ui/sheet';
+import { showToast } from '@/lib/toast';
 import {
-  UserCheck,
-  UserX,
-  Mail,
+  Bell,
   Calendar,
   Clock,
   Database,
-  Gift,
   DollarSign,
-  Bell,
+  Gift,
+  Mail,
   RefreshCw,
-} from "lucide-react";
+  UserCheck,
+  UserX,
+} from 'lucide-react';
+import React, { useState } from 'react';
 
 interface CombinedUser {
   id: string;
@@ -74,26 +74,26 @@ export const UserDetailsSidebar: React.FC<UserDetailsSidebarProps> = ({
   if (!user) return null;
 
   const formatDate = (timestamp: number): string => {
-    return new Date(timestamp).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
+    return new Date(timestamp).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
     });
   };
 
-  const handleAction = async (action: "activate" | "deactivate" | "delete") => {
+  const handleAction = async (action: 'activate' | 'deactivate' | 'delete') => {
     setActionLoading(action);
     try {
-      if (action === "delete") {
+      if (action === 'delete') {
         await onDelete(user.id);
         onClose();
       } else {
-        await onActivate(user.id, action === "activate");
+        await onActivate(user.id, action === 'activate');
 
         // For activate action (Add to Sanity), update user instantly and keep sidebar open
-        if (action === "activate" && !user.inSanity && onUserUpdate) {
+        if (action === 'activate' && !user.inSanity && onUserUpdate) {
           const updatedUser: CombinedUser = {
             ...user,
             inSanity: true,
@@ -105,8 +105,8 @@ export const UserDetailsSidebar: React.FC<UserDetailsSidebarProps> = ({
           };
           onUserUpdate(updatedUser);
           showToast.success(
-            "User added to Sanity successfully!",
-            `${user.fullName} can now receive notifications and track loyalty points.`
+            'User added to Sanity successfully!',
+            `${user.fullName} can now receive notifications and track loyalty points.`,
           );
         } else {
           // For other actions, close the sidebar
@@ -124,11 +124,11 @@ export const UserDetailsSidebar: React.FC<UserDetailsSidebarProps> = ({
     if (!user.inSanity) {
       return (
         <Button
-          onClick={() => handleAction("activate")}
-          disabled={actionLoading === "activate" || isLoading}
+          onClick={() => handleAction('activate')}
+          disabled={actionLoading === 'activate' || isLoading}
           className="w-full"
         >
-          {actionLoading === "activate" ? (
+          {actionLoading === 'activate' ? (
             <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
           ) : (
             <UserCheck className="h-4 w-4 mr-2" />
@@ -141,35 +141,26 @@ export const UserDetailsSidebar: React.FC<UserDetailsSidebarProps> = ({
     return (
       <div className="flex gap-2 w-full">
         <Button
-          variant={user.isActive ? "destructive" : "default"}
-          onClick={() =>
-            handleAction(user.isActive ? "deactivate" : "activate")
-          }
-          disabled={
-            actionLoading === (user.isActive ? "deactivate" : "activate") ||
-            isLoading
-          }
+          variant={user.isActive ? 'destructive' : 'default'}
+          onClick={() => handleAction(user.isActive ? 'deactivate' : 'activate')}
+          disabled={actionLoading === (user.isActive ? 'deactivate' : 'activate') || isLoading}
           className="flex-1"
         >
-          {actionLoading === (user.isActive ? "deactivate" : "activate") ? (
+          {actionLoading === (user.isActive ? 'deactivate' : 'activate') ? (
             <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
           ) : user.isActive ? (
             <UserX className="h-4 w-4 mr-2" />
           ) : (
             <UserCheck className="h-4 w-4 mr-2" />
           )}
-          {user.isActive ? "Deactivate" : "Activate"}
+          {user.isActive ? 'Deactivate' : 'Activate'}
         </Button>
         <Button
           variant="outline"
-          onClick={() => handleAction("delete")}
-          disabled={actionLoading === "delete" || isLoading}
+          onClick={() => handleAction('delete')}
+          disabled={actionLoading === 'delete' || isLoading}
         >
-          {actionLoading === "delete" ? (
-            <RefreshCw className="h-4 w-4 animate-spin" />
-          ) : (
-            "Remove"
-          )}
+          {actionLoading === 'delete' ? <RefreshCw className="h-4 w-4 animate-spin" /> : 'Remove'}
         </Button>
       </div>
     );
@@ -177,16 +168,11 @@ export const UserDetailsSidebar: React.FC<UserDetailsSidebarProps> = ({
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent
-        side="right"
-        className="w-[400px] sm:w-[540px] overflow-y-auto p-0"
-      >
+      <SheetContent side="right" className="w-[400px] sm:w-[540px] overflow-y-auto p-0">
         <div className="flex h-full flex-col">
           <SheetHeader className="px-6 pt-6 pb-4 border-b">
             <SheetTitle>User Details</SheetTitle>
-            <SheetDescription>
-              Manage user account and Sanity integration
-            </SheetDescription>
+            <SheetDescription>Manage user account and Sanity integration</SheetDescription>
           </SheetHeader>
 
           <div className="flex-1 overflow-y-auto px-6 py-6">
@@ -194,9 +180,7 @@ export const UserDetailsSidebar: React.FC<UserDetailsSidebarProps> = ({
               {/* User Profile */}
               <Card
                 className={`p-6 transition-opacity duration-200 ${
-                  actionLoading === "activate"
-                    ? "opacity-50 pointer-events-none"
-                    : ""
+                  actionLoading === 'activate' ? 'opacity-50 pointer-events-none' : ''
                 }`}
               >
                 <div className="flex items-center gap-4">
@@ -206,7 +190,7 @@ export const UserDetailsSidebar: React.FC<UserDetailsSidebarProps> = ({
                       alt={user.fullName}
                       className="w-16 h-16 rounded-full"
                     />
-                    {actionLoading === "activate" && (
+                    {actionLoading === 'activate' && (
                       <div className="absolute inset-0 flex items-center justify-center bg-background/80 rounded-full">
                         <RefreshCw className="h-6 w-6 animate-spin text-primary" />
                       </div>
@@ -219,16 +203,12 @@ export const UserDetailsSidebar: React.FC<UserDetailsSidebarProps> = ({
                       {user.email}
                     </p>
                     <div className="flex gap-2 mt-2">
-                      <Badge
-                        variant={user.emailVerified ? "default" : "secondary"}
-                      >
-                        {user.emailVerified ? "Verified" : "Unverified"}
+                      <Badge variant={user.emailVerified ? 'default' : 'secondary'}>
+                        {user.emailVerified ? 'Verified' : 'Unverified'}
                       </Badge>
-                      {user.banned && (
-                        <Badge variant="destructive">Banned</Badge>
-                      )}
+                      {user.banned && <Badge variant="destructive">Banned</Badge>}
                       {user.locked && <Badge variant="outline">Locked</Badge>}
-                      {actionLoading === "activate" && (
+                      {actionLoading === 'activate' && (
                         <Badge variant="outline" className="animate-pulse">
                           Adding to Sanity...
                         </Badge>
@@ -254,20 +234,14 @@ export const UserDetailsSidebar: React.FC<UserDetailsSidebarProps> = ({
                       <Clock className="h-4 w-4" />
                       Last Sign In
                     </span>
-                    <span>
-                      {user.lastSignInAt
-                        ? formatDate(user.lastSignInAt)
-                        : "Never"}
-                    </span>
+                    <span>{user.lastSignInAt ? formatDate(user.lastSignInAt) : 'Never'}</span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
                     <span className="flex items-center gap-2 text-muted-foreground">
                       <Database className="h-4 w-4" />
                       Clerk ID
                     </span>
-                    <span className="font-mono text-xs">
-                      {user.clerkUserId.slice(0, 12)}...
-                    </span>
+                    <span className="font-mono text-xs">{user.clerkUserId.slice(0, 12)}...</span>
                   </div>
                 </div>
               </Card>
@@ -282,11 +256,9 @@ export const UserDetailsSidebar: React.FC<UserDetailsSidebarProps> = ({
                 {user.inSanity ? (
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">
-                        Status
-                      </span>
-                      <Badge variant={user.isActive ? "default" : "secondary"}>
-                        {user.isActive ? "Active" : "Inactive"}
+                      <span className="text-sm text-muted-foreground">Status</span>
+                      <Badge variant={user.isActive ? 'default' : 'secondary'}>
+                        {user.isActive ? 'Active' : 'Inactive'}
                       </Badge>
                     </div>
 
@@ -307,9 +279,7 @@ export const UserDetailsSidebar: React.FC<UserDetailsSidebarProps> = ({
                           <DollarSign className="h-3 w-3" />
                           Total Spent
                         </div>
-                        <div className="text-lg font-semibold">
-                          ${user.totalSpent.toFixed(2)}
-                        </div>
+                        <div className="text-lg font-semibold">${user.totalSpent.toFixed(2)}</div>
                       </div>
                     </div>
 
@@ -321,9 +291,7 @@ export const UserDetailsSidebar: React.FC<UserDetailsSidebarProps> = ({
                             <Bell className="h-4 w-4" />
                             Notifications
                           </span>
-                          <Badge variant="outline">
-                            {user.notificationCount}
-                          </Badge>
+                          <Badge variant="outline">{user.notificationCount}</Badge>
                         </div>
                       </>
                     )}
@@ -332,13 +300,8 @@ export const UserDetailsSidebar: React.FC<UserDetailsSidebarProps> = ({
                       <>
                         <Separator />
                         <div className="text-xs text-muted-foreground">
-                          <div>
-                            Activated:{" "}
-                            {new Date(user.activatedAt).toLocaleDateString()}
-                          </div>
-                          {user.activatedBy && (
-                            <div>By: {user.activatedBy}</div>
-                          )}
+                          <div>Activated: {new Date(user.activatedAt).toLocaleDateString()}</div>
+                          {user.activatedBy && <div>By: {user.activatedBy}</div>}
                         </div>
                       </>
                     )}
@@ -347,8 +310,8 @@ export const UserDetailsSidebar: React.FC<UserDetailsSidebarProps> = ({
                   <div className="text-center py-4">
                     <Database className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
                     <p className="text-sm text-muted-foreground mb-3">
-                      This user is not yet added to Sanity. Add them to enable
-                      notifications and track their activity.
+                      This user is not yet added to Sanity. Add them to enable notifications and
+                      track their activity.
                     </p>
                     <div className="text-xs text-muted-foreground">
                       Adding to Sanity will create a user record and enable:
@@ -364,9 +327,7 @@ export const UserDetailsSidebar: React.FC<UserDetailsSidebarProps> = ({
               </Card>
             </div>
 
-            <div className="border-t bg-background/50 px-6 py-6 mt-auto">
-              {getActionButton()}
-            </div>
+            <div className="border-t bg-background/50 px-6 py-6 mt-auto">{getActionButton()}</div>
           </div>
         </div>
       </SheetContent>

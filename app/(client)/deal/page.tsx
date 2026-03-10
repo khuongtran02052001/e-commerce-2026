@@ -1,36 +1,23 @@
-import Container from "@/components/Container";
-import ProductCard from "@/components/ProductCard";
-import Title from "@/components/Title";
-import DealCountdown from "@/components/DealCountdown";
-import DynamicBreadcrumb from "@/components/DynamicBreadcrumb";
-import { DEAL_PRODUCTSResult, Product } from "@/sanity.types";
-import { getDealProducts, getCategories } from "@/sanity/queries";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import {
-  Clock,
-  Flame,
-  TrendingDown,
-  Zap,
-  ShoppingBag,
-  Star,
-  Users,
-  Heart,
-} from "lucide-react";
-import Link from "next/link";
+import Container from '@/components/Container';
+import DealCountdown from '@/components/DealCountdown';
+import DynamicBreadcrumb from '@/components/DynamicBreadcrumb';
+import ProductCard from '@/components/ProductCard';
+import Title from '@/components/Title';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { IProduct } from '@/mock-data';
+import { getCategories, getDealProducts } from '@/data/server';
+import { Clock, Flame, Heart, ShoppingBag, Star, TrendingDown, Users, Zap } from 'lucide-react';
+import Link from 'next/link';
 
 const DealPage = async () => {
   const [products] = await Promise.all([getDealProducts(), getCategories()]);
-
   // Calculate deal statistics
   const totalProducts = products?.length || 0;
   const avgDiscount =
-    products?.reduce((acc, product) => acc + (product?.discount || 0), 0) /
-      totalProducts || 0;
-  const maxDiscount = Math.max(
-    ...(products?.map((p) => p?.discount || 0) || [0])
-  );
+    products?.reduce((acc, product) => acc + (product?.discount || 0), 0)! / totalProducts || 0;
+  const maxDiscount = Math.max(...(products?.map((p) => p?.discount || 0) || [0]));
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-red-50 to-orange-50">
@@ -48,9 +35,7 @@ const DealPage = async () => {
                 <div className="flex items-center gap-2 sm:gap-3">
                   <div className="flex items-center gap-1 sm:gap-2 bg-white/20 rounded-full px-3 sm:px-4 py-1 sm:py-2">
                     <Flame className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-300" />
-                    <span className="text-xs sm:text-sm font-semibold">
-                      HOT DEALS
-                    </span>
+                    <span className="text-xs sm:text-sm font-semibold">HOT DEALS</span>
                   </div>
                   <Badge variant="destructive" className="text-xs sm:text-sm">
                     Up to {maxDiscount}% OFF
@@ -62,9 +47,9 @@ const DealPage = async () => {
                     Weekly Hot Deals
                   </h1>
                   <p className="text-sm sm:text-base md:text-lg text-white/90 max-w-2xl">
-                    Don&apos;t miss out on these incredible limited-time offers!
-                    Save big on your favorite products with discounts up to{" "}
-                    {maxDiscount}% off. Limited stock available.
+                    Don&apos;t miss out on these incredible limited-time offers! Save big on your
+                    favorite products with discounts up to {maxDiscount}% off. Limited stock
+                    available.
                   </p>
                 </div>
 
@@ -75,9 +60,7 @@ const DealPage = async () => {
                       <ShoppingBag className="w-4 h-4" />
                       <span className="text-xs sm:text-sm">Products</span>
                     </div>
-                    <p className="text-xl sm:text-2xl font-bold">
-                      {totalProducts}
-                    </p>
+                    <p className="text-xl sm:text-2xl font-bold">{totalProducts}</p>
                   </div>
 
                   <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 sm:p-4">
@@ -85,17 +68,13 @@ const DealPage = async () => {
                       <TrendingDown className="w-4 h-4" />
                       <span className="text-xs sm:text-sm">Avg. Discount</span>
                     </div>
-                    <p className="text-xl sm:text-2xl font-bold">
-                      {avgDiscount.toFixed(0)}%
-                    </p>
+                    <p className="text-xl sm:text-2xl font-bold">{avgDiscount.toFixed(0)}%</p>
                   </div>
 
                   <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 sm:p-4 col-span-2 sm:col-span-1">
                     <div className="flex items-center gap-2 text-white/80 mb-1">
                       <Users className="w-4 h-4" />
-                      <span className="text-xs sm:text-sm">
-                        Happy Customers
-                      </span>
+                      <span className="text-xs sm:text-sm">Happy Customers</span>
                     </div>
                     <p className="text-xl sm:text-2xl font-bold">2.5K+</p>
                   </div>
@@ -119,31 +98,31 @@ const DealPage = async () => {
           {[
             {
               icon: Zap,
-              title: "Lightning Deals",
-              description: "Flash sales with limited time offers",
-              color: "text-yellow-600",
-              bg: "bg-yellow-50 border-yellow-200",
+              title: 'Lightning Deals',
+              description: 'Flash sales with limited time offers',
+              color: 'text-yellow-600',
+              bg: 'bg-yellow-50 border-yellow-200',
             },
             {
               icon: Star,
-              title: "Premium Quality",
-              description: "Top-rated products with best reviews",
-              color: "text-purple-600",
-              bg: "bg-purple-50 border-purple-200",
+              title: 'Premium Quality',
+              description: 'Top-rated products with best reviews',
+              color: 'text-purple-600',
+              bg: 'bg-purple-50 border-purple-200',
             },
             {
               icon: Heart,
-              title: "Customer Favorites",
-              description: "Most loved items by our customers",
-              color: "text-pink-600",
-              bg: "bg-pink-50 border-pink-200",
+              title: 'Customer Favorites',
+              description: 'Most loved items by our customers',
+              color: 'text-pink-600',
+              bg: 'bg-pink-50 border-pink-200',
             },
             {
               icon: Clock,
-              title: "Limited Time",
+              title: 'Limited Time',
               description: "Hurry! These deals won't last long",
-              color: "text-red-600",
-              bg: "bg-red-50 border-red-200",
+              color: 'text-red-600',
+              bg: 'bg-red-50 border-red-200',
             },
           ].map((feature, index) => (
             <Card
@@ -151,15 +130,11 @@ const DealPage = async () => {
               className={`${feature.bg} border-2 hover:shadow-lg transition-all duration-300`}
             >
               <CardContent className="p-4 sm:p-6 text-center">
-                <feature.icon
-                  className={`w-8 h-8 sm:w-10 sm:h-10 ${feature.color} mx-auto mb-3`}
-                />
+                <feature.icon className={`w-8 h-8 sm:w-10 sm:h-10 ${feature.color} mx-auto mb-3`} />
                 <h3 className="text-sm sm:text-base font-semibold text-gray-900 mb-2">
                   {feature.title}
                 </h3>
-                <p className="text-xs sm:text-sm text-gray-600">
-                  {feature.description}
-                </p>
+                <p className="text-xs sm:text-sm text-gray-600">{feature.description}</p>
               </CardContent>
             </Card>
           ))}
@@ -177,19 +152,19 @@ const DealPage = async () => {
             <Flame className="w-6 h-6 sm:w-8 sm:h-8 text-red-500" />
           </div>
           <p className="text-sm sm:text-base text-gray-600 max-w-2xl mx-auto">
-            Discover amazing deals on premium products. Limited quantities
-            available at these special prices.
+            Discover amazing deals on premium products. Limited quantities available at these
+            special prices.
           </p>
         </div>
 
         {products && products.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
-            {products.map((product: DEAL_PRODUCTSResult[0]) => (
+            {products.map((product: IProduct) => (
               <div
-                key={product?._id}
+                key={product?.id}
                 className="transform hover:scale-105 transition-transform duration-300"
               >
-                <ProductCard product={product as unknown as Product} />
+                <ProductCard product={product as unknown as IProduct} />
               </div>
             ))}
           </div>
@@ -223,16 +198,11 @@ const DealPage = async () => {
               Don&apos;t Miss Out on These Amazing Deals!
             </h2>
             <p className="text-sm sm:text-base text-white/90 mb-6 max-w-2xl mx-auto">
-              Subscribe to our newsletter to get notified about flash sales,
-              exclusive deals, and new arrivals.
+              Subscribe to our newsletter to get notified about flash sales, exclusive deals, and
+              new arrivals.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Button
-                size="lg"
-                variant="secondary"
-                asChild
-                className="w-full sm:w-auto"
-              >
+              <Button size="lg" variant="secondary" asChild className="w-full sm:w-auto">
                 <Link href="/shop">Explore All Products</Link>
               </Button>
               <Button

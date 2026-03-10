@@ -1,26 +1,15 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import {
-  Dialog,
-  DialogTitle,
-  DialogPortal,
-  DialogOverlay,
-} from "@/components/ui/dialog";
-import * as DialogPrimitive from "@radix-ui/react-dialog";
-import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
-import {
-  Loader2,
-  CreditCard,
-  X,
-  ShieldCheck,
-  Lock,
-  Sparkles,
-} from "lucide-react";
-import PriceFormatter from "./PriceFormatter";
-import { cn } from "@/lib/utils";
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogOverlay, DialogPortal, DialogTitle } from '@/components/ui/dialog';
+import { fetchService } from '@/lib/restClient';
+import { cn } from '@/lib/utils';
+import * as DialogPrimitive from '@radix-ui/react-dialog';
+import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
+import { CreditCard, Loader2, Lock, ShieldCheck, Sparkles, X } from 'lucide-react';
+import React, { useState } from 'react';
+import { toast } from 'sonner';
+import PriceFormatter from './PriceFormatter';
 
 interface Props {
   isOpen: boolean;
@@ -45,30 +34,27 @@ const DirectPaymentModal: React.FC<Props> = ({
     setIsProcessing(true);
 
     try {
-      const response = await fetch(`/api/orders/${orderId}/pay-now`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetchService(`/orders/${orderId}/pay-now`, { method: 'POST' });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to process payment");
+        throw new Error(data.error || 'Failed to process payment');
       }
 
-      if (data.success && data.checkoutUrl) {
+      const checkoutUrl = data.checkoutUrl || data.url;
+      if (data.success && checkoutUrl) {
         // Redirect directly to Stripe Checkout
-        toast.success("Redirecting to secure payment...");
-        window.location.href = data.checkoutUrl;
+        toast.success('Redirecting to secure payment...');
+        window.location.href = checkoutUrl;
+      } else if (data.success) {
+        toast.success(data.message || 'Payment processed successfully');
       } else {
-        throw new Error("Payment initialization failed");
+        throw new Error('Payment initialization failed');
       }
     } catch (error) {
-      console.error("Payment error:", error);
-      const errorMessage =
-        error instanceof Error ? error.message : "Payment failed";
+      console.error('Payment error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Payment failed';
       toast.error(errorMessage);
     } finally {
       setIsProcessing(false);
@@ -85,11 +71,11 @@ const DirectPaymentModal: React.FC<Props> = ({
         <DialogOverlay className="bg-black/60 backdrop-blur-sm" />
         <DialogPrimitive.Content
           className={cn(
-            "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-6 border-2 border-shop_dark_green/20 bg-white p-8 shadow-2xl duration-300",
-            "data-[state=open]:animate-in data-[state=closed]:animate-out",
-            "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-            "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
-            "sm:rounded-2xl mx-4"
+            'fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-6 border-2 border-shop_dark_green/20 bg-white p-8 shadow-2xl duration-300',
+            'data-[state=open]:animate-in data-[state=closed]:animate-out',
+            'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+            'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
+            'sm:rounded-2xl mx-4',
           )}
         >
           <VisuallyHidden.Root>
@@ -123,19 +109,15 @@ const DirectPaymentModal: React.FC<Props> = ({
 
             <div className="space-y-4">
               <div className="flex items-center justify-between pb-3 border-b border-shop_dark_green/10">
-                <span className="text-sm font-medium text-gray-700">
-                  Order Number
-                </span>
+                <span className="text-sm font-medium text-gray-700">Order Number</span>
                 <span className="font-bold text-shop_dark_green bg-white px-4 py-1.5 rounded-full text-sm border-2 border-shop_dark_green/20 shadow-sm">
-                  #{orderNumber?.slice(-8) || "N/A"}
+                  #{orderNumber?.slice(-8) || 'N/A'}
                 </span>
               </div>
 
               <div className="pt-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-lg font-semibold text-gray-700">
-                    Total Amount
-                  </span>
+                  <span className="text-lg font-semibold text-gray-700">Total Amount</span>
                   <PriceFormatter
                     amount={orderTotal}
                     className="text-3xl font-bold text-shop_dark_green"

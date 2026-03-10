@@ -1,4 +1,4 @@
-import { OrderDetailsSkeleton } from "@/components/OrderSkeletons";
+import { OrderDetailsSkeleton } from '@/components/OrderSkeletons';
 
 export default function OrderDetailsLoading() {
   return (

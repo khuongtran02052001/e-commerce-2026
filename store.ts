@@ -1,20 +1,17 @@
-
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import _ from "lodash";
-import { IProductMock } from "./mock-data";
+import _ from 'lodash';
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import { IProduct } from './mock-data';
 
 export interface CartItem {
-  product: IProductMock;
+  product: IProduct;
   quantity: number;
 }
 
 interface StoreState {
   items: CartItem[];
-  addItem: (product: IProductMock) => void;
-  addMultipleItems: (
-    products: Array<{ product: IProductMock; quantity: number }>
-  ) => void;
+  addItem: (product: IProduct) => void;
+  addMultipleItems: (products: Array<{ product: IProduct; quantity: number }>) => void;
   removeItem: (productId: string) => void;
   deleteCartProduct: (productId: string) => void;
   resetCart: () => void;
@@ -24,16 +21,16 @@ interface StoreState {
   getItemCount: (productId: string) => number;
   getGroupedItems: () => CartItem[];
   // favorite
-  favoriteProduct: IProductMock[];
-  addToFavorite: (product: IProductMock) => Promise<void>;
+  favoriteProduct: IProduct[];
+  addToFavorite: (product: IProduct) => Promise<void>;
   removeFromFavorite: (productId: string) => void;
   resetFavorite: () => void;
   // order placement state
   isPlacingOrder: boolean;
-  orderStep: "validating" | "creating" | "emailing" | "redirecting";
+  orderStep: 'validating' | 'creating' | 'emailing' | 'redirecting';
   setOrderPlacementState: (
     isPlacing: boolean,
-    step?: "validating" | "creating" | "emailing" | "redirecting"
+    step?: 'validating' | 'creating' | 'emailing' | 'redirecting',
   ) => void;
 }
 
@@ -44,16 +41,11 @@ const useCartStore = create<StoreState>()(
       favoriteProduct: [],
       addItem: (product) =>
         set((state) => {
-          const existingItem = _.find(
-            state.items,
-            (item) => item.product.id === product.id
-          );
+          const existingItem = _.find(state.items, (item) => item.product.id === product.id);
           if (existingItem) {
             return {
               items: _.map(state.items, (item) =>
-                item.product.id === product.id
-                  ? { ...item, quantity: item.quantity + 1 }
-                  : item
+                item.product.id === product.id ? { ...item, quantity: item.quantity + 1 } : item,
               ),
             };
           } else {
@@ -65,16 +57,13 @@ const useCartStore = create<StoreState>()(
           let updatedItems = [...state.items];
 
           _.forEach(products, ({ product, quantity }) => {
-            const existingItem = _.find(
-              updatedItems,
-              (item) => item.product.id === product.id
-            );
+            const existingItem = _.find(updatedItems, (item) => item.product.id === product.id);
 
             if (existingItem) {
               updatedItems = _.map(updatedItems, (item) =>
                 item.product.id === product.id
                   ? { ...item, quantity: item.quantity + quantity }
-                  : item
+                  : item,
               );
             } else {
               updatedItems.push({ product, quantity });
@@ -97,15 +86,12 @@ const useCartStore = create<StoreState>()(
               }
               return acc;
             },
-            [] as CartItem[]
+            [] as CartItem[],
           ),
         })),
       deleteCartProduct: (productId) =>
         set((state) => ({
-          items: _.filter(
-            state.items,
-            ({ product }) => product?.id !== productId
-          ),
+          items: _.filter(state.items, ({ product }) => product?.id !== productId),
         })),
       resetCart: () => set({ items: [] }),
       getTotalPrice: () => {
@@ -113,7 +99,7 @@ const useCartStore = create<StoreState>()(
         return _.reduce(
           get().items,
           (total, item) => total + (item.product.price ?? 0) * item.quantity,
-          0
+          0,
         );
       },
       getSubTotalPrice: () => {
@@ -127,7 +113,7 @@ const useCartStore = create<StoreState>()(
             const grossPrice = currentPrice + discountAmount;
             return total + grossPrice * item.quantity;
           },
-          0
+          0,
         );
       },
       getTotalDiscount: () => {
@@ -140,30 +126,21 @@ const useCartStore = create<StoreState>()(
             const discountAmount = (discount * currentPrice) / 100;
             return total + discountAmount * item.quantity;
           },
-          0
+          0,
         );
       },
       getItemCount: (productId) => {
-        const item = _.find(
-          get().items,
-          (item) => item.product.id === productId
-        );
+        const item = _.find(get().items, (item) => item.product.id === productId);
         return item ? item.quantity : 0;
       },
       getGroupedItems: () => get().items,
-      addToFavorite: (product: IProductMock) => {
+      addToFavorite: (product: IProduct) => {
         return new Promise<void>((resolve) => {
           set((state: StoreState) => {
-            const isFavorite = _.some(
-              state.favoriteProduct,
-              (item) => item.id === product.id
-            );
+            const isFavorite = _.some(state.favoriteProduct, (item) => item.id === product.id);
             return {
               favoriteProduct: isFavorite
-                ? _.filter(
-                    state.favoriteProduct,
-                    (item) => item.id !== product.id
-                  )
+                ? _.filter(state.favoriteProduct, (item) => item.id !== product.id)
                 : [...state.favoriteProduct, { ...product }],
             };
           });
@@ -172,10 +149,7 @@ const useCartStore = create<StoreState>()(
       },
       removeFromFavorite: (productId: string) => {
         set((state: StoreState) => ({
-          favoriteProduct: _.filter(
-            state.favoriteProduct,
-            (item) => item?.id !== productId
-          ),
+          favoriteProduct: _.filter(state.favoriteProduct, (item) => item?.id !== productId),
         }));
       },
       resetFavorite: () => {
@@ -183,16 +157,16 @@ const useCartStore = create<StoreState>()(
       },
       // order placement state
       isPlacingOrder: false,
-      orderStep: "validating" as const,
-      setOrderPlacementState: (isPlacing, step = "validating") => {
+      orderStep: 'validating' as const,
+      setOrderPlacementState: (isPlacing, step = 'validating') => {
         set({
           isPlacingOrder: isPlacing,
           orderStep: step,
         });
       },
     }),
-    { name: "cart-store" }
-  )
+    { name: 'cart-store' },
+  ),
 );
 
 export default useCartStore;
