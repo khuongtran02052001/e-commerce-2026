@@ -77,7 +77,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
               variant="ghost"
               size="sm"
               onClick={handleClose}
-              className="h-8 w-8 p-0 hover:bg-gray-100 transition-colors"
+              className="h-8 w-8 p-0 hover:bg-shop_light_pink/80 transition-colors"
             >
               <X className="w-4 h-4" />
             </Button>
@@ -86,19 +86,19 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
 
         <div className="py-4 space-y-6">
           {/* Order Summary */}
-          <div className="p-4 bg-gray-50 rounded-lg border border-gray-100 animate-in slide-in-from-top-2 duration-200">
+          <div className="animate-in slide-in-from-top-2 rounded-2xl border border-shop_light_green/15 bg-shop_light_bg p-4 duration-200">
             <div className="flex justify-between items-center mb-2">
-              <span className="text-sm text-gray-600">Order Number</span>
+              <span className="text-sm text-muted-foreground">Order Number</span>
               <span className="font-medium">#{orderNumber?.slice(-10) || 'N/A'}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600">Total Amount</span>
+              <span className="text-sm text-muted-foreground">Total Amount</span>
               <PriceFormatter showDecimals amount={orderTotal} className="font-semibold text-lg" />
             </div>
           </div>
 
           {/* Payment Info */}
-          <div className="text-center text-sm text-gray-600 animate-in slide-in-from-bottom-2 duration-200 delay-100">
+          <div className="animate-in slide-in-from-bottom-2 text-center text-sm text-muted-foreground duration-200 delay-100">
             <p className="flex items-center justify-center gap-1">
               <ExternalLink className="w-4 h-4" />
               You&apos;ll be redirected to secure checkout
@@ -112,14 +112,14 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
               variant="outline"
               onClick={handleClose}
               disabled={isProcessing}
-              className="flex-1 transition-all duration-200 hover:bg-gray-50"
+              className="flex-1 transition-all duration-200 hover:bg-shop_light_pink/70"
             >
               Cancel
             </Button>
             <Button
               onClick={handlePayNow}
               disabled={isProcessing}
-              className="flex-1 bg-blue-600 hover:bg-blue-700 transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
+              className="flex-1 bg-shop_dark_green hover:bg-shop_btn_dark_green shadow-[0_12px_30px_rgba(139,76,114,0.18)] transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
             >
               {isProcessing ? (
                 <>

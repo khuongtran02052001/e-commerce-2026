@@ -33,6 +33,7 @@ import {
   EmployeeRole,
   getRoleBadgeColor,
   getRoleDisplayName,
+  normalizeEmployeeRole,
 } from '@/types/domain/employee';
 import { Ban, CheckCircle, Search, UserMinus, UserPlus, Users } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -80,15 +81,7 @@ export default function EmployeeManagement() {
     }
   };
 
-  const parseEmployeeRole = (value?: string): EmployeeRole => {
-    const role = String(value || '')
-      .trim()
-      .toLowerCase();
-    if (role === 'callcenter' || role === 'packer' || role === 'deliveryman' || role === 'incharge' || role === 'accounts') {
-      return role;
-    }
-    return 'callcenter';
-  };
+  const parseEmployeeRole = (value?: string): EmployeeRole => normalizeEmployeeRole(value);
 
   const handleAssignRole = async () => {
     if (!selectedUser) return;

@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/sheet';
 import { fetchService } from '@/lib/restClient';
 import { showToast } from '@/lib/toast';
+import { useUserData } from '@/contexts/UserDataContext';
 import { Calendar, Phone, Save, User, X } from 'lucide-react';
 import { useState } from 'react';
 
@@ -67,6 +68,7 @@ export default function ProfileEditSidebar({
   onProfileUpdated,
 }: ProfileEditSidebarProps) {
   const [loading, setLoading] = useState(false);
+  const { refreshUserData } = useUserData();
   const [formData, setFormData] = useState({
     firstName: user.firstName || '',
     lastName: user.lastName || '',
@@ -88,6 +90,7 @@ export default function ProfileEditSidebar({
 
       if (response.ok) {
         showToast.success('Profile Updated', 'Your profile has been successfully updated.');
+        await refreshUserData();
         onClose();
         if (onProfileUpdated) {
           onProfileUpdated();

@@ -14,6 +14,7 @@ interface Address {
   id: string;
   name: string;
   email: string;
+  addressName: string;
   address: string;
   city: string;
   state: string;
@@ -120,7 +121,7 @@ export function AddressSelector({
                       </span>
                     )}
                   </div>
-                  <div className="text-sm text-muted-foreground">{address.address}</div>
+                  <div className="text-sm text-muted-foreground">{address.addressName}</div>
                   <div className="text-sm text-muted-foreground">
                     {address.city}, {address.state} {address.zip}
                   </div>

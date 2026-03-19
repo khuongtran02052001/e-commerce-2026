@@ -178,27 +178,28 @@ export default function WalletDashboard() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'completed':
-        return 'bg-green-500';
+        return 'border border-shop_light_green/25 bg-shop_light_pink/80 text-shop_dark_green';
       case 'pending':
-        return 'bg-yellow-500';
+        return 'border border-[#f0d7e5] bg-[#fff3f9] text-[#b16f91]';
       case 'failed':
-        return 'bg-red-500';
-      case 'cancelled':
-        return 'bg-gray-500';
-      case 'approved':
-        return 'bg-blue-500';
-      case 'processing':
-        return 'bg-purple-500';
       case 'rejected':
-        return 'bg-red-600';
+        return 'border border-[#edc5d4] bg-[#fdeef4] text-[#b35c78]';
+      case 'cancelled':
+        return 'border border-shop_light_green/20 bg-white text-dark-text';
+      case 'approved':
+        return 'border border-shop_dark_blue/15 bg-shop_light_blue/55 text-shop_dark_blue';
+      case 'processing':
+        return 'border border-[#ead7f3] bg-[#f7effb] text-[#8d5da7]';
       default:
-        return 'bg-gray-400';
+        return 'border border-shop_light_green/20 bg-white text-dark-text';
     }
   };
 
   const getTransactionIcon = (type: string) => {
-    if (type.includes('credit')) return <ArrowUpFromLine className="w-4 h-4 text-green-600" />;
-    return <ArrowDownToLine className="w-4 h-4 text-red-600" />;
+    if (type.includes('credit')) {
+      return <ArrowUpFromLine className="w-4 h-4 text-shop_dark_green" />;
+    }
+    return <ArrowDownToLine className="w-4 h-4 text-[#b35c78]" />;
   };
 
   if (isLoading) {
@@ -388,7 +389,9 @@ export default function WalletDashboard() {
                       {new Date(request.requestedAt).toLocaleDateString()}
                     </p>
                     {request.rejectionReason && (
-                      <p className="text-sm text-red-600 mt-1">Reason: {request.rejectionReason}</p>
+                      <p className="mt-1 text-sm text-[#b35c78]">
+                        Reason: {request.rejectionReason}
+                      </p>
                     )}
                   </div>
                   {request.status === 'pending' && (
@@ -432,7 +435,9 @@ export default function WalletDashboard() {
                       <div className="text-right">
                         <p
                           className={`font-semibold ${
-                            transaction.type.includes('credit') ? 'text-green-600' : 'text-red-600'
+                            transaction.type.includes('credit')
+                              ? 'text-shop_dark_green'
+                              : 'text-[#b35c78]'
                           }`}
                         >
                           {transaction.type.includes('credit') ? '+' : '-'}
@@ -440,7 +445,6 @@ export default function WalletDashboard() {
                         </p>
                         <Badge
                           className={`${getStatusColor(transaction.status)} mt-1`}
-                          variant="secondary"
                         >
                           {transaction.status}
                         </Badge>

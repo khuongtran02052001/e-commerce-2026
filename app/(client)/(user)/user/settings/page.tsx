@@ -10,8 +10,10 @@ import { Bell, Download, Shield, Trash2 } from 'lucide-react';
 import { fetchService } from '@/lib/restClient';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { useUserData } from '@/contexts/UserDataContext';
 
 export default function UserSettingsPage() {
+  const { refreshUserData } = useUserData();
   const [settings, setSettings] = useState({
     emailNotifications: true,
     pushNotifications: false,
@@ -31,6 +33,7 @@ export default function UserSettingsPage() {
       if (response.ok) {
         setSettings((prev) => ({ ...prev, [key]: value }));
         toast.success('Settings updated successfully');
+        await refreshUserData();
       } else {
         toast.error('Failed to update settings');
       }

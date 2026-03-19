@@ -147,7 +147,7 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({ adminEmail }) =
   const [notificationPriorityFilter, setNotificationPriorityFilter] = useState('all');
   const [notificationDateFilter, setNotificationDateFilter] = useState('all');
   const [isResending, setIsResending] = useState<'same' | 'new' | null>(null);
-  console.log(users);
+
   // Fetch users using combined API
   const fetchUsers = useCallback(async () => {
     try {
@@ -222,8 +222,7 @@ const AdminNotifications: React.FC<AdminNotificationsProps> = ({ adminEmail }) =
           params.append('dateFilter', notificationDateFilter);
         }
 
-        const data = await safeApiCall(`/admin/notifications/sent?${params.toString()}`);
-
+        const { data } = await safeApiCall(`/admin/notifications/sent?${params.toString()}`);
         setSentNotifications(data.notifications || []);
         setSentNotificationsTotal(data.pagination?.total || data.totalCount || 0);
         setSentNotificationsPage(page);

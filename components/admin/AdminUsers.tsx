@@ -21,9 +21,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { EmployeeRole } from '@/types/domain/employee';
-import { Briefcase, Database, RefreshCw, Trash2, UserCheck, UserX } from 'lucide-react';
+import { Briefcase, RefreshCw, Trash2, UserCheck, UserX } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { DeleteConfirmationDialog } from './DeleteConfirmationDialog';
@@ -35,7 +36,6 @@ import { handleApiError, safeApiCall } from './apiHelpers';
 
 interface CombinedUser {
   id: string;
-  clerkUserId: string;
   firstName: string;
   lastName: string;
   fullName: string;
@@ -46,12 +46,9 @@ interface CombinedUser {
   emailVerified: boolean;
   banned: boolean;
   locked: boolean;
-  // Sanity-specific fields
   isActive: boolean;
   activatedAt?: string;
   activatedBy?: string;
-  sanityId?: string;
-  inSanity: boolean;
   loyaltyPoints: number;
   totalSpent: number;
   notificationCount: number;
@@ -65,7 +62,6 @@ const AdminUsers: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState<CombinedUser[]>([]);
   const [totalUsersCount, setTotalUsersCount] = useState(0);
-  const [sanityUsersCount, setSanityUsersCount] = useState(0);
   const [activeUsersCount, setActiveUsersCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(20);
@@ -208,23 +204,26 @@ const AdminUsers: React.FC = () => {
     }));
 
     // Update counts
-    setSanityUsersCount((prev) => prev + 1);
-    setActiveUsersCount((prev) => prev + 1);
+    if (updatedUser.isActive) {
+      setActiveUsersCount((prev) => prev + 1);
+    }
   };
 
-  // User deletion from Sanity
+  // User deletion
   const handleUserDeletion = async (userId: string) => {
     setActivatingUsers((prev) => new Set(prev).add(userId));
 
     try {
-      await safeApiCall(`/admin/users/${userId}/delete-sanity`, {
+      await safeApiCall('/admin/users', {
         method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userIds: [userId] }),
       });
 
       // Immediately fetch fresh data
       await fetchUsers(currentPage, true);
     } catch (error) {
-      handleApiError(error, 'User deletion from Sanity');
+      handleApiError(error, 'User deletion');
     } finally {
       setActivatingUsers((prev) => {
         const newSet = new Set(prev);
@@ -271,9 +270,9 @@ const AdminUsers: React.FC = () => {
   };
 
   // Handle employee role assignment
-  const handleAssignEmployee = async (sanityId: string, role: EmployeeRole) => {
+  const handleAssignEmployee = async (userId: string, role: EmployeeRole) => {
     try {
-      const result = await assignEmployeeRole(sanityId, role);
+      const result = await assignEmployeeRole(userId, role);
 
       if (result.success) {
         toast.success(result.message);
@@ -289,9 +288,9 @@ const AdminUsers: React.FC = () => {
   };
 
   // Handle employee role removal
-  const handleRemoveEmployee = async (sanityId: string, userName: string) => {
+  const handleRemoveEmployee = async (userId: string, userName: string) => {
     try {
-      const result = await removeEmployeeRole(sanityId);
+      const result = await removeEmployeeRole(userId);
 
       if (result.success) {
         toast.success(result.message);
@@ -321,7 +320,6 @@ const AdminUsers: React.FC = () => {
         const totalCount = Number(meta.totalCount || data.totalCount || 0);
         setUsers(data.data);
         setTotalUsersCount(totalCount);
-        setSanityUsersCount(data.sanityUsersCount || 0);
         setActiveUsersCount(data.activeUsersCount || 0);
       } catch (error) {
         handleApiError(error, 'Users fetch');
@@ -384,14 +382,10 @@ const AdminUsers: React.FC = () => {
           <div className="flex flex-col sm:flex-row sm:items-center gap-3">
             <h3 className="text-lg font-semibold">Users Management</h3>
             <div className="flex flex-wrap gap-2">
-              <div className="px-2 py-1 bg-blue-100 text-blue-800 text-xs sm:text-sm rounded-full font-medium whitespace-nowrap">
+              <div className="whitespace-nowrap rounded-full border border-shop_light_blue/70 bg-shop_light_blue/45 px-2 py-1 text-xs font-medium text-shop_dark_blue sm:text-sm">
                 Total: {totalUsersCount}
               </div>
-              <div className="px-2 py-1 bg-green-100 text-green-800 text-xs sm:text-sm rounded-full font-medium whitespace-nowrap">
-                <Database className="h-3 w-3 inline mr-1" />
-                Sanity: {sanityUsersCount}
-              </div>
-              <div className="px-2 py-1 bg-emerald-100 text-emerald-800 text-xs sm:text-sm rounded-full font-medium whitespace-nowrap">
+              <div className="whitespace-nowrap rounded-full border border-shop_light_green/25 bg-shop_light_pink/75 px-2 py-1 text-xs font-medium text-shop_dark_green sm:text-sm">
                 <UserCheck className="h-3 w-3 inline mr-1" />
                 Active: {activeUsersCount}
               </div>
@@ -440,7 +434,7 @@ const AdminUsers: React.FC = () => {
         ) : (
           <>
             {selectedUsers.length > 0 && (
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 bg-blue-50 p-3 rounded-lg border">
+              <div className="flex flex-col gap-2 rounded-xl border border-shop_light_green/20 bg-shop_light_pink/55 p-3 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
                 <span className="text-sm font-medium text-center sm:text-left">
                   {selectedUsers.length} user
                   {selectedUsers.length > 1 ? 's' : ''} selected
@@ -480,7 +474,7 @@ const AdminUsers: React.FC = () => {
                         Last Sign In
                       </TableHead>
                       <TableHead className="hidden lg:table-cell min-w-[120px]">Status</TableHead>
-                      <TableHead className="min-w-[140px]">Sanity Status</TableHead>
+                      <TableHead className="min-w-[160px]">Account</TableHead>
                       <TableHead className="min-w-[120px]">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -513,11 +507,11 @@ const AdminUsers: React.FC = () => {
                               <div>
                                 <div className="font-medium">{user.fullName}</div>
                                 <div className="text-sm text-gray-500 lg:hidden">{user.email}</div>
-                                {user.inSanity && (
+                                {user.loyaltyPoints > 0 || user.totalSpent > 0 ? (
                                   <div className="text-xs text-muted-foreground">
                                     Points: {user.loyaltyPoints} | Spent: ${user.totalSpent}
                                   </div>
-                                )}
+                                ) : null}
                               </div>
                             </div>
                           </TableCell>
@@ -539,19 +533,12 @@ const AdminUsers: React.FC = () => {
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
-                              {user.inSanity ? (
-                                <Badge
-                                  variant={user.isActive ? 'default' : 'secondary'}
-                                  className="text-xs"
-                                >
-                                  <Database className="h-3 w-3 mr-1" />
-                                  {user.isActive ? 'Active' : 'Inactive'}
-                                </Badge>
-                              ) : (
-                                <Badge variant="outline" className="text-xs">
-                                  Not in Sanity
-                                </Badge>
-                              )}
+                              <Badge
+                                variant={user.isActive ? 'default' : 'secondary'}
+                                className="text-xs"
+                              >
+                                {user.isActive ? 'Active' : 'Inactive'}
+                              </Badge>
                               {user.isEmployee && user.employeeRole && (
                                 <Badge variant="secondary" className="text-xs">
                                   <Briefcase className="h-3 w-3 mr-1" />
@@ -567,66 +554,85 @@ const AdminUsers: React.FC = () => {
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-1">
-                              {!user.inSanity ? (
-                                <Button
-                                  variant="default"
-                                  size="sm"
-                                  onClick={() => openSidebar(user)}
-                                  disabled={activatingUsers.has(user.id)}
-                                  className="h-8 px-3"
-                                >
-                                  {activatingUsers.has(user.id) ? (
-                                    <RefreshCw className="h-3 w-3 animate-spin" />
-                                  ) : (
-                                    <UserCheck className="h-3 w-3" />
-                                  )}
-                                </Button>
-                              ) : (
-                                <>
-                                  <Button
-                                    variant={user.isEmployee ? 'outline' : 'secondary'}
-                                    size="sm"
-                                    onClick={() => openEmployeeDialog(user)}
-                                    className="h-8 px-3"
-                                    title={
-                                      user.isEmployee
-                                        ? 'Manage Employee Role'
-                                        : 'Assign Employee Role'
-                                    }
-                                  >
-                                    <Briefcase className="h-3 w-3" />
-                                  </Button>
-                                  <Button
-                                    variant={user.isActive ? 'destructive' : 'default'}
-                                    size="sm"
-                                    onClick={() =>
-                                      openActionModal(
-                                        user,
-                                        user.isActive ? 'deactivate' : 'activate',
-                                      )
-                                    }
-                                    disabled={activatingUsers.has(user.id)}
-                                    className="h-8 px-3"
-                                  >
-                                    {activatingUsers.has(user.id) ? (
-                                      <RefreshCw className="h-3 w-3 animate-spin" />
-                                    ) : user.isActive ? (
-                                      <UserX className="h-3 w-3" />
-                                    ) : (
-                                      <UserCheck className="h-3 w-3" />
-                                    )}
-                                  </Button>
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => openActionModal(user, 'delete')}
-                                    disabled={activatingUsers.has(user.id)}
-                                    className="h-8 px-3"
-                                  >
-                                    <Trash2 className="h-3 w-3" />
-                                  </Button>
-                                </>
-                              )}
+                              <TooltipProvider delayDuration={150}>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => openSidebar(user)}
+                                      disabled={activatingUsers.has(user.id)}
+                                      className="h-8 px-3"
+                                    >
+                                      {activatingUsers.has(user.id) ? (
+                                        <RefreshCw className="h-3 w-3 animate-spin" />
+                                      ) : (
+                                        <UserCheck className="h-3 w-3" />
+                                      )}
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>View details</TooltipContent>
+                                </Tooltip>
+
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      variant={user.isEmployee ? 'outline' : 'secondary'}
+                                      size="sm"
+                                      onClick={() => openEmployeeDialog(user)}
+                                      className="h-8 px-3"
+                                    >
+                                      <Briefcase className="h-3 w-3" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    {user.isEmployee ? 'Manage role' : 'Assign role'}
+                                  </TooltipContent>
+                                </Tooltip>
+
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      variant={user.isActive ? 'destructive' : 'default'}
+                                      size="sm"
+                                      onClick={() =>
+                                        openActionModal(
+                                          user,
+                                          user.isActive ? 'deactivate' : 'activate',
+                                        )
+                                      }
+                                      disabled={activatingUsers.has(user.id)}
+                                      className="h-8 px-3"
+                                    >
+                                      {activatingUsers.has(user.id) ? (
+                                        <RefreshCw className="h-3 w-3 animate-spin" />
+                                      ) : user.isActive ? (
+                                        <UserX className="h-3 w-3" />
+                                      ) : (
+                                        <UserCheck className="h-3 w-3" />
+                                      )}
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    {user.isActive ? 'Deactivate' : 'Activate'}
+                                  </TooltipContent>
+                                </Tooltip>
+
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => openActionModal(user, 'delete')}
+                                      disabled={activatingUsers.has(user.id)}
+                                      className="h-8 px-3"
+                                    >
+                                      <Trash2 className="h-3 w-3" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>Delete user</TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
                             </div>
                           </TableCell>
                         </TableRow>
@@ -669,11 +675,11 @@ const AdminUsers: React.FC = () => {
                             <div className="text-xs text-muted-foreground mt-1">
                               Joined: {formatDate(user.createdAt)}
                             </div>
-                            {user.inSanity && (
+                            {user.loyaltyPoints > 0 || user.totalSpent > 0 ? (
                               <div className="text-xs text-muted-foreground">
                                 Points: {user.loyaltyPoints} | Spent: ${user.totalSpent}
                               </div>
-                            )}
+                            ) : null}
                           </div>
                         </div>
                       </div>
@@ -697,19 +703,12 @@ const AdminUsers: React.FC = () => {
                               Locked
                             </Badge>
                           )}
-                          {user.inSanity ? (
-                            <Badge
-                              variant={user.isActive ? 'default' : 'secondary'}
-                              className="text-xs"
-                            >
-                              <Database className="h-3 w-3 mr-1" />
-                              {user.isActive ? 'Active' : 'Inactive'}
-                            </Badge>
-                          ) : (
-                            <Badge variant="outline" className="text-xs">
-                              Not in Sanity
-                            </Badge>
-                          )}
+                          <Badge
+                            variant={user.isActive ? 'default' : 'secondary'}
+                            className="text-xs"
+                          >
+                            {user.isActive ? 'Active' : 'Inactive'}
+                          </Badge>
                           {user.isEmployee && user.employeeRole && (
                             <Badge variant="secondary" className="text-xs">
                               <Briefcase className="h-3 w-3 mr-1" />
@@ -729,68 +728,67 @@ const AdminUsers: React.FC = () => {
                             Last: {user.lastSignInAt ? formatDate(user.lastSignInAt) : 'Never'}
                           </div>
                           <div className="flex items-center gap-2">
-                            {!user.inSanity ? (
-                              <Button
-                                variant="default"
-                                size="sm"
-                                onClick={() => openSidebar(user)}
-                                disabled={activatingUsers.has(user.id)}
-                                className="h-7 px-2 text-xs"
-                              >
-                                {activatingUsers.has(user.id) ? (
-                                  <RefreshCw className="h-3 w-3 animate-spin" />
-                                ) : (
-                                  <>
-                                    <UserCheck className="h-3 w-3 mr-1" />
-                                    Add
-                                  </>
-                                )}
-                              </Button>
-                            ) : (
-                              <>
-                                <Button
-                                  variant={user.isEmployee ? 'outline' : 'secondary'}
-                                  size="sm"
-                                  onClick={() => openEmployeeDialog(user)}
-                                  className="h-7 px-2 text-xs"
-                                >
-                                  <Briefcase className="h-3 w-3 mr-1" />
-                                  {user.isEmployee ? 'Manage' : 'Assign'}
-                                </Button>
-                                <Button
-                                  variant={user.isActive ? 'destructive' : 'default'}
-                                  size="sm"
-                                  onClick={() =>
-                                    openActionModal(user, user.isActive ? 'deactivate' : 'activate')
-                                  }
-                                  disabled={activatingUsers.has(user.id)}
-                                  className="h-7 px-2 text-xs"
-                                >
-                                  {activatingUsers.has(user.id) ? (
-                                    <RefreshCw className="h-3 w-3 animate-spin" />
-                                  ) : user.isActive ? (
-                                    <>
-                                      <UserX className="h-3 w-3 mr-1" />
-                                      Deactivate
-                                    </>
-                                  ) : (
-                                    <>
-                                      <UserCheck className="h-3 w-3 mr-1" />
-                                      Activate
-                                    </>
-                                  )}
-                                </Button>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => openActionModal(user, 'delete')}
-                                  disabled={activatingUsers.has(user.id)}
-                                  className="h-7 px-2 text-xs"
-                                >
-                                  <Trash2 className="h-3 w-3" />
-                                </Button>
-                              </>
-                            )}
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => openSidebar(user)}
+                              disabled={activatingUsers.has(user.id)}
+                              className="h-7 px-2 text-xs"
+                              title="View details"
+                            >
+                              {activatingUsers.has(user.id) ? (
+                                <RefreshCw className="h-3 w-3 animate-spin" />
+                              ) : (
+                                <>
+                                  <UserCheck className="h-3 w-3 mr-1" />
+                                  Details
+                                </>
+                              )}
+                            </Button>
+                            <Button
+                              variant={user.isEmployee ? 'outline' : 'secondary'}
+                              size="sm"
+                              onClick={() => openEmployeeDialog(user)}
+                              className="h-7 px-2 text-xs"
+                              title={user.isEmployee ? 'Manage role' : 'Assign role'}
+                            >
+                              <Briefcase className="h-3 w-3 mr-1" />
+                              {user.isEmployee ? 'Manage' : 'Assign'}
+                            </Button>
+                            <Button
+                              variant={user.isActive ? 'destructive' : 'default'}
+                              size="sm"
+                              onClick={() =>
+                                openActionModal(user, user.isActive ? 'deactivate' : 'activate')
+                              }
+                              disabled={activatingUsers.has(user.id)}
+                              className="h-7 px-2 text-xs"
+                              title={user.isActive ? 'Deactivate' : 'Activate'}
+                            >
+                              {activatingUsers.has(user.id) ? (
+                                <RefreshCw className="h-3 w-3 animate-spin" />
+                              ) : user.isActive ? (
+                                <>
+                                  <UserX className="h-3 w-3 mr-1" />
+                                  Deactivate
+                                </>
+                              ) : (
+                                <>
+                                  <UserCheck className="h-3 w-3 mr-1" />
+                                  Activate
+                                </>
+                              )}
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => openActionModal(user, 'delete')}
+                              disabled={activatingUsers.has(user.id)}
+                              className="h-7 px-2 text-xs"
+                              title="Delete user"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
                           </div>
                         </div>
                       </div>
@@ -860,7 +858,6 @@ const AdminUsers: React.FC = () => {
                 lastName: actionModal.user.lastName,
                 email: actionModal.user.email,
                 isActive: actionModal.user.isActive,
-                inSanity: actionModal.user.inSanity,
                 notificationCount: actionModal.user.notificationCount,
               }
             : null

@@ -20,7 +20,7 @@ const SuccessPage = () => {
   const searchParams = useSearchParams();
   const orderNumber = searchParams.get('orderNumber');
 
-  const { isAuthenticated } = useUserData();
+  const { isAuthenticated, refreshUserData } = useUserData();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -38,6 +38,7 @@ const SuccessPage = () => {
     };
 
     if (isAuthenticated) {
+      void refreshUserData();
       fetchData();
     } else {
       setOrders([]);

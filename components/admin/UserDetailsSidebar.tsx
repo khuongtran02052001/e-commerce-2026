@@ -3,7 +3,6 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
 import {
   Sheet,
   SheetContent,
@@ -11,24 +10,11 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
-import { showToast } from '@/lib/toast';
-import {
-  Bell,
-  Calendar,
-  Clock,
-  Database,
-  DollarSign,
-  Gift,
-  Mail,
-  RefreshCw,
-  UserCheck,
-  UserX,
-} from 'lucide-react';
+import { Calendar, Clock, Mail, RefreshCw, UserCheck, UserX } from 'lucide-react';
 import React, { useState } from 'react';
 
 interface CombinedUser {
   id: string;
-  clerkUserId: string;
   firstName: string;
   lastName: string;
   fullName: string;
@@ -39,12 +25,9 @@ interface CombinedUser {
   emailVerified: boolean;
   banned: boolean;
   locked: boolean;
-  // Sanity-specific fields
   isActive: boolean;
   activatedAt?: string;
   activatedBy?: string;
-  sanityId?: string;
-  inSanity: boolean;
   loyaltyPoints: number;
   totalSpent: number;
   notificationCount: number;
@@ -91,27 +74,7 @@ export const UserDetailsSidebar: React.FC<UserDetailsSidebarProps> = ({
         onClose();
       } else {
         await onActivate(user.id, action === 'activate');
-
-        // For activate action (Add to Sanity), update user instantly and keep sidebar open
-        if (action === 'activate' && !user.inSanity && onUserUpdate) {
-          const updatedUser: CombinedUser = {
-            ...user,
-            inSanity: true,
-            isActive: true,
-            activatedAt: new Date().toISOString(),
-            loyaltyPoints: 0,
-            totalSpent: 0,
-            notificationCount: 0,
-          };
-          onUserUpdate(updatedUser);
-          showToast.success(
-            'User added to Sanity successfully!',
-            `${user.fullName} can now receive notifications and track loyalty points.`,
-          );
-        } else {
-          // For other actions, close the sidebar
-          onClose();
-        }
+       
       }
     } catch (error) {
       console.error(`Error during ${action}:`, error);
@@ -121,23 +84,6 @@ export const UserDetailsSidebar: React.FC<UserDetailsSidebarProps> = ({
   };
 
   const getActionButton = () => {
-    if (!user.inSanity) {
-      return (
-        <Button
-          onClick={() => handleAction('activate')}
-          disabled={actionLoading === 'activate' || isLoading}
-          className="w-full"
-        >
-          {actionLoading === 'activate' ? (
-            <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-          ) : (
-            <UserCheck className="h-4 w-4 mr-2" />
-          )}
-          Add to Sanity
-        </Button>
-      );
-    }
-
     return (
       <div className="flex gap-2 w-full">
         <Button
@@ -172,7 +118,7 @@ export const UserDetailsSidebar: React.FC<UserDetailsSidebarProps> = ({
         <div className="flex h-full flex-col">
           <SheetHeader className="px-6 pt-6 pb-4 border-b">
             <SheetTitle>User Details</SheetTitle>
-            <SheetDescription>Manage user account and Sanity integration</SheetDescription>
+            <SheetDescription>Manage user account</SheetDescription>
           </SheetHeader>
 
           <div className="flex-1 overflow-y-auto px-6 py-6">
@@ -208,11 +154,6 @@ export const UserDetailsSidebar: React.FC<UserDetailsSidebarProps> = ({
                       </Badge>
                       {user.banned && <Badge variant="destructive">Banned</Badge>}
                       {user.locked && <Badge variant="outline">Locked</Badge>}
-                      {actionLoading === 'activate' && (
-                        <Badge variant="outline" className="animate-pulse">
-                          Adding to Sanity...
-                        </Badge>
-                      )}
                     </div>
                   </div>
                 </div>
@@ -238,92 +179,14 @@ export const UserDetailsSidebar: React.FC<UserDetailsSidebarProps> = ({
                   </div>
                   <div className="flex items-center justify-between text-sm">
                     <span className="flex items-center gap-2 text-muted-foreground">
-                      <Database className="h-4 w-4" />
-                      Clerk ID
+                      <Clock className="h-4 w-4" />
+                      Account Status
                     </span>
-                    <span className="font-mono text-xs">{user.clerkUserId.slice(0, 12)}...</span>
+                    <Badge variant={user.isActive ? 'default' : 'secondary'}>
+                      {user.isActive ? 'Active' : 'Inactive'}
+                    </Badge>
                   </div>
                 </div>
-              </Card>
-
-              {/* Sanity Status */}
-              <Card className="p-6">
-                <h4 className="font-medium mb-4 flex items-center gap-2">
-                  <Database className="h-4 w-4" />
-                  Sanity Integration
-                </h4>
-
-                {user.inSanity ? (
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">Status</span>
-                      <Badge variant={user.isActive ? 'default' : 'secondary'}>
-                        {user.isActive ? 'Active' : 'Inactive'}
-                      </Badge>
-                    </div>
-
-                    <Separator />
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="text-center">
-                        <div className="flex items-center justify-center gap-1 text-sm text-muted-foreground mb-1">
-                          <Gift className="h-3 w-3" />
-                          Loyalty Points
-                        </div>
-                        <div className="text-lg font-semibold">
-                          {user.loyaltyPoints.toLocaleString()}
-                        </div>
-                      </div>
-                      <div className="text-center">
-                        <div className="flex items-center justify-center gap-1 text-sm text-muted-foreground mb-1">
-                          <DollarSign className="h-3 w-3" />
-                          Total Spent
-                        </div>
-                        <div className="text-lg font-semibold">${user.totalSpent.toFixed(2)}</div>
-                      </div>
-                    </div>
-
-                    {user.notificationCount > 0 && (
-                      <>
-                        <Separator />
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="flex items-center gap-2 text-muted-foreground">
-                            <Bell className="h-4 w-4" />
-                            Notifications
-                          </span>
-                          <Badge variant="outline">{user.notificationCount}</Badge>
-                        </div>
-                      </>
-                    )}
-
-                    {user.activatedAt && (
-                      <>
-                        <Separator />
-                        <div className="text-xs text-muted-foreground">
-                          <div>Activated: {new Date(user.activatedAt).toLocaleDateString()}</div>
-                          {user.activatedBy && <div>By: {user.activatedBy}</div>}
-                        </div>
-                      </>
-                    )}
-                  </div>
-                ) : (
-                  <div className="text-center py-4">
-                    <Database className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
-                    <p className="text-sm text-muted-foreground mb-3">
-                      This user is not yet added to Sanity. Add them to enable notifications and
-                      track their activity.
-                    </p>
-                    <div className="text-xs text-muted-foreground">
-                      Adding to Sanity will create a user record and enable:
-                    </div>
-                    <ul className="text-xs text-muted-foreground mt-1 space-y-1">
-                      <li>• Notification management</li>
-                      <li>• Loyalty points tracking</li>
-                      <li>• Purchase history</li>
-                      <li>• User preferences</li>
-                    </ul>
-                  </div>
-                )}
               </Card>
             </div>
 

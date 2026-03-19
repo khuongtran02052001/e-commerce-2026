@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useUserData } from '@/contexts/UserDataContext';
 import { fetchService } from '@/lib/restClient';
 import { toast } from 'sonner';
@@ -75,52 +75,54 @@ export default function UserDashboardPage() {
   const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
   const [loading, setLoading] = useState(true);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const { authUser: displayProfile } = useUserData();
+  const { authUser: displayProfile, refreshUserData } = useUserData();
   const [userExists, setUserExists] = useState<boolean>(false);
   const [isApplyingBusiness, setIsApplyingBusiness] = useState<boolean>(false);
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
   const [notificationType, setNotificationType] = useState<'premium' | 'business'>('premium');
 
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        setLoading(true);
+  const fetchDashboardData = useCallback(async () => {
+    try {
+      setLoading(true);
 
-        // Fetch user status first
-        const statusResponse = await fetchService('/user/status');
-        if (statusResponse.ok) {
-          const statusData = await statusResponse.json();
-          setUserExists(statusData.userExists);
-          setUserProfile(statusData.userProfile);
-        }
-
-        // Fetch user dashboard stats
-        const response = await fetchService('/user/dashboard/stats');
-        if (response.ok) {
-          const data = await response.json();
-          if (data.success) {
-            setStats(data.stats);
-            setRecentActivity(data.recentActivity);
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching dashboard data:', error);
-      } finally {
-        setLoading(false);
+      // Fetch user status first
+      const statusResponse = await fetchService('/user/status');
+      if (statusResponse.ok) {
+        const statusData = await statusResponse.json();
+        setUserExists(statusData.userExists);
+        setUserProfile(statusData.userProfile);
       }
-    };
 
+      // Fetch user dashboard stats
+      const response = await fetchService('/user/dashboard/stats');
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setStats(data.stats);
+          setRecentActivity(data.recentActivity);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
     if (status === 'authenticated') {
       fetchDashboardData();
     }
-  }, [status]);
+  }, [status, fetchDashboardData]);
 
-  const handlePremiumRegister = () => {
+  const handlePremiumRegister = async () => {
     // Show success notification instead of immediate reload
     setNotificationType('premium');
     setShowSuccessNotification(true);
     setUserExists(true);
+    await refreshUserData();
+    await fetchDashboardData();
   };
 
   const handleBusinessAccountApply = async () => {
@@ -144,10 +146,8 @@ export default function UserDashboardPage() {
         // Show success notification instead of toast and reload
         setNotificationType('business');
         setShowSuccessNotification(true);
-        // Also update the user profile to reflect pending status
-        setTimeout(() => {
-          window.location.reload();
-        }, 2000);
+        await refreshUserData();
+        await fetchDashboardData();
       } else {
         toast.error(data.error || 'Failed to submit business account application');
       }
@@ -179,8 +179,8 @@ export default function UserDashboardPage() {
 
       if (response.ok) {
         toast.success(data.message);
-        // Refresh user profile
-        window.location.reload();
+        await refreshUserData();
+        await fetchDashboardData();
       } else {
         toast.error(data.error || 'Failed to cancel application');
       }

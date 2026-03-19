@@ -23,7 +23,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { updateAdminOrder } from '@/data/client/order';
 import { trackOrderDetails, trackOrderFullfillment } from '@/lib/analytics';
 import { formatCurrency } from '@/lib/formatCurrency';
+import { getStatusBadgeClass } from '@/lib/renderStatus';
 import { showToast } from '@/lib/toast';
+import { formatOrderActor } from '@/types/domain/order';
 import { Calendar, DollarSign, Package, Save, Truck, User, X } from 'lucide-react';
 import React, { useState } from 'react';
 import { OrderDetailsSkeleton } from './SkeletonLoaders';
@@ -90,34 +92,46 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
     });
   };
 
-  const getStatusColor = (status: string): string => {
-    switch (status.toLowerCase()) {
-      case 'completed':
-        return 'bg-green-100 text-green-800';
-      case 'delivered':
-        return 'bg-green-100 text-green-800';
-      case 'out_for_delivery':
-        return 'bg-blue-100 text-blue-800';
-      case 'ready_for_delivery':
-        return 'bg-cyan-100 text-cyan-800';
-      case 'packed':
-        return 'bg-purple-100 text-purple-800';
-      case 'order_confirmed':
-        return 'bg-emerald-100 text-emerald-800';
-      case 'address_confirmed':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'pending':
-        return 'bg-orange-100 text-orange-800';
-      case 'cancelled':
-        return 'bg-red-100 text-red-800';
-      case 'failed_delivery':
-        return 'bg-red-100 text-red-800';
-      case 'rescheduled':
-        return 'bg-amber-100 text-amber-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
+  const trackingEntries = order
+    ? [
+        {
+          label: 'Address Confirmed By',
+          actor: order.addressConfirmedBy,
+          at: order.addressConfirmedAt,
+          empty: 'Not confirmed',
+        },
+        {
+          label: 'Order Confirmed By',
+          actor: order.orderConfirmedBy,
+          at: order.orderConfirmedAt,
+          empty: 'Not confirmed',
+        },
+        {
+          label: 'Packed By',
+          actor: order.packedBy,
+          at: order.packedAt,
+          empty: 'Not packed',
+        },
+        {
+          label: 'Dispatched By',
+          actor: order.dispatchedBy,
+          at: order.dispatchedAt,
+          empty: 'Not dispatched',
+        },
+        {
+          label: 'Delivery Assigned By',
+          actor: order.assignedWarehouseBy,
+          at: order.assignedWarehouseAt,
+          empty: 'Not assigned',
+        },
+        {
+          label: 'Delivered By',
+          actor: order.deliveredBy,
+          at: order.deliveredAt,
+          empty: 'Not delivered',
+        },
+      ]
+    : [];
 
   const handleInputChange = (field: string, value: string | number) => {
     setFormData((prev) => ({
@@ -340,7 +354,7 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
               <CardHeader className="pb-4">
                 <CardTitle className="flex items-center justify-between">
                   <span>Order Status</span>
-                  <Badge className={getStatusColor(order.status)}>{order.status}</Badge>
+                  <Badge className={getStatusBadgeClass(order.status)}>{order.status}</Badge>
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -536,60 +550,23 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label className="text-sm font-medium">Address Confirmed By</Label>
-                    <p className="text-sm">{order.addressConfirmedBy || 'Not confirmed'}</p>
-                    {order.addressConfirmedAt && (
-                      <p className="text-xs text-gray-500">
-                        {formatDate(order.addressConfirmedAt)}
+                  {trackingEntries.map((entry) => (
+                    <div key={entry.label}>
+                      <Label className="text-sm font-medium">{entry.label}</Label>
+                      <p className="text-sm">
+                        {formatOrderActor(entry.actor) || entry.empty}
                       </p>
-                    )}
-                  </div>
-                  <div>
-                    <Label className="text-sm font-medium">Order Confirmed By</Label>
-                    <p className="text-sm">{order.orderConfirmedBy || 'Not confirmed'}</p>
-                    {order.orderConfirmedAt && (
-                      <p className="text-xs text-gray-500">{formatDate(order.orderConfirmedAt)}</p>
-                    )}
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label className="text-sm font-medium">Packed By</Label>
-                    <p className="text-sm">{order.packedBy || 'Not packed'}</p>
-                    {order.packedAt && (
-                      <p className="text-xs text-gray-500">{formatDate(order.packedAt)}</p>
-                    )}
-                  </div>
-                  <div>
-                    <Label className="text-sm font-medium">Dispatched By</Label>
-                    <p className="text-sm">{order.dispatchedBy || 'Not dispatched'}</p>
-                    {order.dispatchedAt && (
-                      <p className="text-xs text-gray-500">{formatDate(order.dispatchedAt)}</p>
-                    )}
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label className="text-sm font-medium">Warehouse Assigned By</Label>
-                    <p className="text-sm">{order.assignedWarehouseBy || 'Not assigned'}</p>
-                    {order.assignedWarehouseAt && (
-                      <p className="text-xs text-gray-500">
-                        {formatDate(order.assignedWarehouseAt)}
-                      </p>
-                    )}
-                  </div>
-                  <div>
-                    <Label className="text-sm font-medium">Delivered By</Label>
-                    <p className="text-sm">{order.deliveredBy || 'Not delivered'}</p>
-                    {order.deliveredAt && (
-                      <p className="text-xs text-gray-500">{formatDate(order.deliveredAt)}</p>
-                    )}
-                  </div>
+                      {entry.at && (
+                        <p className="text-xs text-gray-500">{formatDate(entry.at)}</p>
+                      )}
+                    </div>
+                  ))}
                 </div>
                 <div>
                   <Label className="text-sm font-medium">Assigned Deliveryman</Label>
-                  <p className="text-sm">{order.assignedDeliverymanName || 'Not assigned'}</p>
+                  <p className="text-sm">
+                    {formatOrderActor(order.assignedDeliverymanName) || 'Not assigned'}
+                  </p>
                   {order.assignedDeliverymanId && (
                     <p className="text-xs text-gray-500">ID: {order.assignedDeliverymanId}</p>
                   )}
@@ -701,7 +678,9 @@ const OrderDetailsSidebar: React.FC<OrderDetailsSidebarProps> = ({
                   </div>
                   <div>
                     <Label className="text-sm font-medium">Payment Received By</Label>
-                    <p className="text-sm">{order.paymentReceivedBy || 'Not received'}</p>
+                    <p className="text-sm">
+                      {formatOrderActor(order.paymentReceivedBy) || 'Not received'}
+                    </p>
                     {order.paymentReceivedAt && (
                       <p className="text-xs text-gray-500">{formatDate(order.paymentReceivedAt)}</p>
                     )}

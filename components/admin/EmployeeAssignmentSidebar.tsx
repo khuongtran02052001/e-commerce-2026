@@ -19,7 +19,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
-import { EmployeeRole, getRoleDisplayName } from '@/types/domain/employee';
+import { EmployeeRole, getRoleDisplayName, normalizeEmployeeRole } from '@/types/domain/employee';
 import {
   Briefcase,
   Calculator,
@@ -35,7 +35,6 @@ import React, { useState } from 'react';
 
 interface CombinedUser {
   id: string;
-  clerkUserId: string;
   firstName: string;
   lastName: string;
   fullName: string;
@@ -46,12 +45,9 @@ interface CombinedUser {
   emailVerified: boolean;
   banned: boolean;
   locked: boolean;
-  // Sanity-specific fields
   isActive: boolean;
   activatedAt?: string;
   activatedBy?: string;
-  sanityId?: string;
-  inSanity: boolean;
   loyaltyPoints: number;
   totalSpent: number;
   notificationCount: number;
@@ -65,15 +61,14 @@ interface EmployeeAssignmentSidebarProps {
   isOpen: boolean;
   onClose: () => void;
   user: CombinedUser | null;
-  onAssignRole: (sanityId: string, role: EmployeeRole) => Promise<void>;
-  onRemoveRole: (sanityId: string, userName: string) => Promise<void>;
+  onAssignRole: (userId: string, role: EmployeeRole) => Promise<void>;
+  onRemoveRole: (userId: string, userName: string) => Promise<void>;
   isLoading: boolean;
 }
 
 const ROLE_ICONS = {
   callcenter: Phone,
   packer: Package,
-  warehouse: Truck,
   deliveryman: Truck,
   incharge: ShieldCheck,
   accounts: Calculator,
@@ -81,8 +76,11 @@ const ROLE_ICONS = {
 
 const ROLE_PERMISSIONS = {
   callcenter: ['Confirm customer address', 'Confirm orders', 'View orders'],
-  packer: ['View confirmed orders', 'Mark orders as packed'],
-  warehouse: ['View packed orders', 'Assign orders to deliverymen', 'Manage warehouse'],
+  packer: [
+    'View confirmed orders',
+    'Mark orders as packed',
+    'Assign packed orders to deliverymen',
+  ],
   deliveryman: ['View assigned deliveries', 'Mark orders as delivered', 'Collect cash payments'],
   incharge: ['Monitor all orders', 'Assign deliverymen', 'View analytics'],
   accounts: ['Receive payments from deliverymen', 'View financial analytics', 'Monitor all orders'],
@@ -103,7 +101,7 @@ export const EmployeeAssignmentSidebar: React.FC<EmployeeAssignmentSidebarProps>
   // Initialize selected role when user changes or sidebar opens
   React.useEffect(() => {
     if (user?.isEmployee && user.employeeRole) {
-      setSelectedRole(user.employeeRole as EmployeeRole);
+      setSelectedRole(normalizeEmployeeRole(user.employeeRole));
     } else {
       setSelectedRole('callcenter');
     }
@@ -114,13 +112,9 @@ export const EmployeeAssignmentSidebar: React.FC<EmployeeAssignmentSidebarProps>
   if (!user) return null;
 
   const handleAssignRole = async () => {
-    if (!user.sanityId) {
-      return;
-    }
-
     setActionLoading('assign');
     try {
-      await onAssignRole(user.sanityId, selectedRole);
+      await onAssignRole(user.id, selectedRole);
     } catch (error) {
       console.error('Error assigning role:', error);
     } finally {
@@ -129,13 +123,9 @@ export const EmployeeAssignmentSidebar: React.FC<EmployeeAssignmentSidebarProps>
   };
 
   const handleUpdateRole = async () => {
-    if (!user.sanityId) {
-      return;
-    }
-
     setActionLoading('update');
     try {
-      await onAssignRole(user.sanityId, selectedRole);
+      await onAssignRole(user.id, selectedRole);
     } catch (error) {
       console.error('Error updating role:', error);
     } finally {
@@ -144,14 +134,10 @@ export const EmployeeAssignmentSidebar: React.FC<EmployeeAssignmentSidebarProps>
   };
 
   const handleRemoveRole = async () => {
-    if (!user.sanityId) {
-      return;
-    }
-
     setActionLoading('remove');
     setShowConfirmRemove(false);
     try {
-      await onRemoveRole(user.sanityId, user.fullName);
+      await onRemoveRole(user.id, user.fullName);
       // onClose is now called from parent after data refresh
     } catch (error) {
       console.error('Error removing role:', error);
@@ -212,7 +198,7 @@ export const EmployeeAssignmentSidebar: React.FC<EmployeeAssignmentSidebarProps>
                   <span className="text-muted-foreground">Current Role:</span>
                   <Badge variant="secondary">
                     <Briefcase className="h-3 w-3 mr-1" />
-                    {getRoleDisplayName(user.employeeRole as EmployeeRole)}
+                    {getRoleDisplayName(normalizeEmployeeRole(user.employeeRole))}
                   </Badge>
                 </div>
               )}
@@ -237,7 +223,6 @@ export const EmployeeAssignmentSidebar: React.FC<EmployeeAssignmentSidebarProps>
                   [
                     'callcenter',
                     'packer',
-                    'warehouse',
                     'deliveryman',
                     'incharge',
                     'accounts',
@@ -266,7 +251,7 @@ export const EmployeeAssignmentSidebar: React.FC<EmployeeAssignmentSidebarProps>
               </h4>
             </div>
             <ul className="space-y-2">
-              {ROLE_PERMISSIONS[selectedRole].map((permission, index) => (
+              {(ROLE_PERMISSIONS[selectedRole] || []).map((permission, index) => (
                 <li key={index} className="flex items-start gap-2 text-sm text-muted-foreground">
                   <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
                   <span>{permission}</span>
@@ -277,97 +262,81 @@ export const EmployeeAssignmentSidebar: React.FC<EmployeeAssignmentSidebarProps>
 
           {/* Action Buttons */}
           <div className="space-y-2 pt-4">
-            {!user.sanityId ? (
-              <div className="text-center p-4 bg-muted rounded-lg">
-                <p className="text-sm text-muted-foreground">
-                  User must be in Sanity database before assigning an employee role.
-                </p>
-              </div>
-            ) : (
+            {user.isEmployee ? (
               <>
-                {user.isEmployee ? (
+                {showConfirmRemove ? (
                   <>
-                    {showConfirmRemove ? (
-                      <>
-                        <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
-                          <p className="text-sm font-medium text-destructive mb-2">
-                            Confirm Removal
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            Are you sure you want to remove the employee role from {user.fullName}?
-                          </p>
-                        </div>
-                        <div className="flex gap-2">
-                          <Button
-                            variant="outline"
-                            onClick={handleCancelRemove}
-                            disabled={isAnyActionLoading}
-                            className="flex-1"
-                          >
-                            Cancel
-                          </Button>
-                          <Button
-                            variant="destructive"
-                            onClick={handleRemoveRole}
-                            disabled={isAnyActionLoading}
-                            className="flex-1"
-                          >
-                            {actionLoading === 'remove' ? (
-                              <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                            ) : (
-                              <Briefcase className="h-4 w-4 mr-2" />
-                            )}
-                            Remove
-                          </Button>
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        {hasRoleChanged && (
-                          <Button
-                            onClick={handleUpdateRole}
-                            disabled={isAnyActionLoading}
-                            className="w-full"
-                          >
-                            {actionLoading === 'update' || isLoading ? (
-                              <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                            ) : (
-                              <UserCheck className="h-4 w-4 mr-2" />
-                            )}
-                            {actionLoading === 'update' || isLoading
-                              ? 'Updating...'
-                              : `Update to ${getRoleDisplayName(selectedRole)} Role`}
-                          </Button>
-                        )}
-                        <Button
-                          variant="destructive"
-                          onClick={() => setShowConfirmRemove(true)}
-                          disabled={isAnyActionLoading}
-                          className="w-full"
-                        >
+                    <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
+                      <p className="text-sm font-medium text-destructive mb-2">Confirm Removal</p>
+                      <p className="text-sm text-muted-foreground">
+                        Are you sure you want to remove the employee role from {user.fullName}?
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        onClick={handleCancelRemove}
+                        disabled={isAnyActionLoading}
+                        className="flex-1"
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        onClick={handleRemoveRole}
+                        disabled={isAnyActionLoading}
+                        className="flex-1"
+                      >
+                        {actionLoading === 'remove' ? (
+                          <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                        ) : (
                           <Briefcase className="h-4 w-4 mr-2" />
-                          Remove Employee Role
-                        </Button>
-                      </>
-                    )}
+                        )}
+                        Remove
+                      </Button>
+                    </div>
                   </>
                 ) : (
-                  <Button
-                    onClick={handleAssignRole}
-                    disabled={isAnyActionLoading}
-                    className="w-full"
-                  >
-                    {actionLoading === 'assign' || isLoading ? (
-                      <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                    ) : (
-                      <UserCheck className="h-4 w-4 mr-2" />
+                  <>
+                    {hasRoleChanged && (
+                      <Button
+                        onClick={handleUpdateRole}
+                        disabled={isAnyActionLoading}
+                        className="w-full"
+                      >
+                        {actionLoading === 'update' || isLoading ? (
+                          <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                        ) : (
+                          <UserCheck className="h-4 w-4 mr-2" />
+                        )}
+                        {actionLoading === 'update' || isLoading
+                          ? 'Updating...'
+                          : `Update to ${getRoleDisplayName(selectedRole)} Role`}
+                      </Button>
                     )}
-                    {actionLoading === 'assign' || isLoading
-                      ? 'Assigning...'
-                      : `Assign ${getRoleDisplayName(selectedRole)} Role`}
-                  </Button>
+                    <Button
+                      variant="destructive"
+                      onClick={() => setShowConfirmRemove(true)}
+                      disabled={isAnyActionLoading}
+                      className="w-full"
+                    >
+                      <Briefcase className="h-4 w-4 mr-2" />
+                      Remove Employee Role
+                    </Button>
+                  </>
                 )}
               </>
+            ) : (
+              <Button onClick={handleAssignRole} disabled={isAnyActionLoading} className="w-full">
+                {actionLoading === 'assign' || isLoading ? (
+                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <UserCheck className="h-4 w-4 mr-2" />
+                )}
+                {actionLoading === 'assign' || isLoading
+                  ? 'Assigning...'
+                  : `Assign ${getRoleDisplayName(selectedRole)} Role`}
+              </Button>
             )}
 
             {!showConfirmRemove && (

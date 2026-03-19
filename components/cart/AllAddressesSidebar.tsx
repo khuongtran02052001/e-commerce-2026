@@ -18,6 +18,7 @@ interface Address {
   name: string;
   email: string;
   address: string;
+  addressName: string;
   city: string;
   state: string;
   zip: string;

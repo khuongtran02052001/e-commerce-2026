@@ -51,7 +51,7 @@ const FeatureModal = ({ isOpen, onClose, feature }: FeatureModalProps) => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+            className="fixed inset-0 z-50 bg-shop_dark_green/16 backdrop-blur-[3px]"
             onClick={onClose}
           />
 

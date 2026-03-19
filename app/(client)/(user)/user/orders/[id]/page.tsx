@@ -1,8 +1,8 @@
-import type { Order } from '@/types/domain/order';
 import OrderDetailsPage from '@/components/OrderDetailsPage';
 import { getOrderById } from '@/data/server';
 import { auth } from '@/lib/auth';
 import { fetchServiceJsonServer } from '@/lib/restClient';
+import type { Order } from '@/types/domain/order';
 import { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 
@@ -55,7 +55,7 @@ export default async function OrderDetailsPageRoute({ params }: Props) {
         }>('/auth/me', { accessToken }).catch(() => null)
       : Promise.resolve(null),
   ]);
-
+  console.log(order);
   if (!order) {
     notFound();
   }

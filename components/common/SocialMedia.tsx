@@ -39,7 +39,7 @@ const socialLink = [
 const SocialMedia = ({ className, iconClassName, tooltipClassName }: Props) => {
   return (
     <TooltipProvider>
-      <div className={cn('flex items-center gap-3.5 text-zinc-400', className)}>
+      <div className={cn('flex items-center gap-3.5 text-shop_dark_green/70', className)}>
         {socialLink.map((item) => (
           <Tooltip key={item.title}>
             <TooltipTrigger asChild>
@@ -48,7 +48,7 @@ const SocialMedia = ({ className, iconClassName, tooltipClassName }: Props) => {
                 target="_blank"
                 rel="noopener noreferrer"
                 className={cn(
-                  'p-2 border rounded-full hover:text-white hover:border-shop_dark_green hoverEffect',
+                  'rounded-full border border-shop_light_green/20 bg-white/75 p-2 hover:border-shop_light_green/35 hover:bg-shop_light_pink/75 hover:text-shop_dark_green hoverEffect',
                   iconClassName,
                 )}
               >
@@ -56,7 +56,10 @@ const SocialMedia = ({ className, iconClassName, tooltipClassName }: Props) => {
               </a>
             </TooltipTrigger>
             <TooltipContent
-              className={cn('bg-white text-dark-color font-semibold', tooltipClassName)}
+              className={cn(
+                'border border-shop_light_green/20 bg-white text-dark-color font-semibold shadow-sm',
+                tooltipClassName,
+              )}
             >
               {item.title}
             </TooltipContent>

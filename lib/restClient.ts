@@ -67,7 +67,6 @@ export const fetchService = async (
   if (!mergedHeaders.has('Content-Type') && rest.body) {
     mergedHeaders.set('Content-Type', 'application/json');
   }
-  console.log('path', path);
   return fetch(buildServiceUrl(path, service), {
     ...rest,
     headers: mergedHeaders,

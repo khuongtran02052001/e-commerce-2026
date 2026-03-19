@@ -137,8 +137,8 @@ const ReviewSidebar = React.memo(
               Share your experience with <span className="font-semibold">{productName}</span>
             </SheetDescription>
             {isVerifiedPurchase && (
-              <div className="bg-green-50 border border-green-200 rounded-md p-3 mt-2">
-                <p className="text-sm text-green-700 font-medium">
+              <div className="mt-2 rounded-md border border-shop_light_green/18 bg-shop_light_pink/55 p-3">
+                <p className="text-sm font-medium text-shop_dark_green">
                   ✓ This will be marked as a verified purchase
                 </p>
               </div>
@@ -150,7 +150,7 @@ const ReviewSidebar = React.memo(
               {/* Rating Section */}
               <div className="space-y-3">
                 <Label htmlFor="rating" className="text-base font-semibold text-shop_dark_green">
-                  Your Rating <span className="text-red-500">*</span>
+                  Your Rating <span className="text-[#cf6f93]">*</span>
                 </Label>
                 <div className="flex flex-col gap-3">
                   <div className="flex items-center gap-2">
@@ -170,7 +170,7 @@ const ReviewSidebar = React.memo(
                           className={`${
                             value <= (hoverRating || rating)
                               ? 'text-shop_light_green fill-shop_light_green'
-                              : 'text-gray-300'
+                              : 'text-shop_light_green/30'
                           } transition-colors`}
                         />
                       </button>
@@ -178,7 +178,7 @@ const ReviewSidebar = React.memo(
                   </div>
                   {rating > 0 && (
                     <div className="flex items-center gap-2">
-                      <div className="h-1 flex-1 bg-gray-200 rounded-full overflow-hidden">
+                      <div className="h-1 flex-1 overflow-hidden rounded-full bg-shop_light_pink/70">
                         <div
                           className="h-full bg-shop_light_green transition-all duration-300"
                           style={{ width: `${(rating / 5) * 100}%` }}
@@ -190,7 +190,7 @@ const ReviewSidebar = React.memo(
                     </div>
                   )}
                   {rating === 0 && (
-                    <p className="text-sm text-gray-500">Click to rate this product</p>
+                    <p className="text-sm text-dark-text">Click to rate this product</p>
                   )}
                 </div>
               </div>
@@ -198,7 +198,7 @@ const ReviewSidebar = React.memo(
               {/* Title Section */}
               <div className="space-y-2">
                 <Label htmlFor="title" className="text-base font-semibold text-shop_dark_green">
-                  Review Title <span className="text-red-500">*</span>
+                  Review Title <span className="text-[#cf6f93]">*</span>
                 </Label>
                 <Input
                   id="title"
@@ -208,32 +208,32 @@ const ReviewSidebar = React.memo(
                   maxLength={100}
                   required
                   disabled={isSubmitting}
-                  className={`border-gray-300 focus:border-shop_light_green ${
-                    titleLength > 0 && !isTitleValid ? 'border-red-300' : ''
+                  className={`border-shop_light_green/20 focus:border-shop_light_green ${
+                    titleLength > 0 && !isTitleValid ? 'border-[#edbfd2]' : ''
                   }`}
                 />
                 <div className="flex items-center justify-between">
                   <p
                     className={`text-xs ${
                       titleLength > 0 && !isTitleValid
-                        ? 'text-red-500'
+                        ? 'text-[#c56a8f]'
                         : titleLength >= 5
-                          ? 'text-green-600'
-                          : 'text-gray-500'
+                          ? 'text-shop_dark_green'
+                          : 'text-dark-text'
                     }`}
                   >
                     {titleLength < 5
                       ? `${5 - titleLength} more characters needed`
                       : '✓ Title looks good'}
                   </p>
-                  <p className="text-xs text-gray-500">{titleLength}/100</p>
+                  <p className="text-xs text-dark-text">{titleLength}/100</p>
                 </div>
               </div>
 
               {/* Content Section */}
               <div className="space-y-2">
                 <Label htmlFor="content" className="text-base font-semibold text-shop_dark_green">
-                  Your Review <span className="text-red-500">*</span>
+                  Your Review <span className="text-[#cf6f93]">*</span>
                 </Label>
                 <Textarea
                   id="content"
@@ -244,32 +244,32 @@ const ReviewSidebar = React.memo(
                   rows={8}
                   required
                   disabled={isSubmitting}
-                  className={`border-gray-300 focus:border-shop_light_green resize-none ${
-                    contentLength > 0 && !isContentValid ? 'border-red-300' : ''
+                  className={`resize-none border-shop_light_green/20 focus:border-shop_light_green ${
+                    contentLength > 0 && !isContentValid ? 'border-[#edbfd2]' : ''
                   }`}
                 />
                 <div className="flex items-center justify-between">
                   <p
                     className={`text-xs ${
                       contentLength > 0 && !isContentValid
-                        ? 'text-red-500'
+                        ? 'text-[#c56a8f]'
                         : contentLength >= 20
-                          ? 'text-green-600'
-                          : 'text-gray-500'
+                          ? 'text-shop_dark_green'
+                          : 'text-dark-text'
                     }`}
                   >
                     {contentLength < 20
                       ? `${20 - contentLength} more characters needed`
                       : '✓ Review is detailed enough'}
                   </p>
-                  <p className="text-xs text-gray-500">{contentLength}/1000</p>
+                  <p className="text-xs text-dark-text">{contentLength}/1000</p>
                 </div>
               </div>
 
               {/* Guidelines */}
-              <div className="bg-blue-50 border border-blue-200 rounded-md p-4 space-y-2">
-                <h4 className="text-sm font-semibold text-blue-900">Review Guidelines</h4>
-                <ul className="text-xs text-blue-700 space-y-1 list-disc list-inside">
+              <div className="space-y-2 rounded-md border border-shop_light_blue/35 bg-shop_light_blue/35 p-4">
+                <h4 className="text-sm font-semibold text-shop_dark_blue">Review Guidelines</h4>
+                <ul className="list-inside list-disc space-y-1 text-xs text-shop_dark_blue">
                   <li>Be honest and constructive in your feedback</li>
                   <li>Focus on your experience with the product</li>
                   <li>Your review will be published after admin approval</li>
@@ -293,7 +293,7 @@ const ReviewSidebar = React.memo(
                 <Button
                   type="submit"
                   disabled={isSubmitting || rating === 0 || !isTitleValid || !isContentValid}
-                  className="w-full sm:flex-1 bg-shop_dark_green hover:bg-shop_light_green text-white disabled:opacity-50"
+                  className="w-full sm:flex-1 text-white disabled:opacity-50"
                 >
                   {isSubmitting ? (
                     <>

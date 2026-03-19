@@ -5,6 +5,7 @@ export const getOrderById = async (orderId: string, accessToken?: string) => {
   return fetchServiceJsonServer<Order>(`/orders/${orderId}`, {
     service: 'system',
     accessToken,
+    cache: 'no-store',
   });
 };
 

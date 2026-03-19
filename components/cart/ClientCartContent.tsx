@@ -12,6 +12,7 @@ interface Address {
   name: string;
   email: string;
   address: string;
+  addressName: string;
   city: string;
   state: string;
   zip: string;
@@ -36,15 +37,13 @@ interface UserData {
 }
 
 export function ClientCartContent() {
-  const { isLoading: isLoaded, currentUser: user } = useUserData();
+  const { authReady, isAuthenticated, currentUser: user } = useUserData();
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchUserData = useCallback(async () => {
-    if (!isLoaded || !user) return;
-
-    const userEmail = user.email;
+    const userEmail = user?.email;
     if (!userEmail) {
       setError('Email not found. Please contact support.');
       setLoading(false);
@@ -61,14 +60,15 @@ export function ClientCartContent() {
         throw new Error('Failed to fetch user data');
       }
 
-      const data = await response.json();
+      const payload = await response.json();
+      const data = payload?.data ?? payload;
       setUserData(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load user data');
     } finally {
       setLoading(false);
     }
-  }, [isLoaded, user]);
+  }, [user]);
 
   const refreshAddresses = async () => {
     if (!user) return;
@@ -93,14 +93,21 @@ export function ClientCartContent() {
   };
 
   useEffect(() => {
-    fetchUserData();
-    // Track cart view
-    if (user) {
-      trackCartView(user.email || user.id);
-    }
-  }, [user, fetchUserData]);
+    if (!authReady) return;
 
-  if (!isLoaded || loading) {
+    if (!isAuthenticated || !user) {
+      setLoading(false);
+      setUserData(null);
+      return;
+    }
+
+    fetchUserData();
+
+    // Track cart view
+    trackCartView(user.email || user.id);
+  }, [authReady, isAuthenticated, user, fetchUserData]);
+
+  if (loading) {
     return <CartSkeleton />;
   }
 
@@ -119,7 +126,6 @@ export function ClientCartContent() {
       </div>
     );
   }
-
   const userEmail = user.email!;
 
   return (

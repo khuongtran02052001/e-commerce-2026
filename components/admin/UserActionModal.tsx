@@ -4,7 +4,7 @@ import { Dialog, DialogOverlay, DialogPortal, DialogTitle } from '@/components/u
 import { cn } from '@/lib/utils';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
-import { AlertTriangle, Database, Trash2, UserCheck, UserX, X } from 'lucide-react';
+import { AlertTriangle, Trash2, UserCheck, UserX, X } from 'lucide-react';
 import { FC } from 'react';
 
 interface UserActionModalProps {
@@ -16,7 +16,6 @@ interface UserActionModalProps {
     lastName: string;
     email: string;
     isActive: boolean;
-    inSanity: boolean;
     notificationCount?: number;
   } | null;
   action: 'activate' | 'deactivate' | 'delete' | null;
@@ -37,52 +36,43 @@ export const UserActionModal: FC<UserActionModalProps> = ({
     switch (action) {
       case 'activate':
         return {
-          title: user.inSanity ? 'Activate User in Sanity' : 'Add User to Sanity',
+          title: 'Activate User',
           icon: <UserCheck className="h-5 w-5 text-green-600" />,
-          description: user.inSanity
-            ? 'This will activate the user in Sanity, allowing them to receive notifications.'
-            : 'This will create a new user record in Sanity and activate them for notifications.',
-          confirmText: user.inSanity ? 'Activate User' : 'Add to Sanity',
+          description: 'This will activate the user account and allow access to protected areas.',
+          confirmText: 'Activate User',
           confirmVariant: 'default' as const,
           consequences: [
-            user.inSanity
-              ? 'User will be activated in Sanity'
-              : 'User will be created in Sanity database',
-            'User will be able to receive notifications',
-            'User data will be synchronized with Clerk',
+            'User account will be activated',
+            'User will be able to access protected features',
             'Action will be logged with your admin email',
           ],
         };
 
       case 'deactivate':
         return {
-          title: 'Deactivate User in Sanity',
+          title: 'Deactivate User',
           icon: <UserX className="h-5 w-5 text-orange-600" />,
-          description:
-            'This will deactivate the user in Sanity. They will no longer receive notifications.',
+          description: 'This will deactivate the user account and block access.',
           confirmText: 'Deactivate User',
           confirmVariant: 'destructive' as const,
           consequences: [
-            'User will be deactivated in Sanity',
-            'User will NOT receive any notifications',
-            'User data will remain in Sanity but marked as inactive',
+            'User account will be deactivated',
+            'User will NOT be able to access protected features',
             'User can be reactivated later if needed',
           ],
         };
 
       case 'delete':
         return {
-          title: 'Delete User from Sanity',
+          title: 'Delete User',
           icon: <Trash2 className="h-5 w-5 text-red-600" />,
-          description: 'This will permanently delete the user record from Sanity database.',
-          confirmText: 'Delete from Sanity',
+          description: 'This will permanently delete the user record.',
+          confirmText: 'Delete User',
           confirmVariant: 'destructive' as const,
           consequences: [
-            'User record will be permanently deleted from Sanity',
-            'All user data, preferences, and history will be lost',
-            'User will no longer receive notifications',
+            'User record will be permanently deleted',
+            'All user data and history will be lost',
             'This action CANNOT be undone',
-            'User will remain in Clerk authentication system',
           ],
         };
 
@@ -144,10 +134,6 @@ export const UserActionModal: FC<UserActionModalProps> = ({
               <div className="flex gap-2 mt-3 justify-center">
                 <Badge variant={user.isActive ? 'default' : 'secondary'}>
                   {user.isActive ? 'Active' : 'Inactive'}
-                </Badge>
-                <Badge variant={user.inSanity ? 'default' : 'outline'}>
-                  <Database className="h-3 w-3 mr-1" />
-                  {user.inSanity ? 'In Sanity' : 'Clerk Only'}
                 </Badge>
                 {user.notificationCount && user.notificationCount > 0 && (
                   <Badge variant="outline" className="text-xs">
@@ -219,7 +205,7 @@ export const UserActionModal: FC<UserActionModalProps> = ({
                 <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5 animate-pulse" />
                 <div className="text-sm text-red-800">
                   {action === 'delete'
-                    ? 'This action is permanent and cannot be undone. The user will lose all their Sanity data.'
+                    ? 'This action is permanent and cannot be undone.'
                     : `This user has received ${user.notificationCount} notifications. Deactivating will prevent future notifications.`}
                 </div>
               </div>

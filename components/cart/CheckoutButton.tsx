@@ -14,12 +14,13 @@ import { OrderPlacementOverlay } from './OrderPlacementSkeleton';
 
 interface Address {
   id: string;
-  name: string;
+  addressName: string;
   email: string;
   address: string;
   city: string;
   state: string;
   zip: string;
+  phone?: string;
   default: boolean;
   createdAt: string;
 }

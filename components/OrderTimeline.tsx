@@ -1,6 +1,12 @@
 'use client';
 
 import { cn } from '@/lib/utils';
+import {
+  formatOrderActor,
+  Order,
+  ORDER_WORKFLOW_STAGE_INDEX,
+  requiresOrderCashCollection,
+} from '@/types/domain/order';
 import { format } from 'date-fns';
 import {
   CheckCircle,
@@ -27,25 +33,28 @@ interface TimelineEvent {
 }
 
 interface OrderTimelineProps {
-  order: {
-    orderDate: string;
-    addressConfirmedAt?: string;
-    addressConfirmedBy?: string;
-    orderConfirmedAt?: string;
-    orderConfirmedBy?: string;
-    packedAt?: string;
-    packedBy?: string;
-    paymentCompletedAt?: string;
-    paymentStatus: string;
-    cashCollectedAt?: string;
-    deliveredAt?: string;
-    deliveredBy?: string;
-    assignedDeliverymanName?: string;
-    dispatchedAt?: string;
-    status: string;
-    cancelledAt?: string;
-    cancelledBy?: string;
-  };
+  order: Pick<
+    Order,
+    | 'orderDate'
+    | 'addressConfirmedAt'
+    | 'addressConfirmedBy'
+    | 'orderConfirmedAt'
+    | 'orderConfirmedBy'
+    | 'packedAt'
+    | 'packedBy'
+    | 'paymentCompletedAt'
+    | 'paymentReceivedAt'
+    | 'paymentStatus'
+    | 'paymentMethod'
+    | 'cashCollectedAt'
+    | 'deliveredAt'
+    | 'deliveredBy'
+    | 'assignedDeliverymanName'
+    | 'dispatchedAt'
+    | 'status'
+    | 'cancelledAt'
+    | 'cancelledBy'
+  >;
 }
 
 const OrderTimeline: React.FC<OrderTimelineProps> = ({ order }) => {
@@ -74,13 +83,15 @@ const OrderTimeline: React.FC<OrderTimelineProps> = ({ order }) => {
     const isCancelled = order.status === 'cancelled';
 
     // Determine current status for proper "current" highlighting
-    const isAddressConfirmed = !!order.addressConfirmedAt;
-    const isOrderConfirmed = !!order.orderConfirmedAt;
-    const isPacked = !!order.packedAt;
-    const isDispatched = !!(order.dispatchedAt || order.assignedDeliverymanName);
-    const isCashCollected = !!order.cashCollectedAt;
-    const isDelivered = !!order.deliveredAt;
-    const isCOD = order.paymentStatus === 'pending';
+    const normalizedStatus = String(order.status || '').toLowerCase();
+    const stage = ORDER_WORKFLOW_STAGE_INDEX[normalizedStatus] ?? -1;
+    const isAddressConfirmed = !!order.addressConfirmedAt || stage >= 1;
+    const isOrderConfirmed = !!order.orderConfirmedAt || stage >= 2;
+    const isPacked = !!order.packedAt || stage >= 3;
+    const isDispatched = !!(order.dispatchedAt || order.assignedDeliverymanName) || stage >= 4;
+    const isCashCollected = !!order.cashCollectedAt || stage >= 7;
+    const isDelivered = !!order.deliveredAt || stage >= 6;
+    const isCOD = requiresOrderCashCollection(order);
 
     // 1. Order Placed - Always completed
     events.push({
@@ -107,13 +118,13 @@ const OrderTimeline: React.FC<OrderTimelineProps> = ({ order }) => {
     if (isAddressConfirmed) {
       events.push({
         title: 'Address Confirmed',
-        description: order.addressConfirmedBy
-          ? `Confirmed by ${order.addressConfirmedBy}`
+        description: formatOrderActor(order.addressConfirmedBy)
+          ? `Confirmed by ${formatOrderActor(order.addressConfirmedBy)}`
           : 'Delivery address verified',
         date: order.addressConfirmedAt,
         status: 'completed',
         icon: <MapPin className="w-5 h-5" />,
-        employee: order.addressConfirmedBy,
+        employee: formatOrderActor(order.addressConfirmedBy),
       });
     } else {
       events.push({
@@ -128,13 +139,13 @@ const OrderTimeline: React.FC<OrderTimelineProps> = ({ order }) => {
     if (isOrderConfirmed) {
       events.push({
         title: 'Order Confirmed',
-        description: order.orderConfirmedBy
-          ? `Confirmed by ${order.orderConfirmedBy}`
+        description: formatOrderActor(order.orderConfirmedBy)
+          ? `Confirmed by ${formatOrderActor(order.orderConfirmedBy)}`
           : 'Order has been confirmed',
         date: order.orderConfirmedAt,
         status: 'completed',
         icon: <CheckCircle className="w-5 h-5" />,
-        employee: order.orderConfirmedBy,
+        employee: formatOrderActor(order.orderConfirmedBy),
       });
     } else {
       events.push({
@@ -149,11 +160,13 @@ const OrderTimeline: React.FC<OrderTimelineProps> = ({ order }) => {
     if (isPacked) {
       events.push({
         title: 'Order Packed',
-        description: order.packedBy ? `Packed by ${order.packedBy}` : 'Your order has been packed',
+        description: formatOrderActor(order.packedBy)
+          ? `Packed by ${formatOrderActor(order.packedBy)}`
+          : 'Your order has been packed',
         date: order.packedAt,
         status: 'completed',
         icon: <PackageCheck className="w-5 h-5" />,
-        employee: order.packedBy,
+        employee: formatOrderActor(order.packedBy),
       });
     } else {
       events.push({
@@ -168,13 +181,13 @@ const OrderTimeline: React.FC<OrderTimelineProps> = ({ order }) => {
     if (isDispatched) {
       events.push({
         title: 'Out for Delivery',
-        description: order.assignedDeliverymanName
-          ? `Assigned to ${order.assignedDeliverymanName}`
+        description: formatOrderActor(order.assignedDeliverymanName)
+          ? `Assigned to ${formatOrderActor(order.assignedDeliverymanName)}`
           : 'Order is out for delivery',
         date: order.dispatchedAt,
         status: 'completed',
         icon: <Truck className="w-5 h-5" />,
-        employee: order.assignedDeliverymanName,
+        employee: formatOrderActor(order.assignedDeliverymanName),
       });
     } else {
       events.push({
@@ -203,12 +216,12 @@ const OrderTimeline: React.FC<OrderTimelineProps> = ({ order }) => {
           icon: <DollarSign className="w-5 h-5" />,
         });
       }
-    } else if (order.paymentCompletedAt && !isCashCollected) {
+    } else if ((order.paymentCompletedAt || order.paymentReceivedAt) && !isCashCollected) {
       // Online payment already completed
       events.push({
         title: 'Payment Received',
         description: 'Payment completed online',
-        date: order.paymentCompletedAt,
+        date: order.paymentCompletedAt || order.paymentReceivedAt,
         status: 'completed',
         icon: <DollarSign className="w-5 h-5" />,
       });
@@ -218,13 +231,13 @@ const OrderTimeline: React.FC<OrderTimelineProps> = ({ order }) => {
     if (isDelivered) {
       events.push({
         title: 'Delivered',
-        description: order.deliveredBy
-          ? `Delivered by ${order.deliveredBy}`
+        description: formatOrderActor(order.deliveredBy)
+          ? `Delivered by ${formatOrderActor(order.deliveredBy)}`
           : 'Order has been delivered successfully',
         date: order.deliveredAt,
         status: 'completed',
         icon: <Package className="w-5 h-5" />,
-        employee: order.deliveredBy,
+        employee: formatOrderActor(order.deliveredBy),
       });
     } else {
       events.push({

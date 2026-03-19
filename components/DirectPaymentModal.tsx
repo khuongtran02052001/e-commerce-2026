@@ -68,7 +68,7 @@ const DirectPaymentModal: React.FC<Props> = ({
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogPortal>
-        <DialogOverlay className="bg-black/60 backdrop-blur-sm" />
+        <DialogOverlay className="bg-shop_dark_green/16 backdrop-blur-[3px]" />
         <DialogPrimitive.Content
           className={cn(
             'fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-6 border-2 border-shop_dark_green/20 bg-white p-8 shadow-2xl duration-300',
@@ -92,7 +92,7 @@ const DirectPaymentModal: React.FC<Props> = ({
                 Secure Payment
                 <Sparkles className="w-5 h-5 text-shop_orange animate-pulse" />
               </h3>
-              <p className="text-gray-600 leading-relaxed">
+              <p className="leading-relaxed text-dark-text">
                 Complete your payment securely with Stripe
               </p>
             </div>
@@ -108,8 +108,8 @@ const DirectPaymentModal: React.FC<Props> = ({
             </div>
 
             <div className="space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-shop_dark_green/10">
-                <span className="text-sm font-medium text-gray-700">Order Number</span>
+              <div className="flex items-center justify-between border-b border-shop_dark_green/10 pb-3">
+                <span className="text-sm font-medium text-dark-text">Order Number</span>
                 <span className="font-bold text-shop_dark_green bg-white px-4 py-1.5 rounded-full text-sm border-2 border-shop_dark_green/20 shadow-sm">
                   #{orderNumber?.slice(-8) || 'N/A'}
                 </span>
@@ -117,7 +117,7 @@ const DirectPaymentModal: React.FC<Props> = ({
 
               <div className="pt-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-lg font-semibold text-gray-700">Total Amount</span>
+                  <span className="text-lg font-semibold text-dark-text">Total Amount</span>
                   <PriceFormatter
                     amount={orderTotal}
                     className="text-3xl font-bold text-shop_dark_green"

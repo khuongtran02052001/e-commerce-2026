@@ -9,13 +9,15 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: 'bg-primary text-primary-foreground hover:bg-primary/90',
+        default:
+          'bg-primary text-primary-foreground shadow-[0_12px_30px_rgba(139,76,114,0.18)] hover:bg-primary/92 hover:shadow-[0_16px_34px_rgba(139,76,114,0.22)]',
         destructive:
-          'bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60',
+          'bg-[#cf6f93] text-white shadow-[0_12px_28px_rgba(207,111,147,0.18)] hover:bg-[#c66086] hover:shadow-[0_14px_30px_rgba(207,111,147,0.22)] focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60',
         outline:
-          'border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50',
-        secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
-        ghost: 'hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50',
+          'border border-shop_light_green/25 bg-white/90 text-foreground shadow-xs hover:border-shop_light_green/40 hover:bg-shop_light_pink/70 hover:text-shop_dark_green dark:bg-input/30 dark:border-input dark:hover:bg-input/50',
+        secondary:
+          'bg-shop_light_pink/80 text-shop_dark_green shadow-[0_10px_24px_rgba(201,124,167,0.12)] hover:bg-shop_light_pink',
+        ghost: 'hover:bg-shop_light_pink/70 hover:text-shop_dark_green dark:hover:bg-accent/50',
         link: 'text-primary underline-offset-4 hover:underline',
       },
       size: {

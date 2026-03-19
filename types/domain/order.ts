@@ -35,21 +35,31 @@ export interface OrderAddress {
   zip?: string;
 }
 
+export interface OrderActor {
+  id?: string;
+  name?: string;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+}
+
+export type OrderActorValue = string | OrderActor | null | undefined;
+
 export interface OrderTrackingFields {
-  addressConfirmedBy?: string;
+  addressConfirmedBy?: OrderActorValue;
   addressConfirmedAt?: string;
-  orderConfirmedBy?: string;
+  orderConfirmedBy?: OrderActorValue;
   orderConfirmedAt?: string;
-  packedBy?: string;
+  packedBy?: OrderActorValue;
   packedAt?: string;
   packingNotes?: string;
-  dispatchedBy?: string;
+  dispatchedBy?: OrderActorValue;
   dispatchedAt?: string;
-  assignedWarehouseBy?: string;
+  assignedWarehouseBy?: OrderActorValue;
   assignedWarehouseAt?: string;
   assignedDeliverymanId?: string;
-  assignedDeliverymanName?: string;
-  deliveredBy?: string;
+  assignedDeliverymanName?: OrderActorValue;
+  deliveredBy?: OrderActorValue;
   deliveredAt?: string;
   deliveryNotes?: string;
   deliveryAttempts?: number;
@@ -58,7 +68,7 @@ export interface OrderTrackingFields {
   cashCollected?: boolean;
   cashCollectedAmount?: number;
   cashCollectedAt?: string;
-  paymentReceivedBy?: string;
+  paymentReceivedBy?: OrderActorValue;
   paymentReceivedById?: string;
   paymentReceivedAt?: string;
 }
@@ -128,6 +138,43 @@ export interface UserOrder extends Partial<
 }
 
 export const getOrderId = (order: UserOrder) => order.id || '';
+
+export const ORDER_WORKFLOW_STAGE_INDEX: Record<string, number> = {
+  pending: 0,
+  address_confirmed: 1,
+  order_confirmed: 2,
+  packed: 3,
+  ready_for_delivery: 4,
+  out_for_delivery: 5,
+  delivered: 6,
+  completed: 7,
+};
+
+export const normalizeOrderStatus = (value?: string | null) =>
+  String(value || '')
+    .trim()
+    .toLowerCase();
+
+export const formatOrderActor = (value?: OrderActorValue): string => {
+  if (!value) return '';
+  if (typeof value === 'string') return value;
+
+  const fullName = [value.firstName, value.lastName].filter(Boolean).join(' ').trim();
+  return value.name || fullName || value.email || value.id || '';
+};
+
+export const requiresOrderCashCollection = (order: {
+  paymentMethod?: string | null;
+  paymentStatus?: string | null;
+}) => {
+  const paymentMethod = normalizeOrderStatus(order.paymentMethod);
+  const paymentStatus = normalizeOrderStatus(order.paymentStatus);
+
+  return (
+    ['cod', 'cash_on_delivery', 'pending'].includes(paymentMethod) ||
+    ['pending', 'cash_on_delivery', 'unpaid'].includes(paymentStatus)
+  );
+};
 
 export const getOrderImageUrl = (product?: {
   image?: string | { url?: string; asset?: { url: string } };

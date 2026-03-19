@@ -386,7 +386,7 @@ const AdminOrders: React.FC = () => {
                             <div className="flex items-center gap-2">
                               <Badge className={statusDisplay.style}>{statusDisplay.text}</Badge>
                               {(order as any).cancellationRequested && (
-                                <Badge className="bg-orange-100 text-orange-800 text-xs">
+                                <Badge className="border border-[#f0d7e5] bg-[#fff3f9] text-[#b16f91] text-xs">
                                   ⏳ Cancellation Pending
                                 </Badge>
                               )}

@@ -37,7 +37,8 @@ interface EmailOrderData {
 
 interface Address {
   id: string;
-  name: string;
+  addressName?: string;
+  name?: string;
   email: string;
   address: string;
   city: string;
@@ -121,16 +122,17 @@ export function useOrderPlacement({ user }: UseOrderPlacementProps) {
     setOrderPlacementState(true, 'validating');
 
     try {
+      const addressName = selectedAddress.addressName || selectedAddress.name || 'Shipping Address';
+
       // Step 1: Validate and prepare order data
       setOrderPlacementState(true, 'creating');
-
       const orderData = {
         items: cartSnapshot.map((item) => ({
           productId: item.product.id,
           quantity: item.quantity,
         })),
         paymentMethod: selectedPaymentMethod,
-        addressName: selectedAddress.name,
+        addressName,
         address: selectedAddress.address,
         city: selectedAddress.city,
         state: selectedAddress.state,
@@ -139,7 +141,6 @@ export function useOrderPlacement({ user }: UseOrderPlacementProps) {
         email: selectedAddress.email,
       };
 
-      // Create order in Sanity first (without email sending)
       const orderResponse = await fetchService('/orders', {
         method: 'POST',
         body: JSON.stringify(orderData),
@@ -164,7 +165,7 @@ export function useOrderPlacement({ user }: UseOrderPlacementProps) {
 
       // Step 2: Send confirmation email
       setOrderPlacementState(true, 'emailing');
-
+      console.log(cartSnapshot);
       const emailData: EmailOrderData = {
         customerName: 'Customer', // Will be filled from order data in API
         customerEmail: user?.email || '',
@@ -178,14 +179,14 @@ export function useOrderPlacement({ user }: UseOrderPlacementProps) {
           name: item.product.name || 'Unknown Product',
           price: item.product.price || 0,
           quantity: item.quantity,
-          image: item.product.images?.[0] || undefined,
+          image: item.product.images?.[0].url || undefined,
         })),
         subtotal,
         shipping,
         tax,
         total,
         shippingAddress: {
-          name: selectedAddress.name,
+          name: addressName,
           street: selectedAddress.address,
           city: selectedAddress.city,
           state: selectedAddress.state,

@@ -51,7 +51,7 @@ const UserDropdown = () => {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <button className="flex items-center gap-2 py-1 px-2 rounded-lg hover:bg-shop_light_bg group border border-shop_dark_green/20 hover:border-shop_dark_green hoverEffect">
+        <button className="group flex max-w-[168px] items-center gap-2 rounded-xl border border-shop_dark_green/18 bg-white/85 px-2.5 py-1.5 hover:bg-shop_light_bg hover:border-shop_dark_green hoverEffect xl:max-w-[188px]">
           <div className="relative">
             {mounted && user?.image && !avatarError ? (
               <img
@@ -64,14 +64,14 @@ const UserDropdown = () => {
                 }}
               />
             ) : (
-              <UserCircle className="w-8 h-8 text-gray-500 group-hover:text-shop_light_green transition-colors" />
+              <UserCircle className="h-8 w-8 text-dark-text transition-colors group-hover:text-shop_light_green" />
             )}
 
-            <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white shadow-sm" />
+            <div className="absolute -bottom-1 -right-1 h-3 w-3 rounded-full border-2 border-white bg-shop_light_green shadow-sm" />
           </div>
 
-          <div className="hidden lg:flex flex-col items-start">
-            <span className="text-sm font-medium text-gray-800 group-hover:text-shop_light_green transition-colors">
+          <div className="hidden min-w-0 lg:flex lg:flex-col lg:items-start">
+            <span className="truncate text-sm font-medium text-dark-color transition-colors group-hover:text-shop_light_green">
               {user?.name || 'Username'}
             </span>
           </div>

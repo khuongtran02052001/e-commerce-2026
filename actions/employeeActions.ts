@@ -2,42 +2,15 @@
 
 import { auth } from '@/lib/auth';
 import { fetchServiceJsonServer } from '@/lib/restClient';
-import { Employee, EmployeeRole, EmployeeStatus } from '@/types/domain/employee';
+import {
+  Employee,
+  EmployeeRole,
+  EmployeeStatus,
+  normalizeEmployeeRole,
+  toApiEmployeeRole,
+} from '@/types/domain/employee';
 
 type ApiAny = Record<string, any>;
-
-const toUiRole = (role?: string): EmployeeRole => {
-  const normalized = String(role || '')
-    .trim()
-    .toUpperCase();
-
-  const map: Record<string, EmployeeRole> = {
-    CALL_CENTER: 'callcenter',
-    CALLCENTER: 'callcenter',
-    PACKER: 'packer',
-    WAREHOUSE: 'warehouse',
-    WARE_HOUSE: 'warehouse',
-    DELIVERYMAN: 'deliveryman',
-    DELIVERY_MAN: 'deliveryman',
-    INCHARGE: 'incharge',
-    IN_CHARGE: 'incharge',
-    ACCOUNTS: 'accounts',
-  };
-
-  return map[normalized] ?? 'callcenter';
-};
-
-const toApiRole = (role: EmployeeRole): string => {
-  const map: Record<EmployeeRole, string> = {
-    callcenter: 'CALL_CENTER',
-    packer: 'PACKER',
-    warehouse: 'WARE_HOUSE',
-    deliveryman: 'DELIVERYMAN',
-    incharge: 'IN_CHARGE',
-    accounts: 'ACCOUNTS',
-  };
-  return map[role];
-};
 
 const normalizeEmployee = (value: ApiAny): Employee => {
   const id = value?.id || value?.userId || '';
@@ -47,7 +20,7 @@ const normalizeEmployee = (value: ApiAny): Employee => {
     email: value?.email || '',
     firstName: value?.firstName || '',
     lastName: value?.lastName || '',
-    role: toUiRole(value?.role || value?.employeeRole),
+    role: normalizeEmployeeRole(value?.employeeRole ?? value?.role),
     status: String(
       value?.status || value?.employeeStatus || 'active',
     ).toLowerCase() as EmployeeStatus,
@@ -136,7 +109,7 @@ export async function getAllEmployees(): Promise<Employee[]> {
 export async function getEmployeesByRole(role: EmployeeRole): Promise<Employee[]> {
   try {
     const session = await getSessionOrUnauthorized();
-    const apiRole = toApiRole(role);
+    const apiRole = toApiEmployeeRole(role);
     const roleCandidates = Array.from(
       new Set([
         apiRole,
@@ -203,7 +176,7 @@ export async function assignEmployeeRole(
     const session = await getSessionOrUnauthorized();
     const res = await fetchServiceJsonServer<ApiAny>('/admin/employees/assign-role', {
       method: 'POST',
-      body: JSON.stringify({ userId, role: toApiRole(role) }),
+      body: JSON.stringify({ userId, role: toApiEmployeeRole(role) }),
       accessToken: session.accessToken,
     });
 
@@ -269,7 +242,7 @@ export async function manageEmployeeUser(payload: {
       method: 'POST',
       body: JSON.stringify({
         email: payload.email,
-        role: toApiRole(payload.role),
+        role: toApiEmployeeRole(payload.role),
         active: payload.active,
       }),
       accessToken: session.accessToken,

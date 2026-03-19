@@ -23,6 +23,7 @@ interface Address {
   id: string;
   name: string;
   email: string;
+  addressName: string;
   address: string;
   city: string;
   state: string;
@@ -62,10 +63,10 @@ export function ServerCartContent({
     resetCart,
     setOrderPlacementState,
   } = useCartStore();
+
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
   const [showClearModal, setShowClearModal] = useState(false);
 
-  // Reset order placement state when cart page loads to clear any stale state
   useEffect(() => {
     setOrderPlacementState(false, 'validating');
   }, [setOrderPlacementState]);
@@ -90,22 +91,12 @@ export function ServerCartContent({
     }
   }, []);
 
-  // New pricing structure:
-  // 1. Subtotal = gross amount (sum of original prices before discount)
-  // 2. Discount = total discount amount
-  // 3. Current total = subtotal - discount
-  // 4. Shipping and tax calculated on current total
-  // 5. Final total = current total + shipping + tax
-
   const grossSubtotal = getSubTotalPrice(); // Gross amount (before discount)
   const totalDiscount = getTotalDiscount(); // Total discount amount
   const currentSubtotal = grossSubtotal - totalDiscount; // After discount
   const shipping = currentSubtotal > 100 ? 0 : 10;
   const tax = currentSubtotal * (parseFloat(process.env.TAX_AMOUNT || '0') || 0);
   const finalTotal = currentSubtotal + shipping + tax;
-
-  // Don't show order placement skeleton in ServerCartContent
-  // The overlay is handled by CheckoutButton component instead
 
   if (!cart || cart.length === 0) {
     return (

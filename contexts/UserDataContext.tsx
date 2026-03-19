@@ -61,6 +61,7 @@ export function UserDataProvider({ children }: { children: React.ReactNode }) {
     data: Omit<UserData, 'currentUser'>;
     timestamp: number;
   } | null>(null);
+  const CACHE_TTL_MS = 2 * 60 * 1000;
 
   const [state, setState] = useState<UserData & { isLoading: boolean }>({
     currentUser: null,
@@ -90,7 +91,7 @@ export function UserDataProvider({ children }: { children: React.ReactNode }) {
         return;
       }
       const now = Date.now();
-      if (!force && cacheRef.current && now - cacheRef.current.timestamp < 30_000) {
+      if (!force && cacheRef.current && now - cacheRef.current.timestamp < CACHE_TTL_MS) {
         setState((prev) => ({
           ...prev,
           ...cacheRef.current!.data,

@@ -38,9 +38,9 @@ export default function ApplicationSuccessNotification({
       subtitle: `Congratulations ${userName}!`,
       description:
         'Your premium account application has been successfully submitted and is now under administrative review.',
-      bgColor: 'from-amber-500 to-yellow-500',
-      iconBg: 'bg-amber-100',
-      iconColor: 'text-amber-600',
+      bgColor: 'from-shop_dark_green via-[#a75f8f] to-shop_light_green',
+      iconBg: 'bg-white/22',
+      iconColor: 'text-white',
       benefits: [
         'Exclusive premium features access',
         'Priority customer support',
@@ -53,9 +53,9 @@ export default function ApplicationSuccessNotification({
       subtitle: `Excellent choice ${userName}!`,
       description:
         'Your business account application has been submitted and is under review for approval.',
-      bgColor: 'from-blue-500 to-indigo-500',
-      iconBg: 'bg-blue-100',
-      iconColor: 'text-blue-600',
+      bgColor: 'from-shop_dark_green via-[#9f6eb2] to-shop_dark_blue',
+      iconBg: 'bg-white/22',
+      iconColor: 'text-white',
       benefits: [
         '2% additional discount on all orders',
         'Priority business support',
@@ -68,9 +68,9 @@ export default function ApplicationSuccessNotification({
   const currentConfig = config[type];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-shop_dark_green/16 p-4 backdrop-blur-[3px]">
       <div
-        className={`max-w-lg w-full bg-white rounded-2xl shadow-2xl border border-gray-200 transform transition-all duration-500 ${
+        className={`max-w-lg w-full transform rounded-2xl border border-shop_light_green/18 bg-white shadow-[0_28px_70px_rgba(139,76,114,0.16)] transition-all duration-500 ${
           isAnimating ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
         }`}
       >
@@ -102,18 +102,18 @@ export default function ApplicationSuccessNotification({
 
         {/* Content */}
         <div className="p-6">
-          <p className="text-gray-700 mb-4">{currentConfig.description}</p>
+          <p className="mb-4 text-dark-color">{currentConfig.description}</p>
 
           {/* Status indicator */}
-          <div className="flex items-center gap-2 mb-4 p-3 bg-amber-50 rounded-lg border border-amber-200">
-            <Clock className="w-4 h-4 text-amber-600 animate-pulse" />
-            <span className="text-amber-800 font-medium text-sm">Status: Pending Review</span>
+          <div className="mb-4 flex items-center gap-2 rounded-lg border border-shop_light_green/18 bg-shop_light_pink/55 p-3">
+            <Clock className="h-4 w-4 animate-pulse text-shop_dark_green" />
+            <span className="text-sm font-medium text-shop_dark_green">Status: Pending Review</span>
           </div>
 
           {/* What's next */}
           <div className="mb-4">
-            <h4 className="font-semibold text-gray-900 mb-2">What happens next?</h4>
-            <ul className="text-sm text-gray-600 space-y-1">
+            <h4 className="mb-2 font-semibold text-dark-color">What happens next?</h4>
+            <ul className="space-y-1 text-sm text-dark-text">
               <li>• Admin team will review your application within 24-48 hours</li>
               <li>• You&apos;ll receive an email notification once status changes</li>
               <li>• Upon approval, benefits will be activated immediately</li>

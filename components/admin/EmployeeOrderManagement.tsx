@@ -7,9 +7,9 @@ import {
   confirmOrder,
   getOrderWorkflow,
   getOrdersForEmployee,
-  markFailedDelivery,
   markAsDelivered,
   markAsPacked,
+  markFailedDelivery,
   receivePaymentFromDeliveryman,
   rescheduleDelivery,
   startDelivery,
@@ -33,9 +33,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
 import { Employee, OrderWithTracking, getRoleDisplayName } from '@/types/domain/employee';
+import {
+  formatOrderActor,
+  normalizeOrderStatus,
+  requiresOrderCashCollection,
+} from '@/types/domain/order';
 import {
   CheckCircle,
   Clock,
@@ -49,8 +54,6 @@ import {
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
-const normalizeStatus = (value?: string) => String(value || '').trim().toLowerCase();
-
 const WORKFLOW_STAGE_INDEX: Record<string, number> = {
   pending: 0,
   address_confirmed: 1,
@@ -63,14 +66,12 @@ const WORKFLOW_STAGE_INDEX: Record<string, number> = {
 };
 
 const requiresCashCollection = (order: OrderWithTracking) => {
-  const paymentMethod = normalizeStatus(order.paymentMethod);
-  const paymentStatus = normalizeStatus(order.paymentStatus);
-  return paymentMethod === 'cod' && (paymentStatus === 'pending' || paymentStatus === 'unpaid');
+  return requiresOrderCashCollection(order);
 };
 
 const getOrderWorkflowFlags = (order: OrderWithTracking) => {
   const tracking = order.tracking || {};
-  const status = normalizeStatus(order.status);
+  const status = normalizeOrderStatus(order.status);
   const stage = WORKFLOW_STAGE_INDEX[status] ?? -1;
 
   const hasAddressConfirmed = Boolean(tracking.addressConfirmedBy) || stage >= 1;
@@ -84,7 +85,9 @@ const getOrderWorkflowFlags = (order: OrderWithTracking) => {
     status === 'rescheduled';
   const hasDelivered = Boolean(tracking.deliveredBy) || stage >= 6;
   const hasPaymentReceived =
-    Boolean(tracking.paymentReceivedBy) || normalizeStatus(order.paymentStatus) === 'paid' || stage >= 7;
+    Boolean(tracking.paymentReceivedBy) ||
+    normalizeOrderStatus(order.paymentStatus) === 'paid' ||
+    stage >= 7;
 
   const isTerminal = ['cancelled', 'refunded', 'failed'].includes(status);
 
@@ -125,12 +128,14 @@ export default function EmployeeOrderManagement() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [currentEmp, ordersData, deliverymenData] = await Promise.all([
+      const [currentEmp, ordersData] = await Promise.all([
         getCurrentEmployee(),
         getOrdersForEmployee(),
-        getEmployeesByRole('deliveryman'),
       ]);
-
+      let deliverymenData: Employee[] = [];
+      if (currentEmp && (currentEmp.role === 'packer' || currentEmp.role === 'incharge')) {
+        deliverymenData = await getEmployeesByRole('deliveryman');
+      }
       setEmployee(currentEmp);
       setOrders(ordersData);
       setDeliverymen(deliverymenData);
@@ -141,7 +146,6 @@ export default function EmployeeOrderManagement() {
       setLoading(false);
     }
   };
-
   const handleAction = async () => {
     if (!selectedOrder) return;
     const needCashCollection = requiresCashCollection(selectedOrder);
@@ -228,6 +232,7 @@ export default function EmployeeOrderManagement() {
     setLoadingWorkflowOrderId(orderId);
     try {
       const logs = await getOrderWorkflow(orderId);
+      console.log(logs);
       setWorkflowLogsByOrder((prev) => ({ ...prev, [orderId]: logs || [] }));
     } catch (error) {
       console.error('Failed to load workflow logs:', error);
@@ -269,6 +274,7 @@ export default function EmployeeOrderManagement() {
         return (
           (employee.role === 'deliveryman' || employee.role === 'incharge') &&
           flags.hasAssignedDeliveryman &&
+          flags.hasStartedDelivery &&
           !flags.hasDelivered &&
           !flags.isTerminal
         );
@@ -284,6 +290,7 @@ export default function EmployeeOrderManagement() {
         return (
           (employee.role === 'deliveryman' || employee.role === 'incharge') &&
           flags.hasAssignedDeliveryman &&
+          flags.hasStartedDelivery &&
           !flags.hasDelivered &&
           !flags.isTerminal
         );
@@ -291,6 +298,7 @@ export default function EmployeeOrderManagement() {
         return (
           (employee.role === 'deliveryman' || employee.role === 'incharge') &&
           flags.hasAssignedDeliveryman &&
+          flags.hasStartedDelivery &&
           !flags.hasDelivered &&
           !flags.isTerminal
         );
@@ -325,7 +333,9 @@ export default function EmployeeOrderManagement() {
         return canPerformAction(order, 'confirmAddress') || canPerformAction(order, 'confirmOrder');
       }
       if (currentRole === 'packer') {
-        return canPerformAction(order, 'markPacked') || canPerformAction(order, 'assignDeliveryman');
+        return (
+          canPerformAction(order, 'markPacked') || canPerformAction(order, 'assignDeliveryman')
+        );
       }
       if (currentRole === 'deliveryman') {
         return (
@@ -434,7 +444,10 @@ export default function EmployeeOrderManagement() {
         </div>
       </div>
 
-      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'orders' | 'workflow')}>
+      <Tabs
+        value={activeTab}
+        onValueChange={(value) => setActiveTab(value as 'orders' | 'workflow')}
+      >
         <TabsList className="mb-6">
           <TabsTrigger value="orders">Orders</TabsTrigger>
           <TabsTrigger value="workflow">Workflow Logs</TabsTrigger>
@@ -514,30 +527,38 @@ export default function EmployeeOrderManagement() {
                         <div className="space-y-1 text-xs">
                           {order.tracking.addressConfirmedBy && (
                             <p className="text-gray-600">
-                              ✓ Address confirmed by {order.tracking.addressConfirmedBy}
+                              ✓ Address confirmed by{' '}
+                              {formatOrderActor(order.tracking.addressConfirmedBy) || 'Unknown'}
                             </p>
                           )}
                           {order.tracking.orderConfirmedBy && (
                             <p className="text-gray-600">
-                              ✓ Order confirmed by {order.tracking.orderConfirmedBy}
+                              ✓ Order confirmed by{' '}
+                              {formatOrderActor(order.tracking.orderConfirmedBy) || 'Unknown'}
                             </p>
                           )}
                           {order.tracking.packedBy && (
-                            <p className="text-gray-600">✓ Packed by {order.tracking.packedBy}</p>
+                            <p className="text-gray-600">
+                              ✓ Packed by {formatOrderActor(order.tracking.packedBy) || 'Unknown'}
+                            </p>
                           )}
                           {order.tracking.assignedDeliverymanName && (
                             <p className="text-gray-600">
-                              ✓ Assigned to {order.tracking.assignedDeliverymanName}
+                              ✓ Assigned to{' '}
+                              {formatOrderActor(order.tracking.assignedDeliverymanName) ||
+                                'Unknown'}
                             </p>
                           )}
                           {order.tracking.deliveredBy && (
                             <p className="text-gray-600">
-                              ✓ Delivered by {order.tracking.deliveredBy}
+                              ✓ Delivered by{' '}
+                              {formatOrderActor(order.tracking.deliveredBy) || 'Unknown'}
                             </p>
                           )}
                           {order.tracking.paymentReceivedBy && (
                             <p className="text-gray-600">
-                              ✓ Payment received by {order.tracking.paymentReceivedBy}
+                              ✓ Payment received by{' '}
+                              {formatOrderActor(order.tracking.paymentReceivedBy) || 'Unknown'}
                             </p>
                           )}
                         </div>
@@ -734,17 +755,24 @@ export default function EmployeeOrderManagement() {
                       ) : (
                         <div className="space-y-2">
                           {(workflowLogsByOrder[order.id] || []).map((log, index) => (
-                            <div key={`${order.id}-wf-tab-${index}`} className="bg-white border rounded p-2 text-xs">
+                            <div
+                              key={`${order.id}-wf-tab-${index}`}
+                              className="bg-white border rounded p-2 text-xs"
+                            >
                               <p className="font-medium text-gray-800">
                                 {String(log?.action || log?.status || 'Action')}
                               </p>
                               <p className="text-gray-600">
-                                {String(log?.performedBy || log?.changedBy || log?.userEmail || 'Unknown')} -{' '}
-                                {String(log?.role || log?.changedByRole || 'system')}
+                                {String(
+                                  log?.performedBy || log?.changedBy || log?.userEmail || 'Unknown',
+                                )}{' '}
+                                - {String(log?.role || log?.changedByRole || 'system')}
                               </p>
                               <p className="text-gray-500">
                                 {log?.createdAt || log?.timestamp || log?.changedAt
-                                  ? new Date(log?.createdAt || log?.timestamp || log?.changedAt).toLocaleString()
+                                  ? new Date(
+                                      log?.createdAt || log?.timestamp || log?.changedAt,
+                                    ).toLocaleString()
                                   : '-'}
                               </p>
                             </div>

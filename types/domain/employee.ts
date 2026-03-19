@@ -1,10 +1,39 @@
+import type { OrderActorValue } from './order';
+
 export type EmployeeRole =
   | 'callcenter'
   | 'packer'
-  | 'warehouse'
   | 'deliveryman'
   | 'incharge'
   | 'accounts';
+
+export const API_ROLE_MAP: Record<string, EmployeeRole> = {
+  CALL_CENTER: 'callcenter',
+  CALLCENTER: 'callcenter',
+  PACKER: 'packer',
+  WARE_HOUSE: 'packer',
+  WAREHOUSE: 'packer',
+  DELIVERYMAN: 'deliveryman',
+  DELIVERY_MAN: 'deliveryman',
+  INCHARGE: 'incharge',
+  IN_CHARGE: 'incharge',
+  ACCOUNTS: 'accounts',
+};
+
+export const UI_TO_API_ROLE_MAP: Record<EmployeeRole, string> = {
+  callcenter: 'CALL_CENTER',
+  packer: 'PACKER',
+  deliveryman: 'DELIVERY_MAN',
+  incharge: 'INCHARGE',
+  accounts: 'ACCOUNTS',
+};
+
+export const normalizeEmployeeRole = (role?: string): EmployeeRole => {
+  const normalized = String(role || '').trim().toUpperCase();
+  return API_ROLE_MAP[normalized] ?? 'callcenter';
+};
+
+export const toApiEmployeeRole = (role: EmployeeRole): string => UI_TO_API_ROLE_MAP[role];
 
 export type EmployeeStatus = 'active' | 'inactive' | 'suspended';
 
@@ -62,20 +91,20 @@ export interface OrderStatusHistoryItem {
 }
 
 export interface OrderEmployeeTracking {
-  addressConfirmedBy?: string;
+  addressConfirmedBy?: OrderActorValue;
   addressConfirmedAt?: string;
-  orderConfirmedBy?: string;
+  orderConfirmedBy?: OrderActorValue;
   orderConfirmedAt?: string;
-  packedBy?: string;
+  packedBy?: OrderActorValue;
   packedAt?: string;
   packingNotes?: string;
-  assignedWarehouseBy?: string;
+  assignedWarehouseBy?: OrderActorValue;
   assignedWarehouseAt?: string;
-  dispatchedBy?: string;
+  dispatchedBy?: OrderActorValue;
   dispatchedAt?: string;
   assignedDeliverymanId?: string;
-  assignedDeliverymanName?: string;
-  deliveredBy?: string;
+  assignedDeliverymanName?: OrderActorValue;
+  deliveredBy?: OrderActorValue;
   deliveredAt?: string;
   deliveryNotes?: string;
   deliveryAttempts?: number;
@@ -85,12 +114,12 @@ export interface OrderEmployeeTracking {
   cashCollectedAmount?: number;
   cashCollectedAt?: string;
   cashSubmittedToAccounts?: boolean;
-  cashSubmittedBy?: string;
+  cashSubmittedBy?: OrderActorValue;
   cashSubmittedAt?: string;
   cashSubmissionNotes?: string;
   assignedAccountsEmployeeId?: string;
-  assignedAccountsEmployeeName?: string;
-  paymentReceivedBy?: string;
+  assignedAccountsEmployeeName?: OrderActorValue;
+  paymentReceivedBy?: OrderActorValue;
   paymentReceivedAt?: string;
   statusHistory?: OrderStatusHistoryItem[];
 }
@@ -142,23 +171,11 @@ export const ROLE_PERMISSIONS: Record<EmployeeRole, EmployeePermissions> = {
     canViewOrders: true,
     canConfirmOrders: false,
     canPackOrders: true,
-    canAssignDelivery: false,
-    canDeliverOrders: false,
-    canCollectCash: false,
-    canReceivePayments: false,
-    canViewAnalytics: false,
-    canManageEmployees: false,
-    canAccessAdmin: true,
-  },
-  warehouse: {
-    canViewOrders: true,
-    canConfirmOrders: false,
-    canPackOrders: false,
     canAssignDelivery: true,
     canDeliverOrders: false,
     canCollectCash: false,
     canReceivePayments: false,
-    canViewAnalytics: true,
+    canViewAnalytics: false,
     canManageEmployees: false,
     canAccessAdmin: true,
   },
@@ -204,7 +221,6 @@ export const getRoleDisplayName = (role: EmployeeRole): string => {
   const roleNames: Record<EmployeeRole, string> = {
     callcenter: 'Call Center',
     packer: 'Packer',
-    warehouse: 'Warehouse',
     deliveryman: 'Delivery Man',
     incharge: 'In-Charge',
     accounts: 'Accounts',
@@ -216,7 +232,6 @@ export const getRoleBadgeColor = (role: EmployeeRole): string => {
   const colors: Record<EmployeeRole, string> = {
     callcenter: 'bg-blue-100 text-blue-800',
     packer: 'bg-purple-100 text-purple-800',
-    warehouse: 'bg-orange-100 text-orange-800',
     deliveryman: 'bg-green-100 text-green-800',
     incharge: 'bg-red-100 text-red-800',
     accounts: 'bg-yellow-100 text-yellow-800',
@@ -224,8 +239,5 @@ export const getRoleBadgeColor = (role: EmployeeRole): string => {
   return colors[role];
 };
 
-export const hasPermission = (
-  role: EmployeeRole,
-  permission: keyof EmployeePermissions,
-): boolean => ROLE_PERMISSIONS[role][permission];
-
+export const hasPermission = (role: EmployeeRole, permission: keyof EmployeePermissions): boolean =>
+  ROLE_PERMISSIONS[role][permission];

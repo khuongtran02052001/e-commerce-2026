@@ -18,13 +18,13 @@ interface Props {
 
 const AuthActions = ({ isAuthenticated, signInUrl, signUpUrl }: Props) => {
   return (
-    <div className="flex items-center gap-2 sm:gap-3 lg:gap-4 ml-auto">
-      <div className="flex-shrink-0">
+    <div className="ml-auto flex min-w-0 items-center gap-2 sm:gap-3 lg:gap-3.5">
+      <div className="shrink-0">
         <SearchBar />
       </div>
 
       {/* ================= Desktop ================= */}
-      <div className="hidden lg:flex items-center gap-4">
+      <div className="hidden shrink-0 items-center gap-3 lg:flex">
         <CartIcon />
         <FavoriteButton />
         <NotificationBell />
@@ -34,8 +34,8 @@ const AuthActions = ({ isAuthenticated, signInUrl, signUpUrl }: Props) => {
 
         {/* Signed Out */}
         {!isAuthenticated && (
-          <div className="flex items-center gap-3">
-            <div className="bg-transparent border border-shop_btn_dark_green hover:bg-shop_btn_dark_green text-shop_btn_dark_green hover:text-white px-2 py-1.5 rounded text-xs font-semibold hoverEffect">
+          <div className="flex items-center gap-2">
+            <div className="rounded-full border border-shop_light_green/30 bg-white/80 px-3 py-1.5 text-xs font-semibold text-shop_dark_green shadow-sm transition-all duration-200 hover:border-shop_light_green/45 hover:bg-shop_light_pink/70">
               <form
                 action={async () => {
                   await signIn();
@@ -46,7 +46,7 @@ const AuthActions = ({ isAuthenticated, signInUrl, signUpUrl }: Props) => {
             </div>
             <Link
               href={signUpUrl}
-              className="bg-shop_btn_dark_green border border-shop_btn_dark_green hover:bg-transparent text-white hover:text-shop_btn_dark_green px-2 py-1.5 rounded text-xs font-semibold hoverEffect"
+              className="rounded-full border border-shop_btn_dark_green bg-shop_btn_dark_green px-3 py-1.5 text-xs font-semibold text-white shadow-[0_10px_24px_rgba(139,76,114,0.18)] transition-all duration-200 hover:bg-shop_dark_green"
             >
               Sign Up
             </Link>
@@ -55,7 +55,7 @@ const AuthActions = ({ isAuthenticated, signInUrl, signUpUrl }: Props) => {
       </div>
 
       {/* ================= Tablet ================= */}
-      <div className="hidden md:flex lg:hidden items-center gap-2">
+      <div className="hidden items-center gap-2 md:flex lg:hidden">
         <CartIcon />
         <FavoriteButton />
         <NotificationBell />
@@ -66,13 +66,13 @@ const AuthActions = ({ isAuthenticated, signInUrl, signUpUrl }: Props) => {
           <div className="flex items-center gap-2">
             <Link
               href={signInUrl}
-              className="text-sm font-semibold hover:text-shop_light_green hoverEffect px-2 py-1 transition-colors duration-200"
+              className="rounded-full px-3 py-1.5 text-sm font-semibold text-shop_dark_green transition-colors duration-200 hover:bg-shop_light_pink/70"
             >
               Sign In
             </Link>
             <Link
               href={signUpUrl}
-              className="bg-shop_dark_green hover:bg-shop_light_green text-white px-3 py-1.5 rounded-md text-sm font-semibold transition-all duration-200"
+              className="rounded-full bg-shop_dark_green px-3 py-1.5 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(139,76,114,0.16)] transition-all duration-200 hover:bg-shop_btn_dark_green"
             >
               Sign Up
             </Link>
@@ -88,13 +88,13 @@ const AuthActions = ({ isAuthenticated, signInUrl, signUpUrl }: Props) => {
           <div className="flex items-center gap-1">
             <Link
               href={signInUrl}
-              className="bg-transparent border border-shop_btn_dark_green hover:bg-shop_btn_dark_green text-shop_btn_dark_green hover:text-white px-2 py-1.5 rounded text-xs font-semibold hoverEffect"
+              className="rounded-full border border-shop_light_green/30 bg-white/80 px-2.5 py-1.5 text-xs font-semibold text-shop_dark_green transition-all duration-200 hover:bg-shop_light_pink/70"
             >
               Sign In
             </Link>
             <Link
               href={signUpUrl}
-              className="bg-shop_btn_dark_green border border-shop_btn_dark_green hover:bg-transparent text-white hover:text-shop_btn_dark_green px-2 py-1.5 rounded text-xs font-semibold hoverEffect"
+              className="rounded-full border border-shop_btn_dark_green bg-shop_btn_dark_green px-2.5 py-1.5 text-xs font-semibold text-white transition-all duration-200 hover:bg-shop_dark_green"
             >
               Sign Up
             </Link>

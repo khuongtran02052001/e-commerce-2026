@@ -174,24 +174,24 @@ const Shop = ({ categories, brands }: Props) => {
           {showMobileFilters && (
             <div className="fixed inset-0 z-50 lg:hidden">
               <div
-                className="fixed inset-0 bg-black/50"
+                className="fixed inset-0 bg-shop_dark_green/16 backdrop-blur-[3px]"
                 onClick={() => setShowMobileFilters(false)}
               />
-              <div className="fixed bottom-0 left-0 right-0 bg-white rounded-t-xl shadow-xl max-h-[80vh] overflow-y-auto">
-                <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-gray-900">Filters</h3>
+              <div className="fixed bottom-0 left-0 right-0 max-h-[80vh] overflow-y-auto rounded-t-xl border-t border-shop_light_green/18 bg-white/98 shadow-[0_-18px_40px_rgba(139,76,114,0.12)]">
+                <div className="flex items-center justify-between border-b border-shop_light_green/15 bg-shop_light_pink/28 p-4">
+                  <h3 className="text-lg font-semibold text-dark-color">Filters</h3>
                   <button
                     onClick={() => setShowMobileFilters(false)}
-                    className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200"
+                    className="rounded-full p-2 transition-colors duration-200 hover:bg-shop_light_pink/70"
                   >
                     <X className="w-5 h-5" />
                   </button>
                 </div>
-                <div className="divide-y divide-gray-100">{FilterLists}</div>
-                <div className="p-4 border-t border-gray-200 bg-gray-50">
+                <div className="divide-y divide-shop_light_green/10">{FilterLists}</div>
+                <div className="border-t border-shop_light_green/15 bg-shop_light_bg/70 p-4">
                   <button
                     onClick={() => setShowMobileFilters(false)}
-                    className="w-full bg-shop_dark_green text-white py-3 px-4 rounded-lg font-medium hover:bg-shop_dark_green/90 transition-colors duration-200"
+                    className="w-full rounded-lg bg-shop_dark_green px-4 py-3 font-medium text-white transition-colors duration-200 hover:bg-shop_btn_dark_green"
                   >
                     Apply Filters
                   </button>

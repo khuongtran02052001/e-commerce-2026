@@ -8,11 +8,11 @@ const WishListPage = async () => {
     <Container className="py-6">
       <DynamicBreadcrumb />
 
-      <div className="flex items-center gap-2 mb-8">
-        <Heart className="w-6 h-6 text-red-500" />
+      <div className="mb-8 flex items-center gap-2">
+        <Heart className="h-6 w-6 text-shop_dark_green" />
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">My Wishlist</h1>
-          <p className="text-gray-600 mt-1">Save your favorite items for later</p>
+          <h1 className="text-3xl font-bold text-dark-color">My Wishlist</h1>
+          <p className="mt-1 text-dark-text">Save your favorite items for later</p>
         </div>
       </div>
 

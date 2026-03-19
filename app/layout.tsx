@@ -104,7 +104,7 @@ const RootLayout = async ({ children }: { children: ReactNode }) => {
   const GADSENSE_CLIENT_ID = '';
   const session = await auth();
   return (
-    <SessionProvider session={session}>
+    <SessionProvider session={session} refetchOnWindowFocus={false} refetchInterval={0}>
       <html lang="en" suppressHydrationWarning>
         <Head>
           <meta name="google-adsense-account" content={GADSENSE_CLIENT_ID} />

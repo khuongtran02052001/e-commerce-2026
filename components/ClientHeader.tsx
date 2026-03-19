@@ -20,23 +20,25 @@ const ClientHeader = () => {
     setSignUpUrl(`/sign-up?redirectTo=${encodeURIComponent(path)}`);
   }, []);
   return (
-    <header className="sticky top-0 z-40 py-2 bg-white/95 backdrop-blur-md border-b">
+    <header className="sticky top-0 z-40 py-2 border-b border-shop_light_green/20 bg-white/92 backdrop-blur-md shadow-[0_10px_30px_rgba(201,124,167,0.08)]">
       <Container>
-        <div className="flex items-center">
-          <div className="flex items-center gap-2">
+        <div className="flex items-center justify-between gap-3 xl:gap-5">
+          <div className="flex shrink-0 items-center gap-2">
             <MobileMenu />
             <Logo />
           </div>
 
-          <div className="hidden lg:flex flex-1 justify-center mx-8">
+          <div className="hidden min-w-0 flex-1 justify-center px-4 lg:flex xl:px-6">
             <HeaderMenu />
           </div>
 
-          <AuthActions
-            isAuthenticated={isAuthenticated}
-            signInUrl={signInUrl}
-            signUpUrl={signUpUrl}
-          />
+          <div className="shrink-0">
+            <AuthActions
+              isAuthenticated={isAuthenticated}
+              signInUrl={signInUrl}
+              signUpUrl={signUpUrl}
+            />
+          </div>
         </div>
       </Container>
     </header>
