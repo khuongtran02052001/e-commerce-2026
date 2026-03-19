@@ -4,7 +4,6 @@ import { auth } from '@/lib/auth';
 import type { Metadata } from 'next';
 import { SessionProvider } from 'next-auth/react';
 import localFont from 'next/font/local';
-import Head from 'next/head';
 import { ReactNode } from 'react';
 import { Toaster } from 'sonner';
 import './globals.css';
@@ -28,7 +27,7 @@ const opensans = localFont({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://yourHttps'),
+  metadataBase: new URL('https://e-commerce-2026-three.vercel.app/'),
   title: {
     template: '%s | ShopCart - Premium Online Shopping',
     default: 'ShopCart - Your Trusted Online Shopping Destination',
@@ -58,7 +57,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://yourHttps',
+    url: 'https://e-commerce-2026-three.vercel.app/',
     siteName: 'ShopCart',
     title: 'ShopCart - Your Trusted Online Shopping Destination',
     description:
@@ -96,22 +95,19 @@ export const metadata: Metadata = {
     // Add other verification codes as needed
   },
   alternates: {
-    canonical: 'https://yourHttps',
+    canonical: 'https://e-commerce-2026-three.vercel.app/',
+  },
+  other: {
+    'google-adsense-account': '',
   },
 };
 
 const RootLayout = async ({ children }: { children: ReactNode }) => {
-  const GADSENSE_CLIENT_ID = '';
   const session = await auth();
   return (
-    <SessionProvider session={session} refetchOnWindowFocus={false} refetchInterval={0}>
-      <html lang="en" suppressHydrationWarning>
-        <Head>
-          <meta name="google-adsense-account" content={GADSENSE_CLIENT_ID} />
-        </Head>
-        <body
-          className={`${poppins.variable} ${raleway.variable} ${opensans.variable} antialiased`}
-        >
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${poppins.variable} ${raleway.variable} ${opensans.variable} antialiased`}>
+        <SessionProvider session={session} refetchOnWindowFocus={false} refetchInterval={0}>
           <UserDataProvider>
             {children}
             <PremiumFloatingButton />
@@ -134,12 +130,12 @@ const RootLayout = async ({ children }: { children: ReactNode }) => {
 
           {/* <Script
             async
-            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${GADSENSE_CLIENT_ID}`}
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=`}
             strategy="beforeInteractive"
           /> */}
-        </body>
-      </html>
-    </SessionProvider>
+        </SessionProvider>
+      </body>
+    </html>
   );
 };
 
