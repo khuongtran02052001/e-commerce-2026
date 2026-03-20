@@ -155,13 +155,26 @@ export async function getEmployeesByRole(role: EmployeeRole): Promise<Employee[]
 export async function getCurrentEmployee(): Promise<Employee | null> {
   try {
     const session = await getSessionOrUnauthorized();
-    const res = await fetchServiceJsonServer<ApiAny>('/admin/employees/me/metrics', {
-      accessToken: session.accessToken,
-      cache: 'no-store',
+    const [meRes, metricsRes] = await Promise.all([
+      fetchServiceJsonServer<ApiAny>('/auth/me', {
+        accessToken: session.accessToken,
+        cache: 'no-store',
+      }),
+      fetchServiceJsonServer<ApiAny>('/admin/employees/me/metrics', {
+        accessToken: session.accessToken,
+        cache: 'no-store',
+      }).catch(() => null),
+    ]);
+
+    const me = unwrapObject(meRes, 'user');
+    if (!me) return null;
+
+    return normalizeEmployee({
+      ...me,
+      metrics: metricsRes ?? {},
+      performance: metricsRes ?? {},
+      status: me?.isActive === false ? 'inactive' : 'active',
     });
-    const employeeLike = unwrapObject(res, 'employee');
-    if (!employeeLike) return null;
-    return normalizeEmployee(employeeLike);
   } catch (err) {
     console.error('Error fetching current employee:', err);
     return null;

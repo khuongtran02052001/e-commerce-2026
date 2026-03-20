@@ -246,9 +246,13 @@ export default function EmployeeOrderManagement() {
     if (!employee) return false;
     const flags = getOrderWorkflowFlags(order);
 
-    switch (action) {
+      switch (action) {
       case 'confirmAddress':
-        return employee.role === 'callcenter' && !flags.hasAddressConfirmed && !flags.isTerminal;
+        return (
+          (employee.role === 'callcenter' || employee.role === 'incharge') &&
+          !flags.hasAddressConfirmed &&
+          !flags.isTerminal
+        );
       case 'confirmOrder':
         return (
           (employee.role === 'callcenter' || employee.role === 'incharge') &&
