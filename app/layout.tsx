@@ -4,6 +4,7 @@ import { auth } from '@/lib/auth';
 import type { Metadata } from 'next';
 import { SessionProvider } from 'next-auth/react';
 import localFont from 'next/font/local';
+import Script from 'next/script';
 import { ReactNode } from 'react';
 import { Toaster } from 'sonner';
 import './globals.css';
@@ -91,14 +92,13 @@ export const metadata: Metadata = {
     },
   },
   verification: {
-    google: 'your-google-verification-code',
-    // Add other verification codes as needed
+    google: `${process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION}`,
   },
   alternates: {
     canonical: 'https://e-commerce-2026-three.vercel.app/',
   },
   other: {
-    'google-adsense-account': '',
+    'google-adsense-account': `${process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_CLIENT_ID}`,
   },
 };
 
@@ -128,11 +128,11 @@ const RootLayout = async ({ children }: { children: ReactNode }) => {
             }}
           />
 
-          {/* <Script
+          <Script
             async
-            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=`}
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_CLIENT_ID}`}
             strategy="beforeInteractive"
-          /> */}
+          />
         </SessionProvider>
       </body>
     </html>

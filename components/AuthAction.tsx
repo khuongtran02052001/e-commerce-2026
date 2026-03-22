@@ -13,10 +13,11 @@ const UserDropdown = dynamic(() => import('./UserDropdown'), {
 interface Props {
   isAuthenticated: boolean;
   signInUrl: string;
-  signUpUrl: string;
+  // signUpUrl: string;
 }
 
-const AuthActions = ({ isAuthenticated, signInUrl, signUpUrl }: Props) => {
+// const AuthActions = ({ isAuthenticated, signInUrl, signUpUrl }: Props) => {
+const AuthActions = ({ isAuthenticated, signInUrl }: Props) => {
   return (
     <div className="ml-auto flex min-w-0 items-center gap-2 sm:gap-3 lg:gap-3.5">
       <div className="shrink-0">
@@ -44,12 +45,12 @@ const AuthActions = ({ isAuthenticated, signInUrl, signUpUrl }: Props) => {
                 <button type="submit">Sign in</button>
               </form>
             </div>
-            <Link
+            {/* <Link
               href={signUpUrl}
               className="rounded-full border border-shop_btn_dark_green bg-shop_btn_dark_green px-3 py-1.5 text-xs font-semibold text-white shadow-[0_10px_24px_rgba(139,76,114,0.18)] transition-all duration-200 hover:bg-shop_dark_green"
             >
               Sign Up
-            </Link>
+            </Link> */}
           </div>
         )}
       </div>
@@ -70,12 +71,12 @@ const AuthActions = ({ isAuthenticated, signInUrl, signUpUrl }: Props) => {
             >
               Sign In
             </Link>
-            <Link
+            {/* <Link
               href={signUpUrl}
               className="rounded-full bg-shop_dark_green px-3 py-1.5 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(139,76,114,0.16)] transition-all duration-200 hover:bg-shop_btn_dark_green"
             >
               Sign Up
-            </Link>
+            </Link> */}
           </div>
         )}
       </div>
@@ -92,12 +93,12 @@ const AuthActions = ({ isAuthenticated, signInUrl, signUpUrl }: Props) => {
             >
               Sign In
             </Link>
-            <Link
+            {/* <Link
               href={signUpUrl}
               className="rounded-full border border-shop_btn_dark_green bg-shop_btn_dark_green px-2.5 py-1.5 text-xs font-semibold text-white transition-all duration-200 hover:bg-shop_dark_green"
             >
               Sign Up
-            </Link>
+            </Link> */}
           </div>
         )}
       </div>
