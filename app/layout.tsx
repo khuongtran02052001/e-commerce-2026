@@ -27,80 +27,82 @@ const opensans = localFont({
   weight: '100 800',
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL('https://e-commerce-2026-three.vercel.app/'),
-  title: {
-    template: '%s | ShopCart - Premium Online Shopping',
-    default: 'ShopCart - Your Trusted Online Shopping Destination',
-  },
-  description:
-    'Discover amazing products at ShopCart, your trusted online shopping destination for quality items and exceptional customer service. Shop electronics, fashion, home goods and more with fast delivery.',
-  keywords: [
-    'online shopping',
-    'e-commerce',
-    'buy online',
-    'shop online',
-    'electronics',
-    'fashion',
-    'home goods',
-    'deals',
-    'discounts',
-    'ShopCart',
-  ],
-  authors: [{ name: 'ShopCart' }],
-  creator: 'ShopCart',
-  publisher: 'ShopCart',
-  formatDetection: {
-    email: false,
-    address: false,
-    telephone: false,
-  },
-  openGraph: {
-    type: 'website',
-    locale: 'en_US',
-    url: 'https://e-commerce-2026-three.vercel.app/',
-    siteName: 'ShopCart',
-    title: 'ShopCart - Your Trusted Online Shopping Destination',
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    metadataBase: new URL('https://e-commerce-2026-three.vercel.app/'),
+    title: {
+      template: '%s | ShopCart - Premium Online Shopping',
+      default: 'ShopCart - Your Trusted Online Shopping Destination',
+    },
     description:
-      'Discover amazing products at ShopCart, your trusted online shopping destination for quality items and exceptional customer service.',
-    images: [
-      {
-        url: '/og-image.jpg',
-        width: 1200,
-        height: 630,
-        alt: 'ShopCart Online Store',
-      },
+      'Discover amazing products at ShopCart, your trusted online shopping destination for quality items and exceptional customer service. Shop electronics, fashion, home goods and more with fast delivery.',
+    keywords: [
+      'online shopping',
+      'e-commerce',
+      'buy online',
+      'shop online',
+      'electronics',
+      'fashion',
+      'home goods',
+      'deals',
+      'discounts',
+      'ShopCart',
     ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'ShopCart - Your Trusted Online Shopping Destination',
-    description:
-      'Discover amazing products at ShopCart, your trusted online shopping destination for quality items and exceptional customer service.',
-    images: ['/og-image.jpg'],
-    creator: '@shopcart',
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
+    authors: [{ name: 'ShopCart' }],
+    creator: 'ShopCart',
+    publisher: 'ShopCart',
+    formatDetection: {
+      email: false,
+      address: false,
+      telephone: false,
+    },
+    openGraph: {
+      type: 'website',
+      locale: 'en_US',
+      url: 'https://e-commerce-2026-three.vercel.app/',
+      siteName: 'ShopCart',
+      title: 'ShopCart - Your Trusted Online Shopping Destination',
+      description:
+        'Discover amazing products at ShopCart, your trusted online shopping destination for quality items and exceptional customer service.',
+      images: [
+        {
+          url: '/og-image.jpg',
+          width: 1200,
+          height: 630,
+          alt: 'ShopCart Online Store',
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: 'ShopCart - Your Trusted Online Shopping Destination',
+      description:
+        'Discover amazing products at ShopCart, your trusted online shopping destination for quality items and exceptional customer service.',
+      images: ['/og-image.jpg'],
+      creator: '@shopcart',
+    },
+    robots: {
       index: true,
       follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
     },
-  },
-  verification: {
-    google: `${process.env.GOOGLE_SITE_VERIFICATION}`,
-  },
-  alternates: {
-    canonical: 'https://e-commerce-2026-three.vercel.app/',
-  },
-  other: {
-    'google-adsense-account': `${process.env.GOOGLE_ADSENSE_CLIENT_ID}`,
-  },
-};
+    verification: {
+      google: `${process.env.GOOGLE_SITE_VERIFICATION}`,
+    },
+    alternates: {
+      canonical: 'https://e-commerce-2026-three.vercel.app/',
+    },
+    other: {
+      'google-adsense-account': `${process.env.GOOGLE_ADSENSE_CLIENT_ID}`,
+    },
+  };
+}
 
 const RootLayout = async ({ children }: { children: ReactNode }) => {
   const session = await auth();
