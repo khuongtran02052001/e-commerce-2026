@@ -93,13 +93,13 @@ export async function generateMetadata(): Promise<Metadata> {
       },
     },
     verification: {
-      google: `${process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION}`,
+      google: `3kYzG52_FPmJmGNDQfhOXmHVxDdxDIU48qVTitPizZo`,
     },
     alternates: {
       canonical: 'https://e-commerce-2026-three.vercel.app/',
     },
     other: {
-      'google-adsense-account': `${process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_CLIENT_ID}`,
+      'google-adsense-account': `ca-pub-3215998461819174`,
     },
   };
 }
@@ -132,7 +132,7 @@ const RootLayout = async ({ children }: { children: ReactNode }) => {
 
           <Script
             async
-            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_CLIENT_ID}`}
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3215998461819174`}
             strategy="beforeInteractive"
           />
         </SessionProvider>
