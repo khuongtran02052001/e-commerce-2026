@@ -26,7 +26,6 @@ export default function robots(): MetadataRoute.Robots {
           '/employee/',
           '/user/',
           '/dashboard/',
-          '/studio/',
           '/checkout/',
         ],
       },
