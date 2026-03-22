@@ -92,13 +92,13 @@ export const metadata: Metadata = {
     },
   },
   verification: {
-    google: `${process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION}`,
+    google: `${process.env.GOOGLE_SITE_VERIFICATION}`,
   },
   alternates: {
     canonical: 'https://e-commerce-2026-three.vercel.app/',
   },
   other: {
-    'google-adsense-account': `${process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_CLIENT_ID}`,
+    'google-adsense-account': `${process.env.GOOGLE_ADSENSE_CLIENT_ID}`,
   },
 };
 
