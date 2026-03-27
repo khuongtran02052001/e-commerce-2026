@@ -123,6 +123,7 @@ const SearchBar = () => {
             <TooltipTrigger asChild>
               <button
                 onClick={() => setShowSearch(true)}
+                data-tour="header-search"
                 className="group relative flex h-9 w-9 items-center justify-center rounded-full text-shop_dark_green/80 transition-colors duration-200 hover:bg-shop_light_pink/55 hover:text-shop_dark_green"
                 aria-label={`Open search (${isMac ? 'Cmd' : 'Ctrl'}+K)`}
               >

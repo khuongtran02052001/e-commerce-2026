@@ -1,3 +1,4 @@
+import WebsiteAssistant from '@/components/assistant/WebsiteAssistant';
 import PremiumFloatingButton from '@/components/PremiumFloatingButton';
 import { UserDataProvider } from '@/contexts/UserDataContext';
 import { auth } from '@/lib/auth';
@@ -113,6 +114,7 @@ const RootLayout = async ({ children }: { children: ReactNode }) => {
           <UserDataProvider>
             {children}
             <PremiumFloatingButton />
+            <WebsiteAssistant />
           </UserDataProvider>
           <Toaster
             position="bottom-right"

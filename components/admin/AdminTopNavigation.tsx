@@ -209,7 +209,7 @@ const AdminTopNavigation = ({ currentPath, user }: AdminTopNavigationProps) => {
             )}
           >
             <div className="overflow-hidden">
-              <nav className="px-4 py-3">
+              <nav data-tour="admin-navigation" className="px-4 py-3">
                 <div className="flex flex-nowrap gap-2 overflow-x-auto scrollbar-hide">
                   {adminRoutes.map((route, index) => {
                     const isActive = currentPath === route.href;
