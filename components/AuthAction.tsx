@@ -36,7 +36,10 @@ const AuthActions = ({ isAuthenticated, signInUrl }: Props) => {
         {/* Signed Out */}
         {!isAuthenticated && (
           <div className="flex items-center gap-2">
-            <div className="rounded-full border border-shop_light_green/30 bg-white/80 px-3 py-1.5 text-xs font-semibold text-shop_dark_green shadow-sm transition-all duration-200 hover:border-shop_light_green/45 hover:bg-shop_light_pink/70">
+            <div
+              data-tour="header-auth"
+              className="rounded-full border border-shop_light_green/30 bg-white/80 px-3 py-1.5 text-xs font-semibold text-shop_dark_green shadow-sm transition-all duration-200 hover:border-shop_light_green/45 hover:bg-shop_light_pink/70"
+            >
               <form
                 action={async () => {
                   await signIn();
@@ -67,6 +70,7 @@ const AuthActions = ({ isAuthenticated, signInUrl }: Props) => {
           <div className="flex items-center gap-2">
             <Link
               href={signInUrl}
+              data-tour="header-auth"
               className="rounded-full px-3 py-1.5 text-sm font-semibold text-shop_dark_green transition-colors duration-200 hover:bg-shop_light_pink/70"
             >
               Sign In
@@ -89,6 +93,7 @@ const AuthActions = ({ isAuthenticated, signInUrl }: Props) => {
           <div className="flex items-center gap-1">
             <Link
               href={signInUrl}
+              data-tour="header-auth"
               className="rounded-full border border-shop_light_green/30 bg-white/80 px-2.5 py-1.5 text-xs font-semibold text-shop_dark_green transition-all duration-200 hover:bg-shop_light_pink/70"
             >
               Sign In

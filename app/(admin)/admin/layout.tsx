@@ -47,7 +47,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
   }
 
   return (
-    <div className="min-h-screen">
+    <div data-tour="admin-shell" className="min-h-screen">
       <Header />
       <Container className="py-6">
         <div className="flex flex-col gap-6">
@@ -55,7 +55,10 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
           <AdminTopNavigation currentPath={pathname} user={user} />
 
           {/* Main Content */}
-          <div className="admin-content-push bg-white rounded-2xl shadow-xl border border-shop_light_green/10 overflow-hidden">
+          <div
+            data-tour="admin-content"
+            className="admin-content-push bg-white rounded-2xl shadow-xl border border-shop_light_green/10 overflow-hidden"
+          >
             {children}
           </div>
         </div>

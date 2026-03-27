@@ -9,7 +9,7 @@ const CartIcon = () => {
   const displayCount = itemCount > 9 ? '9+' : itemCount;
 
   return (
-    <Link href={'/cart'} className="group relative">
+    <Link href={'/cart'} data-tour="header-cart" className="group relative">
       <ShoppingBag className="group-hover:text-shop_light_green hoverEffect" />
       {itemCount > 0 ? (
         <span

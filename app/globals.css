@@ -748,3 +748,85 @@
     @apply grid gap-3 p-4;
   }
 }
+
+/* Driver.js assistant tour */
+.driver-active {
+  overflow: hidden;
+}
+
+.shop-assistant-driver.driver-popover {
+  max-width: 320px;
+  border: 1px solid rgba(155, 56, 100, 0.16);
+  border-radius: 20px;
+  background: rgba(255, 252, 254, 0.96);
+  box-shadow: 0 24px 64px rgba(93, 41, 67, 0.22);
+  color: var(--color-dark-color);
+  backdrop-filter: blur(18px);
+}
+
+.shop-assistant-driver .driver-popover-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-shop_dark_green);
+}
+
+.shop-assistant-driver .driver-popover-description {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--color-light-color);
+}
+
+.shop-assistant-driver .driver-popover-progress-text {
+  color: var(--color-dark-text);
+}
+
+.shop-assistant-driver .driver-popover-close-btn {
+  color: var(--color-shop_dark_green);
+}
+
+.shop-assistant-driver .driver-popover-footer {
+  margin-top: 12px;
+}
+
+.shop-assistant-driver .driver-popover-navigation-btns {
+  gap: 8px;
+}
+
+.shop-assistant-driver .driver-popover-prev-btn,
+.shop-assistant-driver .driver-popover-next-btn {
+  border: 1px solid rgba(155, 56, 100, 0.18);
+  border-radius: 999px;
+  padding: 8px 14px;
+  text-shadow: none;
+  box-shadow: none;
+  font-weight: 600;
+}
+
+.shop-assistant-driver .driver-popover-prev-btn {
+  background: white;
+  color: var(--color-shop_dark_green);
+}
+
+.shop-assistant-driver .driver-popover-next-btn {
+  background: linear-gradient(135deg, #9b3864 0%, #c87297 100%);
+  color: white;
+}
+
+.shop-assistant-driver .driver-popover-prev-btn:hover {
+  background: var(--color-shop_light_bg);
+}
+
+.shop-assistant-driver .driver-popover-next-btn:hover {
+  filter: brightness(1.02);
+}
+
+.driver-overlay {
+  background: rgba(18, 10, 22, 0.78) !important;
+}
+
+.driver-stage {
+  border-radius: 22px !important;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.12),
+    0 24px 60px rgba(0, 0, 0, 0.2) !important;
+}

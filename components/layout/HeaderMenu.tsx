@@ -7,7 +7,10 @@ const HeaderMenu = () => {
   const pathname = usePathname();
 
   return (
-    <div className="hidden w-full items-center justify-center gap-1.5 text-sm font-semibold capitalize text-light-color lg:inline-flex xl:gap-3">
+    <div
+      data-tour="header-navigation"
+      className="hidden w-full items-center justify-center gap-1.5 text-sm font-semibold capitalize text-light-color lg:inline-flex xl:gap-3"
+    >
       {headerData?.map((item) => (
         <Link
           key={item?.title}

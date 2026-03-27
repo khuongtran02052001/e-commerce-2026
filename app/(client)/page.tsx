@@ -27,10 +27,16 @@ export default async function Home() {
           __html: JSON.stringify(websiteSchema),
         }}
       /> */}
-      <HomeBanner />
+      <div data-tour="home-hero">
+        <HomeBanner />
+      </div>
       <div className="py-10">
-        <ProductGrid data={products!} />
-        <HomeCategories categories={safeCategories} />
+        <div data-tour="home-products">
+          <ProductGrid data={products!} />
+        </div>
+        <div data-tour="home-categories">
+          <HomeCategories categories={safeCategories} />
+        </div>
         <ShopFeatures />
         <ShopByBrands />
         <LatestBlog />

@@ -51,7 +51,10 @@ const UserDropdown = () => {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <button className="group flex max-w-[168px] items-center gap-2 rounded-xl border border-shop_dark_green/18 bg-white/85 px-2.5 py-1.5 hover:bg-shop_light_bg hover:border-shop_dark_green hoverEffect xl:max-w-[188px]">
+        <button
+          data-tour="header-account"
+          className="group flex max-w-[168px] items-center gap-2 rounded-xl border border-shop_dark_green/18 bg-white/85 px-2.5 py-1.5 hover:bg-shop_light_bg hover:border-shop_dark_green hoverEffect xl:max-w-[188px]"
+        >
           <div className="relative">
             {mounted && user?.image && !avatarError ? (
               <img

@@ -6,6 +6,13 @@ const SERVICE_BLOG_BASE = `${process.env.NEXT_PUBLIC_API_URL}/service-blog/v1/ap
 const buildBaseUrl = (service: 'system' | 'blog') =>
   service === 'blog' ? SERVICE_BLOG_BASE : SERVICE_SYSTEM_BASE;
 
+const sleep = (ms: number) => new Promise((resolve) => globalThis.setTimeout(resolve, ms));
+
+const isRecoverableNetworkError = (error: unknown) =>
+  error instanceof TypeError ||
+  (error instanceof Error &&
+    /failed to fetch|networkerror|network request failed|load failed/i.test(error.message));
+
 export const buildServiceUrl = (path: string, service: 'system' | 'blog' = 'system') => {
   const normalizedPath = path.startsWith('/') ? path : `/${path}`;
   return `${buildBaseUrl(service)}${normalizedPath}`;
@@ -67,10 +74,23 @@ export const fetchService = async (
   if (!mergedHeaders.has('Content-Type') && rest.body) {
     mergedHeaders.set('Content-Type', 'application/json');
   }
-  return fetch(buildServiceUrl(path, service), {
-    ...rest,
-    headers: mergedHeaders,
-  });
+  const url = buildServiceUrl(path, service);
+
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    try {
+      return await fetch(url, {
+        ...rest,
+        headers: mergedHeaders,
+      });
+    } catch (error) {
+      if (!isRecoverableNetworkError(error) || attempt === 2) {
+        throw error;
+      }
+      await sleep(700 * (attempt + 1));
+    }
+  }
+
+  throw new Error('Request failed before fetch completed');
 };
 
 export const fetchServiceJson = async <T>(

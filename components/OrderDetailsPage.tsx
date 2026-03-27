@@ -373,7 +373,7 @@ const OrderDetailsPage: React.FC<OrderDetailsPageProps> = ({ order }) => {
           )}
 
           {/* Order Status */}
-          <Card>
+          <Card data-tour="order-status">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 {getStatusIcon(currentOrder.status)}
@@ -418,10 +418,12 @@ const OrderDetailsPage: React.FC<OrderDetailsPageProps> = ({ order }) => {
           </Card>
 
           {/* Order Timeline */}
-          <OrderTimeline order={timelineOrder} />
+          <div data-tour="order-timeline">
+            <OrderTimeline order={timelineOrder} />
+          </div>
 
           {/* Products */}
-          <Card>
+          <Card data-tour="order-summary">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Package className="w-5 h-5" />
