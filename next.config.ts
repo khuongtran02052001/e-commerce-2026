@@ -73,6 +73,14 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'media.hcdn.vn',
       },
+      {
+        protocol: 'https',
+        hostname: 'down-vn.img.susercontent.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'mint07.com',
+      },
     ],
   },
 
