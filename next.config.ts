@@ -81,6 +81,21 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'mint07.com',
       },
+      {
+        protocol: 'https',
+        hostname: 't4.ftcdn.net',
+      },
+      {
+        protocol: 'https',
+        hostname: 't3.ftcdn.net',
+      },
+      { protocol: 'https', hostname: 'logo-marque.com' },
+      { protocol: 'https', hostname: 'www.sunwayvelocitymall.com' },
+      { protocol: 'https', hostname: 'encrypted-tbn0.gstatic.com' },
+      { protocol: 'https', hostname: 'theordinary.com.vn' },
+      { protocol: 'https', hostname: 'i00.eu' },
+      { protocol: 'https', hostname: '1000logos.net' },
+      { protocol: 'https', hostname: 'encrypted-tbn0.gstatic.com' },
     ],
   },
 
