@@ -2,13 +2,11 @@
 
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogOverlay, DialogPortal, DialogTitle } from '@/components/ui/dialog';
-import { fetchService } from '@/lib/restClient';
 import { cn } from '@/lib/utils';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
 import { CreditCard, Loader2, Lock, ShieldCheck, Sparkles, X } from 'lucide-react';
 import React, { useState } from 'react';
-import { toast } from 'sonner';
 import PriceFormatter from './PriceFormatter';
 
 interface Props {
@@ -31,34 +29,35 @@ const DirectPaymentModal: React.FC<Props> = ({
   const handlePayNow = async () => {
     if (!orderId) return;
 
-    setIsProcessing(true);
+    // setIsProcessing(true);
 
-    try {
-      const response = await fetchService(`/orders/${orderId}/pay-now`, { method: 'POST' });
+    // try {
+    //   const response = await fetchService(`/orders/${orderId}/pay-now`, { method: 'POST' });
 
-      const data = await response.json();
+    //   const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to process payment');
-      }
+    //   if (!response.ok) {
+    //     throw new Error(data.error || 'Failed to process payment');
+    //   }
 
-      const checkoutUrl = data.checkoutUrl || data.url;
-      if (data.success && checkoutUrl) {
-        // Redirect directly to Stripe Checkout
-        toast.success('Redirecting to secure payment...');
-        window.location.href = checkoutUrl;
-      } else if (data.success) {
-        toast.success(data.message || 'Payment processed successfully');
-      } else {
-        throw new Error('Payment initialization failed');
-      }
-    } catch (error) {
-      console.error('Payment error:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Payment failed';
-      toast.error(errorMessage);
-    } finally {
-      setIsProcessing(false);
-    }
+    //   const checkoutUrl = data.checkoutUrl || data.url;
+    //   if (data.success && checkoutUrl) {
+    //     // Redirect directly to Stripe Checkout
+    //     toast.success('Redirecting to secure payment...');
+    //     window.location.href = checkoutUrl;
+    //   } else if (data.success) {
+    //     toast.success(data.message || 'Payment processed successfully');
+    //   } else {
+    //     throw new Error('Payment initialization failed');
+    //   }
+    // } catch (error) {
+    //   console.error('Payment error:', error);
+    //   const errorMessage = error instanceof Error ? error.message : 'Payment failed';
+    //   toast.error(errorMessage);
+    // } finally {
+    //   setIsProcessing(false);
+    // }
+    alert('This is a demo. Payment processing is disabled.');
   };
 
   const handleClose = () => {

@@ -160,11 +160,12 @@ export function CheckoutButton({ cart, selectedAddress }: CheckoutButtonProps) {
           <Button
             onClick={handleCheckout}
             disabled={
-              isPlacingOrder ||
-              actionType === 'checkout' ||
-              hasOutOfStockItems ||
-              !selectedAddress ||
-              cart.length === 0
+              true
+              // isPlacingOrder ||
+              // actionType === 'checkout' ||
+              // hasOutOfStockItems ||
+              // !selectedAddress ||
+              // cart.length === 0
             }
             className="w-full h-12 text-lg font-semibold"
             size="lg"
