@@ -11,7 +11,7 @@ interface AdminPremiumFeatureProps {
 
 export default function AdminPremiumFeature({
   featureName,
-  description = 'This premium feature is only available in the paid version of ShopCart Pro.',
+  description = 'This premium feature is only available in the paid version of Lumière Pro.',
 }: AdminPremiumFeatureProps) {
   const upgradeUrl =
     process.env.NEXT_PUBLIC_PAID_VERION || '#';

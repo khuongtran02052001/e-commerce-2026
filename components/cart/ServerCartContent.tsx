@@ -239,6 +239,7 @@ export function ServerCartContent({
         {/* Address Selection */}
         <AddressSelector
           userEmail={userEmail}
+          userId={userEmail}
           addresses={userAddresses}
           selectedAddress={selectedAddress}
           onAddressSelect={setSelectedAddress}

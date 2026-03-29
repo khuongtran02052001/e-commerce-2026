@@ -7,23 +7,23 @@ import Title from './Title';
 
 const extraData = [
   {
-    title: 'Free Delivery',
-    description: 'Free shipping over $100',
+    title: 'Curated formulas',
+    description: 'Skincare picks selected for routine-friendly use',
     icon: <Truck size={45} />,
   },
   {
-    title: 'Free Return',
-    description: 'Free shipping over $100',
+    title: 'Easy comparison',
+    description: 'Compare textures, skin types and product goals',
     icon: <GitCompareArrows size={45} />,
   },
   {
-    title: 'Customer Support',
-    description: 'Friendly 27/7 customer support',
+    title: 'Routine support',
+    description: 'Helpful skincare content for choosing with less confusion',
     icon: <Headset size={45} />,
   },
   {
-    title: 'Money Back guarantee',
-    description: 'Quality checked by our team',
+    title: 'Trusted selection',
+    description: 'Brands and formulas chosen with consistency in mind',
     icon: <ShieldCheck size={45} />,
   },
 ];
@@ -37,17 +37,17 @@ const ShopByBrands = async () => {
       <div className="text-center mb-12">
         <div className="inline-flex items-center gap-3 mb-4">
           <div className="h-1 w-12 bg-gradient-to-r from-shop_orange to-shop_light_orange rounded-full"></div>
-          <Title className="text-3xl lg:text-4xl font-bold text-dark-color">Shop By Brands</Title>
+          <Title className="text-3xl lg:text-4xl font-bold text-dark-color">Brands we love for skincare</Title>
           <div className="h-1 w-12 bg-gradient-to-l from-shop_orange to-shop_light_orange rounded-full"></div>
         </div>
         <p className="text-light-color text-lg max-w-2xl mx-auto">
-          Discover products from your favorite trusted brands
+          Khám phá các thương hiệu quen thuộc trong routine dưỡng da, từ làm sạch dịu nhẹ đến chống nắng và phục hồi.
         </p>
         <Link
           href={'/shop'}
           className="inline-flex items-center gap-2 mt-6 px-6 py-3 bg-shop_light_pink text-shop_dark_green font-semibold rounded-full hover:bg-shop_orange hover:text-white border-2 border-shop_orange hoverEffect"
         >
-          Explore All Brands
+          Explore skincare brands
           <svg
             className="w-4 h-4 hoverEffect group-hover:translate-x-1"
             fill="none"
@@ -65,7 +65,7 @@ const ShopByBrands = async () => {
       </div>
 
       {/* Brands Grid */}
-      <div className="bg-gradient-to-br from-shop_light_bg via-white to-shop_light_pink p-8 lg:p-12 rounded-3xl shadow-xl border border-shop_light_green/20 mb-16">
+      <div className="mb-16 rounded-3xl border border-[#dffbf7]/70 bg-gradient-to-br from-[#f7fcff] via-white to-[#fff2fa] p-8 shadow-[0_24px_64px_rgba(127,95,209,0.10)] lg:p-12">
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-6">
           {brands?.map((brand, index) => (
             <Link
@@ -74,7 +74,7 @@ const ShopByBrands = async () => {
                 pathname: '/shop',
                 query: { brand: brand?.slug },
               }}
-              className="group bg-white rounded-2xl p-6 flex items-center justify-center aspect-square hover:shadow-2xl shadow-lg border border-gray-100 hover:border-shop_orange hoverEffect transform hover:-translate-y-2"
+              className="group aspect-square rounded-2xl border border-[#ebe4ff] bg-white p-6 shadow-lg transform hover:-translate-y-2 hover:border-[#8bf4ee] hover:shadow-[0_22px_42px_rgba(127,95,209,0.14)] hoverEffect flex items-center justify-center"
               style={{ animationDelay: `${index * 0.05}s` }}
             >
               {brand?.imageUrl && (
@@ -139,7 +139,7 @@ const ShopByBrands = async () => {
           <div className="inline-flex items-center gap-4 px-8 py-4 bg-gradient-to-r from-shop_light_pink to-shop_light_bg rounded-2xl border border-shop_orange/20">
             <div className="w-2 h-2 bg-shop_orange rounded-full animate-pulse"></div>
             <span className="text-dark-text font-medium">
-              Trusted by thousands of customers worldwide
+              Built for people who want skincare shopping to feel calmer and easier
             </span>
             <div className="w-2 h-2 bg-shop_orange rounded-full animate-pulse"></div>
           </div>

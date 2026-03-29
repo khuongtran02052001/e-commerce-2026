@@ -132,12 +132,11 @@ const ContactPage = () => {
             className="text-center"
           >
             <Badge className="mb-6 bg-white/20 text-white border-white/30 hover:bg-white/30">
-              We&apos;re Here to Help
+              Contact Lumière
             </Badge>
             <h1 className="text-5xl lg:text-6xl font-bold mb-6">Contact Us</h1>
             <p className="text-xl lg:text-2xl text-white/90 max-w-3xl mx-auto leading-relaxed">
-              Have questions about our products or need assistance? We&apos;d love to hear from you.
-              Our team is here to help with any inquiries you may have.
+              Have questions about skincare products, routines or your order? We&apos;d love to help you choose more confidently.
             </p>
           </motion.div>
         </Container>
@@ -153,7 +152,7 @@ const ContactPage = () => {
             className="lg:col-span-1"
           >
             <div className="bg-white rounded-2xl shadow-lg p-6 lg:p-8 border border-gray-100">
-              <h2 className="text-2xl font-bold text-shop_dark_green mb-6">Contact Information</h2>
+              <h2 className="text-2xl font-bold text-shop_dark_green mb-6">Lumière Contact Information</h2>
 
               <div className="space-y-6">
                 {contactInfo.map((info, index) => (
@@ -209,7 +208,7 @@ const ContactPage = () => {
             className="lg:col-span-2"
           >
             <div className="bg-white rounded-2xl shadow-lg p-6 lg:p-8 border border-gray-100">
-              <h2 className="text-2xl font-bold text-shop_dark_green mb-6">Send us a Message</h2>
+              <h2 className="text-2xl font-bold text-shop_dark_green mb-6">Send Lumière a Message</h2>
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -397,8 +396,7 @@ const ContactPage = () => {
                   Message Sent Successfully!
                 </h3>
                 <p className="text-dark-text mb-6">
-                  Thank you for contacting us. We&apos;ve received your message and will get back to
-                  you within 24 hours.
+                  Thank you for reaching out to Lumière. We&apos;ve received your message and will get back to you within 24 hours.
                 </p>
                 <Button
                   onClick={() => setSuccess(false)}

@@ -62,7 +62,7 @@ const Footer = () => {
           <div>
             <h3 className="font-semibold text-gray-900 mb-4">Newsletter</h3>
             <p className="text-gray-600 text-sm mb-4">
-              Subscribe to our newsletter to receive updates and exclusive offers.
+              Subscribe for skincare tips, routine notes and fresh product picks from Lumière.
             </p>
             <NewsletterForm />
           </div>
@@ -73,10 +73,7 @@ const Footer = () => {
           <p>
             © {new Date().getFullYear()}{' '}
             <span className="text-dark-color font-black tracking-wider uppercase hover:text-shop_dark_green hoverEffect group font-sans">
-              Shpopcar
-              <span className="text-shop_dark_green group-hover:text-dark-color hoverEffect">
-                t
-              </span>
+              Lumière
             </span>
             . All rights reserved.
           </p>

@@ -7,25 +7,25 @@
 /* @custom-variant dark (&:is(.dark *)); */
 
 @theme {
-  --color-shop_light_pink: #fff1f8;
-  --color-shop_dark_green: #8b4c72;
-  --color-shop_btn_dark_green: #7a4265;
-  --color-shop_light_bg: #fff7fb;
-  --color-shop_light_green: #c97ca7;
-  --color-shop_orange: #e7a4c4;
-  --color-dark-color: #3f3140;
-  --color-light-color: #6b5968;
-  --color-light-orange: #f7dbe9;
-  --color-light-blue: #d8c3e8;
-  --color-dark-blue: #9d79b8;
-  --color-dark-text: #766774;
-  --color-light-bg: #fffafd;
-  --color-dark-red: #f02757;
-  --color-light-text: #ab95a7;
-  --color-light-green: #f0cce0;
-  --color-product-bg: #fff5fa;
-  --color-shop_light_blue: #ead8f2;
-  --color-shop_dark_blue: #8667a6;
+  --color-shop_light_pink: #ffe6ec;
+  --color-shop_dark_green: #6f57a8;
+  --color-shop_btn_dark_green: #5d4694;
+  --color-shop_light_bg: #f9fbff;
+  --color-shop_light_green: #8bf4ee;
+  --color-shop_orange: #f7b9d8;
+  --color-dark-color: #332d4a;
+  --color-light-color: #6f6a86;
+  --color-light-orange: #ffe6ec;
+  --color-light-blue: #ccf8f4;
+  --color-dark-blue: #8f6bd9;
+  --color-dark-text: #746d8a;
+  --color-light-bg: #fcfdff;
+  --color-dark-red: #ee45f9;
+  --color-light-text: #a29cb6;
+  --color-light-green: #dffbf7;
+  --color-product-bg: #fdf9ff;
+  --color-shop_light_blue: #e9e4ff;
+  --color-shop_dark_blue: #7f5fd1;
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
 
@@ -158,57 +158,57 @@
 
 @layer base {
   :root {
-    --background: 327 100% 99%;
-    --foreground: 323 17% 24%;
+    --background: 210 100% 99%;
+    --foreground: 252 24% 23%;
     --card: 0 0% 100%;
-    --card-foreground: 323 17% 24%;
+    --card-foreground: 252 24% 23%;
     --popover: 0 0% 100%;
-    --popover-foreground: 323 17% 24%;
-    --primary: 326 34% 45%;
+    --popover-foreground: 252 24% 23%;
+    --primary: 301 87% 62%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 330 58% 95%;
-    --secondary-foreground: 325 24% 33%;
-    --muted: 323 43% 96%;
-    --muted-foreground: 320 10% 46%;
-    --accent: 327 56% 69%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 84.2% 60.2%;
+    --secondary: 178 72% 94%;
+    --secondary-foreground: 252 24% 28%;
+    --muted: 248 100% 97%;
+    --muted-foreground: 252 10% 48%;
+    --accent: 178 82% 76%;
+    --accent-foreground: 252 24% 24%;
+    --destructive: 336 84% 58%;
     --destructive-foreground: 0 0% 98%;
-    --border: 326 34% 89%;
-    --input: 326 34% 89%;
-    --ring: 326 34% 45%;
-    --chart-1: 326 34% 45%;
-    --chart-2: 334 40% 57%;
-    --chart-3: 322 58% 74%;
-    --chart-4: 278 30% 62%;
-    --chart-5: 317 14% 52%;
-    --radius: 0.5rem;
+    --border: 287 62% 91%;
+    --input: 287 62% 91%;
+    --ring: 301 87% 62%;
+    --chart-1: 301 87% 62%;
+    --chart-2: 178 82% 76%;
+    --chart-3: 330 100% 92%;
+    --chart-4: 260 72% 68%;
+    --chart-5: 248 42% 58%;
+    --radius: 0.75rem;
   }
   .dark {
-    --background: 322 18% 12%;
-    --foreground: 330 40% 96%;
-    --card: 323 16% 14%;
-    --card-foreground: 330 40% 96%;
-    --popover: 323 16% 14%;
-    --popover-foreground: 330 40% 96%;
-    --primary: 327 56% 78%;
-    --primary-foreground: 323 20% 14%;
-    --secondary: 321 15% 20%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 321 15% 20%;
-    --muted-foreground: 328 18% 73%;
-    --accent: 326 30% 28%;
-    --accent-foreground: 330 40% 96%;
-    --destructive: 0 62.8% 30.6%;
+    --background: 252 28% 10%;
+    --foreground: 210 100% 97%;
+    --card: 252 26% 13%;
+    --card-foreground: 210 100% 97%;
+    --popover: 252 26% 13%;
+    --popover-foreground: 210 100% 97%;
+    --primary: 301 87% 68%;
+    --primary-foreground: 252 30% 12%;
+    --secondary: 252 18% 20%;
+    --secondary-foreground: 210 100% 97%;
+    --muted: 252 18% 20%;
+    --muted-foreground: 248 22% 74%;
+    --accent: 178 62% 34%;
+    --accent-foreground: 210 100% 97%;
+    --destructive: 336 70% 45%;
     --destructive-foreground: 0 0% 98%;
-    --border: 321 16% 24%;
-    --input: 321 16% 24%;
-    --ring: 327 56% 78%;
-    --chart-1: 327 56% 78%;
-    --chart-2: 336 42% 67%;
-    --chart-3: 280 40% 65%;
-    --chart-4: 18 74% 63%;
-    --chart-5: 345 62% 64%;
+    --border: 252 16% 24%;
+    --input: 252 16% 24%;
+    --ring: 301 87% 68%;
+    --chart-1: 301 87% 68%;
+    --chart-2: 178 70% 62%;
+    --chart-3: 330 72% 74%;
+    --chart-4: 260 66% 66%;
+    --chart-5: 248 30% 72%;
   }
 }
 @layer utilities {
@@ -225,6 +225,10 @@
   }
   body {
     @apply bg-background text-foreground;
+    background-image:
+      radial-gradient(circle at top left, rgba(139, 244, 238, 0.18), transparent 30%),
+      radial-gradient(circle at bottom center, rgba(238, 69, 249, 0.16), transparent 32%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(253, 249, 255, 0.98));
   }
   .hoverEffect {
     @apply duration-200 ease-out transition-colors cursor-pointer;
@@ -256,25 +260,17 @@
 }
 
 .scrollbar-thin::-webkit-scrollbar-track {
-  background: rgba(201, 124, 167, 0.08);
+  background: rgba(139, 244, 238, 0.12);
   border-radius: 9999px;
 }
 
 .scrollbar-thin::-webkit-scrollbar-thumb {
-  background: linear-gradient(
-    180deg,
-    rgba(201, 124, 167, 0.8) 0%,
-    rgba(139, 76, 114, 0.92) 100%
-  );
+  background: linear-gradient(180deg, rgba(139, 244, 238, 0.92) 0%, rgba(238, 69, 249, 0.92) 100%);
   border-radius: 9999px;
 }
 
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(
-    180deg,
-    rgba(215, 142, 176, 0.9) 0%,
-    rgba(122, 66, 101, 0.95) 100%
-  );
+  background: linear-gradient(180deg, rgba(111, 228, 221, 0.96) 0%, rgba(221, 63, 235, 0.96) 100%);
 }
 
 .scrollbar-track-transparent::-webkit-scrollbar-track {
@@ -282,11 +278,7 @@
 }
 
 .scrollbar-thumb-shop_dark_green::-webkit-scrollbar-thumb {
-  background: linear-gradient(
-    180deg,
-    rgba(201, 124, 167, 0.8) 0%,
-    rgba(139, 76, 114, 0.92) 100%
-  );
+  background: linear-gradient(180deg, rgba(139, 244, 238, 0.92) 0%, rgba(238, 69, 249, 0.92) 100%);
   border-radius: 9999px;
 }
 
@@ -507,19 +499,19 @@
 }
 
 [data-sonner-toaster][data-theme="light"] {
-  --sonner-loading-bar: #b56a95;
-  --sonner-success: #b56a95;
-  --sonner-success-bg: #fff2f8;
-  --sonner-success-border: #efcade;
-  --sonner-error: #f02757;
-  --sonner-error-bg: #fef2f2;
-  --sonner-error-border: #fca5a5;
-  --sonner-warning: #d998bb;
-  --sonner-warning-bg: #fff6fb;
-  --sonner-warning-border: #f5d7e6;
-  --sonner-info: #a887c4;
-  --sonner-info-bg: #f8f3fd;
-  --sonner-info-border: #e5d7f3;
+  --sonner-loading-bar: #ee45f9;
+  --sonner-success: #6f57a8;
+  --sonner-success-bg: #f0fffd;
+  --sonner-success-border: #c9f5f1;
+  --sonner-error: #ff4d8d;
+  --sonner-error-bg: #fff1f6;
+  --sonner-error-border: #ffc3d6;
+  --sonner-warning: #c86ef2;
+  --sonner-warning-bg: #fff4fe;
+  --sonner-warning-border: #f4cef8;
+  --sonner-info: #5ecfd2;
+  --sonner-info-bg: #effffd;
+  --sonner-info-border: #c8f4ef;
 }
 
 [data-sonner-toast][data-type="success"] {
@@ -756,10 +748,10 @@
 
 .shop-assistant-driver.driver-popover {
   max-width: 320px;
-  border: 1px solid rgba(155, 56, 100, 0.16);
+  border: 1px solid rgba(238, 69, 249, 0.14);
   border-radius: 20px;
-  background: rgba(255, 252, 254, 0.96);
-  box-shadow: 0 24px 64px rgba(93, 41, 67, 0.22);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(249, 252, 255, 0.94));
+  box-shadow: 0 24px 64px rgba(111, 87, 168, 0.18);
   color: var(--color-dark-color);
   backdrop-filter: blur(18px);
 }
@@ -808,7 +800,7 @@
 }
 
 .shop-assistant-driver .driver-popover-next-btn {
-  background: linear-gradient(135deg, #9b3864 0%, #c87297 100%);
+  background: linear-gradient(135deg, #8bf4ee 0%, #ee45f9 100%);
   color: white;
 }
 

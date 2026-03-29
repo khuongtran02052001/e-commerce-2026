@@ -11,8 +11,8 @@ import Title from './Title';
 
 const ProductCard = memo(({ product }: { product: IProduct }) => {
   return (
-    <div className="text-sm border rounded-md border-dark-blue/20 group bg-white">
-      <div className="relative group overflow-hidden bg-shop_light_bg">
+    <div className="group overflow-hidden rounded-2xl border border-[#e7dcff] bg-white/95 text-sm shadow-[0_16px_40px_rgba(127,95,209,0.08)] backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_48px_rgba(127,95,209,0.16)]">
+      <div className="relative overflow-hidden bg-gradient-to-br from-white via-[#f5fbff] to-[#fff1f8]">
         {product?.images && (
           <Link href={`/product/${product?.slug}`}>
             <ProductImage
@@ -47,7 +47,9 @@ const ProductCard = memo(({ product }: { product: IProduct }) => {
             {product.categories.map((cat) => cat.title).join(', ')}
           </p>
         )}
-        <Title className="text-sm line-clamp-1">{product?.name}</Title>
+        <Title className="line-clamp-2 min-h-10 text-sm leading-5 text-[#332d4a] transition-colors duration-300 group-hover:text-[#7f5fd1]">
+          {product?.name}
+        </Title>
         <div className="flex items-center gap-2">
           <div className="flex items-center">
             {[...Array(5)].map((_, index) => (
@@ -55,10 +57,10 @@ const ProductCard = memo(({ product }: { product: IProduct }) => {
                 key={index}
                 className={
                   index < Math.round(product?.averageRating || 0)
-                    ? 'text-shop_light_green'
+                    ? 'text-[#ee45f9]'
                     : ' text-light-text'
                 }
-                fill={index < Math.round(product?.averageRating || 0) ? '#93D991' : '#ababab'}
+                fill={index < Math.round(product?.averageRating || 0) ? '#ee45f9' : '#d6cfe5'}
               />
             ))}
           </div>
@@ -70,10 +72,10 @@ const ProductCard = memo(({ product }: { product: IProduct }) => {
         </div>
 
         <div className="flex items-center gap-2.5">
-          <p className="font-medium">In Stock</p>
+          <p className="font-medium text-[#6f6a86]">In Stock</p>
           <p
             className={`${
-              product?.stock === 0 ? 'text-red-600' : 'text-shop_dark_green/80 font-semibold'
+              product?.stock === 0 ? 'text-rose-500' : 'font-semibold text-[#6f57a8]'
             }`}
           >
             {(product?.stock as number) > 0 ? product?.stock : 'unavailable'}
@@ -105,8 +107,8 @@ const STATUS_UI: Record<
     kind: 'label',
     text: 'Sale!',
     className:
-      'text-xs border border-dark-color/50 px-2 py-0.5 rounded-full ' +
-      'group-hover:border-light-green hover:text-shop_dark_green hoverEffect',
+      'rounded-full border border-[#f7b9d8]/70 bg-white/90 px-2 py-0.5 text-xs text-[#8d4ea2] ' +
+      'group-hover:border-[#ee45f9]/40 group-hover:text-[#6f57a8] hoverEffect',
   },
 
   NEW: {
@@ -121,14 +123,9 @@ const STATUS_UI: Record<
     kind: 'iconLink',
     ariaLabel: 'Hot deal',
     className:
-      'absolute top-2 left-2 z-10 border border-shop_orange/50 p-1 rounded-full group-hover:border-shop_orange ' +
-      'group-hover:border-shop_orange hover:text-shop_dark_green hoverEffect',
+      'absolute top-2 left-2 z-10 rounded-full border border-[#ffd7eb] bg-white/90 p-1 shadow-sm group-hover:border-[#ee45f9]/40 hoverEffect',
     icon: (
-      <Flame
-        size={18}
-        fill="#fb6c08"
-        className="text-shop_orange/60 group-hover:text-shop_orange hoverEffect"
-      />
+      <Flame size={18} fill="#ee45f9" className="text-[#ee45f9] hoverEffect" />
     ),
   },
 

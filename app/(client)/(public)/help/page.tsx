@@ -179,12 +179,11 @@ const HelpPage = () => {
             className="text-center"
           >
             <Badge className="mb-6 bg-white/20 text-white border-white/30 hover:bg-white/30">
-              24/7 Support
+              Lumière Support
             </Badge>
             <h1 className="text-5xl lg:text-6xl font-bold mb-6">Help Center</h1>
             <p className="text-xl lg:text-2xl text-white/90 max-w-3xl mx-auto leading-relaxed">
-              Find answers, get support, and resolve issues quickly. We&apos;re here to help you
-              have the best shopping experience.
+              Find answers, get skincare shopping support and resolve issues more calmly with guidance tailored to Lumière.
             </p>
           </motion.div>
         </Container>

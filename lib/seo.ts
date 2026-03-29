@@ -32,7 +32,7 @@ export function generateProductMetadata(product: any): Metadata {
   const title = product.name || 'Product';
   const description =
     product.description ||
-    `Buy ${title} online at ShopCart. ${product.price ? `Price: $${product.price}` : ''}`;
+    `Khám phá ${title} tại Lumière. ${product.price ? `Giá tham khảo: $${product.price}` : ''}`;
   const imageUrl = resolveImageUrl(product.images?.[0]);
   const slug = typeof product.slug === 'string' ? product.slug : product.slug?.current;
   const url = `${BASE_URL}/product/${slug || ''}`;
@@ -80,7 +80,7 @@ export function generateCategoryMetadata(category: any, productCount: number = 0
   const title = category.title || 'Category';
   const description =
     category.description ||
-    `Browse ${productCount} products in ${title} category at ShopCart. Find the best deals and quality items.`;
+    `Khám phá ${productCount} sản phẩm trong danh mục ${title} tại Lumière. Chọn skincare phù hợp cho routine hằng ngày.`;
   const imageUrl = resolveImageUrl(
     (category as { image?: unknown; imageUrl?: string }).image ||
       (category as { imageUrl?: string }).imageUrl,
@@ -134,7 +134,7 @@ export function generateProductSchema(product: any) {
   const slug = typeof product.slug === 'string' ? product.slug : product.slug?.current;
 
   // Extract brand name if it's populated
-  const brandName = typeof product.brand === 'object' ? product.brand?.name : 'ShopCart';
+  const brandName = typeof product.brand === 'object' ? product.brand?.name : 'Lumière';
 
   return {
     '@context': 'https://schema.org',
@@ -196,11 +196,11 @@ export function generateOrganizationSchema() {
   return {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'ShopCart',
+    name: 'Lumière',
     url: BASE_URL,
     logo: `${BASE_URL}/logo.png`,
     description:
-      'Your trusted online shopping destination for quality items and exceptional customer service.',
+      'Curated skincare, beauty picks and routine-friendly products for healthier-looking skin.',
     contactPoint: {
       '@type': 'ContactPoint',
       telephone: '+1-555-123-4567',
@@ -209,10 +209,10 @@ export function generateOrganizationSchema() {
       availableLanguage: 'en',
     },
     sameAs: [
-      'https://facebook.com/shopcart',
-      'https://twitter.com/shopcart',
-      'https://instagram.com/shopcart',
-      'https://linkedin.com/company/shopcart',
+      'https://facebook.com/lumiere',
+      'https://twitter.com/lumiere',
+      'https://instagram.com/lumiere',
+      'https://linkedin.com/company/lumiere',
     ],
   };
 }
@@ -224,7 +224,7 @@ export function generateWebsiteSchema() {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: 'ShopCart',
+    name: 'Lumière',
     url: BASE_URL,
     potentialAction: {
       '@type': 'SearchAction',
@@ -312,37 +312,37 @@ export function generateHomeMetadata(): Metadata {
   return {
     title: 'ShopCart - Your Trusted Online Shopping Destination',
     description:
-      'Discover amazing products at ShopCart, your trusted online shopping destination for quality items and exceptional customer service. Shop electronics, fashion, home goods and more with fast delivery.',
+      'Khám phá skincare, serum, kem chống nắng và beauty picks tại Lumière với trải nghiệm mua sắm dịu mắt và dễ chọn hơn cho routine hằng ngày.',
     keywords: [
-      'online shopping',
-      'e-commerce',
-      'buy online',
-      'shop online',
-      'best deals',
-      'electronics',
-      'fashion',
-      'home goods',
+      'skincare',
+      'beauty store',
+      'serum',
+      'kem chống nắng',
+      'sữa rửa mặt',
+      'routine skincare',
+      'da nhạy cảm',
+      'da dầu mụn',
     ],
     openGraph: {
       type: 'website',
       url: BASE_URL,
-      title: 'ShopCart - Your Trusted Online Shopping Destination',
+      title: 'Lumière - Skincare & Beauty Picks For Healthy-Looking Skin',
       description:
-        'Discover amazing products at ShopCart. Shop electronics, fashion, home goods and more with fast delivery.',
+        'Khám phá skincare, serum, kem dưỡng và beauty picks tại Lumière với trải nghiệm dịu mắt và dễ chọn hơn.',
       images: [
         {
           url: '/og-image.jpg',
           width: 1200,
           height: 630,
-          alt: 'ShopCart Online Store',
+          alt: 'Lumière skincare store',
         },
       ],
     },
     twitter: {
       card: 'summary_large_image',
-      title: 'ShopCart - Your Trusted Online Shopping Destination',
+      title: 'Lumière - Skincare & Beauty Picks For Healthy-Looking Skin',
       description:
-        'Discover amazing products at ShopCart. Shop electronics, fashion, home goods and more.',
+        'Khám phá skincare, serum, kem dưỡng và beauty picks tại Lumière với giao diện dịu mắt và dễ chọn hơn cho routine hằng ngày.',
       images: ['/og-image.jpg'],
     },
     alternates: {

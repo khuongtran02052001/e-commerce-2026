@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!accessToken) {
     return {
-      title: 'Order Details - Shopcart',
+      title: 'Order Details - Lumière',
     };
   }
 
@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   return {
-    title: `Order ${order.orderNumber} - Shopcart`,
+    title: `Order ${order.orderNumber} - Lumière`,
     description: `Order details for ${order.customerName}`,
   };
 }

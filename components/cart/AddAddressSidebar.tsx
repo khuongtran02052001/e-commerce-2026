@@ -18,6 +18,7 @@ import { toast } from 'sonner';
 
 interface AddAddressSidebarProps {
   userEmail: string;
+  userId?: string;
   isOpen: boolean;
   onClose: () => void;
   onAddressAdded?: () => Promise<void>;
@@ -26,6 +27,7 @@ interface AddAddressSidebarProps {
 
 export function AddAddressSidebar({
   userEmail,
+  userId,
   isOpen,
   onClose,
   onAddressAdded,
@@ -55,7 +57,14 @@ export function AddAddressSidebar({
         // Use API route instead of server action for better error handling
         const response = await fetchService('/user/addresses', {
           method: 'POST',
-          body: JSON.stringify(formData),
+          body: JSON.stringify({
+            addressName: formData.name,
+            address: formData.address,
+            city: formData.city,
+            state: formData.state,
+            zip: formData.zip,
+            userId: userId || userEmail,
+          }),
         });
 
         if (!response.ok) {

@@ -121,7 +121,12 @@ export default function AddressEditSidebar({
       const response = await fetchService('/user/addresses', {
         method: isEditing ? 'PUT' : 'POST',
         body: JSON.stringify({
-          ...formData,
+          ...(isEditing && formData.id ? { id: formData.id } : {}),
+          addressName: formData.name,
+          address: formData.address,
+          city: formData.city,
+          state: formData.state,
+          zip: formData.zip,
           userId,
         }),
       });

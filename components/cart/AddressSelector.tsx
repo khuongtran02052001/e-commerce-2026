@@ -25,6 +25,7 @@ interface Address {
 
 interface AddressSelectorProps {
   userEmail: string;
+  userId?: string;
   addresses: Address[];
   selectedAddress: Address | null;
   onAddressSelect: (address: Address) => void;
@@ -33,6 +34,7 @@ interface AddressSelectorProps {
 
 export function AddressSelector({
   userEmail,
+  userId,
   addresses,
   selectedAddress,
   onAddressSelect,
@@ -81,6 +83,7 @@ export function AddressSelector({
 
           <AddAddressSidebar
             userEmail={userEmail}
+            userId={userId}
             isOpen={isSidebarOpen}
             onClose={() => setIsSidebarOpen(false)}
             onAddressAdded={handleAddressAdded}
@@ -149,6 +152,7 @@ export function AddressSelector({
 
         <AddAddressSidebar
           userEmail={userEmail}
+          userId={userId}
           isOpen={isSidebarOpen}
           onClose={() => setIsSidebarOpen(false)}
           onAddressAdded={handleAddressAdded}

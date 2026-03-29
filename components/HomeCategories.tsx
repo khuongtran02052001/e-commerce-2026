@@ -16,18 +16,18 @@ const HomeCategories = ({ categories }: Props) => {
         <div className="inline-flex items-center gap-3 mb-4">
           <div className="h-1 w-12 bg-gradient-to-r from-shop_light_blue to-shop_dark_blue rounded-full"></div>
           <Title className="text-3xl lg:text-4xl font-bold text-dark-color">
-            Popular Categories
+            Shop by skincare needs
           </Title>
           <div className="h-1 w-12 bg-gradient-to-l from-shop_light_blue to-shop_dark_blue rounded-full"></div>
         </div>
         <p className="text-light-color text-lg max-w-2xl mx-auto">
-          Explore our most popular product categories and find what you need
+          Khám phá các nhóm sản phẩm dễ chọn cho routine hằng ngày, từ làm sạch đến phục hồi và chống nắng.
         </p>
         <Link
           href={'/category'}
           className="inline-flex items-center gap-2 mt-6 px-6 py-3 bg-shop_light_pink text-shop_dark_green/80 font-semibold rounded-full hover:bg-shop_light_blue hover:text-shop_dark_green border-2 border-shop_light_blue hover:border-shop_dark_green hoverEffect"
         >
-          Browse All Categories
+          Explore all skincare categories
           <svg
             className="w-4 h-4 hoverEffect group-hover:translate-x-1"
             fill="none"
@@ -45,13 +45,13 @@ const HomeCategories = ({ categories }: Props) => {
       </div>
 
       {/* Categories Grid */}
-      <div className="bg-gradient-to-br from-white via-shop_light_bg to-shop_light_pink p-8 lg:p-12 rounded-3xl shadow-xl border border-shop_light_blue/20">
+      <div className="rounded-3xl border border-[#dffbf7]/70 bg-gradient-to-br from-white via-[#f8fcff] to-[#fff4fb] p-8 shadow-[0_24px_64px_rgba(127,95,209,0.10)] lg:p-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {categories?.map((category, index) => (
             <Link
               key={index}
               href={`/category/${category?.slug}`}
-              className="group bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl border border-gray-100 hover:border-shop_light_blue hoverEffect transform hover:-translate-y-2 cursor-pointer block"
+              className="group block cursor-pointer rounded-2xl border border-[#ebe4ff] bg-white/95 p-6 shadow-lg transform hover:-translate-y-2 hover:border-[#8bf4ee] hover:shadow-[0_22px_42px_rgba(127,95,209,0.14)] hoverEffect"
               style={{ animationDelay: `${index * 0.1}s` }}
             >
               {/* Image Container */}
@@ -93,8 +93,8 @@ const HomeCategories = ({ categories }: Props) => {
                 </div>
 
                 {/* Shop Now Button */}
-                <div className="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-gradient-to-r from-shop_light_pink to-shop_light_bg text-shop_dark_blue font-medium rounded-full group-hover:from-shop_light_blue group-hover:to-shop_dark_blue group-hover:text-white text-sm hoverEffect">
-                  Shop Now
+                <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#eefcff] via-[#f7f2ff] to-[#fff1f8] px-4 py-2 text-sm font-medium text-[#6f57a8] group-hover:from-[#8bf4ee] group-hover:to-[#ee45f9] group-hover:text-white hoverEffect">
+                  Build my routine
                   <svg
                     className="w-3 h-3 hoverEffect group-hover:translate-x-1"
                     fill="none"
@@ -122,11 +122,11 @@ const HomeCategories = ({ categories }: Props) => {
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold text-shop_dark_blue">1000+</div>
-            <div className="text-sm text-light-color">Products</div>
+            <div className="text-sm text-light-color">Skincare picks</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-shop_dark_blue">24/7</div>
-            <div className="text-sm text-light-color">Support</div>
+            <div className="text-2xl font-bold text-shop_dark_blue">Daily</div>
+            <div className="text-sm text-light-color">Routine inspiration</div>
           </div>
         </div>
 
@@ -135,7 +135,7 @@ const HomeCategories = ({ categories }: Props) => {
           <div className="inline-flex items-center gap-4 px-8 py-4 bg-gradient-to-r from-shop_light_pink to-shop_light_bg rounded-2xl border border-shop_light_blue/20">
             <div className="w-2 h-2 bg-shop_light_blue rounded-full animate-pulse"></div>
             <span className="text-dark-text font-medium">
-              Discover amazing products in every category
+              Find the right category for your skin goals
             </span>
             <div className="w-2 h-2 bg-shop_light_blue rounded-full animate-pulse"></div>
           </div>

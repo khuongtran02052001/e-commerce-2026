@@ -29,7 +29,7 @@ const FAQPage = () => {
             <HelpCircle className="w-16 h-16 mx-auto mb-6 opacity-90" />
             <h1 className="text-4xl lg:text-5xl font-bold mb-4">FAQs</h1>
             <p className="text-xl text-white/90 max-w-3xl mx-auto mb-6">
-              Quick answers to the most commonly asked questions about ShopCart.
+              Quick answers to the most common questions about shopping skincare at Lumière.
             </p>
             <Badge className="bg-white/20 text-white border-white/30 hover:bg-white/30">
               Essential Information
@@ -91,10 +91,9 @@ const FAQPage = () => {
             <Card className="bg-gradient-to-r from-shop_light_green to-shop_dark_green text-white shadow-xl">
               <CardContent className="p-8 text-center">
                 <MessageCircle className="w-12 h-12 mx-auto mb-4 opacity-90" />
-                <h3 className="text-2xl font-bold mb-4">Need More Help?</h3>
+                <h3 className="text-2xl font-bold mb-4">Need skincare help?</h3>
                 <p className="text-white/90 mb-6 max-w-2xl mx-auto">
-                  Can&apos;t find the answer you&apos;re looking for? Check out our comprehensive
-                  FAQ section or contact our support team.
+                  If you still feel stuck, reach out and we&apos;ll help you navigate products, routine questions and order support at Lumière.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Button

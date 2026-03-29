@@ -10,14 +10,14 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          'bg-primary text-primary-foreground shadow-[0_12px_30px_rgba(139,76,114,0.18)] hover:bg-primary/92 hover:shadow-[0_16px_34px_rgba(139,76,114,0.22)]',
+          'bg-gradient-to-r from-[#8bf4ee] via-[#c5b7ff] to-[#ee45f9] text-white shadow-[0_16px_36px_rgba(127,95,209,0.22)] hover:brightness-[1.03] hover:shadow-[0_18px_40px_rgba(127,95,209,0.28)]',
         destructive:
-          'bg-[#cf6f93] text-white shadow-[0_12px_28px_rgba(207,111,147,0.18)] hover:bg-[#c66086] hover:shadow-[0_14px_30px_rgba(207,111,147,0.22)] focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60',
+          'bg-[#ff5b93] text-white shadow-[0_12px_28px_rgba(255,91,147,0.18)] hover:bg-[#f24f89] hover:shadow-[0_14px_30px_rgba(255,91,147,0.22)] focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60',
         outline:
-          'border border-shop_light_green/25 bg-white/90 text-foreground shadow-xs hover:border-shop_light_green/40 hover:bg-shop_light_pink/70 hover:text-shop_dark_green dark:bg-input/30 dark:border-input dark:hover:bg-input/50',
+          'border border-[#d8ccff] bg-white/90 text-foreground shadow-xs hover:border-[#8bf4ee] hover:bg-[#f7f3ff] hover:text-[#6f57a8] dark:bg-input/30 dark:border-input dark:hover:bg-input/50',
         secondary:
-          'bg-shop_light_pink/80 text-shop_dark_green shadow-[0_10px_24px_rgba(201,124,167,0.12)] hover:bg-shop_light_pink',
-        ghost: 'hover:bg-shop_light_pink/70 hover:text-shop_dark_green dark:hover:bg-accent/50',
+          'bg-[#f4efff] text-[#6f57a8] shadow-[0_10px_24px_rgba(139,116,213,0.12)] hover:bg-[#ece4ff]',
+        ghost: 'hover:bg-[#f6f2ff] hover:text-[#6f57a8] dark:hover:bg-accent/50',
         link: 'text-primary underline-offset-4 hover:underline',
       },
       size: {

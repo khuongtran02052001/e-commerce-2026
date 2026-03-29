@@ -20,7 +20,7 @@ const ClientHeader = () => {
     // setSignUpUrl(`/sign-up?redirectTo=${encodeURIComponent(path)}`);
   }, []);
   return (
-    <header className="sticky top-0 z-40 py-2 border-b border-shop_light_green/20 bg-white/92 backdrop-blur-md shadow-[0_10px_30px_rgba(201,124,167,0.08)]">
+    <header className="sticky top-0 z-40 border-b border-[#dffbf7]/60 bg-white/88 py-2 backdrop-blur-xl shadow-[0_16px_40px_rgba(127,95,209,0.10)]">
       <Container>
         <div className="flex items-center justify-between gap-3 xl:gap-5">
           <div data-tour="header-logo" className="flex shrink-0 items-center gap-2">

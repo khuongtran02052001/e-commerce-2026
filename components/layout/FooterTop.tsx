@@ -77,7 +77,10 @@ const ContactItem = ({ icon, title, content, href }: ContactItemProps) => {
         <h3 className="font-semibold text-gray-900 group-hover:text-primary transition-colors">
           {title}
         </h3>
-        <p className="text-gray-600 text-sm mt-1 group-hover:text-gray-900 transition-colors">
+        <p
+          style={{ wordBreak: 'break-word' }}
+          className="text-gray-600 text-sm mt-1 group-hover:text-gray-900 transition-colors"
+        >
           {content}
         </p>
       </div>

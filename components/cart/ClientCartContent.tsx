@@ -84,8 +84,11 @@ export function ClientCartContent() {
         throw new Error('Failed to refresh addresses');
       }
 
-      const data = await response.json();
-      setUserData((prev) => (prev ? { ...prev, addresses: data.addresses } : data));
+      const payload = await response.json();
+      const data = payload?.data ?? payload;
+      setUserData((prev) =>
+        prev ? { ...prev, addresses: Array.isArray(data?.addresses) ? data.addresses : [] } : data,
+      );
     } catch (err) {
       console.error('Failed to refresh addresses:', err);
       // Don't show error toast for refresh failures
